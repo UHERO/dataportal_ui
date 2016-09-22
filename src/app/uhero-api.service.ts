@@ -16,4 +16,9 @@ export class UheroApiService {
          .map(response => response.json());
   }
 
+  fetchSeries(id: number): Observable<any> {
+     return this.http.get(`${this.baseUrl}/category/series?id=` + id)
+         .map(response => response.json());
+ }
+
 }

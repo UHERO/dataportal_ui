@@ -1,8 +1,6 @@
-<div class="multi-graph-display">
-   <ol>
-      <li *ngFor="let category of categories">
-         {{category.name}}
-      </li>
-      <p>Test</p>
-   </ol>
-</div>
+<ul id="landingTabs">
+   <li *ngFor="let category of categories">
+      <a href="">{{category.name}}</a>
+   </li>
+</ul>
+<app-series-multiples></app-series-multiples>

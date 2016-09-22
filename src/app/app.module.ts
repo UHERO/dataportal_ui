@@ -9,13 +9,15 @@ import { HeaderComponent } from './header/header.component';
 import { UheroApiService } from './uhero-api.service';
 import { SeriesMultiplesComponent } from './series-multiples/series-multiples.component';
 import { CategoryTreeComponent } from './category-tree/category-tree.component';
+import { MultiSeriesChartComponent } from './multi-series-chart/multi-series-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     SeriesMultiplesComponent,
-    CategoryTreeComponent
+    CategoryTreeComponent,
+    MultiSeriesChartComponent
   ],
   imports: [
     BrowserModule,

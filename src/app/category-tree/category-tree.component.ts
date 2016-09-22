@@ -5,9 +5,11 @@ import { UheroApiService } from '../uhero-api.service';
 @Component({
   selector: 'app-category-tree',
   templateUrl: './category-tree.component.html',
-  styleUrls: ['./category-tree.component.sass']
+  styleUrls: ['./category-tree.component.scss']
 })
 export class CategoryTreeComponent implements OnInit {
+
+  public categories;
 
   constructor(private _uheroAPIService: UheroApiService) { }
 
@@ -29,7 +31,7 @@ export class CategoryTreeComponent implements OnInit {
                });
                console.log(categories);
                console.log(categoryTree);
-               return categoryTree;
+               this.categories = categoryTree;
             },
             error => console.log('Error fetching categories'));
   }
