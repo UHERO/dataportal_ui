@@ -1,0 +1,6 @@
+<select [ngModel]="selectedGeo" (ngModelChange)="onChangeGeo($event)" id="geo-selector">
+   <option [ngValue]="geo" *ngFor="let geo of geos">
+      {{geo.name}}
+   </option>
+   {{selectedGeo | json}}
+</select>

@@ -19,6 +19,11 @@ export class UheroApiService {
   fetchSeries(id: number): Observable<any> {
      return this.http.get(`${this.baseUrl}/category/series?id=` + id)
          .map(response => response.json());
+  }
+
+  fetchGeographies(): Observable<any> {
+     return this.http.get(`${this.baseUrl}/geo`)
+         .map(response => response.json());
  }
 
 }
