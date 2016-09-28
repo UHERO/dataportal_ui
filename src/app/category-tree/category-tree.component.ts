@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output } from '@angular/core';
 
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
   selector: 'app-category-tree',
+  inputs: ['categoryTree'],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.scss']
 })
 export class CategoryTreeComponent implements OnInit {
 
-  public categories;
+  private categories;
+  private categoryTree;
 
-  constructor(private _uheroAPIService: UheroApiService) { }
+  constructor(private _uheroAPIService: UheroApiService) {
+  }
 
   ngOnInit() {
      this._uheroAPIService.fetchCategories()
