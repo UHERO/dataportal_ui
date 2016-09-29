@@ -1,6 +1,6 @@
 <ul id="landingTabs">
-   <li *ngFor="let category of categories">
-      <a href="">{{category.name}}</a>
+   <li *ngFor="let category of categories" (click)="drawSeries(category.id)">
+      <a href="#{{category.name}}">{{category.name}}</a>
    </li>
 </ul>
 <app-multi-series-chart></app-multi-series-chart>
