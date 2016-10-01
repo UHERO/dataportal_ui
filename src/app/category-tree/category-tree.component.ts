@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
-import { CHART_DIRECTIVES } from 'angular2-highcharts';
 
+import { CategoryTree } from '../category-tree';
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
@@ -10,44 +10,28 @@ import { UheroApiService } from '../uhero-api.service';
   styleUrls: ['./category-tree.component.scss']
 })
 export class CategoryTreeComponent implements OnInit {
-
-  private categories;
+  private categories: CategoryTree;
+  private errorMessage: string;
+  /* private categories;
   private categoryTree;
   options: Object;
   private series;
   private dates;
   private observations;
   private levelValues;
-  private percValues;
+  private percValues; */
 
 
   constructor(private _uheroAPIService: UheroApiService) {
   }
 
   ngOnInit() {
-     this._uheroAPIService.fetchCategories()
-         .subscribe(
-            (categories) => {
-               var categories = categories.categories;
-               var dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
-               var categoryTree = [];
-               categories.forEach((value) => {
-                  var parent = dataMap[value.parent];
-                  if (parent) {
-                     (parent.children || (parent.children = []))
-                     .push(value);
-                  } else {
-                     categoryTree.push(value);
-                  }
-               });
-               console.log(categories);
-               console.log(categoryTree);
-               this.categories = categoryTree;
-            },
-            error => console.log('Error fetching categories'));
+    this._uheroAPIService.fetchCategories().subscribe(
+      categories => this.categories = categories,
+      error => this.errorMessage = error);
   }
 
-  drawSeries(id: number) {
+  /* drawSeries(id: number) {
     this._uheroAPIService.fetchSeries(id)
       .subscribe(
         (series) => {
@@ -60,7 +44,7 @@ export class CategoryTreeComponent implements OnInit {
     this._uheroAPIService.fetchObservations(id)
       .subscribe(
         (observations) => {
-          var observations = observations.transformationResults
+          var observations = observations.transformationResults;
           var level = observations[0].observations;
           var perc = observations[1].observations;
           var levelValues = [];
@@ -130,5 +114,5 @@ export class CategoryTreeComponent implements OnInit {
 
         },
         error => console.log('Error fetching observations'));
-  };
+  }; */
 }

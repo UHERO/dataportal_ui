@@ -10,6 +10,7 @@ import { HeaderComponent } from './header/header.component';
 import { UheroApiService } from './uhero-api.service';
 import { CategoryTreeComponent } from './category-tree/category-tree.component';
 import { MultiSeriesChartComponent } from './multi-series-chart/multi-series-chart.component';
+import { DrawMultiChartComponent } from './draw-multi-chart/draw-multi-chart.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
     HeaderComponent,
     CategoryTreeComponent,
     MultiSeriesChartComponent,
+    DrawMultiChartComponent,
     GeoSelectorComponent,
   ],
   imports: [

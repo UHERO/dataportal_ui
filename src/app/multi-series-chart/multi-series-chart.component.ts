@@ -1,5 +1,7 @@
+// Container for charts drawn on Data Portal landing page
+// See draw-multi-chart component for highcharts options for landing page charts
+
 import { Component, OnInit } from '@angular/core';
-import { CHART_DIRECTIVES } from 'angular2-highcharts';
 
 import { UheroApiService } from '../uhero-api.service';
 
@@ -10,7 +12,6 @@ import { UheroApiService } from '../uhero-api.service';
 })
 
 export class MultiSeriesChartComponent implements OnInit {
-  options: Object;
   private series;
   private dates;
   private observations;
@@ -49,60 +50,6 @@ export class MultiSeriesChartComponent implements OnInit {
                       percValues.push(+perc[i].value);
                    }
                    this.levelValues = levelValues;
-
-                   this.options = {
-                     chart: {
-                        height: 200,
-                        width: 200
-                     },
-                     title: {
-                     text: ''
-                     },
-                     legend: {
-                        enabled: false
-                     },
-                     credits: {
-                         enabled: false
-                     },
-                     xAxis: [{
-                         categories: dates.reverse(),
-                         labels: {
-                            enabled: false
-                         },
-                         lineWidth: 0,
-                         tickLength: 0,
-                     }],
-                     yAxis: [{
-                        labels: {
-                           enabled: false
-                        },
-                        title: {
-                           text: ''
-                        },
-                        gridLineColor: 'transparent'
-                        }, {
-                        title: {
-                           text: ''
-                        },
-                        labels: {
-                           enabled: false
-                        },
-                        gridLineColor: 'transparent',
-                        opposite: true
-                     }],
-                     series: [{
-                         name: 'Rate of Change (%)',
-                         type: 'column',
-                         color: '#1D667F',
-                         data: percValues.reverse()
-                     }, {
-                         name: 'Total Visitor Arrivals',
-                         type: 'line',
-                         yAxis: 1,
-                         color: '#F6A01B',
-                         data: levelValues.reverse(),
-                     }]
-                 };
 
                },
                error => console.log('Error fetching observations'));
