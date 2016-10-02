@@ -1,3 +1,4 @@
+// Component for landing page category tabs
 import { Component, OnInit, Input, Output } from '@angular/core';
 
 import { CategoryTree } from '../category-tree';
@@ -12,6 +13,7 @@ import { UheroApiService } from '../uhero-api.service';
 export class CategoryTreeComponent implements OnInit {
   private categories: CategoryTree;
   private errorMessage: string;
+  private selectedSeries: Array<any>;
   /* private categories;
   private categoryTree;
   options: Object;
@@ -29,6 +31,29 @@ export class CategoryTreeComponent implements OnInit {
     this._uheroAPIService.fetchCategories().subscribe(
       categories => this.categories = categories,
       error => this.errorMessage = error);
+  }
+
+  drawSeries(seriesId: number) {
+    let selectedSeries = [];
+
+    // Get IDs of series belonging to their selected category
+    for(var category in this.categories) {
+      if(this.categories[category]['id'] === seriesId) {
+        for(var child in this.categories[category]['children']) {
+          selectedSeries.push(this.categories[category]['children'][child]['id']);
+        }
+      }
+    }
+
+    for(var i in selectedSeries) {
+      this._uheroAPIService.fetchObservations(selectedSeries[i])
+        .subscribe(
+          (observations) => {
+            console.log(observations);
+          },
+          error => console.log('Error fetching observations')
+        );
+    }
   }
 
   /* drawSeries(id: number) {

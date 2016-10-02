@@ -37,7 +37,8 @@ export class MultiSeriesChartComponent implements OnInit {
          this._uheroAPIService.fetchObservations(id[i])
             .subscribe(
                (observations) => {
-                   var observations = observations.transformationResults
+                 observations => console.log(observations);
+                   /* var observations = observations.transformationResults
                    var level = observations[0].observations;
                    var perc = observations[1].observations;
                    var levelValues = [];
@@ -49,7 +50,7 @@ export class MultiSeriesChartComponent implements OnInit {
                       dates.push(level[i].date);
                       percValues.push(+perc[i].value);
                    }
-                   this.levelValues = levelValues;
+                   this.levelValues = levelValues; */
 
                },
                error => console.log('Error fetching observations'));

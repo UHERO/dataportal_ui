@@ -6,12 +6,14 @@ import 'rxjs/add/operator/map';
 import { CategoryTree } from './category-tree';
 import { Series } from './series';
 import { Observations } from './observations';
+import { ObservationResults } from './observation-results';
 
 @Injectable()
 export class UheroApiService {
-   private baseUrl: string;
-   private categories;
-   private categoryTree;
+  private baseUrl: string;
+  private categories;
+  private series;
+  private observations;
 
   constructor(private http: Http) {
      this.baseUrl = 'http://localhost:8080/v1';
@@ -27,8 +29,11 @@ export class UheroApiService {
   }
 
   fetchSeries(id: number): Observable<Series> {
-     return this.http.get(`${this.baseUrl}/category/series?id=` + id)
-         .map(response => response.json());
+    let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id)
+      .map(response => response.json());
+    return series$;
+     //return this.http.get(`${this.baseUrl}/category/series?id=` + id)
+     //    .map(response => response.json());
   }
 
   fetchGeographies(): Observable<any> {
@@ -36,10 +41,16 @@ export class UheroApiService {
          .map(response => response.json());
   }
 
-  fetchObservations(id: number): Observable<Observations> {
+  fetchObservations(id: number): Observable<ObservationResults> {
+    let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id)
+      .map(response => response.json());
+    return observations$;
+  }
+
+  /* fetchObservations(id: number): Observable<Observations> {
      return this.http.get(`${this.baseUrl}/series/observations?id=` + id)
          .map(response => response.json());
-  }
+  } */
 
   // End get data from API
 }
@@ -60,3 +71,9 @@ function mapCategories(response: Response): CategoryTree {
   });
   return categoryTree;
 }
+
+// Create array of Observations to use for draw-multi-chart.component
+/* function mapObservations(response: Response): ObservationResults {
+  console.log(response.json().transformationResults);
+  return response;
+} */
