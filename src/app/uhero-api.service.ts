@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import 'rxjs/Rx';
 
 import { CategoryTree } from './category-tree';
 import { Series } from './series';
@@ -30,7 +30,7 @@ export class UheroApiService {
 
   fetchSeries(id: number): Observable<Series> {
     let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id)
-      .map(response => response.json());
+      .map(mapSeries);
     return series$;
      //return this.http.get(`${this.baseUrl}/category/series?id=` + id)
      //    .map(response => response.json());
@@ -43,14 +43,9 @@ export class UheroApiService {
 
   fetchObservations(id: number): Observable<ObservationResults> {
     let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id)
-      .map(response => response.json());
+      .map(mapObservations);
     return observations$;
   }
-
-  /* fetchObservations(id: number): Observable<Observations> {
-     return this.http.get(`${this.baseUrl}/series/observations?id=` + id)
-         .map(response => response.json());
-  } */
 
   // End get data from API
 }
@@ -70,6 +65,16 @@ function mapCategories(response: Response): CategoryTree {
     }
   });
   return categoryTree;
+}
+
+function mapSeries(response: Response): Series {
+  let series = response.json().series;
+  return series;
+}
+
+function mapObservations(response: Response): ObservationResults {
+  let observations = response.json().transformationResults;
+  return observations;
 }
 
 // Create array of Observations to use for draw-multi-chart.component

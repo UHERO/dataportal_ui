@@ -5,5 +5,8 @@
 </ul>
 <div class="multi-series-container">
   <app-geo-selector></app-geo-selector>
+  <div *ngFor="let serie of series">
+    <chart [options]="options"></chart>
+  </div>
   <app-draw-multi-chart></app-draw-multi-chart>
 </div>
