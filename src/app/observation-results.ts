@@ -1,4 +1,5 @@
 export interface ObservationResults {
-  observations: Array<any>,
-  transformation: string
+  levelValues: Array<any>,
+  percValues: Array<any>,
+  dates: Array<any>
 }

@@ -1,11 +1,11 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async } from '@angular/core/testing';
-import { MultiSeriesChartComponent } from './multi-series-chart.component';
+import { LandingPageComponent } from './landing-page.component';
 
-describe('Component: MultiSeriesChart', () => {
+describe('Component: LandingPage', () => {
   it('should create an instance', () => {
-    let component = new MultiSeriesChartComponent();
+    let component = new LandingPageComponent();
     expect(component).toBeTruthy();
   });
 });

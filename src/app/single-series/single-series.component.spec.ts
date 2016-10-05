@@ -1,11 +1,11 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async } from '@angular/core/testing';
-import { CategoryTreeComponent } from './category-tree.component';
+import { SingleSeriesComponent } from './single-series.component';
 
-describe('Component: CategoryTree', () => {
+describe('Component: SingleSeries', () => {
   it('should create an instance', () => {
-    let component = new CategoryTreeComponent();
+    let component = new SingleSeriesComponent();
     expect(component).toBeTruthy();
   });
 });

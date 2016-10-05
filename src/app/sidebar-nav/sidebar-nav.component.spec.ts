@@ -1,11 +1,11 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async } from '@angular/core/testing';
-import { DrawMultiChartComponent } from './draw-multi-chart.component';
+import { SidebarNavComponent } from './sidebar-nav.component';
 
-describe('Component: DrawMultiChart', () => {
+describe('Component: SidebarNav', () => {
   it('should create an instance', () => {
-    let component = new DrawMultiChartComponent();
+    let component = new SidebarNavComponent();
     expect(component).toBeTruthy();
   });
 });

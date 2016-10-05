@@ -11,9 +11,6 @@ import { ObservationResults } from './observation-results';
 @Injectable()
 export class UheroApiService {
   private baseUrl: string;
-  private categories;
-  private series;
-  private observations;
 
   constructor(private http: Http) {
      this.baseUrl = 'http://localhost:8080/v1';
@@ -24,16 +21,12 @@ export class UheroApiService {
     let categories$ = this.http.get(`${this.baseUrl}/category`)
       .map(mapCategories);
     return categories$;
-     //return this.http.get(`${this.baseUrl}/category`)
-    //   .map(response => response.json());
   }
 
-  fetchSeries(id: number): Observable<Series> {
+  fetchSeries(id: number): Promise<Series> {
     let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id)
-      .map(mapSeries);
+      .map(mapSeries).toPromise();
     return series$;
-     //return this.http.get(`${this.baseUrl}/category/series?id=` + id)
-     //    .map(response => response.json());
   }
 
   fetchGeographies(): Observable<any> {
@@ -41,9 +34,9 @@ export class UheroApiService {
          .map(response => response.json());
   }
 
-  fetchObservations(id: number): Observable<ObservationResults> {
+  fetchObservations(id: number): Promise<ObservationResults> {
     let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id)
-      .map(mapObservations);
+      .map(mapObservations).toPromise();
     return observations$;
   }
 
@@ -51,7 +44,8 @@ export class UheroApiService {
 }
 
 // Create a nested JSON of parent and child categories
-// Used for category-tree.component
+// Used for landing-page.component
+// And side bar navigation on single-series & table views
 function mapCategories(response: Response): CategoryTree {
   let categories = response.json().categories;
   let dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
@@ -74,11 +68,17 @@ function mapSeries(response: Response): Series {
 
 function mapObservations(response: Response): ObservationResults {
   let observations = response.json().transformationResults;
-  return observations;
-}
+  let level = observations[0].observations;
+  let perc = observations[1].observations;
 
-// Create array of Observations to use for draw-multi-chart.component
-/* function mapObservations(response: Response): ObservationResults {
-  console.log(response.json().transformationResults);
-  return response;
-} */
+  let levelValues = [];
+  let percValues = [];
+  let dates = [];
+
+  level.forEach((entry, index) => {
+    levelValues.push(+level[index].value);
+    percValues.push(+perc[index].value);
+    dates.push(level[index].date);
+  });
+  return {'levelValues': levelValues.reverse(), 'percValues': percValues.reverse(), 'dates': dates.reverse()};
+}
