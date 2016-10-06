@@ -1,9 +1,9 @@
 <div id="sidebar-nav">
-  <ul id="sidebar-list">
-    <li *ngFor="let category of categories" (click)="expandItem(category.name)">
+  <ul class="sidebar-list">
+    <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
       {{category.name}}
-      <ul *ngIf="expand === category.name">
-        <li *ngFor="let child of category.children">
+      <ul class="sidebar-list" *ngIf="expand === category.name">
+        <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandItem(category.name)">
           {{child.name}}
         </li>
       </ul>

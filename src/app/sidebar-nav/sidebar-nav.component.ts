@@ -13,6 +13,7 @@ export class SidebarNavComponent implements OnInit {
   private categories: CategoryTree;
   private errorMessage: string;
   private expand: string = null;
+  private collapse: string = null;
 
   constructor(private _uheroAPIService: UheroApiService) { }
 

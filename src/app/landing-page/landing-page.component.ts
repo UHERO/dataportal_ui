@@ -35,6 +35,16 @@ export class LandingPageComponent implements OnInit {
     this.drawSeries(1);
   }
 
+  /* async drawSeries(catId: number) {
+    let series = await this._uheroAPIService.fetchSeries(catId);
+    series.forEach(async (seriesEntry, index) => {
+      await this._uheroAPIService.fetchObservations(index).then(observations => {
+        this.seriesObservations[index] = observations;
+      });
+    });
+    console.log(this.seriesObservations);
+  } */
+
   drawSeries(catId: number) {
     this._uheroAPIService.fetchSeries(catId).then(series => {
       this.series = series;
