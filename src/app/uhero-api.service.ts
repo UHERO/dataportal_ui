@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
@@ -11,31 +11,36 @@ import { ObservationResults } from './observation-results';
 @Injectable()
 export class UheroApiService {
   private baseUrl: string;
+  private requestOptionsArgs: RequestOptionsArgs;
+  private headers: Headers;
 
   constructor(private http: Http) {
      this.baseUrl = 'http://localhost:8080/v1';
+     this.headers = new Headers();
+     this.headers.append('Authorization', 'Bearer OppnaVj5QtxnQOZqHjtziqdw564hUXmMzq9igMRAjFs=');
+     this.requestOptionsArgs = {headers: this.headers};
   }
 
   //  Get data from API
   fetchCategories(): Observable<CategoryTree> {
-    let categories$ = this.http.get(`${this.baseUrl}/category`)
+    let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
       .map(mapCategories);
     return categories$;
   }
 
   fetchSeries(id: number): Promise<Series> {
-    let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id)
+    let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
       .map(mapSeries).toPromise();
     return series$;
   }
 
   fetchGeographies(): Observable<any> {
-     return this.http.get(`${this.baseUrl}/geo`)
+     return this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
          .map(response => response.json());
   }
 
   fetchObservations(id: number): Promise<ObservationResults> {
-    let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id)
+    let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
       .map(mapObservations).toPromise();
     return observations$;
   }
