@@ -34,7 +34,7 @@ export class UheroApiService {
          .map(response => response.json());
   }
 
-  fetchObservations(id: number): Promise<ObservationResults> {
+  fetchObservations(id: number): Promise<any> {
     let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id)
       .map(mapObservations).toPromise();
     return observations$;
@@ -66,7 +66,7 @@ function mapSeries(response: Response): Series {
   return series;
 }
 
-function mapObservations(response: Response): ObservationResults {
+/* function mapObservations(response: Response): ObservationResults {
   let observations = response.json().transformationResults;
   let level = observations[0].observations;
   let perc = observations[1].observations;
@@ -80,5 +80,41 @@ function mapObservations(response: Response): ObservationResults {
     percValues.push(+perc[index].value);
     dates.push(level[index].date);
   });
-  return {'levelValues': levelValues.reverse(), 'percValues': percValues.reverse(), 'dates': dates.reverse()};
+  return {'dates': dates.reverse(), 'levelValues': levelValues.reverse(), 'percValues': percValues.reverse()};
+} */
+
+function mapObservations(response: Response): Array<any> {
+  let observations = response.json().transformationResults;
+  let level = observations[0].observations;
+  let perc = observations[1].observations;
+
+  let chartData = [];
+  let tableData = [];
+
+  let levelValue = [];
+  let percValue = [];
+  let date = [];
+
+  level.forEach((entry, index) => {
+    //Create [date, value] pairs for charts
+    levelValue.push([Date.parse(level[index].date), +level[index].value]);
+    percValue.push([Date.parse(level[index].date), +perc[index].value]);
+
+    tableData.push({
+      date: level[index].date,
+      level: +level[index].value,
+      perc: +perc[index].value
+    });
+  });
+
+  // sort data from earliest to most recent, needed for HighStock Chart
+  levelValue.reverse();
+  percValue.reverse();
+
+  chartData.push({
+    level: levelValue,
+    perc: percValue
+  })
+
+  return [chartData, tableData];
 }
