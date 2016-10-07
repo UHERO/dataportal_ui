@@ -1,6 +1,40 @@
 <div id="series-nav">
   <app-sidebar-nav></app-sidebar-nav>
 </div>
+
 <div id="single-series-chart">
-  <chart type="StockChart" [options]="options"></chart>
+  <chart type="StockChart" [options]="options"><
+    <xAxis (setExtremes)="updateTable($event)"></xAxis>
+  </chart>
+
+  <table id="single-series-table" *ngIf="newTableData.length === 0">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Level</th>
+        <th>Percent</th>
+      </tr>
+    </thead>
+    <tr *ngFor="let row of tableData">
+      <td>{{row.date}}</td>
+      <td>{{row.level}}</td>
+      <td>{{row.perc}}</td>
+    </tr>
+  </table> 
+
+
+  <table id="single-series-table" *ngIf="newTableData.length > 0">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Level</th>
+        <th>Percent</th>
+      </tr>
+    </thead>
+    <tr *ngFor="let row of newTableData">
+      <td>{{row.date}}</td>
+      <td>{{row.level}}</td>
+      <td>{{row.perc}}</td>
+    </tr>
+  </table> 
 </div>

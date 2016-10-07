@@ -19,7 +19,7 @@ export class LandingPageComponent implements OnInit {
   private series;
   // private observations;
   private options: Object;
-  private seriesObservations: ObservationResults[] = [];
+  private seriesObservations = [];
 
 
   constructor(private _uheroAPIService: UheroApiService) {
@@ -35,16 +35,6 @@ export class LandingPageComponent implements OnInit {
     this.drawSeries(1);
   }
 
-  /* async drawSeries(catId: number) {
-    let series = await this._uheroAPIService.fetchSeries(catId);
-    series.forEach(async (seriesEntry, index) => {
-      await this._uheroAPIService.fetchObservations(index).then(observations => {
-        this.seriesObservations[index] = observations;
-      });
-    });
-    console.log(this.seriesObservations);
-  } */
-
   drawSeries(catId: number) {
     this._uheroAPIService.fetchSeries(catId).then(series => {
       this.series = series;
@@ -54,7 +44,10 @@ export class LandingPageComponent implements OnInit {
           this.seriesObservations[index] = observations;
 
           this.seriesObservations.forEach((result, index) => {
-            this.drawChartOptions(this.seriesObservations[index], this.series[index]);
+            let chartData = this.seriesObservations[index][0];
+            console.log(chartData);
+            this.drawChartOptions(chartData[index], this.series[index])
+            //this.drawChartOptions(this.seriesObservations[index], this.series[index]);
           });
         });
       });
@@ -78,14 +71,22 @@ export class LandingPageComponent implements OnInit {
       credits: {
         enabled: false
       },
-      xAxis: [{
-        categories: obs['dates'],
+      xAxis: {
+        type: 'datetime',
+        labels: {
+          enabled: false
+        },
+        lineWidth: 0,
+        tickLength: 0      
+      },/* [{
+        //categories: obs['dates'],
+        type: 'datetime',
         labels: {
           enabled: false
         },
         lineWidth: 0,
         tickLength: 0,
-      }],
+      }], */
       yAxis: [{
         labels: {
           enabled: false
@@ -104,17 +105,28 @@ export class LandingPageComponent implements OnInit {
         gridLineColor: 'transparent',
         opposite: true
       }],
+      plotOptions: {
+        line: {
+          marker: {
+            enabled: false
+          }
+        },
+        series: {
+          pointWidth: 5,
+          pointPadding: 0
+        }
+      },
       series: [{
         name: seriesID['id'],
         type: 'column',
         color: '#1D667F',
-        data: obs['percValues']
+        data: obs['perc']
       }, {
         name: seriesID['id'],
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',
-        data: obs['levelValues'],
+        data: obs['level'],
       }]
     };
   }
