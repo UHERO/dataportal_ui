@@ -20,6 +20,7 @@ export class LandingPageComponent implements OnInit {
   // private observations;
   private options: Object;
   private seriesObservations = [];
+  private expand: string = null;
 
 
   constructor(private _uheroAPIService: UheroApiService) {
@@ -32,28 +33,33 @@ export class LandingPageComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.drawSeries(1);
+    this.drawSeries(5);
+  }
+
+  toggleMenu(expand: string) {
+    this.expand = this.expand === expand ? null : expand;
   }
 
   drawSeries(catId: number) {
+    //this._uheroAPIService.fetchSeries(catId).then(series => {
+    //  this.series = series;
+    console.log(catId);
     this._uheroAPIService.fetchSeries(catId).then(series => {
       this.series = series;
+      console.log(this.series);
 
-      this.series.forEach((seriesEntry, index) => {
-        this._uheroAPIService.fetchObservations(index).then(observations => {
+      this.series.forEach((series, index) => {
+        this._uheroAPIService.fetchObservations(this.series[index]['id']).then(observations => {
           this.seriesObservations[index] = observations;
 
           this.seriesObservations.forEach((result, index) => {
             let chartData = this.seriesObservations[index][0];
-            console.log(chartData);
-            this.drawChartOptions(chartData[index], this.series[index])
-            //this.drawChartOptions(this.seriesObservations[index], this.series[index]);
+            console.log('chart data', chartData[0]['level']);
+            this.drawChartOptions(chartData[index], this.series[index]);
           });
         });
       });
     });
-
-    // console.log(this.seriesObservations);
   }
 
   drawChartOptions(obs, seriesID) {
@@ -117,12 +123,12 @@ export class LandingPageComponent implements OnInit {
         }
       },
       series: [{
-        name: seriesID['id'],
+        name: seriesID['name'],
         type: 'column',
         color: '#1D667F',
         data: obs['perc']
       }, {
-        name: seriesID['id'],
+        name: seriesID['name'],
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',

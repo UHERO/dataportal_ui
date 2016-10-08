@@ -1,10 +1,15 @@
 <ul id="landingTabs">
-   <li *ngFor="let category of categories" (click)="drawSeries(category.id)">
-      <a href="#{{category.name}}">{{category.name}}</a>
+   <li *ngFor="let category of categories" (click)="toggleMenu(category.name)">
+     <a href="#{{category.name}}">{{category.name}}</a>
+     <ul *ngIf="expand === category.name" class="sub-menu">
+       <li *ngFor="let child of category.children" (click)="drawSeries(child.id)">
+         {{child.name}}
+       </li>
+     </ul>
    </li>
 </ul>
 <div class="multi-series-container">
-  <app-geo-selector></app-geo-selector>
+  <!-- <app-geo-selector></app-geo-selector> -->
   <div *ngFor="let serie of series" class="multi-charts">
    <a href="#" [routerLink]="['/series', serie.id]">
      <chart [options]="options"></chart>

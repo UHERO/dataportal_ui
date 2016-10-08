@@ -2,12 +2,14 @@
    position: relative;
    width: 1000px;
    margin: 0 auto;
-  padding: 0 0 0 40px;
+   padding: 0 0 0 40px;
+   //display: block;
 
    li {
       display: inline-block;
       margin: 30px 5px 0 0;
       padding: 0 0 0.3em 0;
+      vertical-align: top;
 
       a {
          background-color: #DBDEDE;
@@ -19,6 +21,13 @@
          letter-spacing: 0.1em;
          padding: 1em 3em;
       }
+   }
+
+   .sub-menu {
+     //display: block;
+     li {
+       display: block;
+     }
    }
 }
 
