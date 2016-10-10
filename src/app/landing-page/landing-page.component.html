@@ -8,9 +8,10 @@
      </ul>
    </li>
 </ul>
-<div class="multi-series-container">
+<div class="multi-series-container" *ngIf="series">
   <!-- <app-geo-selector></app-geo-selector> -->
   <div *ngFor="let serie of series" class="multi-charts">
+    <p>{{serie.id}}</p>
    <a href="#" [routerLink]="['/series', serie.id]">
      <chart [options]="options"></chart>
    </a>

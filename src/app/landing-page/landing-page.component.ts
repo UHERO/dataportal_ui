@@ -33,10 +33,10 @@ export class LandingPageComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.drawSeries(5);
+    this.drawSeries(9);
   }
 
-  toggleMenu(expand: string) {
+  toggleMenu(expand: string): void {
     this.expand = this.expand === expand ? null : expand;
   }
 
@@ -45,22 +45,26 @@ export class LandingPageComponent implements OnInit {
       this.series = series;
 
       this.series.forEach((serie, index) => {
-        this._uheroAPIService.fetchObservations(index).subscribe((observations) => {
-          this.seriesObservations = observations;
-          let seriesData = {'serie': this.series[index], 'observations': this.seriesObservations};
+        console.log('index', index);
+        this._uheroAPIService.fetchObservations(this.series[index]['id']).subscribe((observations) => {
+          let seriesObservations = observations;
+          let seriesData = {'serie': this.series[index], 'observations': seriesObservations};
           let chartData = seriesData['observations']['chart data'];
-          this.drawChartOptions(chartData, seriesData['serie']);
+          //this.drawChartOptions(chartData, seriesData['serie']);
+          console.log(seriesData);
         });
       });
     },
     error => this.errorMessage = error);
   }
 
-  drawChartOptions(obs, seriesID) {
+  drawChartOptions(obs, series) {
+    console.log('chart observations', obs);
     this.options = {
       chart: {
         height: 200,
-        width: 200
+        width: 200,
+        //renderTo: series['id']
       },
       title: {
         text: ''
@@ -78,15 +82,7 @@ export class LandingPageComponent implements OnInit {
         },
         lineWidth: 0,
         tickLength: 0      
-      },/* [{
-        //categories: obs['dates'],
-        type: 'datetime',
-        labels: {
-          enabled: false
-        },
-        lineWidth: 0,
-        tickLength: 0,
-      }], */
+      },
       yAxis: [{
         labels: {
           enabled: false
@@ -117,12 +113,12 @@ export class LandingPageComponent implements OnInit {
         }
       },
       series: [{
-        name: seriesID['name'],
+        name: series['id'],
         type: 'column',
         color: '#1D667F',
         data: obs['perc']
       }, {
-        name: seriesID['name'],
+        name: series['id'],
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',

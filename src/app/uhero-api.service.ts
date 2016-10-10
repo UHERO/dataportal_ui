@@ -18,7 +18,8 @@ export class UheroApiService {
      this.baseUrl = 'http://localhost:8080/v1';
      this.headers = new Headers();
      //this.headers.append('Authorization', 'Bearer OppnaVj5QtxnQOZqHjtziqdw564hUXmMzq9igMRAjFs=');
-     this.headers.append('Authorization', 'Bearer m-5JuaZ7oNT9WfT1g0l9pQcXV9JIdaDxFyZTOnQmdUo=');
+     //this.headers.append('Authorization', 'Bearer m-5JuaZ7oNT9WfT1g0l9pQcXV9JIdaDxFyZTOnQmdUo=');
+     this.headers.append('Authorization', 'Bearer veJyc_Dn5trXxoCeYkQylrpFbxOP4TjbOcmkI9ZDGHI=');
      this.requestOptionsArgs = {headers: this.headers};
   }
 
@@ -75,7 +76,7 @@ function mapSeries(response: Response): Series {
 }
 
 function mapObservations(response: Response): ObservationResults {
-  let observations = response.json().transformationResults;
+  let observations = response.json().data.transformationResults;
   let level = observations[0].observations;
   let perc = observations[1].observations;
 
@@ -96,8 +97,8 @@ function mapObservations(response: Response): ObservationResults {
   });
 
   // sort data from earliest to most recent, needed for HighStock Chart
-  levelValue.reverse();
-  percValue.reverse();
+  levelValue
+  percValue
 
   let chartData = {level: levelValue, perc: percValue};
   let data = {'chart data': chartData, 'table data': tableData};
