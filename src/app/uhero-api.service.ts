@@ -29,9 +29,9 @@ export class UheroApiService {
     return categories$;
   }
 
-  fetchSeries(id: number): Promise<Series> {
+  fetchSeries(id: number): Observable<Series> {
     let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
-      .map(mapSeries).toPromise();
+      .map(mapSeries);
     return series$;
   }
 
@@ -40,9 +40,9 @@ export class UheroApiService {
          .map(response => response.json());
   }
 
-  fetchObservations(id: number): Promise<ObservationResults> {
+  fetchObservations(id: number): Observable<ObservationResults> {
     let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
-      .map(mapObservations).toPromise();
+      .map(mapObservations);
     return observations$;
   }
 
@@ -74,17 +74,14 @@ function mapSeries(response: Response): Series {
   return series;
 }
 
-function mapObservations(response: Response): Array<any> {
-  let observations = response.json().data.transformationResults;
+function mapObservations(response: Response): ObservationResults {
+  let observations = response.json().transformationResults;
   let level = observations[0].observations;
   let perc = observations[1].observations;
 
-  let chartData = [];
   let tableData = [];
-
   let levelValue = [];
   let percValue = [];
-  let date = [];
 
   level.forEach((entry, index) => {
     //Create [date, value] pairs for charts
@@ -99,13 +96,11 @@ function mapObservations(response: Response): Array<any> {
   });
 
   // sort data from earliest to most recent, needed for HighStock Chart
-  //levelValue.reverse();
-  //percValue.reverse();
+  levelValue.reverse();
+  percValue.reverse();
 
-  chartData.push({
-    level: levelValue,
-    perc: percValue
-  });
+  let chartData = {level: levelValue, perc: percValue};
+  let data = {'chart data': chartData, 'table data': tableData};
 
-  return [chartData, tableData];
+  return data;
 }

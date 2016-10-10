@@ -19,7 +19,7 @@ export class LandingPageComponent implements OnInit {
   private series;
   // private observations;
   private options: Object;
-  private seriesObservations = [];
+  private seriesObservations;
   private expand: string = null;
 
 
@@ -41,25 +41,19 @@ export class LandingPageComponent implements OnInit {
   }
 
   drawSeries(catId: number) {
-    //this._uheroAPIService.fetchSeries(catId).then(series => {
-    //  this.series = series;
-    console.log(catId);
-    this._uheroAPIService.fetchSeries(catId).then(series => {
+    this._uheroAPIService.fetchSeries(catId).subscribe((series) => {
       this.series = series;
-      console.log(this.series);
 
-      this.series.forEach((series, index) => {
-        this._uheroAPIService.fetchObservations(this.series[index]['id']).then(observations => {
-          this.seriesObservations[index] = observations;
-
-          this.seriesObservations.forEach((result, index) => {
-            let chartData = this.seriesObservations[index][0];
-            console.log('chart data', chartData[0]['level']);
-            this.drawChartOptions(chartData[index], this.series[index]);
-          });
+      this.series.forEach((serie, index) => {
+        this._uheroAPIService.fetchObservations(index).subscribe((observations) => {
+          this.seriesObservations = observations;
+          let seriesData = {'serie': this.series[index], 'observations': this.seriesObservations};
+          let chartData = seriesData['observations']['chart data'];
+          this.drawChartOptions(chartData, seriesData['serie']);
         });
       });
-    });
+    },
+    error => this.errorMessage = error);
   }
 
   drawChartOptions(obs, seriesID) {
