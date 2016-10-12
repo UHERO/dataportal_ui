@@ -4,8 +4,9 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 import { CategoryTree } from './category-tree';
+import { SelectedSeries } from './selected-series';
 import { Series } from './series';
-import { Observations } from './observations';
+// import { Observations } from './observations';
 import { ObservationResults } from './observation-results';
 
 @Injectable()
@@ -15,11 +16,10 @@ export class UheroApiService {
   private headers: Headers;
 
   constructor(private http: Http) {
-     this.baseUrl = 'http://localhost:8080/v1';
+     // this.baseUrl = 'http://localhost:8080/v1';
+     this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
-     //this.headers.append('Authorization', 'Bearer OppnaVj5QtxnQOZqHjtziqdw564hUXmMzq9igMRAjFs=');
-     //this.headers.append('Authorization', 'Bearer m-5JuaZ7oNT9WfT1g0l9pQcXV9JIdaDxFyZTOnQmdUo=');
-     this.headers.append('Authorization', 'Bearer veJyc_Dn5trXxoCeYkQylrpFbxOP4TjbOcmkI9ZDGHI=');
+     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
      this.requestOptionsArgs = {headers: this.headers};
   }
 
@@ -30,10 +30,16 @@ export class UheroApiService {
     return categories$;
   }
 
-  fetchSeries(id: number): Observable<Series> {
+  fetchSeries(id: number): Observable<SelectedSeries> {
     let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
       .map(mapSeries);
     return series$;
+  }
+
+  fetchSeriesDetail(id: number): Observable<Series> {
+    let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
+      .map(mapSeriesDetail);
+    return seriesDetail$;
   }
 
   fetchGeographies(): Observable<any> {
@@ -59,7 +65,7 @@ function mapCategories(response: Response): CategoryTree {
   let categoryTree = [];
   categories.forEach((value) => {
     let parent = dataMap[value.parentId];
-    if(parent) {
+    if (parent) {
       (parent.children || (parent.children = [])).push(value);
     } else {
       categoryTree.push(value);
@@ -69,10 +75,15 @@ function mapCategories(response: Response): CategoryTree {
   return categoryTree;
 }
 
-function mapSeries(response: Response): Series {
+function mapSeries(response: Response): SelectedSeries {
   let series = response.json().data;
-  //console.log(series);
+  // console.log(series);
   return series;
+}
+
+function mapSeriesDetail(response: Response): Series {
+  let seriesDetail = response.json().data;
+  return seriesDetail;
 }
 
 function mapObservations(response: Response): ObservationResults {
@@ -85,7 +96,7 @@ function mapObservations(response: Response): ObservationResults {
   let percValue = [];
 
   level.forEach((entry, index) => {
-    //Create [date, value] pairs for charts
+    // Create [date, value] pairs for charts
     levelValue.push([Date.parse(level[index].date), +level[index].value]);
     percValue.push([Date.parse(level[index].date), +perc[index].value]);
 
@@ -95,10 +106,6 @@ function mapObservations(response: Response): ObservationResults {
       perc: +perc[index].value
     });
   });
-
-  // sort data from earliest to most recent, needed for HighStock Chart
-  levelValue
-  percValue
 
   let chartData = {level: levelValue, perc: percValue};
   let data = {'chart data': chartData, 'table data': tableData};

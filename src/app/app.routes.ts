@@ -12,6 +12,13 @@ const routes: Routes = [
 
   },
 
+  // map /:id to the multi chart display
+
+  {
+    path: 'category/:id',
+    component: LandingPageComponent
+  },
+
   // map /series/:id to the single series graph/table display
   {
     path: 'series/:id',

@@ -13,6 +13,7 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
 import { SidebarNavComponent } from './sidebar-nav/sidebar-nav.component';
+import { HighchartComponent } from './highchart/highchart.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { SidebarNavComponent } from './sidebar-nav/sidebar-nav.component';
     GeoSelectorComponent,
     SingleSeriesComponent,
     SidebarNavComponent,
+    HighchartComponent,
   ],
   imports: [
     BrowserModule,

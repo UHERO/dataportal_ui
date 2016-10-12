@@ -1,60 +1,50 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
   selector: 'app-single-series',
-  inputs: ['categoryTree'],
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss']
 })
 export class SingleSeriesComponent implements OnInit {
-  private series;
-  private observations;
+  private errorMessage: string;
   private options: Object;
-  private seriesObservations;
-  private chartData = [];
   private tableData = [];
   private newTableData = [];
 
-  constructor(private _uheroAPIService: UheroApiService) { }
+  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this._uheroAPIService.fetchSeries(150390).then(series => {
-      this.series = series
-      this._uheroAPIService.fetchObservations(150390).then(observations => {
-        this.seriesObservations = observations;
-        this.chartData = this.seriesObservations[0];
-        this.tableData = this.seriesObservations[1];
-        this.highStockOptions(this.chartData[0]['level'], this.chartData[0]['perc']);
-      });
+    this.route.params.subscribe(params => {
+      // let catId = Number.parseInt(params['catId']);
+      let seriesId = Number.parseInt(params['id']);
+      console.log('series id', seriesId);
+      // console.log('category id', catId);
+
+      this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((series) => {
+        let seriesDetail = series;
+
+        this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
+          let seriesObservations = observations;
+          console.log('series detail', seriesDetail);
+          console.log('series observations', seriesObservations);
+          let chartData = seriesObservations['chart data'];
+          this.tableData = seriesObservations['table data'];
+          this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['name']);
+        });
+        },
+        error => this.errorMessage = error
+      );
     });
   }
 
-  ngAfterViewInit() {
-    //this.drawChart(1);
-    //console.log('table data', this.tableData);
-  }
-
-  drawChart(seriesId: number) {
-    this._uheroAPIService.fetchSeries(seriesId).then(series => {
-      this.series = series
-      this._uheroAPIService.fetchObservations(seriesId).then(observations => {
-        this.seriesObservations = observations;
-        this.chartData = this.seriesObservations[0];
-        this.tableData = this.seriesObservations[1];
-        console.log(this.chartData[0]);
-
-        this.highStockOptions(this.chartData[0]['level'], this.chartData[0]['perc']);
-      });
-    });
-
-  }
-
-  highStockOptions(leveldata, percdata) {
+  highStockOptions(leveldata, percdata, seriesName) {
     this.options = {
       chart: {
-        zoomType: 'x'
+        zoomType: 'x',
+        backgroundColor: '#3E3E40'
       },
       rangeSelector: {
         selected: 1,
@@ -68,9 +58,7 @@ export class SingleSeriesComponent implements OnInit {
         enabled: false
       },
       xAxis: {
-        /* events: {
-          setExtremes: this.updateTable
-        } */
+
       },
       yAxis: [{
         labels: {
@@ -89,12 +77,12 @@ export class SingleSeriesComponent implements OnInit {
         }
       }],
       series: [{
-        name: 'test',
+        name: seriesName,
         type: 'column',
-        color: '#1D667F',
+        color: '#2B908F',
         data: percdata
       }, {
-        name: 'test',
+        name: seriesName,
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',
@@ -105,7 +93,7 @@ export class SingleSeriesComponent implements OnInit {
 
   updateTable(e) {
     console.log(e);
-    var xMin, xMax, minDate, maxDate, tableStart, tableEnd;
+    let xMin, xMax, minDate, maxDate, tableStart, tableEnd;
 
     // Get date range from chart selection
     xMin = new Date(e.context.min);
@@ -114,12 +102,13 @@ export class SingleSeriesComponent implements OnInit {
     // Annual series observations
     minDate = xMin.getUTCFullYear() + '-01-01';
     maxDate = xMax.getUTCFullYear() + '-01-01';
+
     // Find selected dates in available table data
-    for(var i = 0; i < this.tableData.length; i++) {
-      if(this.tableData[i].date === minDate) {
+    for (let i = 0; i < this.tableData.length; i++) {
+      if (this.tableData[i].date === minDate) {
         tableStart = i;
       }
-      if(this.tableData[i].date === maxDate) {
+      if (this.tableData[i].date === maxDate) {
         tableEnd = i;
       }
     }

@@ -1,43 +1,18 @@
-#landingTabs {
-   position: relative;
-   width: 1000px;
-   margin: 0 auto;
-   padding: 0 0 0 40px;
-   //display: block;
-
-   li {
-      display: inline-block;
-      margin: 30px 5px 0 0;
-      padding: 0 0 0.3em 0;
-      vertical-align: top;
-
-      a {
-         background-color: #DBDEDE;
-         text-decoration: none;
-         color: #000000;
-         font-family: sans-serif;
-         font-size: 0.8em;
-         text-transform: uppercase;
-         letter-spacing: 0.1em;
-         padding: 1em 3em;
-      }
-   }
-
-   .sub-menu {
-     //display: block;
-     li {
-       display: block;
-     }
-   }
-}
-
 .multi-series-container {
+  vertical-align: top;
+  display: inline-block;
+  height: 500px;
+  overflow: auto;
   width: 961px;
   margin: 0 auto;
-  background: #DBDEDE;
+  background: #F6F5F5;
+
+  .all-chart-container {
+    margin: 2% 5%;
+  }
 
   .multi-charts {
     display: inline-block;
-    padding: 1px;
+    padding: 5px;
   }
 }

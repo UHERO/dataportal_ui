@@ -1,39 +1,41 @@
 // Component for landing page category tabs
-import { Component, OnInit, Input, Output, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
-import { CategoryTree } from '../category-tree';
 import { UheroApiService } from '../uhero-api.service';
-import {error} from 'util';
-import {ObservationResults} from '../observation-results';
+// import { error } from 'util';
 
 @Component({
   selector: 'app-landing-page',
-  inputs: ['categoryTree'],
   templateUrl: 'landing-page.component.html',
   styleUrls: ['landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit {
-  private categories: CategoryTree;
+export class LandingPageComponent implements OnInit, AfterViewInit {
   private errorMessage: string;
-  // private selectedSeries: number;
-  private series;
-  // private observations;
-  private options: Object;
-  private seriesObservations;
+  // seriesData array used as input in highchart.component
+  public seriesData = [];
   private expand: string = null;
 
 
-  constructor(private _uheroAPIService: UheroApiService) {
+  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this._uheroAPIService.fetchCategories().subscribe(
+    /* this._uheroAPIService.fetchCategories().subscribe(
       categories => this.categories = categories,
-      error => this.errorMessage = error);
+      error => this.errorMessage = error); */
   }
 
   ngAfterViewInit() {
-    this.drawSeries(9);
+    this.route.params.subscribe(params => {
+      let id = Number.parseInt(params['id']);
+      console.log('series id', id);
+      if (isNaN(id)) {
+        this.drawSeries(9);
+      } else {
+        this.drawSeries(id);
+      }
+    });
   }
 
   toggleMenu(expand: string): void {
@@ -42,88 +44,20 @@ export class LandingPageComponent implements OnInit {
 
   drawSeries(catId: number) {
     this._uheroAPIService.fetchSeries(catId).subscribe((series) => {
-      this.series = series;
+      // this.series = series;
+      let selectedSeries = series;
 
-      this.series.forEach((serie, index) => {
-        console.log('index', index);
-        this._uheroAPIService.fetchObservations(this.series[index]['id']).subscribe((observations) => {
+      selectedSeries.forEach((serie, index) => {
+        // console.log('index', index);
+        this._uheroAPIService.fetchObservations(+selectedSeries[index]['id']).subscribe((observations) => {
           let seriesObservations = observations;
-          let seriesData = {'serie': this.series[index], 'observations': seriesObservations};
-          let chartData = seriesData['observations']['chart data'];
-          //this.drawChartOptions(chartData, seriesData['serie']);
-          console.log(seriesData);
+          this.seriesData.push({'serie': selectedSeries[index], 'observations': seriesObservations});
+          // let chartData = seriesData['observations']['chart data'];
+          console.log('seriesData', this.seriesData);
         });
       });
     },
     error => this.errorMessage = error);
-  }
-
-  drawChartOptions(obs, series) {
-    console.log('chart observations', obs);
-    this.options = {
-      chart: {
-        height: 200,
-        width: 200,
-        //renderTo: series['id']
-      },
-      title: {
-        text: ''
-      },
-      legend: {
-        enabled: false
-      },
-      credits: {
-        enabled: false
-      },
-      xAxis: {
-        type: 'datetime',
-        labels: {
-          enabled: false
-        },
-        lineWidth: 0,
-        tickLength: 0      
-      },
-      yAxis: [{
-        labels: {
-          enabled: false
-        },
-        title: {
-          text: ''
-        },
-        gridLineColor: 'transparent'
-      }, {
-        title: {
-          text: ''
-        },
-        labels: {
-          enabled: false
-        },
-        gridLineColor: 'transparent',
-        opposite: true
-      }],
-      plotOptions: {
-        line: {
-          marker: {
-            enabled: false
-          }
-        },
-        series: {
-          pointWidth: 5,
-          pointPadding: 0
-        }
-      },
-      series: [{
-        name: series['id'],
-        type: 'column',
-        color: '#1D667F',
-        data: obs['perc']
-      }, {
-        name: series['id'],
-        type: 'line',
-        yAxis: 1,
-        color: '#F6A01B',
-        data: obs['level'],
-      }]
-    };
+    this.seriesData = [];
   }
 }
