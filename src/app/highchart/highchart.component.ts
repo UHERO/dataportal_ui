@@ -20,7 +20,15 @@ export class HighchartComponent implements OnInit {
           // renderTo: series['id']
         },
         title: {
-          text: ''
+          text: this.seriesData[index]['serie']['name'],
+          style: {
+            color: '#FFFFFF',
+            fontSize: '0.85em',
+            letterSpacing: '0.05em'
+          }
+        },
+        tooltip: {
+          enabled: false
         },
         legend: {
           enabled: false

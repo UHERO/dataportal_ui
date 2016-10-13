@@ -43,26 +43,44 @@ export class SingleSeriesComponent implements OnInit {
   highStockOptions(leveldata, percdata, seriesName) {
     this.options = {
       chart: {
+        height: 425,
         zoomType: 'x',
         backgroundColor: '#3E3E40'
       },
       rangeSelector: {
         selected: 1,
-        inputDateFormat: '%Y-01-01',
-        inputEditDateFormat: '%Y-01-01'
+        buttonTheme: {
+          visibility: 'hidden'
+        },
+        labelStyle: {
+          visibility: 'hidden'
+        },
+        inputEnabled: false
+        // inputDateFormat: '%Y-01-01',
+        // inputEditDateFormat: '%Y-01-01',
       },
       title: {
-        text: ''
+        text: seriesName,
+        style: {
+          color: '#FFFFFF'
+        }
       },
       credits: {
         enabled: false
       },
       xAxis: {
-
+        labels: {
+          style: {
+            color: '#FFFFFF'
+          }
+        }
       },
       yAxis: [{
         labels: {
-          format: '{value}'
+          format: '{value}',
+          style: {
+            color: '#2B908F'
+          }
         },
         title: {
           text: ''
@@ -73,7 +91,10 @@ export class SingleSeriesComponent implements OnInit {
           text: ''
         },
         labels: {
-          format: '{value}'
+          format: '{value}',
+          style: {
+            color: '#F6A01B'
+          }
         }
       }],
       series: [{

@@ -9,11 +9,11 @@
         <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandSublist(category.name, child.name, child.id)">
           <a href="#" [routerLink]="['/category', child['id']]">{{child.name}}</a>
           <!-- List of series belongning to subcategory/data list -->
-          <ul class="sidebar-list" *ngIf="subcat === child.name">
+          <!-- <ul class="sidebar-list" *ngIf="subcat === child.name">
             <li *ngFor="let serie of series">
               <a href="#" [routerLink]="['/series', serie['id']]" class="series-link">{{serie.name}}</a>
             </li>
-          </ul>
+          </ul> -->
         </li>
       </ul>
     </li>

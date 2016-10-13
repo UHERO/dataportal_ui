@@ -1,7 +1,9 @@
-<div id="single-series-chart">
-  <chart type="StockChart" [options]="options"><
-    <xAxis (setExtremes)="updateTable($event)"></xAxis>
-  </chart>
+<div id="single-series-view">
+  <div class="single-chart-container">
+    <chart type="StockChart" [options]="options">
+      <xAxis (setExtremes)="updateTable($event)"></xAxis>
+    </chart>
+  </div>
 
   <table id="single-series-table" *ngIf="newTableData.length === 0">
     <thead>
