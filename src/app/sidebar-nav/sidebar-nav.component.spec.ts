@@ -1,79 +1,72 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
 
-import { UheroApiService } from '../uhero-api.service';
 import { SidebarNavComponent } from './sidebar-nav.component';
-import { RouterLinkStubDirective } from '../../testing/router-stubs';
+import { UheroApiService } from '../uhero-api.service';
+import { MockApiService } from '../../testing/mockapi-service';
+import { Router, RouterStub, RouterLinkStubDirective } from '../../testing/router-stubs';
+import { addMatchers, newEvent } from '../../testing/helpers';
 
 let comp: SidebarNavComponent;
 let fixture: ComponentFixture<SidebarNavComponent>;
-
-class MockAPIService {
-  fetchCategories(id: number) {
-    let response = ['Test 1', 'Test 2', 'Test 3'];
-    return Observable.of(response);
-  }
-}
+let page: Page;
 
 describe('SidebarNavComponent', () => {
   beforeEach(async(() => {
+    addMatchers();
     TestBed.configureTestingModule({
-      declarations: [
-        SidebarNavComponent,
-        RouterLinkStubDirective
-      ],
-      providers: [ {provide: UheroApiService, useClass: MockAPIService} ]
+      declarations: [ SidebarNavComponent, RouterLinkStubDirective ],
+      providers: [
+        { provide: UheroApiService, useClass: MockApiService },
+        { provide: Router, useClass: RouterStub }
+      ]
     })
     .compileComponents()
-    .then(() => {
-      fixture = TestBed.createComponent(SidebarNavComponent);
-      comp = fixture.componentInstance;
-    });
+    .then(createComponent);
   }));
-  tests();
+
+  it('should display categories', () => {
+    expect(page.categoryRows.length).toBeGreaterThan(0);
+  });
+
+  it('1st category should match 1st test category', () => {
+    const expectedCategory = page.categoryRows[0].textContent;
+    expect(expectedCategory).toContain('Test Category', 'category name');
+  });
+
+  it('should expand the category on click', fakeAsync(() => {
+    const li = page.categoryRows[0];
+    li.dispatchEvent(newEvent('click'));
+    tick();
+    expect(comp.expand).toEqual('Test Category');
+  }));
+  
 });
 
-function tests() {
-  let links: RouterLinkStubDirective[];
-  let linkEls: DebugElement[];
-  let spy: jasmine.Spy;
-  let deEl: DebugElement;
-  let el: HTMLElement;
-  let uheroApiService: UheroApiService;
-  let testCategories = ['Test 1', 'Test 2', 'Test 3'];
+function createComponent() {
+  fixture = TestBed.createComponent(SidebarNavComponent);
+  comp = fixture.componentInstance;
 
-  beforeEach(() => {
+  // triggers ngOnInit
+  fixture.detectChanges();
+
+  return fixture.whenStable().then(() => {
     fixture.detectChanges();
-
-    linkEls = fixture.debugElement.queryAll(By.directive(RouterLinkStubDirective));
-    links = linkEls.map(linkEl => linkEl.injector.get(RouterLinkStubDirective) as RouterLinkStubDirective);
-
-    // API service injected into the component
-    uheroApiService = fixture.debugElement.injector.get(UheroApiService);
-
-    // Setup spy on fetchCategories method
-    // spy = spyOn(uheroApiService, 'fetchCategories').and.returnValue(Observable.of(testCategories));
+    page = new Page();
   });
+}
 
-  it('should create an instance', () => {
-    expect(comp).toBeTruthy();
-  });
+class Page {
+  categoryRows: HTMLLIElement[];
+  navSpy: jasmine.Spy;
 
-  describe('after get categories', () => {
-    beforeEach(async(() => {
-
-      // runs OnInit -> fetchCategories
-      fixture.detectChanges();
-      fixture.whenStable().then(() => fixture.detectChanges());
-    }));
-
-    it('should have categories', () => {
-      const categories = fixture.debugElement.queryAll(By.css('.list-item'));
-      expect(categories.length).toBeGreaterThan(0, 'should have categories listed');
-    });
-  });
+  constructor() {
+    this.categoryRows = fixture.debugElement.queryAll(By.css('li')).map(de => de.nativeElement);
+    const router = fixture.debugElement.injector.get(Router);
+    this.navSpy = spyOn(router, 'navigate');
+  }
 }

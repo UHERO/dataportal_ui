@@ -3,7 +3,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
-// import { error } from 'util';
+import { error } from 'util';
 
 @Component({
   selector: 'app-landing-page',
@@ -14,16 +14,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private errorMessage: string;
   // seriesData array used as input in highchart.component
   public seriesData = [];
-  private expand: string = null;
-
 
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    /* this._uheroAPIService.fetchCategories().subscribe(
-      categories => this.categories = categories,
-      error => this.errorMessage = error); */
+
   }
 
   ngAfterViewInit() {
@@ -36,10 +32,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         this.drawSeries(id);
       }
     });
-  }
-
-  toggleMenu(expand: string): void {
-    this.expand = this.expand === expand ? null : expand;
   }
 
   drawSeries(catId: number) {
