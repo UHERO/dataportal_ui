@@ -1,10 +1,12 @@
 #header {
+   position: absolute;
+   height: 120px;
+   top: 0;
+   width: 100%;
    background-color: #016E7D;
    background: url(../../assets/bg_header.png) repeat-x 0 0;
    color: #ffffff;
    padding: 5px 0;
-   position: relative;
-   width: 100%;
 
    a {
      position: relative;

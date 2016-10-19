@@ -1,21 +1,27 @@
-<div id="sidebar-nav">
+<nav id="sidebar-nav" class="col-md-2 col-lg-2">
+  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+    &#9776;
+  </button>
+
   <!-- List of top level categories -->
-  <ul class="sidebar-list">
-    <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
-      {{category.name}}
-      <!-- List of subcategories/data lists -->
-      <ul class="sidebar-list" *ngIf="expand === category.name">
-        <!-- <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandItem(category.name); expandSubList(child.name); expandSeries(child.id)">-->
-        <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandSublist(category.name, child.name, child.id)">
-          <a href="#" [routerLink]="['/category', child['id']]">{{child.name}}</a>
-          <!-- List of series belongning to subcategory/data list -->
-          <!-- <ul class="sidebar-list" *ngIf="subcat === child.name">
-            <li *ngFor="let serie of series">
-              <a href="#" [routerLink]="['/series', serie['id']]" class="series-link">{{serie.name}}</a>
-            </li>
-          </ul> -->
-        </li>
-      </ul>
-    </li>
-  </ul>
-</div>
+  <div class="collapse navbar-toggleable-xs" id="catNavbar">
+    <ul class="sidebar-list">
+      <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
+        {{category.name}}
+        <!-- List of subcategories/data lists -->
+        <ul class="sidebar-list" *ngIf="expand === category.name">
+          <!-- <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandItem(category.name); expandSubList(child.name); expandSeries(child.id)">-->
+          <li class="sub-list-item" *ngFor="let child of category.children" (click)="expandSublist(category.name, child.name, child.id)">
+            <a href="#" [routerLink]="['/category', child['id']]">{{child.name}}</a>
+              <!-- List of series belongning to subcategory/data list -->
+              <!-- <ul class="sidebar-list" *ngIf="subcat === child.name">
+              <li *ngFor="let serie of series">
+                <a href="#" [routerLink]="['/series', serie['id']]" class="series-link">{{serie.name}}</a>
+              </li>
+              </ul> -->
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

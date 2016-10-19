@@ -1,9 +1,11 @@
 #sidebar-nav {
-  display: inline-block;
-  height: 440px;
-  padding: 0 10px;
-  width: 230px;
+  float: left;
+  // display: inline-block;
+  min-height: 100%;
+  // padding: 0 10px;
+  // width: 230px;
   background: #F6F5F5;
+  padding: 1% 2%;
   // border: 1px solid #E2E2E2;
   // border-radius: 5px;
 
@@ -16,11 +18,13 @@
     letter-spacing: 0.05em;
     padding: 5px;
     cursor: pointer;
+    white-space: nowrap;
   }
 
   .sub-list-item {
     margin: 1em;
-    font-size: 1em;
+    font-size: 1.15em;
+    white-space: nowrap;
 
     a {
       text-decoration: none;

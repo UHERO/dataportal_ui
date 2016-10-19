@@ -1,14 +1,20 @@
 #wrapper {
    background-color: #CBC8C8;
-   position: relative;
+   // position: relative;
    width: 100%;
    min-height: 100px;
-   margin: 0 auto;
+   // margin: 0 auto;
    font-size: 15px;
    height: 100%;
+   
+   .container, .row {
+     min-height: 100%;
+     background: #F6F5F5;
+   }
 
-   .content {
+   /* .content {
       margin-left: 25%;
+      margin: 0 auto;
    }
 
    .view-display {
@@ -19,11 +25,11 @@
      width: 960px;
      margin: 0 auto;
      background: #F6F5F5;
-   }
+   } */
 
-  @media (max-width: 1400px) {
+  /* @media (max-width: 1400px) {
     .content {
       margin-left: 5%;
     }
-  }
+  } */
 }

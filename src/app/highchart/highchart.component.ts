@@ -17,10 +17,9 @@ export class HighchartComponent implements OnInit {
           height: 200,
           width: 200,
           backgroundColor: '#3E3E40'
-          // renderTo: series['id']
         },
         title: {
-          text: this.seriesData[index]['serie']['name'],
+          text: this.seriesData[index]['serie']['title'],
           style: {
             color: '#FFFFFF',
             fontSize: '0.85em',
@@ -73,13 +72,8 @@ export class HighchartComponent implements OnInit {
             pointPadding: 0
           }
         },
-        series: [/*{
-          name: this.seriesData[index]['serie']['name'],
-          type: 'column',
-          color: '#1D667F',
-          data: this.seriesData[index]['observations']['chart data']['perc']
-        }, */{
-          name: this.seriesData[index]['serie']['name'],
+        series: [{
+          name: this.seriesData[index]['serie']['title'],
           type: 'line',
           yAxis: 1,
           color: '#2B908F',

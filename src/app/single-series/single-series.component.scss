@@ -1,16 +1,17 @@
 #single-series-view {
   background: #F6F5F5;
-  width: 650px;
+  // width: 650px;
+  margin-left: 6%;
   vertical-align: top;
   display: inline-block;
 
   .single-chart-container {
-    margin: 2% 3.5%;
+    margin: 2% 3%;
   }
 
   #single-series-table {
-    margin: 0 auto;
-    width: 600px;
+    margin: 0 3%;
+    width: 800px;
     font-family: sans-serif;
     font-size: 0.9em;
 

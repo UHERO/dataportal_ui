@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { Highcharts } from 'angular2-highcharts';
+
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  }
+});
 
 @Component({
   selector: 'app-single-series',
@@ -32,7 +39,7 @@ export class SingleSeriesComponent implements OnInit {
           console.log('series observations', seriesObservations);
           let chartData = seriesObservations['chart data'];
           this.tableData = seriesObservations['table data'];
-          this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['name']);
+          this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['title'], seriesDetail['unitsLabelShort']);
         });
         },
         error => this.errorMessage = error
@@ -40,10 +47,11 @@ export class SingleSeriesComponent implements OnInit {
     });
   }
 
-  highStockOptions(leveldata, percdata, seriesName) {
+  highStockOptions(leveldata, percdata, seriesName, seriesUnits) {
     this.options = {
       chart: {
         height: 425,
+        width: 800,
         zoomType: 'x',
         backgroundColor: '#3E3E40'
       },
@@ -60,7 +68,7 @@ export class SingleSeriesComponent implements OnInit {
         // inputEditDateFormat: '%Y-01-01',
       },
       title: {
-        text: seriesName,
+        text: seriesName + ' (' + seriesUnits + ')',
         style: {
           color: '#FFFFFF'
         }
@@ -77,7 +85,7 @@ export class SingleSeriesComponent implements OnInit {
       },
       yAxis: [{
         labels: {
-          format: '{value}',
+          format: '{value:,.0f}',
           style: {
             color: '#2B908F'
           }
@@ -91,19 +99,21 @@ export class SingleSeriesComponent implements OnInit {
           text: ''
         },
         labels: {
-          format: '{value}',
+          format: '{value:,.0f}',
           style: {
             color: '#F6A01B'
           }
         }
       }],
       series: [{
-        name: seriesName,
+        // name: seriesName,
+        name: 'Percent',
         type: 'column',
         color: '#2B908F',
         data: percdata
       }, {
-        name: seriesName,
+        // name: seriesName,
+        name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',
