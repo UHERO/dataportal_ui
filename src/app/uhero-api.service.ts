@@ -71,7 +71,6 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
-  console.log(categoryTree);
   return categoryTree;
 }
 
@@ -91,24 +90,37 @@ function mapObservations(response: Response): ObservationResults {
   let level = observations[0].observations;
   let perc = observations[1].observations;
 
-  let tableData = [];
   let levelValue = [];
   let percValue = [];
 
   level.forEach((entry, index) => {
-    // Create [date, value] pairs for charts
+    // Create [date, value] level pairs for charts
     levelValue.push([Date.parse(level[index].date), +level[index].value]);
-    percValue.push([Date.parse(level[index].date), +perc[index].value]);
-
-    tableData.push({
-      date: level[index].date,
-      level: +level[index].value,
-      perc: +perc[index].value
-    });
   });
 
+  perc.forEach((entry, index) => {
+    // Create [date, value] percent pairs for charts
+    percValue.push([Date.parse(perc[index].date), +perc[index].value]);
+  });
+  
+  let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue};
   let data = {'chart data': chartData, 'table data': tableData};
-
   return data;
+}
+
+// Combine level and percent arrays from Observation data
+// Used to construct table data for single series view
+function combineObsData(level, perc) {
+  var table = level;
+  for(let i = 0; i < level.length; i++) {
+    table[i].percValue = "NA";
+    for(let j = 0; j < perc.length; j++) {
+      if(level[i].date === perc[j].date) {
+        table[i].percValue = perc[j].value;
+        break;
+      }
+    }
+  }
+  return table;
 }

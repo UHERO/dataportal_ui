@@ -77,6 +77,7 @@ export class SingleSeriesComponent implements OnInit {
         enabled: false
       },
       xAxis: {
+        ordinal: false,
         labels: {
           style: {
             color: '#FFFFFF'
@@ -110,14 +111,16 @@ export class SingleSeriesComponent implements OnInit {
         name: 'Percent',
         type: 'column',
         color: '#2B908F',
-        data: percdata
+        data: percdata,
+        pointStart: 1964
       }, {
         // name: seriesName,
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',
-        data: leveldata
+        data: leveldata,
+        pointStart: 1964
       }]
     };
   }

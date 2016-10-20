@@ -66,10 +66,6 @@ export class HighchartComponent implements OnInit {
             marker: {
               enabled: false
             }
-          },
-          series: {
-            pointWidth: 5,
-            pointPadding: 0
           }
         },
         series: [{

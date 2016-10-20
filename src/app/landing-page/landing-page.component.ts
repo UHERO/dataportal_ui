@@ -40,9 +40,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       let selectedSeries = series;
 
       selectedSeries.forEach((serie, index) => {
-        // console.log('index', index);
+        console.log('index', selectedSeries[index]['id']);
         this._uheroAPIService.fetchObservations(+selectedSeries[index]['id']).subscribe((observations) => {
           let seriesObservations = observations;
+          console.log('series observations', seriesObservations);
           this.seriesData.push({'serie': selectedSeries[index], 'observations': seriesObservations});
           // let chartData = seriesData['observations']['chart data'];
           console.log('seriesData', this.seriesData);
