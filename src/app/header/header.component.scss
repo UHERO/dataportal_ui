@@ -10,22 +10,27 @@
 
    a {
      position: relative;
-     top: 45px;
-     left: 5px;
+     top: 28px;
+     // left: 5px;
      display: block;
-     width: 680px;
-     height: 50px;
-     text-indent: -500px;
+     // width: 680px;
+     // height: 50px;
+     // text-indent: -500px;
      overflow: hidden;
-     position: relative;
    }
 
-   .portal-header {
-      background: url(../../assets/uhero_header.png) no-repeat 0 28px;
-      height: 115px;
-      width: 788px;
-      padding: 4px 0 0 0;
-      margin: 0 5px;
+   img {
+     width: 100%;
+     max-width: 788px;
+     height: auto;
+   }
+
+   @media (max-width: 543px) {
+     height: 50px;
+
+     a {
+       top: 10px;
+     }
    }
 }
 

@@ -25,7 +25,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.route.params.subscribe(params => {
       let id = Number.parseInt(params['id']);
-      console.log('series id', id);
       if (isNaN(id)) {
         this.drawSeries(9);
       } else {
@@ -36,17 +35,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   drawSeries(catId: number) {
     this._uheroAPIService.fetchSeries(catId).subscribe((series) => {
-      // this.series = series;
       let selectedSeries = series;
 
       selectedSeries.forEach((serie, index) => {
-        console.log('index', selectedSeries[index]['id']);
         this._uheroAPIService.fetchObservations(+selectedSeries[index]['id']).subscribe((observations) => {
           let seriesObservations = observations;
-          console.log('series observations', seriesObservations);
           this.seriesData.push({'serie': selectedSeries[index], 'observations': seriesObservations});
-          // let chartData = seriesData['observations']['chart data'];
-          console.log('seriesData', this.seriesData);
         });
       });
     },

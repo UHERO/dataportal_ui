@@ -1,5 +1,5 @@
 #sidebar-nav {
-  float: left;
+  // float: left;
   // display: inline-block;
   min-height: 100%;
   // padding: 0 10px;
@@ -19,6 +19,10 @@
     padding: 5px;
     cursor: pointer;
     white-space: nowrap;
+
+    @media (min-width: 768px) and (max-width: 991px) {
+      white-space: normal;
+    }
   }
 
   .sub-list-item {
@@ -29,6 +33,10 @@
     a {
       text-decoration: none;
       color: #000000;
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+      white-space: normal;
     }
   }
 }

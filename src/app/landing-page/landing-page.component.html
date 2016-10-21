@@ -1,11 +1,11 @@
-<div class="col-md-10 col-lg-10 multi-series-container">
+<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 multi-series-container">
   <!-- <app-geo-selector></app-geo-selector> -->
-  <div class="all-chart-container">
+  <!-- <div class="all-chart-container"> -->
   <div *ngFor="let series of seriesData" class="multi-charts">
    <a href="#" [routerLink]="['/series', series['serie']['id']]">
      <app-highchart [seriesData]="seriesData"></app-highchart>
    </a>
   </div>
-  </div>
+  <!-- </div> -->
 </div>
 

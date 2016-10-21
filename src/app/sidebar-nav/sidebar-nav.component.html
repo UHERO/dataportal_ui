@@ -1,10 +1,10 @@
-<nav id="sidebar-nav" class="col-md-2 col-lg-2">
-  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+<nav id="sidebar-nav" class="col-md-3 col-lg-3">
+  <button class="navbar-toggler hidden-md-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
     &#9776;
   </button>
 
   <!-- List of top level categories -->
-  <div class="collapse navbar-toggleable-xs" id="catNavbar">
+  <div class="collapse navbar-toggleable-sm" id="catNavbar">
     <ul class="sidebar-list">
       <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
         {{category.name}}

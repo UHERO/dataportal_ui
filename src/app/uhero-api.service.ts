@@ -93,15 +93,19 @@ function mapObservations(response: Response): ObservationResults {
   let levelValue = [];
   let percValue = [];
 
-  level.forEach((entry, index) => {
-    // Create [date, value] level pairs for charts
-    levelValue.push([Date.parse(level[index].date), +level[index].value]);
-  });
+  if(level) {
+    level.forEach((entry, index) => {
+      // Create [date, value] level pairs for charts
+      levelValue.push([Date.parse(level[index].date), +level[index].value]);
+    });
+  }
 
-  perc.forEach((entry, index) => {
-    // Create [date, value] percent pairs for charts
-    percValue.push([Date.parse(perc[index].date), +perc[index].value]);
-  });
+  if(perc) {
+    perc.forEach((entry, index) => {
+      // Create [date, value] percent pairs for charts
+      percValue.push([Date.parse(perc[index].date), +perc[index].value]);
+    });
+  }
   
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue};
@@ -112,13 +116,16 @@ function mapObservations(response: Response): ObservationResults {
 // Combine level and percent arrays from Observation data
 // Used to construct table data for single series view
 function combineObsData(level, perc) {
-  var table = level;
-  for(let i = 0; i < level.length; i++) {
-    table[i].percValue = "NA";
-    for(let j = 0; j < perc.length; j++) {
-      if(level[i].date === perc[j].date) {
-        table[i].percValue = perc[j].value;
-        break;
+  // Check that level and perc arrays are not null
+  if(level && perc) {
+    var table = level;
+    for(let i = 0; i < level.length; i++) {
+      table[i].percValue = "NA";
+      for(let j = 0; j < perc.length; j++) {
+        if(level[i].date === perc[j].date) {
+          table[i].percValue = perc[j].value;
+          break;
+        }
       }
     }
   }

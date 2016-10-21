@@ -3,18 +3,23 @@
   display: inline-block;
   min-height: 100%;
   overflow: auto;
-  margin-left: 4%;
-  margin-right: -4%;
+  margin: 1.5% 0;
+  // margin-left: 4%;
+  // margin-right: -4%;
   // width: 960px;
   // margin: 0 auto;
   // background: #F6F5F5;
 
-  .all-chart-container {
+  /* .all-chart-container {
     margin: 2% 5%;
+  } */
+
+  @media (max-width: 767px) {
+    margin: 1.5% 10%;
   }
 
   .multi-charts {
     display: inline-block;
-    padding: 3px;
+    padding: 0 3px;
   }
 }

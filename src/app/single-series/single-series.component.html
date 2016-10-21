@@ -1,11 +1,11 @@
-<div id="single-series-view" class="col-md-8 col-lg-8">
-  <div class="single-chart-container">
+<div id="single-series-view" class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9">
+  <!-- <div class="single-chart-container col-xs-12 col-sm-12 col-md-10 col-lg-10"> -->
     <chart type="StockChart" [options]="options">
       <xAxis (setExtremes)="updateTable($event)"></xAxis>
     </chart>
-  </div>
+<!-- </div> -->
 
-  <table id="single-series-table" *ngIf="newTableData.length === 0">
+  <table id="single-series-table" *ngIf="newTableData.length === 0" class="col-md-8 col-lg-10 col-xl-10">
     <thead>
       <tr>
         <th>Date</th>
@@ -21,7 +21,7 @@
   </table> 
 
 
-  <table id="single-series-table" *ngIf="newTableData.length > 0">
+  <table id="single-series-table" *ngIf="newTableData.length > 0" class="col-md-8 col-lg-10 col-xl-10">
     <thead>
       <tr>
         <th>Date</th>

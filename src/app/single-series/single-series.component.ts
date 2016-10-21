@@ -21,22 +21,17 @@ export class SingleSeriesComponent implements OnInit {
   private tableData = [];
   private newTableData = [];
 
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
+  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      // let catId = Number.parseInt(params['catId']);
       let seriesId = Number.parseInt(params['id']);
-      console.log('series id', seriesId);
-      // console.log('category id', catId);
 
       this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((series) => {
         let seriesDetail = series;
 
         this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
           let seriesObservations = observations;
-          console.log('series detail', seriesDetail);
-          console.log('series observations', seriesObservations);
           let chartData = seriesObservations['chart data'];
           this.tableData = seriesObservations['table data'];
           this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['title'], seriesDetail['unitsLabelShort']);
@@ -50,10 +45,10 @@ export class SingleSeriesComponent implements OnInit {
   highStockOptions(leveldata, percdata, seriesName, seriesUnits) {
     this.options = {
       chart: {
-        height: 425,
-        width: 800,
+        //height: 425,
+        // width: 800,
         zoomType: 'x',
-        backgroundColor: '#3E3E40'
+        backgroundColor: '#3E3E40',
       },
       rangeSelector: {
         selected: 1,
@@ -126,7 +121,6 @@ export class SingleSeriesComponent implements OnInit {
   }
 
   updateTable(e) {
-    console.log(e);
     let xMin, xMax, minDate, maxDate, tableStart, tableEnd;
 
     // Get date range from chart selection
@@ -148,6 +142,5 @@ export class SingleSeriesComponent implements OnInit {
     }
 
     this.newTableData = this.tableData.slice(tableStart, tableEnd + 1);
-    console.log(this.newTableData);
   }
 }
