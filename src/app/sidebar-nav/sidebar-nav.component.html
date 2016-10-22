@@ -1,11 +1,12 @@
-<nav id="sidebar-nav" class="col-md-3 col-lg-3">
-  <button class="navbar-toggler hidden-md-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+<nav class="col-md-3 col-lg-3" id="sidebar-nav">
+  <button (click)="mobileMenuToggle()" id="navbarSideButton" class="navbar-toggler hidden-md-up float-xs-right float-sm-right" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
     &#9776;
   </button>
 
   <!-- List of top level categories -->
-  <div class="collapse navbar-toggleable-sm" id="catNavbar">
-    <ul class="sidebar-list">
+  <!-- <div class="collapse navbar-toggleable-sm" id="catNavbar"> -->
+    <!-- <ul id="navbarSide" class="navbar-side sidebar-list"> -->
+    <ul id="navbarSide" class="navbar-side" [class.reveal]="reveal">
       <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
         {{category.name}}
         <!-- List of subcategories/data lists -->
@@ -23,5 +24,6 @@
         </ul>
       </li>
     </ul>
-  </div>
+  <!-- </div> -->
+  <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>

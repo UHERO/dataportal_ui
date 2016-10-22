@@ -3,11 +3,16 @@
   // width: 650px;
   // margin-left: 8%;
   // margin-right: -8%;
+  margin: 25% 0 0 0;
   vertical-align: top;
   display: inline-block;
+  
+  @media (min-width: 767px) and (max-width: 1000px) {
+    margin: 20% 0 0 0;
+  }
 
-  @media (max-width: 543px) {
-    margin: 0;
+  @media (min-width: 1001px) {
+    margin: 15% 0 0 0;
   }
 
   .single-chart-container {

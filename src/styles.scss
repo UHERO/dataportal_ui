@@ -5,14 +5,19 @@ html, body {
 
 body {
    position: relative;
-   padding: 120px 0 0 0;
+   // padding: 120px 0 0 0;
+   padding: 0;
    box-sizing: border-box;
    background-color: #CBC8C8;
    // margin: 0 0 0 0;
 
-   @media (max-width: 543px) {
-       padding: 50px 0 0 0;
+   /* @media (max-width: 543px) {
+       padding: 70px 0 0 0;
    }
+
+   @media (min-width: 544px) and (max-width: 767px) {
+       padding: 90px 0 0 0;
+   } */
 }
 
 chart {

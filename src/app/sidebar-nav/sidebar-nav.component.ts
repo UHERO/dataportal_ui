@@ -15,6 +15,8 @@ export class SidebarNavComponent implements OnInit, Input {
   private errorMessage: string;
   private expand: string = null;
   private subcat: string = null;
+  private reveal: boolean = false;
+  private overlay: boolean = false;
 
   constructor(private _uheroAPIService: UheroApiService) { }
 
@@ -22,6 +24,11 @@ export class SidebarNavComponent implements OnInit, Input {
     this._uheroAPIService.fetchCategories().subscribe(
       categories => this.categories = categories,
       error => this.errorMessage = error);
+  }
+
+  mobileMenuToggle(): void {
+    this.reveal = this.reveal === false ? true : false;
+    this.overlay = this.overlay === false ? true : false;
   }
 
   expandItem(expand: string): void {

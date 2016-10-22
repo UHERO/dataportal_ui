@@ -1,12 +1,17 @@
 #header {
    position: absolute;
-   height: 120px;
+   // height: 120px;
    top: 0;
    width: 100%;
-   background-color: #016E7D;
+   // background-color: #016E7D;
    background: url(../../assets/bg_header.png) repeat-x 0 0;
    color: #ffffff;
    padding: 5px 0;
+
+   @media (min-width: 767px) {
+     background-color: #016E7D;
+     height: 120px;
+   }
 
    a {
      position: relative;

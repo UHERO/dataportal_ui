@@ -14,8 +14,8 @@ export class HighchartComponent implements OnInit {
     this.seriesData.forEach((series, index) => {
       this.options = {
         chart: {
-          height: 200,
-          width: 200,
+          // height: 200,
+          // width: 200,
           backgroundColor: '#3E3E40'
         },
         title: {
