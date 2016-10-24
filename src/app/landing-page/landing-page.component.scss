@@ -3,7 +3,11 @@
   display: inline-block;
   min-height: 100%;
   overflow: auto;
-  margin: 25% 0 0 0;
+
+  @media (min-width: 768px) {
+    margin-top: 135px;
+  }
+  // margin: 25% 0 0 0;
   // margin-left: 4%;
   // margin-right: -4%;
   // width: 960px;
@@ -14,13 +18,13 @@
     margin: 2% 5%;
   } */
 
-  @media (min-width: 767px) and (max-width: 1000px) {
+  /* @media (min-width: 767px) and (max-width: 1000px) {
     margin: 20% 0 0 0;
   }
 
   @media (min-width: 1001px) {
     margin: 15% 0 0 0;
-  }
+  } */
 
   .multi-charts {
     display: inline-block;

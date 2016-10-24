@@ -8,28 +8,26 @@
    height: 100%;
    
    .container, .row {
+     margin: 0;
+     padding: 0;
      min-height: 100%;
-     background: #F6F5F5;
+     // background: #F6F5F5;
+
+     @media (min-width: 768px) {
+       overflow: hidden;
+     }
    }
 
-   /* .content {
-      margin-left: 25%;
-      margin: 0 auto;
+   .sidebar-col, .content-col {
+     @media (min-width: 768px) {
+       margin-bottom: -9999px;
+       padding-bottom: 9999px;
+     }
    }
 
-   .view-display {
-     vertical-align: top;
-     display: inline-block;
-     height: 440px;
-     overflow: auto;
-     width: 960px;
-     margin: 0 auto;
-     background: #F6F5F5;
-   } */
-
-  /* @media (max-width: 1400px) {
-    .content {
-      margin-left: 5%;
-    }
-  } */
+   .sidebar-col {
+     @media (min-width: 768px) {
+       background: #3E3E40;
+     }
+   }
 }

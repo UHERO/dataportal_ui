@@ -1,13 +1,17 @@
 #sidebar-nav {
   min-height: 100%;
-  background: #F6F5F5;
-  margin: 25% 0;
+  // background: #F6F5F5;
+  // margin: 25% 0;
+
+  @media (min-width: 768px) {
+    margin-top: 135px;
+  }
 
   button {
     color: #FFFFFF;
   }
 
-  @media (max-width: 767px) {
+  /* @media (max-width: 767px) {
     margin: 0;
     padding: 0;
     background: transparent;
@@ -31,7 +35,7 @@
 
   @media (min-width: 1001px) {
     margin: 15% 0;
-  }
+  } */
 
   .navbar-side {
     padding-left: 0px;
@@ -103,9 +107,10 @@
     list-style-type: none;
     -webkit-padding-start: 1em;
     font-family: sans-serif;
+    color: #FFFFFF;
     text-transform: uppercase;
-    font-size: 0.85em;
-    letter-spacing: 0.025em;
+    font-size: 0.8em;
+    // letter-spacing: 0.025em;
     padding: 5px;
     cursor: pointer;
     white-space: nowrap;
@@ -114,9 +119,9 @@
       border-bottom: 2px solid #CCC;
     }
 
-    @media (min-width: 768px) and (max-width: 991px) {
+    /* @media (min-width: 768px) and (max-width: 991px) {
       white-space: normal;
-    }
+    } */
   }
 
   .sub-list-item {
@@ -126,7 +131,7 @@
 
     a {
       text-decoration: none;
-      color: #000000;
+      color: #FFFFFF;
     }
 
     @media (min-width: 768px) and (max-width: 991px) {
