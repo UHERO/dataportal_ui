@@ -3,7 +3,7 @@
   <!-- <div class="all-chart-container"> -->
   <div *ngFor="let series of seriesData" class="multi-charts">
    <a href="#" [routerLink]="['/series', series['serie']['id']]">
-     <app-highchart [seriesData]="seriesData"></app-highchart>
+     <app-highchart [seriesData]="series"></app-highchart>
    </a>
   </div>
   <!-- </div> -->

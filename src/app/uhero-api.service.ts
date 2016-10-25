@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
-import { Observable, ReplaySubject } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
+import 'rxjs/add/operator/mergeMap';
 
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
@@ -13,12 +14,13 @@ export class UheroApiService {
   private baseUrl: string;
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
-  private obsResults$ = new ReplaySubject(1);
-  /* private geoResults$ = new ReplaySubject(1);
-  private seriesDetail$ = new ReplaySubject(1);
-  private series$ = new ReplaySubject(1);
-  private category$ = new ReplaySubject(1); */
-
+  private cachedCategories;
+  private cachedChartData = [];
+  private cachedGeographies;
+  private cachedObservations = [];
+  private cachedSeries = [];
+  private cachedSeriesDetail = [];
+  private errorMessage: string;
 
   constructor(private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
@@ -29,184 +31,102 @@ export class UheroApiService {
   }
 
   //  Get data from API
-  /* fetchCategories(): Observable<CategoryTree> {
-    let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
-      .map(mapCategories);
-    return categories$;
-  }
-
-  fetchCategories(): Observable<CategoryTree> {
-    let catData, catObservable;
-    if(catData) {
-      return Observable.of(catData);
-    } else if(catObservable) {
-      return catObservable;
+  fetchCategories() {
+    if(this.cachedCategories) {
+      return Observable.of(this.cachedCategories);
     } else {
-      catObservable = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
+      let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
         .map(mapCategories)
         .do(val => {
-          catData = val;
-          catObservable = null;
-        })
-        .share();
-      return catObservable;
+          this.cachedCategories = val;
+          // categories$ = null;
+        });
+      return categories$;
     }
-  } */
-
-  fetchCategories(forceRefresh?: boolean): Observable<any> {
-    let category$ = new ReplaySubject(1);
-    if(!category$.observers.length || forceRefresh) {
-      this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
-        .map(mapCategories)
-        .subscribe(data => category$.next(data),
-        error => category$.error(error));
-    }
-    return category$;
-  }
-  
-
-  /* fetchSeries(id: number): Observable<SelectedSeries> {
-    let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
-      .map(mapSeries);
-    return series$;
   }
 
-  fetchSeries(id: number): Observable<SelectedSeries> {
-    let seriesData = [], seriesObservable = [];
-    if(seriesData[id]) {
-      return Observable.of(seriesData[id]);
-    } else if(seriesObservable[id]) {
-      return seriesObservable[id];
+  fetchSeries(id: number) {
+    if(this.cachedSeries[id]) {
+      return Observable.of(this.cachedSeries[id]);
     } else {
-      seriesObservable[id] = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
+      let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
         .map(mapSeries)
         .do(val => {
-          seriesData[id] = val;
-          seriesObservable[id] = null;
-        })
-        .share();
-      return seriesObservable[id];
+          this.cachedSeries[id] = val;
+          series$ = null;
+        });
+      return series$;
     }
-  } */
-
-  fetchSeries(id: number, forceRefresh?: boolean): Observable<any> {
-    let series$ = new ReplaySubject(1);
-    if(!series$.observers.length || forceRefresh) {
-      this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
-        .map(mapSeries)
-        .subscribe(data => series$.next(data),
-        error => series$.error(error));
-    }
-    return series$;
   }
 
-
-  /* fetchSeriesDetail(id: number): Observable<Series> {
-    let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
-      .map(mapSeriesDetail);
-    return seriesDetail$;
-  }
-
-  fetchSeriesDetail(id: number): Observable<Series> {
-    let seriesDetailData = [], seriesDetailObservable = [];
-    if(seriesDetailData[id]) {
-      return Observable.of(seriesDetailData[id]);
-    } else if(seriesDetailObservable[id]) {
-      return seriesDetailObservable[id];
+  fetchSeriesDetail(id: number) {
+    if(this.cachedSeriesDetail[id]) {
+      return Observable.of(this.cachedSeriesDetail[id]);
     } else {
-      seriesDetailObservable[id] = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
+      let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
         .map(mapSeriesDetail)
         .do(val => {
-          seriesDetailData[id] = val;
-          seriesDetailObservable[id] = null;
-        })
-        .share();
-      return seriesDetailObservable[id];
+          this.cachedSeriesDetail[id] = val;
+          seriesDetail$ = null;
+        });
+      return seriesDetail$;
     }
-  } */
-
-  fetchSeriesDetail(id: number, forceRefresh?: boolean): Observable<any> {
-    let seriesDetail$ = new ReplaySubject(1);
-    if(!seriesDetail$.observers.length || forceRefresh) {
-      this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
-        .map(mapSeriesDetail)
-        .subscribe(data => seriesDetail$.next(data),
-        error => seriesDetail$.error(error));
-    }
-    return seriesDetail$;
   }
 
-  /* fetchGeographies(): Observable<any> {
+  fetchGeographies(): Observable<any> {
      return this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
          .map(response => response.json());
   }
 
-  fetchGeographies(): Observable<any> {
-    let geoData, geoObservable;
-    if(geoData) {
-      return Observable.of(geoData);
-    } else if(geoObservable) {
-      return geoObservable;
+  /* fetchGeographies() {
+    if(this.cachedGeographies) {
+      return Observable.of(this.cachedGeographies);
     } else {
-      geoObservable = this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
-        .map(response => response.json())
+      let geographies$ = this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
+        .map(response => response.json)
         .do(val => {
-          geoData = val;
-          geoObservable = null;
-        })
-        .share();
-      return geoObservable;
+          this.cachedGeographies = val;
+          geographies$ = null;
+        });
+      return geographies$;
     }
   } */
-  fetchGeographies(forceRefresh?: boolean): Observable<any> {
-    let geoResults$ = new ReplaySubject(1);
-    if(!geoResults$.observers.length || forceRefresh) {
-      this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
-        .map(response => response.json())
-        .subscribe(data => geoResults$.next(data),
-        error => geoResults$.error(error));
-    }
-    return geoResults$;
-  }
 
-
-  /* fetchObservations(id: number): Observable<ObservationResults> {
-    let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
-      .map(mapObservations);
-    return observations$;
-  } */
-
-  fetchObservations(id: number, forceRefresh?: boolean): Observable<any> {
-    let obsResults$ = new ReplaySubject(1);
-    if(!obsResults$.observers.length || forceRefresh) {
-      this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
-        .map(mapObservations)
-        .subscribe(data => obsResults$.next(data),
-        error => obsResults$.error(error));
-    }
-    console.log('obsResults$', obsResults$);
-    return obsResults$;
-  }
-
-  /* fetchObservations(id: number): Observable<ObservationResults> {
-    let obsData = [], obsObservable = [];
-    console.log(obsData);
-    if(obsData[id]) {
-      console.log('obs', Observable.of(obsData[id]));
-      return Observable.of(obsData[id]);
-    } else if(obsObservable[id]) {
-      return obsObservable[id];
+    fetchObservations(id: number) {
+    if(this.cachedObservations[id]) {
+      return Observable.of(this.cachedObservations[id]);
     } else {
-      obsObservable[id] = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
+      let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
         .map(mapObservations)
         .do(val => {
-          obsData[id] = val;
-          obsObservable[id] = null;
-        })
-        .share();
-      return obsObservable[id];
+          this.cachedObservations[id] = val;
+          observations$ = null;
+        });
+      return observations$;
     }
-  } */
+
+  }
+
+  // Get series and observation data for landing page component charts
+  fetchChartData(id: number) {
+    if(this.cachedChartData[id]) {
+      return this.cachedChartData[id];
+    } else {
+      let chartData = [];
+      this.fetchSeries(id).subscribe((series) => {
+        let seriesData = series;
+        seriesData.forEach((serie, index) => {
+          this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
+            let seriesObservations = obs;
+            chartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+          });
+        });
+      },
+      error => this.errorMessage = error);
+      this.cachedChartData[id] = (Observable.forkJoin(Observable.of(chartData)));
+      return this.cachedChartData[id];
+    }
+  }
 
 
   // End get data from API
