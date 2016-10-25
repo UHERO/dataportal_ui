@@ -41,6 +41,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         this._uheroAPIService.fetchObservations(+selectedSeries[index]['id']).subscribe((observations) => {
           let seriesObservations = observations;
           this.seriesData.push({'serie': selectedSeries[index], 'observations': seriesObservations});
+          console.log('series data', this.seriesData);
         });
       });
     },

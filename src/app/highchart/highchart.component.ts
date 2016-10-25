@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-highchart',
@@ -11,6 +11,7 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log('highchart', this.seriesData);
     this.seriesData.forEach((series, index) => {
       this.options = {
         chart: {
