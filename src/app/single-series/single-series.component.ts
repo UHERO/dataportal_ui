@@ -48,7 +48,7 @@ export class SingleSeriesComponent implements OnInit {
         //height: 425,
         // width: 800,
         zoomType: 'x',
-        backgroundColor: '#3E3E40',
+        backgroundColor: '#E5E5E5',
       },
       rangeSelector: {
         selected: 1,
@@ -65,7 +65,7 @@ export class SingleSeriesComponent implements OnInit {
       title: {
         text: seriesName + ' (' + seriesUnits + ')',
         style: {
-          color: '#FFFFFF'
+          color: '#505050'
         }
       },
       credits: {
@@ -75,7 +75,7 @@ export class SingleSeriesComponent implements OnInit {
         ordinal: false,
         labels: {
           style: {
-            color: '#FFFFFF'
+            color: '#505050'
           }
         }
       },

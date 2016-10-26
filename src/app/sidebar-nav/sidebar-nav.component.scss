@@ -68,14 +68,14 @@
     @media (max-width: 543px) {
       height: 100%;
       width: 85%;
-      -webkit-transform: translateX(100%);
-      -ms-transform: translateX(100%);
-      transform: translateX(100%);
+      -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+      transform: translateX(-100%);
       -webkit-transition: 300ms ease;
       transition: 300ms ease;
       position: fixed;
       top: 0;
-      right: 0;
+      left: 0;
       padding: 0;
       list-style: none;
       border-left: 2px solid #ccc;
@@ -87,21 +87,20 @@
     @media (min-width:544px) and (max-width: 767px) {
       width: 50%;
       height: 100%;
-      -webkit-transform: translateX(100%);
-      -ms-transform: translateX(100%);
-      transform: translateX(100%);
+      -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+      transform: translateX(-100%);
       -webkit-transition: 300ms ease;
       transition: 300ms ease;
       position: fixed;
       top: 0;
-      right: 0;
+      left: 0;
       padding: 0;
       list-style: none;
       border-left: 2px solid #ccc;
       background-color: #F7F7F9;
       overflow-y: scroll;
       z-index: 100;
-
     }
   }
 
