@@ -16,8 +16,9 @@ export class SidebarNavComponent implements OnInit, Input {
   private expand: string = null;
   private subcat: string = null;
   private reveal: boolean = false;
-  private selected: Array<boolean> = [];
   private overlay: boolean = false;
+  private selectedSublist: number;
+  private selectedCategory: number;
 
   constructor(private _uheroAPIService: UheroApiService) { }
 
@@ -32,14 +33,20 @@ export class SidebarNavComponent implements OnInit, Input {
     this.overlay = this.overlay === false ? true : false;
   }
 
-  expandItem(expand: string): void {
+  expandItem(expand: string, cat): void {
+    // Adds class of selected to a category on click
+    this.selectedCategory = cat;
+
     // Expands top level category
     this.expand = this.expand === expand ? null : expand;
   }
 
-  expandSublist(expand: string, subcat: string, catId: number): void {
+  expandSublist(expand: string, cat, childCat, subcat: string, catId: number): void {
     // Keep top level category expanded
-    this.expandItem(expand);
+    this.expandItem(expand, cat);
+
+    // Adds class of selected to a sublist on click
+    this.selectedSublist = childCat;
 
     // Expand subcategory list with series
     this.subcat = this.subcat === subcat ? null : subcat;

@@ -5,7 +5,11 @@
   overflow: auto;
 
   @media (min-width: 768px) {
-    margin-top: 135px;
+    margin-top: 80px;
+  }
+
+  @media (max-width: 767px) {
+    margin-top: 60px;
   }
   // margin: 25% 0 0 0;
   // margin-left: 4%;

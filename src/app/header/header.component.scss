@@ -1,12 +1,12 @@
 #header {
-   position: absolute;
+   // position: absolute;
    // height: 120px;
    top: 0;
    width: 100%;
-   // background-color: #016E7D;
-   background: url(../../assets/bg_header.png) repeat-x 0 0;
+   background-color: #FFFFFF;
+   // background: url(../../assets/bg_header.png) repeat-x 0 0;
    color: #ffffff;
-   padding: 5px 0;
+   padding: 0;
 
    @media (max-width: 767px) {
      display: none;
@@ -14,21 +14,22 @@
 
    @media (min-width: 768px) {
      z-index: 1;
-     position: fixed;
+     // position: fixed;
      //background-color: #016E7D;
-     padding-bottom: 3.5%;
+     // padding-bottom: 3.5%;
      //height: 120px;
    }
 
-   @media (min-width: 1100px) {
+   /* @media (min-width: 1100px) {
      padding-bottom: 2.5%; 
-   }
+   } */
 
    a {
-     position: relative;
-     top: 28px;
+     padding: 0;
+     // position: relative;
+     // top: 28px;
      // left: 5px;
-     display: block;
+     // display: block;
      // width: 680px;
      // height: 50px;
      // text-indent: -500px;
@@ -36,18 +37,18 @@
    }
 
    img {
-     width: 100%;
-     max-width: 788px;
+     width: 15%;
+     // max-width: 788px;
      // height: auto;
    }
 
-   @media (max-width: 543px) {
+   /* @media (max-width: 543px) {
      height: 50px;
 
      a {
        top: 10px;
      }
-   }
+   } */
 }
 
 .about-portal {
