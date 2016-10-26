@@ -1,13 +1,16 @@
-<nav id="sidebar-nav">
-  <button (click)="mobileMenuToggle()" id="navbarSideButton" class="navbar-toggler hidden-md-up float-xs-right float-sm-right" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+<nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light bg-faded">
+  <button (click)="mobileMenuToggle()" id="navbarSideButton" class="navbar-toggler hidden-md-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
     &#9776;
   </button>
-
+  <a class="navbar-brand" href="#">
+    <!-- <img src="../../assets/UHERO-Logo.jpg"> -->
+    Logo
+  </a>
   <!-- List of top level categories -->
   <!-- <div class="collapse navbar-toggleable-sm" id="catNavbar"> -->
     <!-- <ul id="navbarSide" class="navbar-side sidebar-list"> -->
     <ul id="navbarSide" class="navbar-side" [class.reveal]="reveal">
-      <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)">
+      <li class="list-item" *ngFor="let category of categories" (click)="expandItem(category.name)" >
         {{category.name}}
         <!-- List of subcategories/data lists -->
         <ul class="sidebar-list" *ngIf="expand === category.name">

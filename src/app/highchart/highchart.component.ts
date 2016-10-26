@@ -15,12 +15,14 @@ export class HighchartComponent implements OnInit {
       chart: {
         // height: 200,
         // width: 200,
-        backgroundColor: '#3E3E40'
+        // backgroundColor: '#3E3E40'
+        backgroundColor: '#E5E5E5'
       },
       title: {
         text: this.seriesData['serie']['title'],
         style: {
-          color: '#FFFFFF',
+          // color: '#FFFFFF',
+          color: '#505050',
           fontSize: '0.85em',
           letterSpacing: '0.05em'
         }

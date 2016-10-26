@@ -8,11 +8,20 @@
    color: #ffffff;
    padding: 5px 0;
 
+   @media (max-width: 767px) {
+     display: none;
+   }
+
    @media (min-width: 768px) {
      z-index: 1;
+     position: fixed;
      //background-color: #016E7D;
      padding-bottom: 3.5%;
      //height: 120px;
+   }
+
+   @media (min-width: 1100px) {
+     padding-bottom: 2.5%; 
    }
 
    a {

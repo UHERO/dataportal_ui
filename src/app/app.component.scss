@@ -1,5 +1,6 @@
 #wrapper {
-   background-color: #CBC8C8;
+   // background-color: #CBC8C8;
+   background: #F3F3F3;
    // position: relative;
    width: 100%;
    min-height: 100px;
@@ -18,16 +19,29 @@
      }
    }
 
-   .sidebar-col, .content-col {
+   /* .sidebar-col, .content-col {
      @media (min-width: 768px) {
        margin-bottom: -9999px;
        padding-bottom: 9999px;
      }
-   }
+   } */
 
    .sidebar-col {
      @media (min-width: 768px) {
-       background: #3E3E40;
+       position: fixed;
+       top: 0;
+       bottom: 0;
+       left: 0;
+       width: 270px;
+       // background: #3E3E40;
+       background: #F7F7F7;
+     }
+   }
+
+   .content-col {
+     @media (min-width: 768px) {
+       position: relative;
+       left: 270px;
      }
    }
 }

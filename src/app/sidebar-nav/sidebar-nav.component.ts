@@ -16,6 +16,7 @@ export class SidebarNavComponent implements OnInit, Input {
   private expand: string = null;
   private subcat: string = null;
   private reveal: boolean = false;
+  private selected: Array<boolean> = [];
   private overlay: boolean = false;
 
   constructor(private _uheroAPIService: UheroApiService) { }
