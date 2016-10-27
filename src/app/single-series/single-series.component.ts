@@ -101,21 +101,24 @@ export class SingleSeriesComponent implements OnInit {
           }
         }
       }],
+      navigator: {
+        series: {
+          data: leveldata
+        }
+      },
       series: [{
         // name: seriesName,
         name: 'Percent',
         type: 'column',
         color: '#2B908F',
-        data: percdata,
-        pointStart: 1964
+        data: percdata
       }, {
         // name: seriesName,
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#F6A01B',
-        data: leveldata,
-        pointStart: 1964
+        data: leveldata
       }]
     };
   }
