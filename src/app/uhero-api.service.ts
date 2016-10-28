@@ -7,6 +7,8 @@ import 'rxjs/add/operator/mergeMap';
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
 import { Series } from './series';
+// import { Geography } from './geography';
+import { Regions } from './regions';
 import { ObservationResults } from './observation-results';
 
 @Injectable()
@@ -16,7 +18,9 @@ export class UheroApiService {
   private headers: Headers;
   private cachedCategories;
   private cachedChartData = [];
-  private cachedGeographies;
+  private cachedMultiChartData = {};
+  private cachedGeographies = [];
+  private cachedGeoSeries = [];
   private cachedObservations = [];
   private cachedSeries = [];
   private cachedSeriesDetail = [];
@@ -73,26 +77,32 @@ export class UheroApiService {
     }
   }
 
-  fetchGeographies(): Observable<any> {
+  /* fetchGeographies(): Observable<any> {
      return this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
          .map(response => response.json());
-  }
-
-  /* fetchGeographies() {
-    if(this.cachedGeographies) {
-      return Observable.of(this.cachedGeographies);
-    } else {
-      let geographies$ = this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
-        .map(response => response.json)
-        .do(val => {
-          this.cachedGeographies = val;
-          geographies$ = null;
-        });
-      return geographies$;
-    }
   } */
 
-    fetchObservations(id: number) {
+  fetchGeographies(id: number): Observable<Regions> {
+    /* if(this.cachedGeographies) {
+      return Observable.of(this.cachedGeographies);
+    } else { */
+      let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
+        .map(mapGeographies)
+        /* .do(val => {
+          this.cachedGeographies = val;
+          geographies$ = null;
+        }); */
+      return geographies$;
+    //}
+  }
+
+  fetchGeoSeries(id: number, handle: string) {
+    let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle)
+      .map(mapGeoSeries);
+    return geoSeries$;
+  }
+
+  fetchObservations(id: number) {
     if(this.cachedObservations[id]) {
       return Observable.of(this.cachedObservations[id]);
     } else {
@@ -128,6 +138,27 @@ export class UheroApiService {
     }
   }
 
+  /* fetchMultiChartData(id: number, handle: string) {
+    if(this.cachedMultiChartData[id + handle]) {
+      return this.cachedMultiChartData[id];
+    } else {
+      let multiChartData = [];
+      this.fetchGeoSeries(id, handle).subscribe((series) => {
+        let seriesData = series;
+        seriesData.forEach((serie, index) => {
+          this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
+            let seriesObservations = obs;
+            multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+          });
+        });
+      },
+      error => this.errorMessage = error);
+      this.cachedMultiChartData[id + handle] = (Observable.forkJoin(Observable.of(multiChartData)));
+      console.log(this.cachedMultiChartData[id + handle]);
+      return this.cachedMultiChartData[id + handle];
+    }
+  } */
+
 
   // End get data from API
 }
@@ -159,6 +190,18 @@ function mapSeries(response: Response): SelectedSeries {
 function mapSeriesDetail(response: Response): Series {
   let seriesDetail = response.json().data;
   return seriesDetail;
+}
+
+function mapGeographies(response: Response): Regions {
+  let geos = response.json().data;
+  console.log('geos', geos);
+  return geos;
+}
+
+function mapGeoSeries(response: Response): SelectedSeries {
+  let geoSeries = response.json().data;
+  console.log('geo series', geoSeries);
+  return geoSeries;
 }
 
 function mapObservations(response: Response): ObservationResults {

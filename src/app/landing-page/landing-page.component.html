@@ -1,5 +1,5 @@
 <div class="multi-series-container">
-  <!-- <app-geo-selector></app-geo-selector> -->
+  <!-- <app-geo-selector [regions]="regions"></app-geo-selector> -->
   <!-- <div class="all-chart-container"> -->
   <div *ngFor="let series of seriesData" class="multi-charts">
    <a href="#" [routerLink]="['/series', series['serie']['id']]">
