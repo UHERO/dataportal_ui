@@ -2,10 +2,13 @@
   <!-- <app-geo-selector [regions]="regions"></app-geo-selector> -->
   <!-- <div class="all-chart-container"> -->
   <div *ngFor="let series of seriesData" class="multi-charts">
-   <a href="#" [routerLink]="['/series', series['serie']['id']]">
-     <app-highchart [seriesData]="series"></app-highchart>
-   </a>
+    {{series['sublist']['name']}}
+    <app-geo-selector [regions]="regions"></app-geo-selector>
+    <div *ngFor="let serie of series.series">
+      <a href="#" [routerLink]="['/series', serie['serie']['id']]">
+        <app-highchart [seriesData]="serie"></app-highchart>
+      </a>
+    </div>
   </div>
-  <!-- </div> -->
 </div>
 

@@ -125,6 +125,7 @@ export class UheroApiService {
       let chartData = [];
       this.fetchSeries(id).subscribe((series) => {
         let seriesData = series;
+        console.log('service', seriesData);
         seriesData.forEach((serie, index) => {
           this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
             let seriesObservations = obs;

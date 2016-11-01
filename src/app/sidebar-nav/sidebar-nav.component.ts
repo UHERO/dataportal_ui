@@ -10,14 +10,15 @@ import { SelectedSeries } from '../selected-series';
   styleUrls: ['./sidebar-nav.component.scss']
 })
 export class SidebarNavComponent implements OnInit, Input {
-  @Input() categories: CategoryTree;
-  private series: SelectedSeries;
+  // @Input() categories: CategoryTree;
+  // private series: SelectedSeries;
+  private categories: CategoryTree;
   private errorMessage: string;
   private expand: string = null;
-  private subcat: string = null;
+  // private subcat: string = null;
   private reveal: boolean = false;
   private overlay: boolean = false;
-  private selectedSublist: number;
+  // private selectedSublist: number;
   private selectedCategory: number;
 
   constructor(private _uheroAPIService: UheroApiService) { }
@@ -33,7 +34,7 @@ export class SidebarNavComponent implements OnInit, Input {
     this.overlay = this.overlay === false ? true : false;
   }
 
-  expandItem(expand: string, cat): void {
+  expandItem(sublist: Array<any>, expand: string, cat): void {
     // Adds class of selected to a category on click
     this.selectedCategory = cat;
 
@@ -41,7 +42,7 @@ export class SidebarNavComponent implements OnInit, Input {
     this.expand = this.expand === expand ? null : expand;
   }
 
-  expandSublist(expand: string, cat, childCat, subcat: string, catId: number): void {
+  /* expandSublist(expand: string, cat, childCat, subcat: string, catId: number): void {
     // Keep top level category expanded
     this.expandItem(expand, cat);
 
@@ -63,5 +64,5 @@ export class SidebarNavComponent implements OnInit, Input {
     // Clear array of series
     // Prevents series from displaying under the wrong category while loading
     this.series = [];
-  }
+  } */
 }

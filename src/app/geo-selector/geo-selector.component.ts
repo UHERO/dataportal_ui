@@ -14,6 +14,7 @@ export class GeoSelectorComponent implements OnInit {
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    console.log('geo component', this.regions)
      /* this._uheroAPIService.fetchGeographies()
          .subscribe(
             (geos) => {
@@ -24,7 +25,7 @@ export class GeoSelectorComponent implements OnInit {
             error => console.log('Error fetching geographies')); */
   }
 
-  onChangeGeo(newGeo) {
+  /* onChangeGeo(newGeo) {
     this.route.params.subscribe(params => {
       let id = Number.parseInt(params['id']);
       console.log(id);
@@ -34,5 +35,5 @@ export class GeoSelectorComponent implements OnInit {
         })
       })
     });
-  }
+  } */
 }

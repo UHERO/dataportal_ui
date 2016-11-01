@@ -11,6 +11,7 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log('highcharts', this.seriesData);
     this.options = {
       chart: {
         // height: 200,
