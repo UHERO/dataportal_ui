@@ -14,7 +14,7 @@ export class SidebarNavComponent implements OnInit, Input {
   // private series: SelectedSeries;
   private categories: CategoryTree;
   private errorMessage: string;
-  private expand: string = null;
+  public expand: string = null;
   // private subcat: string = null;
   private reveal: boolean = false;
   private overlay: boolean = false;

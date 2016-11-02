@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
-import { Highcharts } from 'angular2-highcharts';
+import * as Highcharts from 'highcharts';
 
 Highcharts.setOptions({
   lang: {

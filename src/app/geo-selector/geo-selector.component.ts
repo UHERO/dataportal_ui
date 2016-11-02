@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -10,7 +10,8 @@ import { UheroApiService } from '../uhero-api.service';
 })
 export class GeoSelectorComponent implements OnInit {
   @Input() regions;
-  public seriesData = [];
+  @Input() selectedGeo;
+  @Output() selectedGeoChange = new EventEmitter();
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
 
   ngOnInit() {
@@ -25,15 +26,10 @@ export class GeoSelectorComponent implements OnInit {
             error => console.log('Error fetching geographies')); */
   }
 
-  /* onChangeGeo(newGeo) {
-    this.route.params.subscribe(params => {
-      let id = Number.parseInt(params['id']);
-      console.log(id);
-      this.regions.forEach((region, index) => {
-        this._uheroAPIService.fetchMultiChartData(id, this.regions[index]['handle']).subscribe((results) => {
-          console.log(this.regions[index]['handle']);
-        })
-      })
-    });
-  } */
+  onChange(newGeo) {
+    console.log('ng', newGeo);
+    this.selectedGeo = this.regions.find(region => region.handle == newGeo);
+    console.log('selected', this.selectedGeo);
+    this.selectedGeoChange.emit(this.selectedGeo);
+  }
 }

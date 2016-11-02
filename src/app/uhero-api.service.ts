@@ -83,23 +83,32 @@ export class UheroApiService {
   } */
 
   fetchGeographies(id: number): Observable<Regions> {
-    /* if(this.cachedGeographies) {
-      return Observable.of(this.cachedGeographies);
-    } else { */
+    if(this.cachedGeographies[id]) {
+      console.log(this.cachedGeographies[id])
+      return Observable.of(this.cachedGeographies[id]);
+    } else {
       let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
         .map(mapGeographies)
-        /* .do(val => {
-          this.cachedGeographies = val;
+        .do(val => {
+          this.cachedGeographies[id] = val;
           geographies$ = null;
-        }); */
+        });
       return geographies$;
-    //}
+    }
   }
 
   fetchGeoSeries(id: number, handle: string) {
-    let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle)
-      .map(mapGeoSeries);
+    if(this.cachedGeoSeries[id + handle]) {
+      return Observable.of(this.cachedGeoSeries[id + handle]);
+    } else {
+    let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle, this.requestOptionsArgs)
+      .map(mapGeoSeries)
+      .do(val => {
+        this.cachedGeoSeries[id + handle] = val;
+        geoSeries$ = null;
+      });
     return geoSeries$;
+    }
   }
 
   fetchObservations(id: number) {
@@ -118,7 +127,7 @@ export class UheroApiService {
   }
 
   // Get series and observation data for landing page component charts
-  fetchChartData(id: number) {
+  /* fetchChartData(id: number) {
     if(this.cachedChartData[id]) {
       return this.cachedChartData[id];
     } else {
@@ -137,28 +146,35 @@ export class UheroApiService {
       this.cachedChartData[id] = (Observable.forkJoin(Observable.of(chartData)));
       return this.cachedChartData[id];
     }
-  }
+  } */
 
-  /* fetchMultiChartData(id: number, handle: string) {
+  // Get series and observation data for landing page component charts; filtered by region
+  fetchMultiChartData(id: number, handle: string) {
     if(this.cachedMultiChartData[id + handle]) {
-      return this.cachedMultiChartData[id];
+      return this.cachedMultiChartData[id + handle];
     } else {
       let multiChartData = [];
+      console.log('id', id);
       this.fetchGeoSeries(id, handle).subscribe((series) => {
         let seriesData = series;
-        seriesData.forEach((serie, index) => {
-          this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-            let seriesObservations = obs;
-            multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+        if(seriesData !== null) {
+          seriesData.forEach((serie, index) => {
+            this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
+              let seriesObservations = obs;
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+            });
           });
-        });
+        } else {
+          multiChartData.push({'serie': 'No data available'})
+        }
       },
       error => this.errorMessage = error);
       this.cachedMultiChartData[id + handle] = (Observable.forkJoin(Observable.of(multiChartData)));
       console.log(this.cachedMultiChartData[id + handle]);
       return this.cachedMultiChartData[id + handle];
     }
-  } */
+  }
+
 
 
   // End get data from API
@@ -195,13 +211,11 @@ function mapSeriesDetail(response: Response): Series {
 
 function mapGeographies(response: Response): Regions {
   let geos = response.json().data;
-  console.log('geos', geos);
   return geos;
 }
 
 function mapGeoSeries(response: Response): SelectedSeries {
   let geoSeries = response.json().data;
-  console.log('geo series', geoSeries);
   return geoSeries;
 }
 

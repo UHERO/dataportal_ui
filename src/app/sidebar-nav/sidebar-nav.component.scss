@@ -156,13 +156,24 @@
       border-bottom: 2px solid #CCC;
     }
 
+    a {
+      display: block;
+      text-decoration: none;
+      color: #505050;
+      margin-left: 5px;
+
+      &:active {
+        color: #FFFFFF;
+      }
+    }
+
     li:hover {
       background-color: #1d667f;
       color: #FFFFFF;
     }
   }
 
-  .sub-list-item {
+  /* .sub-list-item {
     // margin: 1em;
     font-size: 1.15em;
     white-space: nowrap;
@@ -184,14 +195,14 @@
     @media (min-width: 768px) and (max-width: 991px) {
       white-space: normal;
     }
-  }
+  } */
 
-  .selectedCategory, .selectedSublist {
+  .selectedCategory {
     background-color: #1d667f;
     color: #FFFFFF;
   }
 
-  .selectedSublist {
+  .selectedCategory {
     a, a:hover, a:active {
       color: #FFFFFF;
     }

@@ -4,6 +4,22 @@
   min-height: 100%;
   overflow: auto;
 
+  .selected-category {
+    display: inline-block;
+    color: #1D667F;
+    font-size: 1.2em;
+    margin-bottom: 40px;
+  }
+
+  .sublist {
+    color: #1D667F;
+    font-size: 1em;
+  }
+
+  .selector {
+    display: inline-block;
+  }
+
   @media (min-width: 768px) {
     margin-top: 80px;
   }
@@ -30,8 +46,14 @@
     margin: 15% 0 0 0;
   } */
 
+  .multi-charts-row {
+    display: block;
+    margin-bottom: 40px;
+  }
+
   .multi-charts {
     display: inline-block;
     padding: 0 3px;
   }
+
 }
