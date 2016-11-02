@@ -15,20 +15,12 @@ export class GeoSelectorComponent implements OnInit {
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    console.log('geo component', this.regions)
-     /* this._uheroAPIService.fetchGeographies()
-         .subscribe(
-            (geos) => {
-            this.geos = geos = geos.geographies;
-            this.selectedGeo = geos[0];
-            console.log(this.selectedGeo);
-         },
-            error => console.log('Error fetching geographies')); */
+
   }
 
   onChange(newGeo) {
     console.log('ng', newGeo);
-    this.selectedGeo = this.regions.find(region => region.handle == newGeo);
+    this.selectedGeo = this.regions.find(region => region.handle === newGeo);
     console.log('selected', this.selectedGeo);
     this.selectedGeoChange.emit(this.selectedGeo);
   }

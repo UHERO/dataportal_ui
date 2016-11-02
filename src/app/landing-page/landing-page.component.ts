@@ -1,5 +1,5 @@
 // Component for landing page category tabs
-import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -68,20 +68,20 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       let categories = category;
 
       categories.forEach((category, index) => {
-        if(categories[index]['id'] === catId) {
-          this.selectedCategory = categories[index]['name']
+        if (categories[index]['id'] === catId) {
+          this.selectedCategory = categories[index]['name'];
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
             this._uheroAPIService.fetchGeographies(sublist[index]['id']).subscribe((geos) => {
               this.regions = geos;
               this.currentGeo = geos[0];
               this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle).subscribe((results) => {
-                this.seriesData.push({'sublist': sublist[index], 'series':results[0]});
+                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
             });
           });
         } else {
-          return
+          return;
         }
       },
       this.seriesData = []);
@@ -95,15 +95,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       let categories = category;
 
       categories.forEach((category, index) => {
-        if(categories[index]['id'] === this.id) {
+        if (categories[index]['id'] === this.id) {
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
             this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle).subscribe((results) => {
-                this.seriesData.push({'sublist': sublist[index], 'series':results[0]});
+                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
             });
         } else {
-          return
+          return;
         }
       },
       this.seriesData = []);

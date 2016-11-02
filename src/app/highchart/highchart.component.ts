@@ -54,6 +54,11 @@ export class HighchartComponent implements OnInit {
         }
       }
     } else {
+      let level = this.seriesData['observations']['chart data']['level'];
+      let title = this.seriesData['serie']['title'];
+      let tableData = this.seriesData['observations']['table data'];
+      let unitsShort = this.seriesData['serie']['unitsLabelShort'];
+
       this.options = {
         chart: {
           // height: 200,
@@ -113,25 +118,22 @@ export class HighchartComponent implements OnInit {
           }
         },
         series: [{
-          name: this.seriesData['serie']['title'],
+          name: title,
           type: 'line',
           yAxis: 1,
           color: '#2B908F',
-          data: this.seriesData['observations']['chart data']['level'],
+          data: level,
         }],
-        labels: {
+        /* labels: {
           items: [{
-            html: 'Last Observation:<br>' + this.seriesData['observations']['chart data']['level'][this.seriesData['observations']['chart data']['level'].length - 1][1] + ' (' + this.seriesData['serie']['unitsLabelShort'] + ') <br>' + this.seriesData['observations']['table data'][this.seriesData['observations']['table data'].length - 1]['date'],
+            html: 'Last Observation:<br>' + level[level.length - 1] + ' (' + unitsShort + ') <br>', //+ tableData[tableData.length - 1]['date'],
             style: {
               left: '0px',
               top: '0px',
               color: '#505050'
             }
-          }],
-          style: {
-            'zIndex': 100
-          }
-        }
+          }]
+        } */
       };
     }
   }

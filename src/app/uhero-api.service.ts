@@ -17,7 +17,7 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
-  private cachedChartData = [];
+  // private cachedChartData = [];
   private cachedMultiChartData = {};
   private cachedGeographies = [];
   private cachedGeoSeries = [];
@@ -36,7 +36,7 @@ export class UheroApiService {
 
   //  Get data from API
   fetchCategories() {
-    if(this.cachedCategories) {
+    if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
       let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
@@ -50,7 +50,7 @@ export class UheroApiService {
   }
 
   fetchSeries(id: number) {
-    if(this.cachedSeries[id]) {
+    if (this.cachedSeries[id]) {
       return Observable.of(this.cachedSeries[id]);
     } else {
       let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
@@ -64,7 +64,7 @@ export class UheroApiService {
   }
 
   fetchSeriesDetail(id: number) {
-    if(this.cachedSeriesDetail[id]) {
+    if (this.cachedSeriesDetail[id]) {
       return Observable.of(this.cachedSeriesDetail[id]);
     } else {
       let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
@@ -83,8 +83,8 @@ export class UheroApiService {
   } */
 
   fetchGeographies(id: number): Observable<Regions> {
-    if(this.cachedGeographies[id]) {
-      console.log(this.cachedGeographies[id])
+    if (this.cachedGeographies[id]) {
+      console.log(this.cachedGeographies[id]);
       return Observable.of(this.cachedGeographies[id]);
     } else {
       let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
@@ -98,7 +98,7 @@ export class UheroApiService {
   }
 
   fetchGeoSeries(id: number, handle: string) {
-    if(this.cachedGeoSeries[id + handle]) {
+    if (this.cachedGeoSeries[id + handle]) {
       return Observable.of(this.cachedGeoSeries[id + handle]);
     } else {
     let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle, this.requestOptionsArgs)
@@ -112,7 +112,7 @@ export class UheroApiService {
   }
 
   fetchObservations(id: number) {
-    if(this.cachedObservations[id]) {
+    if (this.cachedObservations[id]) {
       return Observable.of(this.cachedObservations[id]);
     } else {
       let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
@@ -150,14 +150,14 @@ export class UheroApiService {
 
   // Get series and observation data for landing page component charts; filtered by region
   fetchMultiChartData(id: number, handle: string) {
-    if(this.cachedMultiChartData[id + handle]) {
+    if (this.cachedMultiChartData[id + handle]) {
       return this.cachedMultiChartData[id + handle];
     } else {
       let multiChartData = [];
       console.log('id', id);
       this.fetchGeoSeries(id, handle).subscribe((series) => {
         let seriesData = series;
-        if(seriesData !== null) {
+        if (seriesData !== null) {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
@@ -165,7 +165,7 @@ export class UheroApiService {
             });
           });
         } else {
-          multiChartData.push({'serie': 'No data available'})
+          multiChartData.push({'serie': 'No data available'});
         }
       },
       error => this.errorMessage = error);
@@ -227,20 +227,20 @@ function mapObservations(response: Response): ObservationResults {
   let levelValue = [];
   let percValue = [];
 
-  if(level) {
+  if (level) {
     level.forEach((entry, index) => {
       // Create [date, value] level pairs for charts
       levelValue.push([Date.parse(level[index].date), +level[index].value]);
     });
   }
 
-  if(perc) {
+  if (perc) {
     perc.forEach((entry, index) => {
       // Create [date, value] percent pairs for charts
       percValue.push([Date.parse(perc[index].date), +perc[index].value]);
     });
   }
-  
+
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue};
   let data = {'chart data': chartData, 'table data': tableData};
@@ -251,12 +251,12 @@ function mapObservations(response: Response): ObservationResults {
 // Used to construct table data for single series view
 function combineObsData(level, perc) {
   // Check that level and perc arrays are not null
-  if(level && perc) {
+  if (level && perc) {
     var table = level;
-    for(let i = 0; i < level.length; i++) {
-      table[i].percValue = "NA";
-      for(let j = 0; j < perc.length; j++) {
-        if(level[i].date === perc[j].date) {
+    for (let i = 0; i < level.length; i++) {
+      table[i].percValue = 'NA';
+      for (let j = 0; j < perc.length; j++) {
+        if (level[i].date === perc[j].date) {
           table[i].percValue = perc[j].value;
           break;
         }

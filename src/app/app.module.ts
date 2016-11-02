@@ -14,6 +14,7 @@ import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
 import { SidebarNavComponent } from './sidebar-nav/sidebar-nav.component';
 import { HighchartComponent } from './highchart/highchart.component';
+import { FreqSelectorComponent } from './freq-selector/freq-selector.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { HighchartComponent } from './highchart/highchart.component';
     SingleSeriesComponent,
     SidebarNavComponent,
     HighchartComponent,
+    FreqSelectorComponent,
   ],
   imports: [
     BrowserModule,
