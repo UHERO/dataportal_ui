@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
-import { UheroApiService } from '../uhero-api.service';
+import { Geography } from '../geography';
 
 @Component({
   selector: 'app-geo-selector',
@@ -9,10 +8,11 @@ import { UheroApiService } from '../uhero-api.service';
   styleUrls: ['./geo-selector.component.scss']
 })
 export class GeoSelectorComponent implements OnInit {
-  @Input() regions;
-  @Input() selectedGeo;
+  @Input() regions: Array<Geography>;
+  @Input() selectedGeo: Geography;
   @Output() selectedGeoChange = new EventEmitter();
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
+
+  constructor() { }
 
   ngOnInit() {
 

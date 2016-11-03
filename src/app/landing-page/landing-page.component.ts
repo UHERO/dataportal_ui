@@ -1,8 +1,12 @@
 // Component for landing page category tabs
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { Frequencies } from '../freq-const';
+import { Frequency } from '../frequency';
+import { Geography } from '../Geography';
+
 import { error } from 'util';
 
 @Component({
@@ -13,29 +17,33 @@ import { error } from 'util';
 export class LandingPageComponent implements OnInit, AfterViewInit {
   private selectedCategory;
   private categories;
-  private id;
+  private id: number;
+  private geoHandle: string;
+  private freqHandle: string;
   private errorMessage: string;
   // seriesData array used as input in highchart.component
   public seriesData = [];
   public regions = [];
-  public currentGeo;
+  public freqs = Frequencies;
+  public currentGeo: Geography;
+  public currentFreq: Frequency;
 
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.currentGeo = {handle: null};
+    this.currentGeo = {fips: null, name: null, handle: null};
+    this.currentFreq = {name: null, handle: null};
   }
 
   ngAfterViewInit() {
     this.route.params.subscribe(params => {
       this.id = Number.parseInt(params['id']);
       if (isNaN(this.id)) {
-        this.getRegions(42);
-        // this.drawSeries(8);
+        this.id = 42;
+        this.drawSeries(42);
       } else {
-        this.getRegions(this.id);
-        // this.drawSeries(id);
+        this.drawSeries(this.id);
       }
     });
   }
@@ -63,7 +71,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   // Called on page load
   // Gets data for sublists on default selected region
-  getRegions(catId: number) {
+  drawSeries(catId: number) {
+    let geoArray = [];
+    this.currentFreq = this.freqs[0];
+    console.log('default freq', this.currentFreq);
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -73,9 +84,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
             this._uheroAPIService.fetchGeographies(sublist[index]['id']).subscribe((geos) => {
-              this.regions = geos;
-              this.currentGeo = geos[0];
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle).subscribe((results) => {
+              geos.forEach((geo, index) => {
+                this.uniqueGeos(geos[index], geoArray);
+              });
+              this.regions = geoArray;
+              this.currentGeo = geoArray[0];
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, this.currentFreq.handle).subscribe((results) => {
                 this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
             });
@@ -90,7 +104,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw series when a new region is selected
-  redrawSeries(event) {
+  redrawSeriesGeo(event) {
+    this.geoHandle = event.handle;
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -98,10 +113,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
-            this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle).subscribe((results) => {
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle, this.currentFreq.handle).subscribe((results) => {
                 this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
-            });
+          });
         } else {
           return;
         }
@@ -109,5 +124,40 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.seriesData = []);
     },
     error => this.errorMessage = error);
+  }
+
+  redrawSeriesFreq(event) {
+    this.freqHandle = event.handle;
+    this._uheroAPIService.fetchCategories().subscribe((category) => {
+      let categories = category;
+
+      categories.forEach((category, index) => {
+        if (categories[index]['id'] === this.id) {
+          let sublist = categories[index]['children'];
+          sublist.forEach((sub, index) => {
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, event.handle).subscribe((results) => {
+                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
+              });
+          });
+        } else {
+          return;
+        }
+      },
+      this.seriesData = []);
+    },
+    error => this.errorMessage = error);
+  }
+
+  uniqueGeos(geo, geoList) {
+    let exist = false;
+    for (let i in geoList) {
+      if (geo.name === geoList[i].name) {
+        exist = true;
+      }
+    }
+
+    if (!exist) {
+      geoList.push(geo);
+    }
   }
 }

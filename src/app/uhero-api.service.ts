@@ -7,8 +7,7 @@ import 'rxjs/add/operator/mergeMap';
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
 import { Series } from './series';
-// import { Geography } from './geography';
-import { Regions } from './regions';
+import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
 
 @Injectable()
@@ -35,6 +34,8 @@ export class UheroApiService {
   }
 
   //  Get data from API
+
+  // Gets all available categories. Used for navigation & displaying sublists 
   fetchCategories() {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
@@ -49,20 +50,21 @@ export class UheroApiService {
     }
   }
 
-  fetchSeries(id: number) {
-    if (this.cachedSeries[id]) {
-      return Observable.of(this.cachedSeries[id]);
+  fetchSeries(id: number, geo: string, freq: string) {
+    if (this.cachedSeries[id + geo + freq]) {
+      return Observable.of(this.cachedSeries[id + geo + freq]);
     } else {
-      let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id, this.requestOptionsArgs)
+      let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapSeries)
         .do(val => {
-          this.cachedSeries[id] = val;
+          this.cachedSeries[id + geo + freq] = val;
           series$ = null;
         });
       return series$;
     }
   }
 
+  // Gets data for a particular series. Used for single series view.
   fetchSeriesDetail(id: number) {
     if (this.cachedSeriesDetail[id]) {
       return Observable.of(this.cachedSeriesDetail[id]);
@@ -82,7 +84,8 @@ export class UheroApiService {
          .map(response => response.json());
   } */
 
-  fetchGeographies(id: number): Observable<Regions> {
+  // Gets available geographies for a particular category
+  fetchGeographies(id: number): Observable<Geography[]> {
     if (this.cachedGeographies[id]) {
       console.log(this.cachedGeographies[id]);
       return Observable.of(this.cachedGeographies[id]);
@@ -111,6 +114,7 @@ export class UheroApiService {
     }
   }
 
+  // Gets observation data for a series
   fetchObservations(id: number) {
     if (this.cachedObservations[id]) {
       return Observable.of(this.cachedObservations[id]);
@@ -149,14 +153,15 @@ export class UheroApiService {
   } */
 
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, handle: string) {
-    if (this.cachedMultiChartData[id + handle]) {
-      return this.cachedMultiChartData[id + handle];
+  fetchMultiChartData(id: number, geo: string, freq: string) {
+    if (this.cachedMultiChartData[id + geo + freq]) {
+      console.log('cached', this.cachedMultiChartData[id + geo + freq])
+      return this.cachedMultiChartData[id + geo + freq];
     } else {
       let multiChartData = [];
-      console.log('id', id);
-      this.fetchGeoSeries(id, handle).subscribe((series) => {
+      this.fetchSeries(id, geo, freq).subscribe((series) => {
         let seriesData = series;
+        console.log('series', seriesData);
         if (seriesData !== null) {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
@@ -169,9 +174,9 @@ export class UheroApiService {
         }
       },
       error => this.errorMessage = error);
-      this.cachedMultiChartData[id + handle] = (Observable.forkJoin(Observable.of(multiChartData)));
-      console.log(this.cachedMultiChartData[id + handle]);
-      return this.cachedMultiChartData[id + handle];
+      this.cachedMultiChartData[id + geo + freq] = (Observable.forkJoin(Observable.of(multiChartData)));
+      console.log(this.cachedMultiChartData[id + geo + freq]);
+      return this.cachedMultiChartData[id + geo + freq];
     }
   }
 
@@ -209,7 +214,7 @@ function mapSeriesDetail(response: Response): Series {
   return seriesDetail;
 }
 
-function mapGeographies(response: Response): Regions {
+function mapGeographies(response: Response): Geography[] {
   let geos = response.json().data;
   return geos;
 }
@@ -252,7 +257,7 @@ function mapObservations(response: Response): ObservationResults {
 function combineObsData(level, perc) {
   // Check that level and perc arrays are not null
   if (level && perc) {
-    var table = level;
+    let table = level;
     for (let i = 0; i < level.length; i++) {
       table[i].percValue = 'NA';
       for (let j = 0; j < perc.length; j++) {
@@ -262,6 +267,6 @@ function combineObsData(level, perc) {
         }
       }
     }
+    return table;
   }
-  return table;
 }
