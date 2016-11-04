@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { Frequency } from '../frequency';
 import * as Highcharts from 'highcharts';
 
 Highcharts.setOptions({
@@ -17,6 +18,13 @@ Highcharts.setOptions({
 })
 export class SingleSeriesComponent implements OnInit {
   private errorMessage: string;
+  public chartData;
+  public seriesDetail;
+  public freqs;
+  public currentFreq;
+  public regions = [];
+  public currentGeo;
+  private seriesSiblings;
   private options: Object;
   private tableData = [];
   private newTableData = [];
@@ -24,106 +32,111 @@ export class SingleSeriesComponent implements OnInit {
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
+    this.currentGeo = {fips: null, name: null, handle: null};
+    this.currentFreq = {freq: null, label: null};
+    /* this.route.params.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
 
       this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((series) => {
-        let seriesDetail = series;
+        this.seriesDetail = series;
 
         this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
           let seriesObservations = observations;
-          let chartData = seriesObservations['chart data'];
+          //let chartData = seriesObservations['chart data'];
+          this.chartData = seriesObservations['chart data'];
+          console.log('chart data', this.chartData);
           this.tableData = seriesObservations['table data'];
-          this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['title'], seriesDetail['unitsLabelShort']);
+          // this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['title'], seriesDetail['unitsLabelShort']);
         });
         },
         error => this.errorMessage = error
       );
+    }); */
+  }
+
+  ngAfterViewInit() {
+    /* this.route.params.subscribe(params => {
+      let seriesId = Number.parseInt(params['id']);
+      this.drawChart(seriesId);
+    }) */
+   this.route.params.subscribe(params => {
+      let seriesId = Number.parseInt(params['id']);
+      this.drawChart(seriesId);
+    })
+
+  }
+
+  drawChart(id: number) {
+    this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
+      this.seriesDetail = series;
+      console.log('detail', this.seriesDetail);
+
+      this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
+        this.seriesSiblings = siblings;
+        console.log('siblings', this.seriesSiblings);
+      })
+
+      this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
+        this.freqs = frequencies;
+        this.currentFreq = {'freq': this.seriesDetail['frequencyShort'], 'label': this.seriesDetail['frequency']};
+        console.log(this.currentFreq);
+      });
+
+      this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
+        this.regions = geos;
+        this.currentGeo = {'fips': this.seriesDetail['geography']['fips'], 'name': this.seriesDetail['geography']['name'], 'handle': this.seriesDetail['geography']['handle']};
+      });
+      this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
+        console.log('observations', observations);
+        let seriesObservations = observations;
+        this.chartData = seriesObservations['chart data'];
+        // this.chartData.push(seriesObservations['chart data']);
+        console.log('chart data', this.chartData);
+        this.tableData = seriesObservations['table data'];
+      });
     });
   }
 
   highStockOptions(leveldata, percdata, seriesName, seriesUnits) {
-    this.options = {
-      chart: {
-        //height: 425,
-        // width: 800,
-        zoomType: 'x',
-        backgroundColor: '#E5E5E5',
-      },
-      rangeSelector: {
-        selected: 1,
-        buttonTheme: {
-          visibility: 'hidden'
-        },
-        labelStyle: {
-          visibility: 'hidden'
-        },
-        inputEnabled: false
-        // inputDateFormat: '%Y-01-01',
-        // inputEditDateFormat: '%Y-01-01',
-      },
-      title: {
-        text: seriesName + ' (' + seriesUnits + ')',
-        style: {
-          color: '#505050'
-        }
-      },
-      credits: {
-        enabled: false
-      },
-      xAxis: {
-        ordinal: false,
-        labels: {
-          style: {
-            color: '#505050'
-          }
-        }
-      },
-      yAxis: [{
-        labels: {
-          format: '{value:,.0f}',
-          style: {
-            color: '#2B908F'
-          }
-        },
-        title: {
-          text: ''
-        },
-       opposite: false
-      }, {
-        title: {
-          text: ''
-        },
-        labels: {
-          format: '{value:,.0f}',
-          style: {
-            color: '#F6A01B'
-          }
-        }
-      }],
-      navigator: {
-        series: {
-          data: leveldata
-        }
-      },
-      series: [{
-        // name: seriesName,
-        name: 'Percent',
-        type: 'column',
-        color: '#2B908F',
-        data: percdata
-      }, {
-        // name: seriesName,
-        name: 'Level',
-        type: 'line',
-        yAxis: 1,
-        color: '#F6A01B',
-        data: leveldata
-      }]
-    };
   }
 
-  updateTable(e) {
+  redrawGeo(event) {
+    this.chartData = [];
+    console.log(event);
+    this.seriesSiblings.forEach((sibling, index) => {
+      if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.label === this.seriesSiblings[index]['frequency']) {
+        let id = this.seriesSiblings[index]['id'];
+
+        this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
+          this.seriesDetail = series;
+        });
+
+        this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
+          let seriesObservations = observations;
+          this.chartData = seriesObservations['chart data'];
+          // this.chartData.push(seriesObservations['chart data']);
+          console.log('new data', this.chartData)
+          this.tableData = seriesObservations['table data'];
+        });
+      } else {
+        return;
+      }
+    },
+    error => this.errorMessage = error);
+  }
+
+  redrawFreq(event) {
+    console.log(event);
+    this.seriesSiblings.forEach((sibling, index) => {
+      if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.label === this.seriesSiblings[index]['frequency']) {
+        console.log('true');
+      } else {
+        return;
+      }
+    });
+  }
+
+  /* updateTable(e) {
     let xMin, xMax, minDate, maxDate, tableStart, tableEnd;
 
     // Get date range from chart selection
@@ -135,6 +148,22 @@ export class SingleSeriesComponent implements OnInit {
     maxDate = xMax.getUTCFullYear() + '-01-01';
 
     // Find selected dates in available table data
+    for (let i = 0; i < this.tableData.length; i++) {
+      if (this.tableData[i].date === minDate) {
+        tableStart = i;
+      }
+      if (this.tableData[i].date === maxDate) {
+        tableEnd = i;
+      }
+    }
+
+    this.newTableData = this.tableData.slice(tableStart, tableEnd + 1);
+  } */
+  redrawTable(e) {
+    let minDate, maxDate, tableStart, tableEnd;
+    minDate = e['min date'];
+    maxDate = e['max date'];
+
     for (let i = 0; i < this.tableData.length; i++) {
       if (this.tableData[i].date === minDate) {
         tableStart = i;

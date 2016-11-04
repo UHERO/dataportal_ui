@@ -1,5 +1,5 @@
 export interface Frequency {
-    name: string,
-    handle: string
+    freq: string,
+    label: string
 }
 

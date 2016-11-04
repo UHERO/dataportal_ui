@@ -15,11 +15,12 @@ export class FreqSelectorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log('selected', this.selectedFreq);
   }
 
  onChange(newFreq) {
     console.log('nf', newFreq);
-    this.selectedFreq = this.freqs.find(freq => freq.handle === newFreq);
+    this.selectedFreq = this.freqs.find(freq => freq.freq === newFreq);
     console.log('selected', this.selectedFreq);
     this.selectedFreqChange.emit(this.selectedFreq);
   }

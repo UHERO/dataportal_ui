@@ -1,5 +1,5 @@
-<select [ngModel]="selectedFreq.handle" (ngModelChange)="onChange($event)" id="freq-selector">
-   <option [ngValue]="freq.handle" *ngFor="let freq of freqs">
-      {{freq.name}}
+<select [ngModel]="selectedFreq.freq" (ngModelChange)="onChange($event)" id="freq-selector">
+   <option [ngValue]="freq.freq" *ngFor="let freq of freqs">
+      {{freq.label}}
    </option>
 </select>

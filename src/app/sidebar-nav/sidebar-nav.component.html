@@ -10,7 +10,7 @@
     <!-- <ul id="navbarSide" class="navbar-side sidebar-list"> -->
     <ul id="navbarSide" class="navbar-side" [class.reveal]="reveal">
       <li class="list-item" *ngFor="let category of categories, let cat = index" (click)="expandItem(category.children, category.name, cat)" [class.selectedCategory]="cat === selectedCategory">
-        <a href="#" [routerLink]="['/category', category['id']]">{{category.name}}</a>
+        <a href="#" [routerLink]="['/category', category['id']]">&nbsp; {{category.name}}</a>
         <!-- List of subcategories/data lists -->
         <!-- <ul class="sidebar-list" *ngIf="expand === category.name">
           <li class="sub-list-item" *ngFor="let child of category.children, let childCat = index" (click)="expandSublist(category.name, cat, childCat, child.name, child.id)" [class.selectedSublist]="childCat === selectedSublist">

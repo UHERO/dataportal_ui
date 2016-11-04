@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 import { Frequencies } from '../freq-const';
 import { Frequency } from '../frequency';
-import { Geography } from '../Geography';
+import { Geography } from '../geography';
 
 import { error } from 'util';
 
@@ -33,7 +33,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
-    this.currentFreq = {name: null, handle: null};
+    this.currentFreq = {freq: null, label: null};
   }
 
   ngAfterViewInit() {
@@ -89,7 +89,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
               });
               this.regions = geoArray;
               this.currentGeo = geoArray[0];
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, this.currentFreq.handle).subscribe((results) => {
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
                 this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
             });
@@ -113,7 +113,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle, this.currentFreq.handle).subscribe((results) => {
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
                 this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
           });

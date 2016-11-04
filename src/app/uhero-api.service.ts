@@ -7,6 +7,7 @@ import 'rxjs/add/operator/mergeMap';
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
 import { Series } from './series';
+import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
 
@@ -23,6 +24,9 @@ export class UheroApiService {
   private cachedObservations = [];
   private cachedSeries = [];
   private cachedSeriesDetail = [];
+  private cachedSiblings = [];
+  private cachedSiblingFreqs = [];
+  private cachedSiblingGeos = [];
   private errorMessage: string;
 
   constructor(private http: Http) {
@@ -67,22 +71,64 @@ export class UheroApiService {
   // Gets data for a particular series. Used for single series view.
   fetchSeriesDetail(id: number) {
     if (this.cachedSeriesDetail[id]) {
+      console.log(this.cachedSeriesDetail[id])
       return Observable.of(this.cachedSeriesDetail[id]);
     } else {
       let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
         .map(mapSeriesDetail)
         .do(val => {
           this.cachedSeriesDetail[id] = val;
+          console.log(val);
           seriesDetail$ = null;
         });
       return seriesDetail$;
     }
   }
 
-  /* fetchGeographies(): Observable<any> {
-     return this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
-         .map(response => response.json());
-  } */
+  // Get list of siblings for a particular series
+  fetchSeriesSiblings(seriesId: number) {
+    if (this.cachedSiblings[seriesId]) {
+      return Observable.of(this.cachedSiblings[seriesId]);
+    } else {
+      let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=` + seriesId, this.requestOptionsArgs)
+        .map(mapSeries)
+        .do(val => {
+          this.cachedSiblings[seriesId] = val;
+          seriesSiblings$ = null;
+        });
+      return seriesSiblings$;
+    }
+  }
+
+  // Get available frequencies for a series' siblings
+  fetchSiblingFreqs(seriesId: number): Observable<Frequency> {
+    if (this.cachedSiblingFreqs[seriesId]) {
+      return Observable.of(this.cachedSiblingFreqs[seriesId]);
+    } else {
+      let siblingFreqs$ = this.http.get(`${this.baseUrl}/series/siblings/freq?id=` + seriesId, this.requestOptionsArgs)
+        .map(mapSiblingFreqs)
+        .do(val => {
+          this.cachedSiblingFreqs[seriesId] = val;
+          siblingFreqs$ = null;
+        });
+      return siblingFreqs$;
+    }
+  }
+
+  // Get available geographies for a series' siblings
+  fetchSiblingGeos(seriesId: number): Observable<Geography[]> {
+    if (this.cachedSiblingGeos[seriesId]) {
+      return Observable.of(this.cachedSiblingGeos[seriesId]);
+    } else {
+      let siblingGeos$ = this.http.get(`${this.baseUrl}/series/siblings/geo?id=` + seriesId, this.requestOptionsArgs)
+        .map(mapGeographies)
+        .do(val => {
+          this.cachedSiblingGeos[seriesId] = val;
+          siblingGeos$ = null;
+        });
+      return siblingGeos$;
+    }
+  }
 
   // Gets available geographies for a particular category
   fetchGeographies(id: number): Observable<Geography[]> {
@@ -207,6 +253,11 @@ function mapSeries(response: Response): SelectedSeries {
   let series = response.json().data;
   // console.log(series);
   return series;
+}
+
+function mapSiblingFreqs(response: Response): Frequency {
+  let frequencies = response.json().data;
+  return frequencies;
 }
 
 function mapSeriesDetail(response: Response): Series {

@@ -1,7 +1,11 @@
-<div id="single-series-view" class="col-xs-12 col-sm-12">
-    <chart type="StockChart" [options]="options">
+<div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12">
+  <h3>{{seriesDetail.title}} - {{seriesDetail.geography.name}}</h3>
+  <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawGeo($event)"></app-geo-selector>
+  <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)"></app-freq-selector>
+    <!-- <chart type="StockChart" [options]="options">
       <xAxis (setExtremes)="updateTable($event)"></xAxis>
-    </chart>
+    </chart> -->
+    <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail" (chartExtremes)="redrawTable($event)"></app-highstock>
 
   <table id="single-series-table" *ngIf="newTableData.length === 0" class="col-md-8 col-lg-10 col-xl-10">
     <thead>

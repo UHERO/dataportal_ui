@@ -1,7 +1,7 @@
 import { Frequency } from './frequency';
 
 export const Frequencies: Array<Frequency> = [
-    {'name': 'Annual', 'handle': 'A'},
-    {'name': 'Monthly', 'handle': 'M'},
-    {'name': 'Quarterly', 'handle': 'Q'}
+    {'freq': 'A', 'label': 'year'},
+    {'freq': 'M', 'label': 'month'},
+    {'freq': 'Q', 'label': 'quarter'}
 ];
