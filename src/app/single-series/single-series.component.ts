@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -18,47 +18,29 @@ Highcharts.setOptions({
 })
 export class SingleSeriesComponent implements OnInit {
   private errorMessage: string;
-  public chartData;
-  public seriesDetail;
-  public freqs;
-  public currentFreq;
-  public regions = [];
-  public currentGeo;
   private seriesSiblings;
   private options: Object;
   private tableData = [];
   private newTableData = [];
+  
+  // Vars used in highstock component
+  public chartData;
+  public seriesDetail;
+
+  // Vars used in selectors
+  public freqs;
+  public currentFreq;
+  public regions = [];
+  public currentGeo;
 
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
     this.currentFreq = {freq: null, label: null};
-    /* this.route.params.subscribe(params => {
-      let seriesId = Number.parseInt(params['id']);
-
-      this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((series) => {
-        this.seriesDetail = series;
-
-        this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
-          let seriesObservations = observations;
-          //let chartData = seriesObservations['chart data'];
-          this.chartData = seriesObservations['chart data'];
-          console.log('chart data', this.chartData);
-          this.tableData = seriesObservations['table data'];
-          // this.highStockOptions(chartData['level'], chartData['perc'], seriesDetail['title'], seriesDetail['unitsLabelShort']);
-        });
-        },
-        error => this.errorMessage = error
-      );
-    }); */
   }
 
   ngAfterViewInit() {
-    /* this.route.params.subscribe(params => {
-      let seriesId = Number.parseInt(params['id']);
-      this.drawChart(seriesId);
-    }) */
    this.route.params.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       this.drawChart(seriesId);
@@ -66,6 +48,7 @@ export class SingleSeriesComponent implements OnInit {
 
   }
 
+  // Draws chart & table on load
   drawChart(id: number) {
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
@@ -84,22 +67,18 @@ export class SingleSeriesComponent implements OnInit {
 
       this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
         this.regions = geos;
-        this.currentGeo = {'fips': this.seriesDetail['geography']['fips'], 'name': this.seriesDetail['geography']['name'], 'handle': this.seriesDetail['geography']['handle']};
+        this.currentGeo = this.seriesDetail['geography'];
       });
       this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
         console.log('observations', observations);
         let seriesObservations = observations;
         this.chartData = seriesObservations['chart data'];
-        // this.chartData.push(seriesObservations['chart data']);
-        console.log('chart data', this.chartData);
         this.tableData = seriesObservations['table data'];
       });
     });
   }
 
-  highStockOptions(leveldata, percdata, seriesName, seriesUnits) {
-  }
-
+  // Redraw chart when selecting a new region
   redrawGeo(event) {
     this.chartData = [];
     console.log(event);
@@ -114,8 +93,6 @@ export class SingleSeriesComponent implements OnInit {
         this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
           let seriesObservations = observations;
           this.chartData = seriesObservations['chart data'];
-          // this.chartData.push(seriesObservations['chart data']);
-          console.log('new data', this.chartData)
           this.tableData = seriesObservations['table data'];
         });
       } else {
@@ -125,40 +102,30 @@ export class SingleSeriesComponent implements OnInit {
     error => this.errorMessage = error);
   }
 
+  // Redraw chart when selecting a new frequency
   redrawFreq(event) {
     console.log(event);
     this.seriesSiblings.forEach((sibling, index) => {
       if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.label === this.seriesSiblings[index]['frequency']) {
-        console.log('true');
+        let id = this.seriesSiblings[index]['id'];
+
+        this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
+          this.seriesDetail = series;
+        });
+
+        this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
+          let seriesObservations = observations;
+          this.chartData = seriesObservations['chart data'];
+          this.tableData = seriesObservations['table data'];
+        });
       } else {
         return;
       }
-    });
+    },
+    error => this.errorMessage = error);
   }
 
-  /* updateTable(e) {
-    let xMin, xMax, minDate, maxDate, tableStart, tableEnd;
-
-    // Get date range from chart selection
-    xMin = new Date(e.context.min);
-    xMax = new Date(e.context.max);
-
-    // Annual series observations
-    minDate = xMin.getUTCFullYear() + '-01-01';
-    maxDate = xMax.getUTCFullYear() + '-01-01';
-
-    // Find selected dates in available table data
-    for (let i = 0; i < this.tableData.length; i++) {
-      if (this.tableData[i].date === minDate) {
-        tableStart = i;
-      }
-      if (this.tableData[i].date === maxDate) {
-        tableEnd = i;
-      }
-    }
-
-    this.newTableData = this.tableData.slice(tableStart, tableEnd + 1);
-  } */
+  // Update table when selecting new ranges in the chart
   redrawTable(e) {
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e['min date'];

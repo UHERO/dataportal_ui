@@ -1,5 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
 
+import * as Highcharts from 'highcharts';
+
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  }
+});
+
 @Component({
   selector: 'app-highchart',
   templateUrl: './highchart.component.html',
@@ -57,7 +65,7 @@ export class HighchartComponent implements OnInit {
       let title = this.seriesData['serie']['title'];
       let tableData = this.seriesData['observations']['table data'];
       let unitsShort = this.seriesData['serie']['unitsLabelShort'];
-
+      let lastLevel = level[level.length - 1][1].toLocaleString();
       this.options = {
         chart: {
           // height: 200,
@@ -66,7 +74,9 @@ export class HighchartComponent implements OnInit {
           backgroundColor: '#E5E5E5'
         },
         title: {
-          text: this.seriesData['serie']['title'],
+          text: '<b>' + this.seriesData['serie']['title'] + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
+          align: 'left',
+          widthAdjust: 0,
           style: {
             // color: '#FFFFFF',
             color: '#505050',
@@ -120,7 +130,7 @@ export class HighchartComponent implements OnInit {
           name: title,
           type: 'line',
           yAxis: 1,
-          color: '#2B908F',
+          color: '#1D667F',
           data: level,
         }],
         /* labels: {

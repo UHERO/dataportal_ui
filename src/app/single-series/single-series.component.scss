@@ -1,5 +1,5 @@
 #single-series-view {
-  background: #F6F5F5;
+  // background: #F6F5F5;
   // width: 650px;
   // margin-left: 8%;
   // margin-right: -8%;
@@ -16,6 +16,23 @@
   } */
   @media (min-width: 768px) {
     margin-top: 80px;
+  }
+
+  .series-title {
+    // display: inline-block;
+    // text-align: center;
+    font-size: 1.5em;
+    color: #1D667F;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .selectors {
+    margin: 0 auto;
+
+    .geo-selector, .freq-selector {
+      display: inline-block;
+    }
   }
 
   .single-chart-container {

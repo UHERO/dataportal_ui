@@ -40,7 +40,7 @@ export class UheroApiService {
   //  Get data from API
 
   // Gets all available categories. Used for navigation & displaying sublists 
-  fetchCategories() {
+  fetchCategories(): Observable<CategoryTree> {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
@@ -54,12 +54,12 @@ export class UheroApiService {
     }
   }
 
-  fetchSeries(id: number, geo: string, freq: string) {
+  fetchSeries(id: number, geo: string, freq: string): Observable<Series[]> {
     if (this.cachedSeries[id + geo + freq]) {
       return Observable.of(this.cachedSeries[id + geo + freq]);
     } else {
       let series$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
-        .map(mapSeries)
+        .map(mapData)
         .do(val => {
           this.cachedSeries[id + geo + freq] = val;
           series$ = null;
@@ -69,16 +69,15 @@ export class UheroApiService {
   }
 
   // Gets data for a particular series. Used for single series view.
-  fetchSeriesDetail(id: number) {
+  fetchSeriesDetail(id: number): Observable<Series> {
     if (this.cachedSeriesDetail[id]) {
       console.log(this.cachedSeriesDetail[id])
       return Observable.of(this.cachedSeriesDetail[id]);
     } else {
       let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
-        .map(mapSeriesDetail)
+        .map(mapData)
         .do(val => {
           this.cachedSeriesDetail[id] = val;
-          console.log(val);
           seriesDetail$ = null;
         });
       return seriesDetail$;
@@ -86,12 +85,12 @@ export class UheroApiService {
   }
 
   // Get list of siblings for a particular series
-  fetchSeriesSiblings(seriesId: number) {
+  fetchSeriesSiblings(seriesId: number): Observable<Series[]> {
     if (this.cachedSiblings[seriesId]) {
       return Observable.of(this.cachedSiblings[seriesId]);
     } else {
       let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=` + seriesId, this.requestOptionsArgs)
-        .map(mapSeries)
+        .map(mapData)
         .do(val => {
           this.cachedSiblings[seriesId] = val;
           seriesSiblings$ = null;
@@ -106,7 +105,7 @@ export class UheroApiService {
       return Observable.of(this.cachedSiblingFreqs[seriesId]);
     } else {
       let siblingFreqs$ = this.http.get(`${this.baseUrl}/series/siblings/freq?id=` + seriesId, this.requestOptionsArgs)
-        .map(mapSiblingFreqs)
+        .map(mapData)
         .do(val => {
           this.cachedSiblingFreqs[seriesId] = val;
           siblingFreqs$ = null;
@@ -121,7 +120,7 @@ export class UheroApiService {
       return Observable.of(this.cachedSiblingGeos[seriesId]);
     } else {
       let siblingGeos$ = this.http.get(`${this.baseUrl}/series/siblings/geo?id=` + seriesId, this.requestOptionsArgs)
-        .map(mapGeographies)
+        .map(mapData)
         .do(val => {
           this.cachedSiblingGeos[seriesId] = val;
           siblingGeos$ = null;
@@ -137,7 +136,7 @@ export class UheroApiService {
       return Observable.of(this.cachedGeographies[id]);
     } else {
       let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
-        .map(mapGeographies)
+        .map(mapData)
         .do(val => {
           this.cachedGeographies[id] = val;
           geographies$ = null;
@@ -146,12 +145,12 @@ export class UheroApiService {
     }
   }
 
-  fetchGeoSeries(id: number, handle: string) {
+  fetchGeoSeries(id: number, handle: string): Observable<Series[]> {
     if (this.cachedGeoSeries[id + handle]) {
       return Observable.of(this.cachedGeoSeries[id + handle]);
     } else {
     let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle, this.requestOptionsArgs)
-      .map(mapGeoSeries)
+      .map(mapData)
       .do(val => {
         this.cachedGeoSeries[id + handle] = val;
         geoSeries$ = null;
@@ -249,30 +248,9 @@ function mapCategories(response: Response): CategoryTree {
   return categoryTree;
 }
 
-function mapSeries(response: Response): SelectedSeries {
-  let series = response.json().data;
-  // console.log(series);
-  return series;
-}
-
-function mapSiblingFreqs(response: Response): Frequency {
-  let frequencies = response.json().data;
-  return frequencies;
-}
-
-function mapSeriesDetail(response: Response): Series {
-  let seriesDetail = response.json().data;
-  return seriesDetail;
-}
-
-function mapGeographies(response: Response): Geography[] {
-  let geos = response.json().data;
-  return geos;
-}
-
-function mapGeoSeries(response: Response): SelectedSeries {
-  let geoSeries = response.json().data;
-  return geoSeries;
+function mapData(response: Response): any {
+  let data = response.json().data;
+  return data;
 }
 
 function mapObservations(response: Response): ObservationResults {

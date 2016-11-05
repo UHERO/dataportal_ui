@@ -3,6 +3,7 @@
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
   <!-- <div class="all-chart-container"> -->
+  <hr>
   <div *ngFor="let series of seriesData" class="multi-charts-row">
     <h3 class="sublist">{{series['sublist']['name']}}</h3>
     <div *ngFor="let serie of series.series" class="multi-charts">

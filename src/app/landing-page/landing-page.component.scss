@@ -5,20 +5,15 @@
   overflow: auto;
 
   .selected-category {
-    display: inline-block;
+    display: block;
     color: #1D667F;
     font-size: 1.9em;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
 
   .sublist {
     color: #1D667F;
-    font-size: 1em;
-  }
-
-  .selector {
-    // display: inline-block;
-    float: right;
+    font-size: 1.3em;
   }
 
   @media (min-width: 768px) {

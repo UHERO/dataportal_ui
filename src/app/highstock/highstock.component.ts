@@ -60,7 +60,8 @@ export class HighstockComponent implements OnInit {
         // inputEditDateFormat: '%Y-01-01',
       },
       title: {
-        text: name + ' (' + units + ')',
+        text: '',
+        //text: name + ' (' + units + ')',
         style: {
           color: '#505050'
         }
@@ -80,16 +81,16 @@ export class HighstockComponent implements OnInit {
         labels: {
           format: '{value:,.0f}',
           style: {
-            color: '#2B908F'
+            color: '#1D667F'
           }
         },
         title: {
-          text: ''
+          text: 'Percent'
         },
        opposite: false
       }, {
         title: {
-          text: ''
+          text: 'In ' + units
         },
         labels: {
           format: '{value:,.0f}',
@@ -106,7 +107,7 @@ export class HighstockComponent implements OnInit {
       series: [{
         name: 'Percent',
         type: 'column',
-        color: '#2B908F',
+        color: '#1D667F',
         data: perc
       }, {
         name: 'Level',
