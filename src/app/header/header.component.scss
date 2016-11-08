@@ -7,6 +7,9 @@
    // background: url(../../assets/bg_header.png) repeat-x 0 0;
    color: #ffffff;
    padding: 0;
+   box-shadow: 0 4px 6px -6px black;
+   -moz-box-shadow: 0 4px 6px -6px black;
+   -webkit-box-shadow: 0 4px 6px -6px black;
 
    @media (max-width: 767px) {
      display: none;

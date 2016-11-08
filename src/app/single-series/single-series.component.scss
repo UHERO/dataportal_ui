@@ -19,12 +19,14 @@
   }
 
   .series-title {
-    // display: inline-block;
-    // text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.5em;
     color: #1D667F;
-    text-transform: uppercase;
+    // text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin: auto 15px auto 0;
   }
   
   .selectors {

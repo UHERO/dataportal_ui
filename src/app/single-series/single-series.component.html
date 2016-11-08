@@ -1,9 +1,7 @@
 <div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12">
   <h3 class="series-title">{{seriesDetail.title}}</h3>
-  <div class="selectors">
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawGeo($event)" class="geo-selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)" class="freq-selector"></app-freq-selector>
-  </div>
   <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail" (chartExtremes)="redrawTable($event)"></app-highstock>
 
   <table id="single-series-table" *ngIf="newTableData.length === 0" class="col-md-8 col-lg-10 col-xl-10">

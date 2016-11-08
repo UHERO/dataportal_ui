@@ -125,7 +125,7 @@
       border-bottom: 1px solid #EBEBEB;
       // margin-right: -30px;
       // margin-left: -30px;
-      height: 40px;
+      height: 35px;
       padding: 0;
     }
 
@@ -134,10 +134,11 @@
     }
 
     a {
+      font-family: 'Montserrat', sans-serif;
       display: block;
       text-decoration: none;
       color: #505050;
-      line-height: 40px;
+      line-height: 35px;
       // margin-left: 5px;
 
       &:active {

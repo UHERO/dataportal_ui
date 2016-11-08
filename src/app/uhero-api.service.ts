@@ -200,13 +200,11 @@ export class UheroApiService {
   // Get series and observation data for landing page component charts; filtered by region
   fetchMultiChartData(id: number, geo: string, freq: string) {
     if (this.cachedMultiChartData[id + geo + freq]) {
-      console.log('cached', this.cachedMultiChartData[id + geo + freq])
       return this.cachedMultiChartData[id + geo + freq];
     } else {
       let multiChartData = [];
       this.fetchSeries(id, geo, freq).subscribe((series) => {
         let seriesData = series;
-        console.log('series', seriesData);
         if (seriesData !== null) {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
@@ -220,7 +218,6 @@ export class UheroApiService {
       },
       error => this.errorMessage = error);
       this.cachedMultiChartData[id + geo + freq] = (Observable.forkJoin(Observable.of(multiChartData)));
-      console.log(this.cachedMultiChartData[id + geo + freq]);
       return this.cachedMultiChartData[id + geo + freq];
     }
   }

@@ -5,15 +5,18 @@
   overflow: auto;
 
   .selected-category {
-    display: block;
+    font-family: 'Montserrat', sans-serif;
+    display: inline-block;
     color: #1D667F;
-    font-size: 1.9em;
-    margin-bottom: 10px;
+    font-size: 1.5em;
+    margin: auto 15px auto 0px;
+    vertical-align: middle;
   }
 
   .sublist {
+    font-family: 'Montserrat', sans-serif;
     color: #1D667F;
-    font-size: 1.3em;
+    font-size: 1.2em;
   }
 
   @media (min-width: 768px) {

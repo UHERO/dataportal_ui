@@ -45,7 +45,7 @@ export class HighstockComponent implements OnInit {
     this.options = {
       chart: {
         zoomType: 'x',
-        backgroundColor: '#E5E5E5',
+        backgroundColor: '#F3F3F3',
       },
       rangeSelector: {
         selected: 'All',
@@ -85,12 +85,18 @@ export class HighstockComponent implements OnInit {
           }
         },
         title: {
-          text: 'Percent'
+          text: 'Percent',
+          style: {
+            color: '#1D667F'
+          }
         },
        opposite: false
       }, {
         title: {
-          text: 'In ' + units
+          text: 'In ' + units,
+          style: {
+            color: '#F6A01B'
+          }
         },
         labels: {
           format: '{value:,.0f}',

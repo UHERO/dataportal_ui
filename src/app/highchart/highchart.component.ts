@@ -22,7 +22,7 @@ export class HighchartComponent implements OnInit {
     if(this.seriesData['serie'] === 'No data available') {
       this.options = {
         chart: {
-          backgroundColor: '#E5E5E5'
+          backgroundColor: '#F3F3F3'
         },
         title: {
           text: 'No Data Available',
@@ -71,7 +71,7 @@ export class HighchartComponent implements OnInit {
           // height: 200,
           // width: 200,
           // backgroundColor: '#3E3E40'
-          backgroundColor: '#E5E5E5'
+          backgroundColor: '#F3F3F3'
         },
         title: {
           text: '<b>' + this.seriesData['serie']['title'] + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
@@ -80,7 +80,7 @@ export class HighchartComponent implements OnInit {
           style: {
             // color: '#FFFFFF',
             color: '#505050',
-            fontSize: '0.85em',
+            fontSize: '0.9em',
             letterSpacing: '0.05em'
           }
         },

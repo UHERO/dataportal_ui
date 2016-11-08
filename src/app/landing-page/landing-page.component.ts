@@ -127,7 +127,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   }
 
   redrawSeriesFreq(event) {
-    this.freqHandle = event.handle;
+    this.freqHandle = event.freq;
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -135,7 +135,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           let sublist = categories[index]['children'];
           sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, event.handle).subscribe((results) => {
+              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
                 this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
               });
           });
@@ -148,6 +148,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     error => this.errorMessage = error);
   }
 
+  // Get a unique array of available regions for a category
   uniqueGeos(geo, geoList) {
     let exist = false;
     for (let i in geoList) {
