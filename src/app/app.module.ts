@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
+import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { routing } from './app.routes';
 
 import { AppComponent } from './app.component';
@@ -34,7 +35,8 @@ import { HighstockComponent } from './highstock/highstock.component';
     ChartModule,
     FormsModule,
     HttpModule,
-    routing
+    routing,
+    DataTableModule, SharedModule
   ],
   providers: [UheroApiService],
   bootstrap: [AppComponent]

@@ -52,17 +52,14 @@ export class SingleSeriesComponent implements OnInit {
   drawChart(id: number) {
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
-      console.log('detail', this.seriesDetail);
 
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesSiblings = siblings;
-        console.log('siblings', this.seriesSiblings);
       })
 
       this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
         this.freqs = frequencies;
         this.currentFreq = {'freq': this.seriesDetail['frequencyShort'], 'label': this.seriesDetail['frequency']};
-        console.log(this.currentFreq);
       });
 
       this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
@@ -70,7 +67,6 @@ export class SingleSeriesComponent implements OnInit {
         this.currentGeo = this.seriesDetail['geography'];
       });
       this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
-        console.log('observations', observations);
         let seriesObservations = observations;
         this.chartData = seriesObservations['chart data'];
         this.tableData = seriesObservations['table data'];
@@ -80,8 +76,10 @@ export class SingleSeriesComponent implements OnInit {
 
   // Redraw chart when selecting a new region
   redrawGeo(event) {
+    // Reset chart and table data
     this.chartData = [];
-    console.log(event);
+    this.newTableData = [];
+
     this.seriesSiblings.forEach((sibling, index) => {
       if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.label === this.seriesSiblings[index]['frequency']) {
         let id = this.seriesSiblings[index]['id'];
@@ -104,7 +102,7 @@ export class SingleSeriesComponent implements OnInit {
 
   // Redraw chart when selecting a new frequency
   redrawFreq(event) {
-    console.log(event);
+    this.newTableData = [];
     this.seriesSiblings.forEach((sibling, index) => {
       if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.label === this.seriesSiblings[index]['frequency']) {
         let id = this.seriesSiblings[index]['id'];

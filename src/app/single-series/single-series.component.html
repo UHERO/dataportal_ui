@@ -4,34 +4,9 @@
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)" class="freq-selector"></app-freq-selector>
   <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail" (chartExtremes)="redrawTable($event)"></app-highstock>
 
-  <table id="single-series-table" *ngIf="newTableData.length === 0" class="col-md-8 col-lg-10 col-xl-10">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Level</th>
-        <th>Percent</th>
-      </tr>
-    </thead>
-    <tr *ngFor="let row of tableData">
-      <td>{{row.date}}</td>
-      <td>{{row.value}}</td>
-      <td>{{row.percValue}}</td>
-    </tr>
-  </table>
-
-
-  <table id="single-series-table" *ngIf="newTableData.length > 0" class="col-md-8 col-lg-10 col-xl-10">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Level</th>
-        <th>Percent</th>
-      </tr>
-    </thead>
-    <tr *ngFor="let row of newTableData">
-      <td>{{row.date}}</td>
-      <td>{{row.value}}</td>
-      <td>{{row.percValue}}</td>
-    </tr>
-  </table>
+  <p-dataTable [value]="newTableData.length === 0 ? tableData : newTableData" scrollable="true">
+    <p-column field="date" header="Date" [sortable]="true"></p-column>
+    <p-column field="value" header="Value" [sortable]="true"></p-column>
+    <p-column field="percValue" header="Percent" [sortable]="true"></p-column>
+  </p-dataTable>
 </div>

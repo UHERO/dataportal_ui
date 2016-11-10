@@ -19,9 +19,7 @@ export class GeoSelectorComponent implements OnInit {
   }
 
   onChange(newGeo) {
-    console.log('ng', newGeo);
     this.selectedGeo = this.regions.find(region => region.handle === newGeo);
-    console.log('selected', this.selectedGeo);
     this.selectedGeoChange.emit(this.selectedGeo);
   }
 }
