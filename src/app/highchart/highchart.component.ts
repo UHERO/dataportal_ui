@@ -19,17 +19,21 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if(this.seriesData['serie'] === 'No data available') {
+    let level = this.seriesData['observations']['chart data']['level'];
+    let title = this.seriesData['serie']['title'];
+    if(this.seriesData['serie'] === 'No data available' || level.length === 0) {
       this.options = {
         chart: {
           backgroundColor: '#F3F3F3'
         },
         title: {
-          text: 'No Data Available',
-          verticalAlign: 'middle',
+          text: '<b>' + title + '</b><br>' + 'No Data Available',
+          // verticalAlign: 'middle',
+          align: 'left',
+          widthAdjust: 0,
           style: {
             color: '#505050',
-            fontSize: '1em',
+            fontSize: '0.9em',
             letterSpacing: '0.05em'
           }
         },
@@ -61,11 +65,18 @@ export class HighchartComponent implements OnInit {
         }
       }
     } else {
-      let level = this.seriesData['observations']['chart data']['level'];
-      let title = this.seriesData['serie']['title'];
+      // let level = this.seriesData['observations']['chart data']['level'];
+      // console.log('level', level);
+      // let title = this.seriesData['serie']['title'];
       let tableData = this.seriesData['observations']['table data'];
       let unitsShort = this.seriesData['serie']['unitsLabelShort'];
-      let lastLevel = level[level.length - 1][1].toLocaleString();
+      let lastLevel;
+      if (level.length > 0) {
+        lastLevel = level[level.length - 1][1].toLocaleString();
+      } else {
+        return;
+      }
+      // let lastLevel = level[level.length - 1][1].toLocaleString();
       this.options = {
         chart: {
           // height: 200,
@@ -74,7 +85,7 @@ export class HighchartComponent implements OnInit {
           backgroundColor: '#F3F3F3'
         },
         title: {
-          text: '<b>' + this.seriesData['serie']['title'] + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
+          text: '<b>' + title + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
           align: 'left',
           widthAdjust: 0,
           style: {
@@ -133,16 +144,6 @@ export class HighchartComponent implements OnInit {
           color: '#1D667F',
           data: level,
         }],
-        /* labels: {
-          items: [{
-            html: 'Last Observation:<br>' + level[level.length - 1] + ' (' + unitsShort + ') <br>', //+ tableData[tableData.length - 1]['date'],
-            style: {
-              left: '0px',
-              top: '0px',
-              color: '#505050'
-            }
-          }]
-        } */
       };
     }
   }

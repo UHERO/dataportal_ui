@@ -209,6 +209,7 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
+              console.log('observations', obs);
               multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
             });
           });
