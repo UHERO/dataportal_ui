@@ -45,12 +45,28 @@ export class HighstockComponent implements OnInit {
     this.options = {
       chart: {
         zoomType: 'x',
-        backgroundColor: '#F3F3F3',
+        backgroundColor: '#F9F9F9',
       },
       rangeSelector: {
         selected: 'All',
+        buttons: [{
+          type: 'year',
+          count: 1,
+          text: '1Y'
+        }, {
+          type: 'year',
+          count: 5,
+          text: '5Y'
+        }, {
+          type: 'year',
+          count: 10,
+          text: '10Y'
+        }, {
+          type: 'all',
+          text: 'All'
+        }],
         buttonTheme: {
-          visibility: 'hidden'
+          // visibility: 'hidden'
         },
         labelStyle: {
           visibility: 'hidden'
@@ -58,6 +74,11 @@ export class HighstockComponent implements OnInit {
         inputEnabled: false
         // inputDateFormat: '%Y-01-01',
         // inputEditDateFormat: '%Y-01-01',
+      },
+      tooltip: {
+        borderWidth: 0,
+        shadow: false,
+        valueDecimals: 2
       },
       title: {
         text: '',
@@ -81,13 +102,13 @@ export class HighstockComponent implements OnInit {
         labels: {
           format: '{value:,.0f}',
           style: {
-            color: '#1D667F'
+            color: '#727272'
           }
         },
         title: {
           text: 'Percent',
           style: {
-            color: '#1D667F'
+            color: '#727272'
           }
         },
        opposite: false
@@ -95,13 +116,13 @@ export class HighstockComponent implements OnInit {
         title: {
           text: 'In ' + units,
           style: {
-            color: '#F6A01B'
+            color: '#1D667F'
           }
         },
         labels: {
           format: '{value:,.0f}',
           style: {
-            color: '#F6A01B'
+            color: '#1D667F'
           }
         }
       }],
@@ -113,13 +134,13 @@ export class HighstockComponent implements OnInit {
       series: [{
         name: 'Percent',
         type: 'column',
-        color: '#1D667F',
+        color: '#727272',
         data: perc
       }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        color: '#F6A01B',
+        color: '#1D667F',
         data: level
       }]
     };

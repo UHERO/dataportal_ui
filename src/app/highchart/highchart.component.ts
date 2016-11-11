@@ -20,11 +20,17 @@ export class HighchartComponent implements OnInit {
 
   ngOnInit() {
     let level = this.seriesData['observations']['chart data']['level'];
-    let title = this.seriesData['serie']['title'];
-    if(this.seriesData['serie'] === 'No data available' || level.length === 0) {
+    // let title = this.seriesData['serie']['title'];
+    let title;
+    if (this.seriesData['serie']['title'] === undefined) {
+      title = this.seriesData['serie']['name'];
+    } else {
+      title = this.seriesData['serie']['title'];
+    }
+    if (this.seriesData['serie'] === 'No data available' || level.length === 0) {
       this.options = {
         chart: {
-          backgroundColor: '#F3F3F3'
+          backgroundColor: '#F9F9F9'
         },
         title: {
           text: '<b>' + title + '</b><br>' + 'No Data Available',
@@ -82,7 +88,9 @@ export class HighchartComponent implements OnInit {
           // height: 200,
           // width: 200,
           // backgroundColor: '#3E3E40'
-          backgroundColor: '#F3F3F3'
+          backgroundColor: '#F7F7F7',
+          // borderColor: '#F5F5F5',
+          // borderWidth: 1
         },
         title: {
           text: '<b>' + title + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',

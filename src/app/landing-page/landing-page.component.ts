@@ -16,6 +16,7 @@ import { error } from 'util';
 })
 export class LandingPageComponent implements OnInit, AfterViewInit {
   private selectedCategory;
+  private sublist;
   private categories;
   private id: number;
   private geoHandle: string;
@@ -74,23 +75,23 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   drawSeries(catId: number) {
     let geoArray = [];
     this.currentFreq = this.freqs[0];
-    console.log('default freq', this.currentFreq);
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
       categories.forEach((category, index) => {
         if (categories[index]['id'] === catId) {
           this.selectedCategory = categories[index]['name'];
-          let sublist = categories[index]['children'];
-          sublist.forEach((sub, index) => {
-            this._uheroAPIService.fetchGeographies(sublist[index]['id']).subscribe((geos) => {
+          this.sublist = categories[index]['children'];
+          console.log('data list', this.sublist);
+          this.sublist.forEach((sub, index) => {
+            this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
               });
               this.regions = geoArray;
               this.currentGeo = geoArray[0];
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
+                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               });
             });
           });
@@ -111,10 +112,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
       categories.forEach((category, index) => {
         if (categories[index]['id'] === this.id) {
-          let sublist = categories[index]['children'];
-          sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
+          this.sublist = categories[index]['children'];
+          this.sublist.forEach((sub, index) => {
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
+                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               });
           });
         } else {
@@ -133,10 +134,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
       categories.forEach((category, index) => {
         if (categories[index]['id'] === this.id) {
-          let sublist = categories[index]['children'];
-          sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': sublist[index], 'series': results[0]});
+          this.sublist = categories[index]['children'];
+          this.sublist.forEach((sub, index) => {
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
+                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               });
           });
         } else {

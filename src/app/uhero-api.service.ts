@@ -71,7 +71,6 @@ export class UheroApiService {
   // Gets data for a particular series. Used for single series view.
   fetchSeriesDetail(id: number): Observable<Series> {
     if (this.cachedSeriesDetail[id]) {
-      console.log(this.cachedSeriesDetail[id])
       return Observable.of(this.cachedSeriesDetail[id]);
     } else {
       let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=` + id, this.requestOptionsArgs)
@@ -132,7 +131,6 @@ export class UheroApiService {
   // Gets available geographies for a particular category
   fetchGeographies(id: number): Observable<Geography[]> {
     if (this.cachedGeographies[id]) {
-      console.log(this.cachedGeographies[id]);
       return Observable.of(this.cachedGeographies[id]);
     } else {
       let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
@@ -209,7 +207,6 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              console.log('observations', obs);
               multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
             });
           });

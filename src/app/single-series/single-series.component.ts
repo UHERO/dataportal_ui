@@ -113,6 +113,7 @@ export class SingleSeriesComponent implements OnInit {
 
         this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
           let seriesObservations = observations;
+          console.log('observations', seriesObservations);
           this.chartData = seriesObservations['chart data'];
           this.tableData = seriesObservations['table data'];
         });
