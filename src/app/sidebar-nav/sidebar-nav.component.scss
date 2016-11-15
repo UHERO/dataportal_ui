@@ -106,7 +106,7 @@
   .sidebar-list, .list-item {
     list-style-type: none;
     -webkit-padding-start: 1em;
-    font-family: sans-serif;
+    font-family: 'Lucida Sans', sans-serif;
     color: #505050;
     // text-transform: uppercase;
     font-size: 0.9em;
@@ -134,7 +134,8 @@
     }
 
     a {
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Lucida Sans', sans-serif;
+      font-size: 0.9em;
       display: block;
       text-decoration: none;
       color: #505050;

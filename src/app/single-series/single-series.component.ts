@@ -78,10 +78,11 @@ export class SingleSeriesComponent implements OnInit {
   redrawGeo(event) {
     // Reset chart and table data
     this.chartData = [];
+    this.tableData = [];
     this.newTableData = [];
 
     this.seriesSiblings.forEach((sibling, index) => {
-      if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.label === this.seriesSiblings[index]['frequency']) {
+      if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.freq === this.seriesSiblings[index]['frequencyShort']) {
         let id = this.seriesSiblings[index]['id'];
 
         this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
@@ -102,9 +103,12 @@ export class SingleSeriesComponent implements OnInit {
 
   // Redraw chart when selecting a new frequency
   redrawFreq(event) {
+    // Reset Chart and Table data
+    this.chartData = [];
+    this.tableData = [];
     this.newTableData = [];
     this.seriesSiblings.forEach((sibling, index) => {
-      if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.label === this.seriesSiblings[index]['frequency']) {
+      if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.freq === this.seriesSiblings[index]['frequencyShort']) {
         let id = this.seriesSiblings[index]['id'];
 
         this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
@@ -113,7 +117,6 @@ export class SingleSeriesComponent implements OnInit {
 
         this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
           let seriesObservations = observations;
-          console.log('observations', seriesObservations);
           this.chartData = seriesObservations['chart data'];
           this.tableData = seriesObservations['table data'];
         });
