@@ -19,11 +19,16 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private sublist;
   private categories;
   private id: number;
-  private geoHandle: string;
-  private freqHandle: string;
   private errorMessage: string;
+
   // seriesData array used as input in highchart.component
   public seriesData = [];
+
+  // Variables for geo and freq selectors
+  private geoHandle: string;
+  private freqHandle: string;
+  private defaultFreq: string;
+  private defaultGeo: string;
   public regions = [];
   public freqs = Frequencies;
   public currentGeo: Geography;
@@ -79,17 +84,44 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       let categories = category;
 
       categories.forEach((category, index) => {
+        // Look for selected category in list of available categories
         if (categories[index]['id'] === catId) {
           this.selectedCategory = categories[index]['name'];
           this.sublist = categories[index]['children'];
-          console.log('data list', this.sublist);
+
+          // Get a category's default geo and freq if available
+          if (categories[index]['defaults']) {
+            this.defaultFreq = categories[index]['defaults']['freq'];
+            this.defaultGeo = categories[index]['defaults']['geo'];
+          } else {
+            this.defaultFreq = '';
+            this.defaultGeo = '';
+          }
+
+          // If a default freq. is available, export as current frequency on page load
+          this.freqs.forEach((freq, index) => {
+            if (this.freqs[index]['freq'] === this.defaultFreq) {
+              this.currentFreq = this.freqs[index];
+            }
+          });
+
           this.sublist.forEach((sub, index) => {
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
               });
               this.regions = geoArray;
-              this.currentGeo = geoArray[0];
+
+              // If a default geo is available, export as current geography on page load
+              this.regions.forEach((geo, index) => {
+                if (this.defaultGeo === this.regions[index]['handle']) {
+                  this.currentGeo = this.regions[index];
+                } else {
+                  this.currentGeo = this.regions[0];
+                }
+              })
+
+              // Get observation data for series in a given category, region, and frequency
               this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
                 this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               });
@@ -161,5 +193,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     if (!exist) {
       geoList.push(geo);
     }
+  }
+
+  scrollTo(location: string): void {
+    window.location.hash = location;
+    console.log(window.location.hash)
   }
 }

@@ -48,6 +48,7 @@ export class UheroApiService {
         .map(mapCategories)
         .do(val => {
           this.cachedCategories = val;
+          console.log(val);
           // categories$ = null;
         });
       return categories$;
@@ -230,12 +231,15 @@ export class UheroApiService {
 // And side bar navigation on single-series & table views
 function mapCategories(response: Response): CategoryTree {
   let categories = response.json().data;
+  // console.log('categories', categories);
   let dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   let categoryTree = [];
   categories.forEach((value) => {
     let parent = dataMap[value.parentId];
+    // let defaults = dataMap[value.defaults];
     if (parent) {
       (parent.children || (parent.children = [])).push(value);
+      // (parent.defaults || (parent.defaults = [])).push(value);
     } else {
       categoryTree.push(value);
     }
@@ -284,13 +288,30 @@ function combineObsData(level, perc) {
     let table = level;
     for (let i = 0; i < level.length; i++) {
       table[i].percValue = 'NA';
+      table[i].value = formatNum(+level[i].value, 2);
       for (let j = 0; j < perc.length; j++) {
         if (level[i].date === perc[j].date) {
-          table[i].percValue = perc[j].value;
+          table[i].percValue = formatNum(+perc[j].value, 2);
           break;
         }
       }
     }
     return table;
+  }
+
+  function formatNum(num: number, decimal: number) {
+    //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    let fixedNum: any;
+    fixedNum = num.toFixed(decimal);
+    // remove decimals 
+    let int = fixedNum|0;
+    let signCheck = num < 0 ? 1 : 0;
+    // store deicmal value
+    let remainder = Math.abs(fixedNum - int);
+    let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
+    let intString = '' + int, i = intString.length;
+    let r = '';
+    while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
+    return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
   }
 }

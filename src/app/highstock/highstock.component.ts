@@ -32,7 +32,6 @@ export class HighstockComponent implements OnInit {
   }
 
   ngOnChanges() {
-    console.log('highstock', this.chartData);
     let level = this.chartData['level'];
     let perc = this.chartData['perc'];
     let name = this.seriesDetail['title'];
