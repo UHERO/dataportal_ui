@@ -48,7 +48,6 @@ export class UheroApiService {
         .map(mapCategories)
         .do(val => {
           this.cachedCategories = val;
-          console.log(val);
           // categories$ = null;
         });
       return categories$;

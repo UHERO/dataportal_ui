@@ -149,16 +149,12 @@ export class HighstockComponent implements OnInit {
   updateTable(e) {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
-    let xMin, xMax, minDate, maxDate;
+    let xMin, xMax, minDate, maxDate, minYear, minMonth, maxYear, maxMonth;
 
     // Get date range from chart selection
-    xMin = new Date(e.context.min);
-    xMax = new Date(e.context.max);
+    xMin = new Date(e.context.min).toISOString().split('T')[0];
+    xMax = new Date(e.context.max).toISOString().split('T')[0];
 
-    // Annual series observations
-    minDate = xMin.getUTCFullYear() + '-01-01';
-    maxDate = xMax.getUTCFullYear() + '-01-01';
-
-    this.chartExtremes.emit({'min date': minDate, 'max date': maxDate})
+    this.chartExtremes.emit({'min date': xMin, 'max date': xMax})
   }
 }

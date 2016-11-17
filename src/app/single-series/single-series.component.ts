@@ -132,10 +132,12 @@ export class SingleSeriesComponent implements OnInit {
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e['min date'];
     maxDate = e['max date'];
+    console.log('new table', e);
 
     for (let i = 0; i < this.tableData.length; i++) {
       if (this.tableData[i].date === minDate) {
         tableStart = i;
+        console.log('table start', tableStart);
       }
       if (this.tableData[i].date === maxDate) {
         tableEnd = i;
