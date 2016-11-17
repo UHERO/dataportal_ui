@@ -102,10 +102,10 @@ export class HighstockComponent implements OnInit {
       },
       yAxis: [{
         labels: {
-          format: '{value:,.0f}',
+          format: '{value:,.2f}',
           style: {
             color: '#727272'
-          }
+          },
         },
         title: {
           text: 'Percent',
@@ -122,13 +122,16 @@ export class HighstockComponent implements OnInit {
           }
         },
         labels: {
-          format: '{value:,.0f}',
+          format: '{value:,.2f}',
           style: {
             color: '#1D667F'
-          }
+          },
         }
       }],
       navigator: {
+        navigator: {
+          adaptToUpdatedData: true
+        },
         series: {
           data: level
         }
@@ -151,11 +154,12 @@ export class HighstockComponent implements OnInit {
   updateTable(e) {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
-    let xMin, xMax, minDate, maxDate, minYear, minMonth, maxYear, maxMonth;
+    let xMin, xMax, selectedRange;
 
-    // Get date range from chart selection
-    xMin = new Date(e.context.min).toISOString().split('T')[0];
-    xMax = new Date(e.context.max).toISOString().split('T')[0];
+    // Selected level data
+    selectedRange = e.context.series[1].points;
+    xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+    xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0]
 
     this.chartExtremes.emit({'min date': xMin, 'max date': xMax})
   }
