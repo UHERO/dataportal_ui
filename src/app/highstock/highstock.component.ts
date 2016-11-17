@@ -1,7 +1,9 @@
 // Highstock chart component used for single-series view
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
-import * as Highcharts from 'highcharts';
+// import * as Highcharts from 'highcharts';
+declare var require: any;
+const Highcharts = require('../../../node_modules/highcharts/highstock.src');
 
 Highcharts.setOptions({
   lang: {
