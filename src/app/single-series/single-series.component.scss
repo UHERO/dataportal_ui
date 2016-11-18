@@ -1,9 +1,5 @@
 #single-series-view {
-  // background: #F6F5F5;
-  // width: 650px;
-  // margin-left: 8%;
-  // margin-right: -8%;
-  margin: 25% 0 0 0;
+  margin: 20% 0 0 0;
   vertical-align: top;
   display: inline-block;
   
@@ -19,14 +15,20 @@
   }
 
   .series-title {
-    display: inline-block;
-    vertical-align: middle;
+    display: block;
+    // vertical-align: middle;
     font-family: 'Lucida Sans', sans-serif;
     font-size: 1.5em;
     color: #1D667F;
     // text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin: auto 15px auto 0;
+    // margin: auto 15px auto 0;
+
+    @media (min-width: 768px) {
+      margin: auto 15px auto 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
   }
   
   .selectors {

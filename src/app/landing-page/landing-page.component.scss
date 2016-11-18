@@ -29,11 +29,20 @@
 
   .selected-category {
     font-family: 'Lucida Sans', sans-serif;
-    display: inline-block;
+    // display: inline-block;
     color: #1D667F;
     font-size: 1.5em;
     margin: auto 15px auto 0px;
     vertical-align: middle;
+
+    @media (min-width: 768px) {
+      display: inline-block;
+    }
+
+    @media (max-width: 767px) {
+      display: block;
+      margin-bottom: 10px;
+    }
   }
 
   .top-anchor {
@@ -48,7 +57,7 @@
   .sublist {
     font-family: 'Lucida Sans', sans-serif;
     color: #1D667F;
-    font-size: 1.2em;
+    font-size: 1.1em;
   }
 
   .sublist:before {

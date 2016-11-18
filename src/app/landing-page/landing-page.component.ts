@@ -197,6 +197,5 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   scrollTo(location: string): void {
     window.location.hash = location;
-    console.log(window.location.hash)
   }
 }

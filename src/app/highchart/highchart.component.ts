@@ -92,6 +92,9 @@ export class HighchartComponent implements OnInit {
           // borderColor: '#F5F5F5',
           // borderWidth: 1
         },
+        exporting: {
+          enabled: false
+        },
         title: {
           text: '<b>' + title + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
           align: 'left',

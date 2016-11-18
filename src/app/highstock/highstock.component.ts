@@ -1,9 +1,14 @@
 // Highstock chart component used for single-series view
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
-// import * as Highcharts from 'highcharts';
 declare var require: any;
 const Highcharts = require('../../../node_modules/highcharts/highstock.src');
+const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
+const exportCSV = require('../csv-export');
+
+// Plug in export module for Highstock chart
+exporting(Highcharts);
+exportCSV(Highcharts);
 
 Highcharts.setOptions({
   lang: {
@@ -49,6 +54,14 @@ export class HighstockComponent implements OnInit {
         zoomType: 'x',
         backgroundColor: '#F9F9F9',
       },
+      navigation: {
+        buttonOptions: {
+          align: 'left',
+          theme: {
+            fill: '#F9F9F9'
+          }
+        }
+      },
       rangeSelector: {
         selected: 'All',
         buttons: [{
@@ -67,8 +80,19 @@ export class HighstockComponent implements OnInit {
           type: 'all',
           text: 'All'
         }],
+        buttonPosition: {
+          x: 10,
+          y: 10
+        },
         buttonTheme: {
-          // visibility: 'hidden'
+          states: {
+            select: {
+              fill: '#1D667F',
+              style: {
+                color: '#FFFFFF'
+              }
+            }
+          }
         },
         labelStyle: {
           visibility: 'hidden'
@@ -129,9 +153,6 @@ export class HighstockComponent implements OnInit {
         }
       }],
       navigator: {
-        navigator: {
-          adaptToUpdatedData: true
-        },
         series: {
           data: level
         }
@@ -140,13 +161,19 @@ export class HighstockComponent implements OnInit {
         name: 'Percent',
         type: 'column',
         color: '#727272',
-        data: perc
+        data: perc,
+        dataGrouping: {
+          enabled: false
+        }
       }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#1D667F',
-        data: level
+        data: level,
+        dataGrouping: {
+          enabled: false
+        }
       }]
     };
   }
