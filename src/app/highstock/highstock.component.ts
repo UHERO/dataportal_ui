@@ -162,18 +162,18 @@ export class HighstockComponent implements OnInit {
         type: 'column',
         color: '#727272',
         data: perc,
-        dataGrouping: {
+        /* dataGrouping: {
           enabled: false
-        }
+        } */
       }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#1D667F',
         data: level,
-        dataGrouping: {
+        /* dataGrouping: {
           enabled: false
-        }
+        } */
       }]
     };
   }

@@ -20,7 +20,7 @@ export class HighchartComponent implements OnInit {
 
   ngOnInit() {
     let level = this.seriesData['observations']['chart data']['level'];
-    // let title = this.seriesData['serie']['title'];
+    let ytd = this.seriesData['observations']['chart data']['ytd'];
     let title;
     if (this.seriesData['serie']['title'] === undefined) {
       title = this.seriesData['serie']['name'];
@@ -71,18 +71,15 @@ export class HighchartComponent implements OnInit {
         }
       }
     } else {
-      // let level = this.seriesData['observations']['chart data']['level'];
-      // console.log('level', level);
-      // let title = this.seriesData['serie']['title'];
-      let tableData = this.seriesData['observations']['table data'];
       let unitsShort = this.seriesData['serie']['unitsLabelShort'];
-      let lastLevel;
-      if (level.length > 0) {
-        lastLevel = level[level.length - 1][1].toLocaleString();
+      let lastYtd;
+      let lastDate;
+      if (ytd.length > 0) {
+        lastYtd = ytd[ytd.length - 1][1].toLocaleString();
+        lastDate = ytd[ytd.length - 1][0];
       } else {
         return;
       }
-      // let lastLevel = level[level.length - 1][1].toLocaleString();
       this.options = {
         chart: {
           // height: 200,
@@ -96,7 +93,7 @@ export class HighchartComponent implements OnInit {
           enabled: false
         },
         title: {
-          text: '<b>' + title + '</b>' + '<br>' + 'Last Observation:' + '<br>' + lastLevel + ' (' + unitsShort + ')',
+          text: '<b>' + title + '</b>' + '<br>' + lastDate + '<br>' + 'YTD: ' + lastYtd,
           align: 'left',
           widthAdjust: 0,
           style: {

@@ -1,5 +1,6 @@
 // Edited export-csv module to format csv export
 // Removes time stamp from DateTime Column & removes view data table option
+// Ignores data grouping -- exports csv of all data points and remove Navigator series from export
 // Original module found in node_modules/highcharts-export-csv/export-csv.js
 
 (function (factory) {
@@ -52,51 +53,16 @@
         // Loop the series and index values
         i = 0;
         each(this.series, function (series) {
-            var keys = series.options.keys,
-                pointArrayMap = keys || series.pointArrayMap || ['y'],
-                valueCount = pointArrayMap.length,
-                requireSorting = series.requireSorting,
-                categoryMap = {},
-                j;
-
-            // Map the categories for value axes
-            each(pointArrayMap, function (prop) {
-                categoryMap[prop] = (series[prop + 'Axis'] && series[prop + 'Axis'].categories) || [];
-            });
-
-            if (series.options.includeInCSVExport !== false && series.visible !== false) { // #55
-                j = 0;
-                while (j < valueCount) {
-                    names.push(columnHeaderFormatter(series, pointArrayMap[j], pointArrayMap.length));
-                    j = j + 1;
-                }
-
-                each(series.points, function (point, pIdx) {
-                    var key = requireSorting ? point.x : pIdx,
-                        prop,
-                        val;
-
-                    j = 0;
-
-                    if (!rows[key]) {
-                        rows[key] = [];
+            if (series.options.includeInCSVExport !== false && series.name !== 'Navigator 1') {
+                names.push(series.name);
+                each(series.options.data, function (point) {
+                    if (!rows[point[0]]) {
+                        rows[point[0]] = [];
                     }
-                    rows[key].x = point.x;
-
-                    // Pies, funnels, geo maps etc. use point name in X row
-                    if (!series.xAxis || series.exportKey === 'name') {
-                        rows[key].name = point.name;
-                    }
-
-                    while (j < valueCount) {
-                        prop = pointArrayMap[j]; // y, z etc
-                        val = point[prop];
-                        rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
-                        j = j + 1;
-                    }
-
+                    rows[point[0]].x = point[0];
+                    rows[point[0]][i] = point[1];
                 });
-                i = i + j;
+                i += 1;
             }
         });
 

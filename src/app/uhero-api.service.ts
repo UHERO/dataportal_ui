@@ -220,8 +220,6 @@ export class UheroApiService {
     }
   }
 
-
-
   // End get data from API
 }
 
@@ -255,9 +253,11 @@ function mapObservations(response: Response): ObservationResults {
   let observations = response.json().data.transformationResults;
   let level = observations[0].observations;
   let perc = observations[1].observations;
+  let ytd = observations[2].observations;
 
   let levelValue = [];
   let percValue = [];
+  let ytdValue = [];
 
   if (level) {
     level.forEach((entry, index) => {
@@ -273,8 +273,15 @@ function mapObservations(response: Response): ObservationResults {
     });
   }
 
+  if (ytd) {
+    ytd.forEach((entry, index) => {
+      // Create [date, value] YTD pairs
+      ytdValue.push([ytd[index].date, +ytd[index].value]);
+    });
+  }
+
   let tableData = combineObsData(level, perc);
-  let chartData = {level: levelValue, perc: percValue};
+  let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
   let data = {'chart data': chartData, 'table data': tableData};
   return data;
 }
