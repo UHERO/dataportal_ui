@@ -4,14 +4,14 @@
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
   <br>
-  <p class="contents">Go To: </p>
+  <hr>
   <ul class="content-links">
     <li *ngFor="let sub of sublist"><!-- <a [routerLink]="" [fragment]="sub.id">{{sub.name}}</a> -->
     <a [routerLink]="" (click)="scrollTo(sub.id)">{{sub.name}}</a></li>
   </ul>
   <hr>
   <div *ngFor="let series of seriesData" class="multi-charts-row">
-    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a [routerLink]="" (click)="scrollTo('top')">&and;</a></h3>
+    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <div *ngFor="let serie of series.series" class="multi-charts">
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>
       <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">

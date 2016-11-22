@@ -7,14 +7,14 @@
   .contents {
     display: inline-block;
     margin-bottom: 0px;
-    margin-top: 10px;
+    // margin-top: 10px;
   }
 
   .content-links {
     padding-left: 5px;
     display: inline-block;
     margin-bottom: 0px;
-    margin-top: 10px;
+    // margin-top: 10px;
 
     li {
       display: inline-block;
@@ -23,6 +23,13 @@
        a {
          font-family: 'Lucida Sans', sans-serif;
          text-decoration: none;
+         font-size: 0.9em;
+         color: #1D667F;
+       }
+
+       @media (max-width: 767px) {
+         min-width: 50%;
+         margin-right: 0px;
        }
     }
   }
@@ -75,6 +82,12 @@
   @media (max-width: 767px) {
     margin-top: 60px;
   }
+
+  .material-icons.md-18 {
+    font-size: 18px;
+    color: #1D667F;
+  }
+
   // margin: 25% 0 0 0;
   // margin-left: 4%;
   // margin-right: -4%;
