@@ -1,10 +1,8 @@
-<div class="multi-series-container">
+<div class="category-tables">
   <p class="top-anchor" id="top"></p>
   <h2 class="selected-category">{{selectedCategory}}</h2>
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
-  <a [routerLink]="['/category/table', id]">Table View</a>
-  <br>
   <hr>
   <ul class="content-links">
     <li *ngFor="let sub of sublist"><!-- <a [routerLink]="" [fragment]="sub.id">{{sub.name}}</a> -->
@@ -16,8 +14,13 @@
     <div *ngFor="let serie of series.series" class="multi-charts">
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>
       <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
-        <app-highchart [seriesData]="serie"></app-highchart>
+          <p>{{serie['serie']['title']}}</p>
       </a>
+          <p-dataTable [value]="serie['observations']['table data']" scrollable="true">
+            <p-column *ngFor="let data of serie['observations']['table data']" [field]="data.value" [header]="data.date"></p-column>
+            <!-- <p-column field="value" [header]="date"></p-column>
+            <p-column field="percValue" header="Percent" [sortable]="true"></p-column> -->
+          </p-dataTable>
     </div>
   </div>
 </div>

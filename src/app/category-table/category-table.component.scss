@@ -1,0 +1,14 @@
+.category-tables {
+  vertical-align: top;
+  display: inline-block;
+  min-height: 100%;
+  overflow: auto;
+
+  @media (min-width: 768px) {
+    margin-top: 70px;
+  }
+
+  @media (max-width: 767px) {
+    margin-top: 60px;
+  }
+}
