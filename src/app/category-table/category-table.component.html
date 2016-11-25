@@ -16,11 +16,13 @@
       <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
           <p>{{serie['serie']['title']}}</p>
       </a>
+      <div class="category-table">
           <p-dataTable [value]="serie['observations']['table data']" scrollable="true">
-            <p-column *ngFor="let data of serie['observations']['table data']" [field]="data.value" [header]="data.date"></p-column>
-            <!-- <p-column field="value" [header]="date"></p-column>
-            <p-column field="percValue" header="Percent" [sortable]="true"></p-column> -->
+            <p-column field="date" header="Date"></p-column>
+            <p-column field="value" header="Level"></p-column>
+            <!-- <p-column field="percValue" header="Percent" [sortable]="true"></p-column> -->
           </p-dataTable>
+      </div>
     </div>
   </div>
 </div>

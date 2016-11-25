@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -12,7 +12,8 @@ import { error } from 'util';
 @Component({
   selector: 'app-category-table',
   templateUrl: './category-table.component.html',
-  styleUrls: ['./category-table.component.scss']
+  styleUrls: ['./category-table.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CategoryTableComponent implements OnInit {
   private selectedCategory;

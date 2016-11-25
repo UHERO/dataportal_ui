@@ -11,4 +11,36 @@
   @media (max-width: 767px) {
     margin-top: 60px;
   }
+
+  .category-table {
+    white-space: nowrap;
+    overflow-x: auto;
+    max-width: 10%;
+
+    .ui-widget-header {
+      display: inline-block;
+
+      table {
+        width: auto;
+        th {
+          display: block !important;
+        }
+      }
+    }
+
+    .ui-datatable-scrollable-body {
+      display: inline-block;
+
+      table {
+        width: auto;
+        tr.ui-widget-content {
+          display: inline-block;
+
+          td {
+            display: block !important;
+          }
+        }
+      }
+    }
+  }
 }
