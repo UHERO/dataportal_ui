@@ -13,12 +13,12 @@
     <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <div *ngFor="let serie of series.series" class="multi-charts">
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>
-      <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
+      <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']" class="series-name">
           <p>{{serie['serie']['title']}}</p>
       </a>
       <div class="category-table">
           <p-dataTable [value]="serie['observations']['table data']" scrollable="true">
-            <p-column field="date" header="Date"></p-column>
+            <p-column field="date" header="Date" [sortable]="true"></p-column>
             <p-column field="value" header="Level"></p-column>
             <!-- <p-column field="percValue" header="Percent" [sortable]="true"></p-column> -->
           </p-dataTable>

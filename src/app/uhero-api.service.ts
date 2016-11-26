@@ -294,9 +294,11 @@ function combineObsData(level, perc) {
     let table = level;
     for (let i = 0; i < level.length; i++) {
       table[i].percValue = 'NA';
+      // table[i].value = parseFloat((+level[i].value).toFixed(2));
       table[i].value = formatNum(+level[i].value, 2);
       for (let j = 0; j < perc.length; j++) {
         if (level[i].date === perc[j].date) {
+          // table[i].percValue = parseFloat((+perc[j].value).toFixed(2));
           table[i].percValue = formatNum(+perc[j].value, 2);
           break;
         }
@@ -308,6 +310,7 @@ function combineObsData(level, perc) {
   function formatNum(num: number, decimal: number) {
     //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     let fixedNum: any;
+    let formattedNum: string;
     fixedNum = num.toFixed(decimal);
     // remove decimals 
     let int = fixedNum|0;
@@ -319,5 +322,6 @@ function combineObsData(level, perc) {
     let r = '';
     while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
     return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
+    // return +formattedNum;
   }
 }

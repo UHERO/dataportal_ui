@@ -12,32 +12,55 @@
     margin-top: 60px;
   }
 
+  a.series-name {
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #1D667F;
+    text-decoration: none;
+
+    p {
+      margin-bottom: 0px;
+    }
+  }
+
   .category-table {
     white-space: nowrap;
     overflow-x: auto;
     max-width: 10%;
+    margin-bottom: 20px;
 
     .ui-widget-header {
       display: inline-block;
+      border: 1px solid #DDDDDD;
+      border-right: none;
 
       table {
         width: auto;
         th {
+          border-radius: 0px;
           display: block !important;
+          font-family: 'Lucida Sans', sans-serif;
+          font-size: 0.9em;
         }
       }
     }
 
     .ui-datatable-scrollable-body {
       display: inline-block;
+      margin-left: -4px;
 
       table {
         width: auto;
         tr.ui-widget-content {
           display: inline-block;
+          border: none;
 
           td {
             display: block !important;
+            border-color: #DDDDDD !important;
+            font-family: 'Lucida Sans', sans-serif;
+            font-size: 0.9em;
           }
         }
       }
