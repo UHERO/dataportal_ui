@@ -3,6 +3,78 @@
   display: inline-block;
   min-height: 100%;
   overflow: auto;
+  width: 100%;
+
+  .content-links {
+    padding-left: 5px;
+    display: inline-block;
+    margin-bottom: 0px;
+    // margin-top: 10px;
+
+    li {
+      display: inline-block;
+      margin-right: 10px;
+
+       a {
+         font-family: 'Lucida Sans', sans-serif;
+         text-decoration: none;
+         font-size: 0.9em;
+         color: #1D667F;
+       }
+
+       @media (max-width: 767px) {
+         min-width: 50%;
+         margin-right: 0px;
+       }
+    }
+  }
+
+  .selected-category {
+    font-family: 'Lucida Sans', sans-serif;
+    display: inline-block;
+    color: #1D667F;
+    font-size: 1.5em;
+    margin: auto 15px 10px 0px;
+    vertical-align: middle;
+  }
+
+  .switch-view {
+    font-family: 'Lucida Sans', sans-serif;
+    text-decoration: none;
+    font-size: 0.9em;
+    color: #1D667F;
+    margin-left: 10px;
+  }
+
+  .top-anchor {
+    display: block;
+    content: ' ';
+    margin-top: -250px;
+    height: 250px;
+    visibility: hidden;
+  }
+
+
+  .sublist {
+    font-family: 'Lucida Sans', sans-serif;
+    color: #1D667F;
+    font-size: 1.2em;
+    margin-bottom: 0px;
+  }
+
+  .sublist:before {
+    display: block;
+    content: ' ';
+    margin-top: -150px;
+    height: 150px;
+    visibility: hidden;
+  }
+
+  .sublist-separator {
+    margin-top: 0.5rem;
+    background-color: #1D667F;
+    height: 2px;
+  }
 
   @media (min-width: 768px) {
     margin-top: 70px;
@@ -16,7 +88,7 @@
     font-family: 'Lucida Sans', sans-serif;
     font-size: 0.9em;
     font-weight: bold;
-    color: #1D667F;
+    color: #505050;
     text-decoration: none;
 
     p {
@@ -24,10 +96,24 @@
     }
   }
 
-  .category-table {
+  .material-icons.md-18 {
+    font-size: 18px;
+    color: #1D667F;
+    vertical-align: middle;
+  }
+
+  .table-row {
+    margin-bottom: 40px;
+  }
+
+  .series-table {
+    margin-top: 20px;
+  }
+
+  .table-data {
     white-space: nowrap;
     overflow-x: auto;
-    max-width: 10%;
+    width: 99%;
     margin-bottom: 20px;
 
     .ui-widget-header {
@@ -42,6 +128,8 @@
           display: block !important;
           font-family: 'Lucida Sans', sans-serif;
           font-size: 0.9em;
+          background-image: none;
+          background-color: #F9F9F9;
         }
       }
     }

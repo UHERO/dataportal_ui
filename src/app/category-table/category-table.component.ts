@@ -100,9 +100,53 @@ export class CategoryTableComponent implements OnInit {
               // Get observation data for series in a given category, region, and frequency
               this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
                 this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                console.log(this.seriesData);
               });
             });
+          });
+        } else {
+          return;
+        }
+      },
+      this.seriesData = []);
+    },
+    error => this.errorMessage = error);
+  }
+
+  // Update table data when a new region/frequency is selected
+  redrawTableGeo(event) {
+    this.geoHandle = event.handle;
+    this._uheroAPIService.fetchCategories().subscribe((category) => {
+      let categories = category;
+
+      categories.forEach((category, index) => {
+        if (categories[index]['id'] === this.id) {
+          this.sublist = categories[index]['children'];
+          this.sublist.forEach((sub, index) => {
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
+                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+              });
+          });
+        } else {
+          return;
+        }
+      },
+      this.seriesData = []);
+    },
+    error => this.errorMessage = error);
+  }
+
+  redrawTableFreq(event) {
+    this.freqHandle = event.freq;
+    this._uheroAPIService.fetchCategories().subscribe((category) => {
+      let categories = category;
+
+      categories.forEach((category, index) => {
+        if (categories[index]['id'] === this.id) {
+          this.sublist = categories[index]['children'];
+          this.sublist.forEach((sub, index) => {
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
+                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+              });
           });
         } else {
           return;
