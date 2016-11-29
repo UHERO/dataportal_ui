@@ -1,8 +1,9 @@
-.multi-series-container {
+.category-tables {
   vertical-align: top;
   display: inline-block;
   min-height: 100%;
   overflow: auto;
+  width: 100%;
 
   .content-links {
     padding-left: 5px;
@@ -35,6 +36,14 @@
     font-size: 1.5em;
     margin: auto 15px 10px 0px;
     vertical-align: middle;
+  }
+
+  .switch-view {
+    font-family: 'Lucida Sans', sans-serif;
+    text-decoration: none;
+    font-size: 0.9em;
+    color: #1D667F;
+    margin-left: 10px;
   }
 
   .top-anchor {
@@ -75,52 +84,74 @@
     margin-top: 60px;
   }
 
+  a.series-name {
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #505050;
+    text-decoration: none;
+
+    p {
+      margin-bottom: 0px;
+    }
+  }
+
   .material-icons.md-18 {
     font-size: 18px;
     color: #1D667F;
     vertical-align: middle;
   }
 
-  .switch-view {
-    font-family: 'Lucida Sans', sans-serif;
-    text-decoration: none;
-    font-size: 0.9em;
-    color: #1D667F;
-    margin-left: 10px;
-  }
-
-  // margin: 25% 0 0 0;
-  // margin-left: 4%;
-  // margin-right: -4%;
-  // width: 960px;
-  // margin: 0 auto;
-  // background: #F6F5F5;
-
-  /* .all-chart-container {
-    margin: 2% 5%;
-  } */
-
-  /* @media (min-width: 767px) and (max-width: 1000px) {
-    margin: 20% 0 0 0;
-  }
-
-  @media (min-width: 1001px) {
-    margin: 15% 0 0 0;
-  } */
-
-  .multi-charts-row {
-    display: block;
+  .table-row {
     margin-bottom: 40px;
   }
 
-  .multi-charts {
-    display: inline-block;
-    padding: 0 3px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    margin: 10px;
-    background: #F7F7F7
+  .series-table {
+    margin-top: 20px;
   }
 
+  .table-data {
+    white-space: nowrap;
+    overflow-x: auto;
+    width: 99%;
+    margin-bottom: 20px;
+
+    .ui-widget-header {
+      display: inline-block;
+      border: 1px solid #DDDDDD;
+      border-right: none;
+
+      table {
+        width: auto;
+        th {
+          border-radius: 0px;
+          display: block !important;
+          font-family: 'Lucida Sans', sans-serif;
+          font-size: 0.9em;
+          background-image: none;
+          background-color: #F9F9F9;
+        }
+      }
+    }
+
+    .ui-datatable-scrollable-body {
+      display: inline-block;
+      margin-left: -4px;
+
+      table {
+        width: auto;
+        tr.ui-widget-content {
+          display: inline-block;
+          border: none;
+
+          td {
+            display: block !important;
+            border-color: #DDDDDD !important;
+            font-family: 'Lucida Sans', sans-serif;
+            font-size: 0.9em;
+          }
+        }
+      }
+    }
+  }
 }
