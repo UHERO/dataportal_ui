@@ -19,6 +19,7 @@ export class UheroApiService {
   private cachedCategories;
   // private cachedChartData = [];
   private cachedMultiChartData = {};
+  private cachedFrequencies = [];
   private cachedGeographies = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
@@ -110,6 +111,20 @@ export class UheroApiService {
           siblingFreqs$ = null;
         });
       return siblingFreqs$;
+    }
+  }
+
+  fetchFrequencies(id: number): Observable<Frequency[]> {
+    if(this.cachedFrequencies[id]) {
+      return Observable.of(this.cachedFrequencies[id]);
+    } else {
+      let frequencies$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedFrequencies[id] = val;
+          frequencies$ = null;
+        });
+      return frequencies$;
     }
   }
 

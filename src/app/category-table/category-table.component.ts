@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
-import { Frequencies } from '../freq-const';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
@@ -23,6 +22,7 @@ export class CategoryTableComponent implements OnInit {
   private errorMessage: string;
 
   private seriesData = [];
+  private categoryData = [];
 
   // Variables for geo and freq selectors
   private geoHandle: string;
@@ -30,7 +30,7 @@ export class CategoryTableComponent implements OnInit {
   private defaultFreq: string;
   private defaultGeo: string;
   public regions = [];
-  public freqs = Frequencies;
+  public freqs = [];
   public currentGeo: Geography;
   public currentFreq: Frequency;
 
@@ -55,7 +55,9 @@ export class CategoryTableComponent implements OnInit {
 
   drawSeriesTable(catId: number) {
     let geoArray = [];
-    this.currentFreq = this.freqs[0];
+    let freqArray = [];
+
+    // this.currentFreq = this.freqs[0];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -74,13 +76,6 @@ export class CategoryTableComponent implements OnInit {
             this.defaultGeo = '';
           }
 
-          // If a default freq. is available, export as current frequency on page load
-          this.freqs.forEach((freq, index) => {
-            if (this.freqs[index]['freq'] === this.defaultFreq) {
-              this.currentFreq = this.freqs[index];
-            }
-          });
-
           this.sublist.forEach((sub, index) => {
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
@@ -97,9 +92,37 @@ export class CategoryTableComponent implements OnInit {
                 }
               })
 
-              // Get observation data for series in a given category, region, and frequency
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+              this._uheroAPIService.fetchFrequencies(this.sublist[index]['id']).subscribe((frequencies) => {
+                frequencies.forEach((frequency, index) => {
+                  this.uniqueFreqs(frequencies[index], freqArray);
+                });
+                this.freqs = freqArray;
+
+                // If a default freq. is available, export as current frequency on page load
+                this.freqs.forEach((freq, index) => {
+                  if (this.defaultFreq === this.freqs[index]['label']) {
+                    this.currentFreq = this.freqs[index];
+                  } else {
+                    this.currentFreq = this.freqs[0];
+                  }
+                });
+
+                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
+                  this.sublist[index]['series'] = results[0];
+                  this.seriesData.push({'sublist': this.sublist[index]});
+                  console.log('series data', this.seriesData);
+
+                  this.seriesData.forEach((sub, index) => {
+                    let tableData = [];
+                    let series$ = this.seriesData[index];
+                    console.log('sublist', this.seriesData[index]);
+                    /* series$['series'].forEach((serie, index) => {
+                      this.categoryData.push({'sublist': series$['sublist'], 'observations': series$['series'][index]['observations']});
+                    }); */
+                  });
+
+                  console.log('category table', this.categoryData);
+                });
               });
             });
           });
@@ -170,6 +193,21 @@ export class CategoryTableComponent implements OnInit {
       geoList.push(geo);
     }
   }
+
+  // Get a unique array of available frequencies for a category
+  uniqueFreqs(freq, freqList) {
+    let exist = false;
+    for (let i in freqList) {
+      if (freq.label === freqList[i].label) {
+        exist = true;
+      }
+    }
+
+    if (!exist && (freq.freq === 'A' || freq.freq === 'M' || freq.freq === 'Q')) {
+      freqList.push(freq);
+    }
+  }
+
 
   scrollTo(location: string): void {
     window.location.hash = location;
