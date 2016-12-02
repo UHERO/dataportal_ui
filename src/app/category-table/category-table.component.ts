@@ -23,6 +23,8 @@ export class CategoryTableComponent implements OnInit {
 
   private seriesData = [];
   private categoryData = [];
+  private dateRange = ["1995-01-01", "2015-01-01"]
+  // private dateArray = [];
 
   // Variables for geo and freq selectors
   private geoHandle: string;
@@ -42,6 +44,7 @@ export class CategoryTableComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    //this.calculateDateArray(this.dateRange, this.dateArray)
     this.route.params.subscribe(params => {
       this.id = Number.parseInt(params['id']);
       if (isNaN(this.id)) {
@@ -51,6 +54,18 @@ export class CategoryTableComponent implements OnInit {
         this.drawSeriesTable(this.id);
       }
     });
+  }
+
+  calculateDateArray(dateStart, dateEnd, dateArray) {
+    let start = +dateStart.substring(0,4);
+    let end = +dateEnd.substring(0,4);
+    let append = dateStart.substring(5,10);
+
+    while (start < end) {
+      dateArray.push(start.toString() + '-' + append);
+      start+=1;
+    }
+    // console.log('date array', this.dateArray)
   }
 
   drawSeriesTable(catId: number) {
@@ -76,7 +91,15 @@ export class CategoryTableComponent implements OnInit {
             this.defaultGeo = '';
           }
 
+          //let sublistItemsProcessed = 0;
+
           this.sublist.forEach((sub, index) => {
+            console.log('sublist', this.sublist[index])
+
+            let dateArray = [];
+            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            console.log('sublist dates', dateArray)
+            //sublistItemsProcessed++;
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
@@ -108,20 +131,14 @@ export class CategoryTableComponent implements OnInit {
                 });
 
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
-                  this.sublist[index]['series'] = results[0];
-                  this.seriesData.push({'sublist': this.sublist[index]});
-                  console.log('series data', this.seriesData);
+                  this.sublist[index]['date range'] = dateArray;
+                  this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+                  console.log('series data', this.seriesData)
 
-                  this.seriesData.forEach((sub, index) => {
-                    let tableData = [];
-                    let series$ = this.seriesData[index];
-                    console.log('sublist', this.seriesData[index]);
-                    /* series$['series'].forEach((serie, index) => {
-                      this.categoryData.push({'sublist': series$['sublist'], 'observations': series$['series'][index]['observations']});
-                    }); */
-                  });
-
-                  console.log('category table', this.categoryData);
+                  /* if (sublistItemsProcessed === this.seriesData.length) {
+                    console.log(sublistItemsProcessed)
+                    this.findDateRange(this.seriesData);
+                  } */
                 });
               });
             });
@@ -133,6 +150,66 @@ export class CategoryTableComponent implements OnInit {
       this.seriesData = []);
     },
     error => this.errorMessage = error);
+    // callback(this.seriesData)
+  }
+
+  findDateRange(seriesData) {
+    console.log('data callback', seriesData);
+    console.log('start date', this.dateRange[0])
+    
+    for (let i = 0; i < seriesData.length; i++) {
+      console.log('sublist', seriesData[i]);
+      let dateArray = [];
+      let startDates = [];
+      let endDates = [];
+      let append;
+      let series = seriesData[i]['sublist']['series'];
+      console.log('sublist series', series)
+
+      for (let j = 0; j < series.length; j++) {
+        let start = series[j]['observations']['start'];
+        let end = series[j]['observations']['end'];
+        console.log('start', start);
+        // console.log('end', end);
+      }
+
+    }
+    /* for (let i = 0; i < this.seriesData.length; i++) {
+      let dateArray = [];
+      let startDates = [];
+      let endDates = [];
+      let append;
+      let series$ = this.seriesData[i]['sublist']['series']
+      console.log('sublist index', i)
+
+      for (let j = 0; j < series$.length; j++) {
+        let start = series$[j]['observations']['start'];
+        let end = series$[j]['observations']['end'];
+        let minYear = +start.substring(0, 4);
+        let maxYear = +end.substring(0, 4);
+        append = start.substring(5);
+        startDates.push(minYear);
+        endDates.push(maxYear);
+        console.log('sublist', this.sublist[index])
+        console.log('start', startDates);
+        console.log('end', endDates)
+      }
+      if (startDates.length !== 0 && endDates.length !== 0) {
+        let startYear = Math.min(...startDates);
+        let endYear = Math.max(...endDates);
+        while (startYear <= endYear) {
+          dateArray.push(startYear.toString() + '-' + append)
+          startYear+=1 ;
+        }
+        // this.sublist[index]['date range'] = dateArray;
+        // this.categoryData.push(this.sublist[index]);
+        // console.log(this.categoryData)
+        } else {
+          return
+        }
+          console.log('date range', dateArray)
+        } */
+    return seriesData;
   }
 
   // Update table data when a new region/frequency is selected

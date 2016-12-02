@@ -13,16 +13,18 @@
   </ul>
   <hr>
   <div *ngFor="let series of seriesData" class="table-row">
-    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
     <!-- <div *ngFor="let serie of series.series" class="series-table"> -->
       <table id="category-table">
         <thead>
           <th>Series</th>
+          <th *ngFor="let date of series['sublist']['date range']">{{date}}</th>
         </thead>
         <tbody>
           <tr *ngFor="let row of series['series']">
             <td>{{row.serie.title}}</td>
+            <td *ngFor="let item of row['observations']['table data']"></td>
           </tr>
         </tbody>
       </table>

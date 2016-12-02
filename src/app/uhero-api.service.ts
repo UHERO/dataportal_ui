@@ -18,7 +18,7 @@ export class UheroApiService {
   private headers: Headers;
   private cachedCategories;
   // private cachedChartData = [];
-  private cachedMultiChartData = {};
+  private cachedMultiChartData = [];
   private cachedFrequencies = [];
   private cachedGeographies = [];
   private cachedGeoSeries = [];
@@ -215,14 +215,21 @@ export class UheroApiService {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
+      let seriesData;
+      let seriesItemProcessed = 0;
       let multiChartData = [];
+      let data;
       this.fetchSeries(id, geo, freq).subscribe((series) => {
         let seriesData = series;
         if (seriesData !== null) {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
+              seriesItemProcessed++;
               let seriesObservations = obs;
               multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+              if(seriesItemProcessed === seriesData.length) {
+                checkData(multiChartData, data);
+              }
             });
           });
         } else {
@@ -230,12 +237,18 @@ export class UheroApiService {
         }
       },
       error => this.errorMessage = error);
-      this.cachedMultiChartData[id + geo + freq] = (Observable.forkJoin(Observable.of(multiChartData)));
+      this.cachedMultiChartData[id + geo + freq] = Observable.forkJoin(Observable.of(multiChartData));
       return this.cachedMultiChartData[id + geo + freq];
     }
   }
 
   // End get data from API
+}
+
+function checkData(seriesObservations, storeResults) {
+  console.log('obs callback', seriesObservations);
+  storeResults = seriesObservations;
+  return storeResults;
 }
 
 // Create a nested JSON of parent and child categories
@@ -256,6 +269,7 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
+  console.log('categories', categoryTree)
   return categoryTree;
 }
 
@@ -265,10 +279,12 @@ function mapData(response: Response): any {
 }
 
 function mapObservations(response: Response): ObservationResults {
-  let observations = response.json().data.transformationResults;
-  let level = observations[0].observations;
-  let perc = observations[1].observations;
-  let ytd = observations[2].observations;
+  let observations = response.json().data;
+  let start = observations.observationStart;
+  let end = observations.observationEnd;
+  let level = observations.transformationResults[0].observations;
+  let perc = observations.transformationResults[1].observations;
+  let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
   let percValue = [];
@@ -297,7 +313,7 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData};
+  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 
