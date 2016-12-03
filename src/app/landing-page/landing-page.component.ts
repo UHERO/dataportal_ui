@@ -18,6 +18,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private sublist;
   private categories;
   private id: number;
+  private saIsActive: boolean = true;
   private errorMessage: string;
 
   // seriesData array used as input in highchart.component
@@ -54,7 +55,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   }
 
   calculateDateArray(dateStart, dateEnd, dateArray) {
-    console.log('current freq', this.currentFreq);
+    // console.log('current freq', this.currentFreq);
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
 
@@ -149,6 +150,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+                  console.log('data', this.seriesData);
                 });
               });
             });
@@ -200,6 +202,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
             this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
               this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+              console.log('freq change', this.seriesData);
             });
           });
         } else {
@@ -237,6 +240,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     if (!exist && (freq.freq === 'A' || freq.freq === 'M' || freq.freq === 'Q')) {
       freqList.push(freq);
     }
+  }
+
+  saActive(e) {
+    // console.log('checkbox', e)
+    this.saIsActive = e.target.checked;
+    console.log('SA On', this.saIsActive)
   }
 
   scrollTo(location: string): void {

@@ -4,6 +4,15 @@
   <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
+    <div class="sa-toggle">
+      <template ngFor let-series [ngForOf]="seriesData">
+        <template ngFor let-serie [ngForOf]="series['series']">
+          <label class="btn btn-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === false" [class.isActive]="saIsActive">
+            <input type="checkbox" autocomplete="off" [checked]="saIsActive" (change)="saActive($event)">Sesonally Adjusted
+          </label>
+        </template>
+      </template>
+    </div>
     <a [routerLink]="['/category', id]" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
   </div>
   <hr>
@@ -22,10 +31,16 @@
           <th *ngFor="let date of series['sublist']['date range']">{{date.date}}</th>
         </thead>
         <tbody>
-          <tr *ngFor="let row of series['series']">
-            <td><a [routerLink]="['/series', row['serie']['id']]">{{row.serie.title}}</a></td>
-            <td *ngFor="let item of row['category table']">{{item.value}}</td>
-          </tr>
+          <template ngFor let-serie [ngForOf]="series['series']">
+            <!-- <template ngFor let-serie [ngForOf]="series['series']"> -->
+
+              <!-- <tr *ngFor="let row of series['series']"> -->
+              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted']">
+                <td><a [routerLink]="['/series', serie['serie']['id']]">{{serie['serie']['title']}}</a></td>
+                <td *ngFor="let item of serie['category table']">{{item.value}}</td>
+              </tr>
+            <!-- </template> -->
+          </template>
         </tbody>
       </table>
     </div>

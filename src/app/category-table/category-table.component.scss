@@ -84,6 +84,37 @@
     margin-top: 60px;
   }
 
+  .sa-toggle {
+    display: inline-block;
+
+    label {
+      display: none;
+    }
+
+    label:first-child {
+      display: inline-block;
+      background-color: #FFFFFF;
+      color: #1D667F;
+      font-family: 'Lucia Sans', sans-serif;
+      font-size: 0.9em;
+      font-weight: normal;
+      border-radius: 0px;
+      border-color: #CCCCCC;
+      padding: 4px 10px;
+      vertical-align: top;
+      
+      input {
+        display: none;
+      }
+    }
+
+    label:first-child.isActive {
+      background-color: #5B93A7;
+      // font-weight: bold;
+      color: #FFFFFF;
+    }
+  }
+
   a.series-name {
     font-family: 'Lucida Sans', sans-serif;
     font-size: 0.9em;

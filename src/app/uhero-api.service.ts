@@ -222,7 +222,7 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              let categoryTable = catTable(seriesObservations, dates)
+              let categoryTable = catTable(seriesObservations, dates);
               multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'date range': dates, 'category table': categoryTable});
             });
           });

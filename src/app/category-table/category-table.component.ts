@@ -19,12 +19,12 @@ export class CategoryTableComponent implements OnInit {
   private sublist;
   private categories;
   private id: number;
+  private saIsActive: boolean = true;
   private errorMessage: string;
 
   private seriesData = [];
   private categoryData = [];
   private dateRange = ["1995-01-01", "2015-01-01"]
-  // private dateArray = [];
 
   // Variables for geo and freq selectors
   private geoHandle: string;
@@ -234,10 +234,13 @@ export class CategoryTableComponent implements OnInit {
     }
   }
 
+  saActive(e) {
+    // console.log('checkbox', e)
+    this.saIsActive = e.target.checked;
+    console.log('SA On', this.saIsActive)
+  }
 
   scrollTo(location: string): void {
     window.location.hash = location;
   }
-
-
 }
