@@ -252,8 +252,6 @@ function catTable(seriesObservations, dateRange) {
         }
       }
     }
-    // results.push({'serie': seriesInfo, 'observations': seriesObservations, 'category table': table});
-    // console.log('cat table', results);
     return results;
   }
 }

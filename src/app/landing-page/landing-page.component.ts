@@ -18,6 +18,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private sublist;
   private categories;
   private id: number;
+
+  // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
   private errorMessage: string;
 
@@ -55,7 +57,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   }
 
   calculateDateArray(dateStart, dateEnd, dateArray) {
-    // console.log('current freq', this.currentFreq);
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
 
@@ -76,10 +77,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         });
         start+=1;
       }
-      // dateArray.push({'date': start.toString() + '-' + append});
-      // start+=1;
     }
-    // console.log('date array', this.dateArray)
   }
 
   // Called on page load
@@ -106,13 +104,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             this.defaultFreq = '';
             this.defaultGeo = '';
           }
-
-          // If a default freq. is available, export as current frequency on page load
-          /* this.freqs.forEach((freq, index) => {
-            if (this.freqs[index]['freq'] === this.defaultFreq) {
-              this.currentFreq = this.freqs[index];
-            }
-          }); */
 
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
@@ -150,7 +141,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                  console.log('data', this.seriesData);
+                  // console.log('data', this.seriesData);
                 });
               });
             });
@@ -167,7 +158,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // Redraw series when a new region is selected
   redrawSeriesGeo(event) {
     this.geoHandle = event.handle;
-    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -175,8 +165,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
+            let dateArray = [];
             this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
             this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
+              this.sublist[index]['date range'] = dateArray;
               this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
             });
           });
@@ -191,7 +183,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   redrawSeriesFreq(event) {
     this.freqHandle = event.freq;
-    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -199,8 +190,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
+            let dateArray = [];
             this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
             this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
+              this.sublist[index]['date range'] = dateArray;
               this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               console.log('freq change', this.seriesData);
             });

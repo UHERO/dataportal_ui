@@ -19,6 +19,8 @@ export class CategoryTableComponent implements OnInit {
   private sublist;
   private categories;
   private id: number;
+  
+  // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
   private errorMessage: string;
 
@@ -56,7 +58,6 @@ export class CategoryTableComponent implements OnInit {
   }
 
   calculateDateArray(dateStart, dateEnd, dateArray) {
-    console.log('current freq', this.currentFreq);
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
 
@@ -140,7 +141,6 @@ export class CategoryTableComponent implements OnInit {
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                  // console.log('series data', this.seriesData)
                 });
               });
             });
@@ -157,7 +157,6 @@ export class CategoryTableComponent implements OnInit {
   // Update table data when a new region/frequency is selected
   redrawTableGeo(event) {
     this.geoHandle = event.handle;
-    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -165,11 +164,12 @@ export class CategoryTableComponent implements OnInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
-                this.sublist[index]['date range'] = dateArray;
-                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-              });
+            let dateArray = [];
+            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
+              this.sublist[index]['date range'] = dateArray;
+              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+            });
           });
         } else {
           return;
@@ -182,7 +182,6 @@ export class CategoryTableComponent implements OnInit {
 
   redrawTableFreq(event) {
     this.freqHandle = event.freq;
-    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -190,12 +189,12 @@ export class CategoryTableComponent implements OnInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
-                this.sublist[index]['date range'] = dateArray;
-                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                // console.log('new series data', this.seriesData)
-              });
+            let dateArray = [];
+            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
+              this.sublist[index]['date range'] = dateArray;
+              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+            });
           });
         } else {
           return;
