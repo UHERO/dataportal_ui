@@ -4,22 +4,33 @@
   <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
+    <div class="sa-toggle">
+      <template ngFor let-series [ngForOf]="seriesData">
+        <template ngFor let-serie [ngForOf]="series['series']">
+          <label class="btn btn-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === false" [class.isActive]="saIsActive">
+            <input type="checkbox" autocomplete="off" [checked]="saIsActive" (change)="saActive($event)">Sesonally Adjusted
+          </label>
+        </template>
+      </template>
+    </div>
     <a [routerLink]="['/category/table', id]" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
   </div>
   <hr>
   <ul class="content-links">
-    <li *ngFor="let sub of sublist"><!-- <a [routerLink]="" [fragment]="sub.id">{{sub.name}}</a> -->
+    <li *ngFor="let sub of sublist">
     <a [routerLink]="" (click)="scrollTo(sub.id)">{{sub.name}}</a></li>
   </ul>
   <hr>
   <div *ngFor="let series of seriesData" class="multi-charts-row">
     <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
-    <div *ngFor="let serie of series.series" class="multi-charts">
+    <template ngFor let-serie [ngForOf]="series['series']">
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>
-      <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
-        <app-highchart [seriesData]="serie"></app-highchart>
-      </a>
-    </div>
+      <div *ngIf="saIsActive === serie['serie']['seasonallyAdjusted']" class="multi-charts">
+        <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
+          <app-highchart [seriesData]="serie"></app-highchart>
+        </a>
+      </div>
+    </template>
   </div>
 </div>

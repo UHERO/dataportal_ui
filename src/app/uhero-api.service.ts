@@ -18,7 +18,8 @@ export class UheroApiService {
   private headers: Headers;
   private cachedCategories;
   // private cachedChartData = [];
-  private cachedMultiChartData = {};
+  private cachedMultiChartData = [];
+  private cachedFrequencies = [];
   private cachedGeographies = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
@@ -113,6 +114,20 @@ export class UheroApiService {
     }
   }
 
+  fetchFrequencies(id: number): Observable<Frequency[]> {
+    if(this.cachedFrequencies[id]) {
+      return Observable.of(this.cachedFrequencies[id]);
+    } else {
+      let frequencies$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedFrequencies[id] = val;
+          frequencies$ = null;
+        });
+      return frequencies$;
+    }
+  }
+
   // Get available geographies for a series' siblings
   fetchSiblingGeos(seriesId: number): Observable<Geography[]> {
     if (this.cachedSiblingGeos[seriesId]) {
@@ -196,7 +211,7 @@ export class UheroApiService {
   } */
 
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string) {
+  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>) {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
@@ -207,7 +222,8 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+              let categoryTable = catTable(seriesObservations, dates);
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'date range': dates, 'category table': categoryTable});
             });
           });
         } else {
@@ -215,12 +231,29 @@ export class UheroApiService {
         }
       },
       error => this.errorMessage = error);
-      this.cachedMultiChartData[id + geo + freq] = (Observable.forkJoin(Observable.of(multiChartData)));
+      this.cachedMultiChartData[id + geo + freq] = Observable.forkJoin(Observable.of(multiChartData));
       return this.cachedMultiChartData[id + geo + freq];
     }
   }
 
   // End get data from API
+}
+
+// create array of dates & values to be used for the category level table view
+function catTable(seriesObservations, dateRange) {
+  let results = [];
+  if (dateRange && seriesObservations['table data']) {
+    for (let i = 0; i < dateRange.length; i++) {
+      results.push({'date': dateRange[i]['date'], 'value': ' '})
+      for (let j = 0; j < seriesObservations['table data'].length; j++) {
+        if (results[i].date === seriesObservations['table data'][j]['date']) {
+          results[i].value = seriesObservations['table data'][j]['value'];
+          break;
+        }
+      }
+    }
+    return results;
+  }
 }
 
 // Create a nested JSON of parent and child categories
@@ -250,10 +283,12 @@ function mapData(response: Response): any {
 }
 
 function mapObservations(response: Response): ObservationResults {
-  let observations = response.json().data.transformationResults;
-  let level = observations[0].observations;
-  let perc = observations[1].observations;
-  let ytd = observations[2].observations;
+  let observations = response.json().data;
+  let start = observations.observationStart;
+  let end = observations.observationEnd;
+  let level = observations.transformationResults[0].observations;
+  let perc = observations.transformationResults[1].observations;
+  let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
   let percValue = [];
@@ -282,7 +317,7 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData};
+  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 

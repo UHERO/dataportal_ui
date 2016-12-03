@@ -158,7 +158,7 @@ export class HighstockComponent implements OnInit {
         }
       },
       series: [{
-        name: 'Percent',
+        name: 'YOY % Change',
         type: 'column',
         color: '#727272',
         data: perc,

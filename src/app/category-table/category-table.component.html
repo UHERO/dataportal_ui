@@ -4,6 +4,15 @@
   <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
+    <div class="sa-toggle">
+      <template ngFor let-series [ngForOf]="seriesData">
+        <template ngFor let-serie [ngForOf]="series['series']">
+          <label class="btn btn-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === false" [class.isActive]="saIsActive">
+            <input type="checkbox" autocomplete="off" [checked]="saIsActive" (change)="saActive($event)">Sesonally Adjusted
+          </label>
+        </template>
+      </template>
+    </div>
     <a [routerLink]="['/category', id]" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
   </div>
   <hr>
@@ -13,20 +22,23 @@
   </ul>
   <hr>
   <div *ngFor="let series of seriesData" class="table-row">
-    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
-    <div *ngFor="let serie of series.series" class="series-table">
-      <p *ngIf="!serie['serie']['id']"> No Data Available </p>
-      <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']" class="series-name">
-          <p>{{serie['serie']['title']}}</p>
-      </a>
-      <div class="table-data">
-          <p-dataTable [value]="serie['observations']['table data']" scrollable="true" *ngIf="serie['serie']['id']">
-            <p-column field="date" header="Date" [sortable]="true"></p-column>
-            <p-column field="value" header="Level"></p-column>
-            <!-- <p-column field="percValue" header="Percent" [sortable]="true"></p-column> -->
-          </p-dataTable>
-      </div>
+    <div class="table">
+      <table class="category-table">
+        <thead>
+          <th>Series</th>
+          <th *ngFor="let date of series['sublist']['date range']">{{date.date}}</th>
+        </thead>
+        <tbody>
+          <template ngFor let-serie [ngForOf]="series['series']">
+              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted']">
+                <td><a [routerLink]="['/series', serie['serie']['id']]">{{serie['serie']['title']}}</a></td>
+                <td *ngFor="let item of serie['category table']">{{item.value}}</td>
+              </tr>
+          </template>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
