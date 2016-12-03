@@ -211,25 +211,19 @@ export class UheroApiService {
   } */
 
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string) {
+  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>) {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
-      let seriesData;
-      let seriesItemProcessed = 0;
       let multiChartData = [];
-      let data;
       this.fetchSeries(id, geo, freq).subscribe((series) => {
         let seriesData = series;
         if (seriesData !== null) {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-              seriesItemProcessed++;
               let seriesObservations = obs;
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
-              if(seriesItemProcessed === seriesData.length) {
-                checkData(multiChartData, data);
-              }
+              let categoryTable = catTable(seriesObservations, dates)
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'date range': dates, 'category table': categoryTable});
             });
           });
         } else {
@@ -245,10 +239,23 @@ export class UheroApiService {
   // End get data from API
 }
 
-function checkData(seriesObservations, storeResults) {
-  console.log('obs callback', seriesObservations);
-  storeResults = seriesObservations;
-  return storeResults;
+// create array of dates & values to be used for the category level table view
+function catTable(seriesObservations, dateRange) {
+  let results = [];
+  if (dateRange && seriesObservations['table data']) {
+    for (let i = 0; i < dateRange.length; i++) {
+      results.push({'date': dateRange[i]['date'], 'value': ' '})
+      for (let j = 0; j < seriesObservations['table data'].length; j++) {
+        if (results[i].date === seriesObservations['table data'][j]['date']) {
+          results[i].value = seriesObservations['table data'][j]['value'];
+          break;
+        }
+      }
+    }
+    // results.push({'serie': seriesInfo, 'observations': seriesObservations, 'category table': table});
+    // console.log('cat table', results);
+    return results;
+  }
 }
 
 // Create a nested JSON of parent and child categories
@@ -269,7 +276,6 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
-  console.log('categories', categoryTree)
   return categoryTree;
 }
 

@@ -44,7 +44,6 @@ export class CategoryTableComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    //this.calculateDateArray(this.dateRange, this.dateArray)
     this.route.params.subscribe(params => {
       this.id = Number.parseInt(params['id']);
       if (isNaN(this.id)) {
@@ -57,15 +56,28 @@ export class CategoryTableComponent implements OnInit {
   }
 
   calculateDateArray(dateStart, dateEnd, dateArray) {
+    console.log('current freq', this.currentFreq);
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
-    let append = dateStart.substring(5,10);
 
     while (start < end) {
-      dateArray.push(start.toString() + '-' + append);
-      start+=1;
+      if (this.currentFreq.freq === 'A') {
+        dateArray.push({'date': start.toString() + '-01-01'});
+        start+=1;
+      } else if (this.currentFreq.freq === 'M') {
+        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        month.forEach((mon, index) => {
+          dateArray.push({'date': start.toString() + '-' + month[index] + '-01'});
+        });
+        start+=1;
+      } else {
+        let quarter = ['01', '04', '07', '10'];
+        quarter.forEach((quart, index) => {
+          dateArray.push({'date': start.toString() + '-' + quarter[index] + '-01'});
+        });
+        start+=1;
+      }
     }
-    // console.log('date array', this.dateArray)
   }
 
   drawSeriesTable(catId: number) {
@@ -91,15 +103,9 @@ export class CategoryTableComponent implements OnInit {
             this.defaultGeo = '';
           }
 
-          //let sublistItemsProcessed = 0;
-
           this.sublist.forEach((sub, index) => {
-            console.log('sublist', this.sublist[index])
-
             let dateArray = [];
-            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-            console.log('sublist dates', dateArray)
-            //sublistItemsProcessed++;
+
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
@@ -130,15 +136,11 @@ export class CategoryTableComponent implements OnInit {
                   }
                 });
 
-                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
+                this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                  console.log('series data', this.seriesData)
-
-                  /* if (sublistItemsProcessed === this.seriesData.length) {
-                    console.log(sublistItemsProcessed)
-                    this.findDateRange(this.seriesData);
-                  } */
+                  // console.log('series data', this.seriesData)
                 });
               });
             });
@@ -150,71 +152,12 @@ export class CategoryTableComponent implements OnInit {
       this.seriesData = []);
     },
     error => this.errorMessage = error);
-    // callback(this.seriesData)
-  }
-
-  findDateRange(seriesData) {
-    console.log('data callback', seriesData);
-    console.log('start date', this.dateRange[0])
-    
-    for (let i = 0; i < seriesData.length; i++) {
-      console.log('sublist', seriesData[i]);
-      let dateArray = [];
-      let startDates = [];
-      let endDates = [];
-      let append;
-      let series = seriesData[i]['sublist']['series'];
-      console.log('sublist series', series)
-
-      for (let j = 0; j < series.length; j++) {
-        let start = series[j]['observations']['start'];
-        let end = series[j]['observations']['end'];
-        console.log('start', start);
-        // console.log('end', end);
-      }
-
-    }
-    /* for (let i = 0; i < this.seriesData.length; i++) {
-      let dateArray = [];
-      let startDates = [];
-      let endDates = [];
-      let append;
-      let series$ = this.seriesData[i]['sublist']['series']
-      console.log('sublist index', i)
-
-      for (let j = 0; j < series$.length; j++) {
-        let start = series$[j]['observations']['start'];
-        let end = series$[j]['observations']['end'];
-        let minYear = +start.substring(0, 4);
-        let maxYear = +end.substring(0, 4);
-        append = start.substring(5);
-        startDates.push(minYear);
-        endDates.push(maxYear);
-        console.log('sublist', this.sublist[index])
-        console.log('start', startDates);
-        console.log('end', endDates)
-      }
-      if (startDates.length !== 0 && endDates.length !== 0) {
-        let startYear = Math.min(...startDates);
-        let endYear = Math.max(...endDates);
-        while (startYear <= endYear) {
-          dateArray.push(startYear.toString() + '-' + append)
-          startYear+=1 ;
-        }
-        // this.sublist[index]['date range'] = dateArray;
-        // this.categoryData.push(this.sublist[index]);
-        // console.log(this.categoryData)
-        } else {
-          return
-        }
-          console.log('date range', dateArray)
-        } */
-    return seriesData;
   }
 
   // Update table data when a new region/frequency is selected
   redrawTableGeo(event) {
     this.geoHandle = event.handle;
+    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -222,7 +165,9 @@ export class CategoryTableComponent implements OnInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
+              this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
+                this.sublist[index]['date range'] = dateArray;
                 this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
               });
           });
@@ -237,6 +182,7 @@ export class CategoryTableComponent implements OnInit {
 
   redrawTableFreq(event) {
     this.freqHandle = event.freq;
+    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -244,8 +190,11 @@ export class CategoryTableComponent implements OnInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
+              this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
+                this.sublist[index]['date range'] = dateArray;
                 this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+                // console.log('new series data', this.seriesData)
               });
           });
         } else {

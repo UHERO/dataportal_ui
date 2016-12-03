@@ -53,6 +53,34 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     });
   }
 
+  calculateDateArray(dateStart, dateEnd, dateArray) {
+    console.log('current freq', this.currentFreq);
+    let start = +dateStart.substring(0,4);
+    let end = +dateEnd.substring(0,4);
+
+    while (start < end) {
+      if (this.currentFreq.freq === 'A') {
+        dateArray.push({'date': start.toString() + '-01-01'});
+        start+=1;
+      } else if (this.currentFreq.freq === 'M') {
+        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        month.forEach((mon, index) => {
+          dateArray.push({'date': start.toString() + '-' + month[index] + '-01'});
+        });
+        start+=1;
+      } else {
+        let quarter = ['01', '04', '07', '10'];
+        quarter.forEach((quart, index) => {
+          dateArray.push({'date': start.toString() + '-' + quarter[index] + '-01'});
+        });
+        start+=1;
+      }
+      // dateArray.push({'date': start.toString() + '-' + append});
+      // start+=1;
+    }
+    // console.log('date array', this.dateArray)
+  }
+
   // Called on page load
   // Gets data for sublists on default selected region
   drawSeries(catId: number) {
@@ -86,6 +114,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           }); */
 
           this.sublist.forEach((sub, index) => {
+            let dateArray = [];
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
@@ -115,8 +144,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
                     this.currentFreq = this.freqs[0];
                   }
                 });
+                this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
 
-                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((results) => {
+                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
+                  this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
                 });
               });
@@ -134,6 +165,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // Redraw series when a new region is selected
   redrawSeriesGeo(event) {
     this.geoHandle = event.handle;
+    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -141,9 +173,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-              });
+            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
+              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+            });
           });
         } else {
           return;
@@ -156,6 +189,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   redrawSeriesFreq(event) {
     this.freqHandle = event.freq;
+    let dateArray = [];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
@@ -163,9 +197,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
-              this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq).subscribe((results) => {
-                this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-              });
+            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
+              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
+            });
           });
         } else {
           return;
