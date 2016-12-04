@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { Frequency } from '../frequency';
-import * as Highcharts from 'highcharts';
+/* import * as Highcharts from 'highcharts';
 
 Highcharts.setOptions({
   lang: {
     thousandsSep: ','
   }
-});
+}); */
 
 @Component({
   selector: 'app-single-series',
