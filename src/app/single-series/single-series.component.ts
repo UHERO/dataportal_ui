@@ -50,6 +50,8 @@ export class SingleSeriesComponent implements OnInit {
 
   // Draws chart & table on load
   drawChart(id: number) {
+    let freqArray = [];
+
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
 

@@ -43,6 +43,9 @@ export class HighchartComponent implements OnInit {
             letterSpacing: '0.05em'
           }
         },
+        exporting: {
+          enabled: false
+        },
         legend: {
           enabled: false
         },

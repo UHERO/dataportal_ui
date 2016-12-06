@@ -23,6 +23,7 @@ Highcharts.setOptions({
 })
 export class HighstockComponent implements OnInit {
   @Input() chartData;
+  @Input() currentFreq;
   @Input() seriesDetail;
   @Output() chartExtremes = new EventEmitter();
   private options: Object;
@@ -34,8 +35,11 @@ export class HighstockComponent implements OnInit {
     let perc = this.chartData['perc'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
+    // let quarterlyData = this.currentFreq.freq === 'Q' ? true : false;
+    let dataFreq = this.currentFreq.freq;
+    console.log('init freq', dataFreq);
 
-    this.drawChart(level, perc, name, unitsShort);
+    this.drawChart(level, perc, name, unitsShort, dataFreq);
   }
 
   ngOnChanges() {
@@ -43,12 +47,15 @@ export class HighstockComponent implements OnInit {
     let perc = this.chartData['perc'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
+    // let quarterlyData = this.currentFreq.freq === 'Q' ? true : false;
+    let dataFreq = this.currentFreq.freq;
+    console.log('change freq', dataFreq);
 
-    this.drawChart(level, perc, name, unitsShort);
+    this.drawChart(level, perc, name, unitsShort, dataFreq);
   }
 
 
-  drawChart(level, perc, name, units) {
+  drawChart(level, perc, name, units, freq) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -104,7 +111,31 @@ export class HighstockComponent implements OnInit {
       tooltip: {
         borderWidth: 0,
         shadow: false,
-        valueDecimals: 2
+        valueDecimals: 2,
+        formatter: function () {
+          let s = '<b>';
+          console.log('tooltip', freq)
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
+            s = s + 'Q1'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
+            s = s + 'Q2'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
+            s = s + 'Q3'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
+            s = s + 'Q4'
+          };
+          if (freq === 'M') {
+            s = s + Highcharts.dateFormat('%b', this.x);
+          }
+          s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
+          this.points.forEach((point, index) => {
+            s += '<br><span style="color:' + point.series.color + '">\u25CF</span> ' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+          })
+          return s;
+        }
       },
       title: {
         text: '',
@@ -121,7 +152,19 @@ export class HighstockComponent implements OnInit {
         labels: {
           style: {
             color: '#505050'
-          }
+          },
+          /* formatter: function() {
+            let s;
+            console.log('true', freq)
+            if (freq === 'A') {
+              console.log('true')
+              // let d = new Date(this.value),
+              // q = Math.floor((d.getMonth() + 3) / 3);
+              // s = 'Q' + q + ' ' + d.getFullYear();
+              s = this.value
+            };
+            return s;
+          } */
         }
       },
       yAxis: [{
@@ -157,28 +200,34 @@ export class HighstockComponent implements OnInit {
           data: level
         }
       },
+      plotOptions: {
+        series: {
+          cropThreshold: 0
+        }
+      },
       series: [{
         name: 'YOY % Change',
         type: 'column',
         color: '#727272',
         data: perc,
-        /* dataGrouping: {
+        dataGrouping: {
           enabled: false
-        } */
+        }
       }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#1D667F',
         data: level,
-        /* dataGrouping: {
+        dataGrouping: {
           enabled: false
-        } */
+        }
       }]
     };
   }
 
   updateTable(e) {
+    console.log('event', e)
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax, selectedRange;
