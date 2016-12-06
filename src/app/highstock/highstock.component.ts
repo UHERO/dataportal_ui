@@ -2,12 +2,16 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
-const Highcharts = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/highstock.src');
-const exporting = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/modules/exporting.src');
+// const Highcharts = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/highstock.src');
+// const exporting = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/modules/exporting.src');
+const Highcharts = require('../../../node_modules/highcharts/highstock.src');
+const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
+const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 
 // Plug in export module for Highstock chart
 exporting(Highcharts);
+offlineExport(Highcharts);
 exportCSV(Highcharts);
 
 Highcharts.setOptions({
@@ -107,6 +111,19 @@ export class HighstockComponent implements OnInit {
         inputEnabled: false
         // inputDateFormat: '%Y-01-01',
         // inputEditDateFormat: '%Y-01-01',
+      },
+      exporting: {
+        chartOptions: {
+          navigator: {
+            enabled: false
+          },
+          scrollbar: {
+            enabled: false
+          },
+          rangeSelector: {
+            enabled: false
+          }
+        }
       },
       tooltip: {
         borderWidth: 0,
