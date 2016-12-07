@@ -110,11 +110,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
             // Find date ranges for a given sublist
             this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
-              if (cat['observationStart'] && cat['observationEnd']) {
                 this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-              } else {
-                return;
-              }
             });
 
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
@@ -147,9 +143,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
                   }
                 });
 
-                if (dateArray.length === 0) {
-                  this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-                }
                 // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
@@ -179,7 +172,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
+                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
+            });
+            // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
             this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
               this.sublist[index]['date range'] = dateArray;
               this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
@@ -204,7 +200,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
+                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
+            });
+            // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
             this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
               this.sublist[index]['date range'] = dateArray;
               this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
