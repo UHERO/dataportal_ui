@@ -109,9 +109,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             let dateArray = [];
 
             // Find date ranges for a given sublist
-            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
+            /* this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
                 this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-            });
+            }); */
 
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
@@ -142,6 +142,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
                     this.currentFreq = this.freqs[0];
                   }
                 });
+
+                // Find date ranges for a given sublist
+                this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
+                  this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
+                });
+
 
                 // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {

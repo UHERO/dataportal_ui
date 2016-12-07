@@ -140,11 +140,10 @@
     // overflow-x: auto;
 
     .table {
-      // width: 99%;
-      width: 53%;
+      width: 99%;
+      // width: 53%;
       overflow-x: auto;
-      margin-left: 47%;
-      //z-index: 1;
+      // margin-left: 47%;
 
       .category-table {
         margin-bottom: 5px;
@@ -155,7 +154,7 @@
           background-color: #ECECEC;
         }
 
-        td:first-child {
+        /* td:first-child {
           position: absolute;
           background: #FFFFFF;
           width: 47%;
@@ -163,14 +162,14 @@
           border-right: 1px solid;
           margin-left: -47%;
           padding: 1px;
-        }
+        } */
 
         th, td {
           white-space: nowrap;
           font-family: 'Lucida Sans', sans-serif;
           font-size: 0.9em;
-          // padding: 3px;
-          padding: 1px;
+          padding: 3px;
+          // padding: 1px;
         }
 
         a {
