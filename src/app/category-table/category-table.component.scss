@@ -140,8 +140,10 @@
     // overflow-x: auto;
 
     .table {
-      width: 99%;
+      // width: 99%;
+      width: 53%;
       overflow-x: auto;
+      margin-left: 47%;
       //z-index: 1;
 
       .category-table {
@@ -153,11 +155,22 @@
           background-color: #ECECEC;
         }
 
+        td:first-child {
+          position: absolute;
+          background: #FFFFFF;
+          width: 47%;
+          white-space: nowrap;
+          border-right: 1px solid;
+          margin-left: -47%;
+          padding: 1px;
+        }
+
         th, td {
           white-space: nowrap;
           font-family: 'Lucida Sans', sans-serif;
           font-size: 0.9em;
-          padding: 3px;
+          // padding: 3px;
+          padding: 1px;
         }
 
         a {

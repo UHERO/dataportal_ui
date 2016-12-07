@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 import 'rxjs/add/operator/mergeMap';
 
+import { Category } from './category';
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
 import { Series } from './series';
@@ -17,6 +18,7 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
+  private cachedSelectedCategory = [];
   // private cachedChartData = [];
   private cachedMultiChartData = [];
   private cachedFrequencies = [];
@@ -49,9 +51,24 @@ export class UheroApiService {
         .map(mapCategories)
         .do(val => {
           this.cachedCategories = val;
-          // categories$ = null;
+          categories$ = null;
         });
       return categories$;
+    }
+  }
+
+  // Gets a particular category. Used to identify a category's date ranges
+  fetchSelectedCategory(id: number): Observable<Category> {
+    if (this.cachedSelectedCategory[id]) {
+      return Observable.of(this.cachedSelectedCategory[id]);
+    } else {
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSelectedCategory[id] = val;
+          selectedCat$ = null;
+        });
+      return selectedCat$;
     }
   }
 
@@ -274,6 +291,7 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
+  console.log('categories', categoryTree)
   return categoryTree;
 }
 
@@ -284,8 +302,8 @@ function mapData(response: Response): any {
 
 function mapObservations(response: Response): ObservationResults {
   let observations = response.json().data;
-  let start = observations.observationStart;
-  let end = observations.observationEnd;
+  // let start = observations.observationStart;
+  // let end = observations.observationEnd;
   let level = observations.transformationResults[0].observations;
   let perc = observations.transformationResults[1].observations;
   let ytd = observations.transformationResults[2].observations;
@@ -317,7 +335,8 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
+  let data = {'chart data': chartData, 'table data': tableData};
+  // let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 

@@ -107,6 +107,15 @@ export class CategoryTableComponent implements OnInit {
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
 
+            // Find date ranges for a given sublist
+            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
+              if (cat['observationStart'] && cat['observationEnd']) {
+                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
+              } else {
+                return;
+              }
+            });
+
             this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
               geos.forEach((geo, index) => {
                 this.uniqueGeos(geos[index], geoArray);
@@ -137,7 +146,10 @@ export class CategoryTableComponent implements OnInit {
                   }
                 });
 
-                this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+                if (dateArray.length === 0) {
+                  this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
+                }
+                // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
