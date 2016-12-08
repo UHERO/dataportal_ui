@@ -336,7 +336,6 @@ function mapObservations(response: Response): ObservationResults {
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
   let data = {'chart data': chartData, 'table data': tableData};
-  // let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 
@@ -359,23 +358,30 @@ function combineObsData(level, perc) {
       }
     }
     return table;
+  } else if (level && !perc) {
+    let table = level;
+    for (let i = 0; i < level.length; i++) {
+      table[i].percValue = 'NA';
+      table[i].value = formatNum(+level[i].value, 2);
+    }
+    return table;
   }
+}
 
-  function formatNum(num: number, decimal: number) {
-    //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    let fixedNum: any;
-    let formattedNum: string;
-    fixedNum = num.toFixed(decimal);
-    // remove decimals 
-    let int = fixedNum|0;
-    let signCheck = num < 0 ? 1 : 0;
-    // store deicmal value
-    let remainder = Math.abs(fixedNum - int);
-    let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
-    let intString = '' + int, i = intString.length;
-    let r = '';
-    while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
-    return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
-    // return +formattedNum;
-  }
+function formatNum(num: number, decimal: number) {
+  //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  let fixedNum: any;
+  let formattedNum: string;
+  fixedNum = num.toFixed(decimal);
+  // remove decimals 
+  let int = fixedNum|0;
+  let signCheck = num < 0 ? 1 : 0;
+  // store deicmal value
+  let remainder = Math.abs(fixedNum - int);
+  let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
+  let intString = '' + int, i = intString.length;
+  let r = '';
+  while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
+  return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
+  // return +formattedNum;
 }

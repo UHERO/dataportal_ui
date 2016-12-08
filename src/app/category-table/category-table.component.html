@@ -32,7 +32,7 @@
         </thead>
         <tbody>
           <template ngFor let-serie [ngForOf]="series['series']">
-              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted']">
+              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted'] && serie['category table']">
                 <td><a [routerLink]="['/series', serie['serie']['id']]">{{serie['serie']['title']}}</a></td>
                 <td *ngFor="let item of serie['category table']">{{item.value}}</td>
               </tr>
