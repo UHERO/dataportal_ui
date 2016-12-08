@@ -28,7 +28,7 @@
       <table class="category-table">
         <thead>
           <th>Series</th>
-          <th *ngFor="let date of series['sublist']['date range']">{{date.date}}</th>
+          <th *ngFor="let date of series['sublist']['date range']">{{date['table date']}}</th>
         </thead>
         <tbody>
           <template ngFor let-serie [ngForOf]="series['series']">

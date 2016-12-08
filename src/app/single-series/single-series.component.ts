@@ -44,8 +44,7 @@ export class SingleSeriesComponent implements OnInit {
    this.route.params.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       this.drawChart(seriesId);
-    })
-
+    });
   }
 
   // Draws chart & table on load
@@ -70,6 +69,7 @@ export class SingleSeriesComponent implements OnInit {
       });
       this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
         let seriesObservations = observations;
+        console.log('series observations', observations);
         this.chartData = seriesObservations['chart data'];
         this.tableData = seriesObservations['table data'];
       });

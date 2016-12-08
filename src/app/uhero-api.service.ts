@@ -261,7 +261,7 @@ function catTable(seriesObservations, dateRange) {
   let results = [];
   if (dateRange && seriesObservations['table data']) {
     for (let i = 0; i < dateRange.length; i++) {
-      results.push({'date': dateRange[i]['date'], 'value': ' '})
+      results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'value': ' '})
       for (let j = 0; j < seriesObservations['table data'].length; j++) {
         if (results[i].date === seriesObservations['table data'][j]['date']) {
           results[i].value = seriesObservations['table data'][j]['value'];
@@ -302,8 +302,8 @@ function mapData(response: Response): any {
 
 function mapObservations(response: Response): ObservationResults {
   let observations = response.json().data;
-  // let start = observations.observationStart;
-  // let end = observations.observationEnd;
+  let start = observations.observationStart;
+  let end = observations.observationEnd;
   let level = observations.transformationResults[0].observations;
   let perc = observations.transformationResults[1].observations;
   let ytd = observations.transformationResults[2].observations;
@@ -335,7 +335,7 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData};
+  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 

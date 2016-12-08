@@ -62,18 +62,19 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
     while (start < end) {
       if (this.currentFreq.freq === 'A') {
-        dateArray.push({'date': start.toString() + '-01-01'});
+        dateArray.push({'date': start.toString() + '-01-01', 'table date': start.toString()});
         start+=1;
       } else if (this.currentFreq.freq === 'M') {
         let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
         month.forEach((mon, index) => {
-          dateArray.push({'date': start.toString() + '-' + month[index] + '-01'});
+          dateArray.push({'date': start.toString() + '-' + month[index] + '-01', 'table date': start.toString() + '-' + month[index]});
         });
         start+=1;
       } else {
-        let quarter = ['01', '04', '07', '10'];
-        quarter.forEach((quart, index) => {
-          dateArray.push({'date': start.toString() + '-' + quarter[index] + '-01'});
+        let quarterMonth = ['01', '04', '07', '10'];
+        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
+        quarterMonth.forEach((quart, index) => {
+          dateArray.push({'date': start.toString() + '-' + quarterMonth[index] + '-01', 'table date': start.toString() + ' ' + quarter[index]});
         });
         start+=1;
       }

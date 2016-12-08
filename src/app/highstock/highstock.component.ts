@@ -39,9 +39,7 @@ export class HighstockComponent implements OnInit {
     let perc = this.chartData['perc'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
-    // let quarterlyData = this.currentFreq.freq === 'Q' ? true : false;
     let dataFreq = this.currentFreq.freq;
-    console.log('init freq', dataFreq);
 
     this.drawChart(level, perc, name, unitsShort, dataFreq);
   }
@@ -51,9 +49,7 @@ export class HighstockComponent implements OnInit {
     let perc = this.chartData['perc'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
-    // let quarterlyData = this.currentFreq.freq === 'Q' ? true : false;
     let dataFreq = this.currentFreq.freq;
-    console.log('change freq', dataFreq);
 
     this.drawChart(level, perc, name, unitsShort, dataFreq);
   }
@@ -131,7 +127,6 @@ export class HighstockComponent implements OnInit {
         valueDecimals: 2,
         formatter: function () {
           let s = '<b>';
-          console.log('tooltip', freq)
           if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1'
           };
@@ -169,19 +164,7 @@ export class HighstockComponent implements OnInit {
         labels: {
           style: {
             color: '#505050'
-          },
-          /* formatter: function() {
-            let s;
-            console.log('true', freq)
-            if (freq === 'A') {
-              console.log('true')
-              // let d = new Date(this.value),
-              // q = Math.floor((d.getMonth() + 3) / 3);
-              // s = 'Q' + q + ' ' + d.getFullYear();
-              s = this.value
-            };
-            return s;
-          } */
+          }
         }
       },
       yAxis: [{
