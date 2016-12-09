@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, Renderer } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
 import { UheroApiService } from '../uhero-api.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
@@ -14,7 +13,9 @@ import { error } from 'util';
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements OnInit {
+export class CategoryTableComponent implements OnInit, AfterViewInit {
+  @ViewChildren('tableScroll') private tableEl;
+
   private selectedCategory;
   private sublist;
   private categories;
@@ -22,11 +23,11 @@ export class CategoryTableComponent implements OnInit {
   
   // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
+  private userEvent: boolean = false;
   private errorMessage: string;
 
   private seriesData = [];
   private categoryData = [];
-  private dateRange = ["1995-01-01", "2015-01-01"]
 
   // Variables for geo and freq selectors
   private geoHandle: string;
@@ -38,7 +39,7 @@ export class CategoryTableComponent implements OnInit {
   public currentGeo: Geography;
   public currentFreq: Frequency;
 
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) { }
+  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute, private renderer: Renderer) { }
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -51,10 +52,22 @@ export class CategoryTableComponent implements OnInit {
       if (isNaN(this.id)) {
         this.id = 42;
         this.drawSeriesTable(42);
+        // this.tableScroll();
       } else {
         this.drawSeriesTable(this.id);
+        // this.tableScroll();
       }
     });
+    // this.tableScroll();
+    // this.renderer.invokeElementMethod(this.tableEl.nativeElement, 'this.tableScroll');
+  }
+
+  ngAfterViewChecked() {
+    // Do not force scroll to the right if mouseover event occurs
+    // Prevents scrollbar from resetting to the right afer manually scrolling
+    if (!this.userEvent) {
+      this.tableScroll();
+    }
   }
 
   calculateDateArray(dateStart, dateEnd, dateArray) {
@@ -153,7 +166,7 @@ export class CategoryTableComponent implements OnInit {
                 this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
                   this.sublist[index]['date range'] = dateArray;
                   this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                  console.log('series data', this.seriesData);
+                  this.tableScroll();
                 });
               });
             });
@@ -255,10 +268,24 @@ export class CategoryTableComponent implements OnInit {
   saActive(e) {
     // console.log('checkbox', e)
     this.saIsActive = e.target.checked;
-    console.log('SA On', this.saIsActive)
   }
 
   scrollTo(location: string): void {
     window.location.hash = location;
+  }
+
+  // On load, table scrollbars should start at the right -- showing most recent data
+  tableScroll(): void {
+    try {
+      this.tableEl._results.forEach((el, index) => {
+        this.tableEl._results[index].nativeElement.scrollLeft = this.tableEl._results[index].nativeElement.scrollWidth;
+      })
+    } catch(err) {
+      console.log(err) 
+    } 
+  }
+
+  userMouse(): void {
+    this.userEvent = true;
   }
 }

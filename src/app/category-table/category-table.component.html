@@ -24,7 +24,7 @@
   <div *ngFor="let series of seriesData" class="table-row">
     <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
-    <div class="table">
+    <div class="table" #tableScroll on-mouseover="userMouse()">
       <table class="category-table">
         <thead>
           <th>Series</th>
@@ -33,7 +33,7 @@
         <tbody>
           <template ngFor let-serie [ngForOf]="series['series']">
               <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted'] && serie['category table']">
-                <td><a [routerLink]="['/series', serie['serie']['id']]">{{serie['serie']['title']}}</a></td>
+                <td><a [routerLink]="['/series', serie['serie']['id']]" [title]="serie['serie']['title']">{{serie['serie']['title']}}</a></td>
                 <td *ngFor="let item of serie['category table']">{{item.value}}</td>
               </tr>
           </template>

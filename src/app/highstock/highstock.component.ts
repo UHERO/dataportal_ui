@@ -227,7 +227,6 @@ export class HighstockComponent implements OnInit {
   }
 
   updateTable(e) {
-    console.log('event', e)
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax, selectedRange;
