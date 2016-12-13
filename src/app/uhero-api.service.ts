@@ -261,7 +261,7 @@ function catTable(seriesObservations, dateRange) {
   let results = [];
   if (dateRange && seriesObservations['table data']) {
     for (let i = 0; i < dateRange.length; i++) {
-      results.push({'date': dateRange[i]['date'], 'value': ' '})
+      results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'value': ' '})
       for (let j = 0; j < seriesObservations['table data'].length; j++) {
         if (results[i].date === seriesObservations['table data'][j]['date']) {
           results[i].value = seriesObservations['table data'][j]['value'];
@@ -291,7 +291,6 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
-  console.log('categories', categoryTree)
   return categoryTree;
 }
 
@@ -302,8 +301,8 @@ function mapData(response: Response): any {
 
 function mapObservations(response: Response): ObservationResults {
   let observations = response.json().data;
-  // let start = observations.observationStart;
-  // let end = observations.observationEnd;
+  let start = observations.observationStart;
+  let end = observations.observationEnd;
   let level = observations.transformationResults[0].observations;
   let perc = observations.transformationResults[1].observations;
   let ytd = observations.transformationResults[2].observations;
@@ -335,8 +334,7 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, perc);
   let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData};
-  // let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
+  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 
@@ -359,23 +357,30 @@ function combineObsData(level, perc) {
       }
     }
     return table;
+  } else if (level && !perc) {
+    let table = level;
+    for (let i = 0; i < level.length; i++) {
+      table[i].percValue = 'NA';
+      table[i].value = formatNum(+level[i].value, 2);
+    }
+    return table;
   }
+}
 
-  function formatNum(num: number, decimal: number) {
-    //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    let fixedNum: any;
-    let formattedNum: string;
-    fixedNum = num.toFixed(decimal);
-    // remove decimals 
-    let int = fixedNum|0;
-    let signCheck = num < 0 ? 1 : 0;
-    // store deicmal value
-    let remainder = Math.abs(fixedNum - int);
-    let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
-    let intString = '' + int, i = intString.length;
-    let r = '';
-    while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
-    return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
-    // return +formattedNum;
-  }
+function formatNum(num: number, decimal: number) {
+  //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  let fixedNum: any;
+  let formattedNum: string;
+  fixedNum = num.toFixed(decimal);
+  // remove decimals 
+  let int = fixedNum|0;
+  let signCheck = num < 0 ? 1 : 0;
+  // store deicmal value
+  let remainder = Math.abs(fixedNum - int);
+  let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
+  let intString = '' + int, i = intString.length;
+  let r = '';
+  while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
+  return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
+  // return +formattedNum;
 }
