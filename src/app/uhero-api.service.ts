@@ -291,7 +291,6 @@ function mapCategories(response: Response): CategoryTree {
       categoryTree.push(value);
     }
   });
-  console.log('categories', categoryTree)
   return categoryTree;
 }
 

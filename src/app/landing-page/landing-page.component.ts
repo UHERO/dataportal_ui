@@ -3,6 +3,7 @@ import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
@@ -36,7 +37,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   public currentGeo: Geography;
   public currentFreq: Frequency;
 
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -49,124 +50,98 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.id = Number.parseInt(params['id']);
       if (isNaN(this.id)) {
         this.id = 42;
-        this.drawSeries(42);
+        this.initContent(42);
       } else {
-        this.drawSeries(this.id);
+        this.initContent(this.id)
       }
     });
   }
 
-  calculateDateArray(dateStart, dateEnd, dateArray) {
-    let start = +dateStart.substring(0,4);
-    let end = +dateEnd.substring(0,4);
-
-    while (start < end) {
-      if (this.currentFreq.freq === 'A') {
-        dateArray.push({'date': start.toString() + '-01-01', 'table date': start.toString()});
-        start+=1;
-      } else if (this.currentFreq.freq === 'M') {
-        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        month.forEach((mon, index) => {
-          dateArray.push({'date': start.toString() + '-' + month[index] + '-01', 'table date': start.toString() + '-' + month[index]});
-        });
-        start+=1;
-      } else {
-        let quarterMonth = ['01', '04', '07', '10'];
-        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-        quarterMonth.forEach((quart, index) => {
-          dateArray.push({'date': start.toString() + '-' + quarterMonth[index] + '-01', 'table date': start.toString() + ' ' + quarter[index]});
-        });
-        start+=1;
-      }
-    }
-  }
-
   // Called on page load
-  // Gets data for sublists on default selected region
-  drawSeries(catId: number) {
+  // Gets data sublists available for a selected category
+  initContent(catId: number) {
     let geoArray = [];
     let freqArray = [];
 
-    // this.currentFreq = this.freqs[0];
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
 
       categories.forEach((category, index) => {
-        // Look for selected category in list of available categories
         if (categories[index]['id'] === catId) {
           this.selectedCategory = categories[index]['name'];
           this.sublist = categories[index]['children'];
 
-          // Get a category's default geo and freq if available
+          // Get a sublist's default geo/freq if available
           if (categories[index]['defaults']) {
             this.defaultFreq = categories[index]['defaults']['freq'];
-            this.defaultGeo = categories[index]['defaults']['geo'];
+            this.defaultGeo  = categories[index]['defaults']['geo'];
           } else {
             this.defaultFreq = '';
             this.defaultGeo = '';
           }
 
           this.sublist.forEach((sub, index) => {
-            let dateArray = [];
-
-            // Find date ranges for a given sublist
-            /* this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
-                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-            }); */
-
-            this._uheroAPIService.fetchGeographies(this.sublist[index]['id']).subscribe((geos) => {
-              geos.forEach((geo, index) => {
-                this.uniqueGeos(geos[index], geoArray);
-              });
-              this.regions = geoArray;
-
-              // If a default geo is available, export as current geography on page load
-              this.regions.forEach((geo, index) => {
-                if (this.defaultGeo === this.regions[index]['handle']) {
-                  this.currentGeo = this.regions[index];
-                } else {
-                  this.currentGeo = this.regions[0];
-                }
-              })
-
-              this._uheroAPIService.fetchFrequencies(this.sublist[index]['id']).subscribe((frequencies) => {
-                frequencies.forEach((frequency, index) => {
-                  this.uniqueFreqs(frequencies[index], freqArray);
-                });
-                this.freqs = freqArray;
-
-                // If a default freq. is available, export as current frequency on page load
-                this.freqs.forEach((freq, index) => {
-                  if (this.defaultFreq === this.freqs[index]['label']) {
-                    this.currentFreq = this.freqs[index];
-                  } else {
-                    this.currentFreq = this.freqs[0];
-                  }
-                });
-
-                // Find date ranges for a given sublist
-                this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
-                  this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-                });
-
-
-                // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-                this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
-                  this.sublist[index]['date range'] = dateArray;
-                  this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-                  // console.log('data', this.seriesData);
-                });
-              });
-            });
+            this.initSettings(this.sublist[index], geoArray, freqArray);
           });
         } else {
-          return;
+          return
         }
       },
       this.seriesData = []);
-    },
-    error => this.errorMessage = error);
+    });
   }
+
+  // Get regions and frequencies available for a selected category
+  initSettings(sublistIndex, regions: Array<any>, freqs: Array<any>) {
+    let dateArray = [];
+
+    this._uheroAPIService.fetchGeographies(sublistIndex['id']).subscribe((geos) => {
+      geos.forEach((geo, index) => {
+        this._helper.uniqueGeos(geos[index], regions);
+      });
+      this.regions = regions;
+
+      this.regions.forEach((geo, index) => {
+        if (this.defaultGeo === this.regions[index]['handle']) {
+          this.currentGeo = this.regions[index];
+        } else {
+          this.currentGeo = this.regions[0];
+        }
+      });
+
+      this._uheroAPIService.fetchFrequencies(sublistIndex['id']).subscribe((frequencies) => {
+        frequencies.forEach((frequency, index) => {
+          this._helper.uniqueFreqs(frequencies[index], freqs);
+        });
+        this.freqs = freqs;
+
+        // If a default freq. is available, export as current frequency on page load
+        this.freqs.forEach((freq, index) => {
+          if (this.defaultFreq === this.freqs[index]['label']) {
+            this.currentFreq = this.freqs[index];
+          } else {
+            this.currentFreq = this.freqs[0];
+          }
+        });
+
+        // Fetch data for current region/frequency settings
+        this.sublistData(sublistIndex, this.currentGeo.handle, this.currentFreq.freq, dateArray);
+      });
+    });
+  }
+
+  // Get series for each subcategory
+  sublistData(sublistIndex, geoHandle: string, freqFrequency: string, dates: Array<any>) {
+    this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
+      this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], freqFrequency, dates);
+    });
+
+    this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates).subscribe((results) => {
+      sublistIndex['date range'] = dates;
+      this.seriesData.push({'sublist': sublistIndex, 'series': results[0]});
+    });
+  }
+
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event) {
@@ -179,14 +154,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
-                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-            });
-            // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], event.handle, this.currentFreq.freq, dateArray).subscribe((results) => {
-              this.sublist[index]['date range'] = dateArray;
-              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-            });
+            this.sublistData(this.sublist[index], this.geoHandle, this.currentFreq.freq, dateArray);
           });
         } else {
           return;
@@ -207,15 +175,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((cat) => {
-                this.calculateDateArray(cat['observationStart'], cat['observationEnd'], dateArray);
-            });
-            // this.calculateDateArray(this.sublist[index]['observationStart'], this.sublist[index]['observationEnd'], dateArray);
-            this._uheroAPIService.fetchMultiChartData(this.sublist[index]['id'], this.currentGeo.handle, event.freq, dateArray).subscribe((results) => {
-              this.sublist[index]['date range'] = dateArray;
-              this.seriesData.push({'sublist': this.sublist[index], 'series': results[0]});
-              console.log('freq change', this.seriesData);
-            });
+            this.sublistData(this.sublist[index], this.currentGeo.handle, this.freqHandle, dateArray);
           });
         } else {
           return;
@@ -224,34 +184,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.seriesData = []);
     },
     error => this.errorMessage = error);
-  }
-
-  // Get a unique array of available regions for a category
-  uniqueGeos(geo, geoList) {
-    let exist = false;
-    for (let i in geoList) {
-      if (geo.name === geoList[i].name) {
-        exist = true;
-      }
-    }
-
-    if (!exist) {
-      geoList.push(geo);
-    }
-  }
-
-  // Get a unique array of available frequencies for a category
-  uniqueFreqs(freq, freqList) {
-    let exist = false;
-    for (let i in freqList) {
-      if (freq.label === freqList[i].label) {
-        exist = true;
-      }
-    }
-
-    if (!exist && (freq.freq === 'A' || freq.freq === 'M' || freq.freq === 'Q')) {
-      freqList.push(freq);
-    }
   }
 
   saActive(e) {
