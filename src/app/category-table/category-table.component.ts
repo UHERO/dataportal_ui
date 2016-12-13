@@ -18,7 +18,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
 
   private selectedCategory;
-  private sublist;
+  private sublist: Array<any> = [];
   private categories;
   private id: number;
   

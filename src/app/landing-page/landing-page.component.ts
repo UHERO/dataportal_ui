@@ -16,7 +16,7 @@ import { error } from 'util';
 })
 export class LandingPageComponent implements OnInit, AfterViewInit {
   private selectedCategory;
-  private sublist;
+  private sublist: Array<any> = [];
   private categories;
   private id: number;
 

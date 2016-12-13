@@ -5,6 +5,11 @@
   overflow: auto;
   width: 100%;
 
+  .filters {
+    display: inline-block;
+    vertical-align: top;
+  }
+
   .content-links {
     padding-left: 5px;
     display: inline-block;
@@ -34,7 +39,7 @@
     display: inline-block;
     color: #1D667F;
     font-size: 1.5em;
-    margin: auto 15px 10px 0px;
+    margin: auto 5px 10px 0px;
     vertical-align: middle;
   }
 
@@ -43,7 +48,7 @@
     text-decoration: none;
     font-size: 0.9em;
     color: #1D667F;
-    margin-left: 10px;
+    // margin-left: 10px;
   }
 
   .top-anchor {
@@ -134,54 +139,6 @@
     vertical-align: middle;
   }
 
-  /* .table-row {
-    margin-bottom: 60px;
-    // width: 99%;
-    // overflow-x: auto;
-
-    .table {
-      width: 99%;
-      // width: 53%;
-      overflow-x: auto;
-      // margin-left: 47%;
-
-      .category-table {
-        margin-bottom: 5px;
-        // width: 99%;
-        // overflow-x: auto;
-
-        th, tr:nth-child(even) {
-          background-color: #ECECEC;
-        } */
-
-        /* td:first-child {
-          position: absolute;
-          background: #FFFFFF;
-          width: 47%;
-          white-space: nowrap;
-          border-right: 1px solid;
-          margin-left: -47%;
-          padding: 1px;
-        } */
-
-        /* th, td {
-          white-space: nowrap;
-          font-family: 'Lucida Sans', sans-serif;
-          font-size: 0.9em;
-          padding: 3px;
-          // padding: 1px;
-        }
-
-        a {
-          font-family: 'Lucida Sans', sans-serif;
-          font-size: 0.9em;
-          color: #505050;
-          // text-decoration: none;
-        }
-      }
-    }
-  } */
-
 
   // Freeze first column
   .table-row {
@@ -190,7 +147,7 @@
     // overflow-x: auto;
 
     .table {
-      width: 68%;
+      width: 65%;
       overflow-x: auto;
       margin-left: 32%;
 
@@ -238,54 +195,7 @@
     }
   }
 
-   
-
   .series-table {
     margin-top: 20px;
-  }
-
-  .table-data {
-    white-space: nowrap;
-    overflow-x: auto;
-    width: 99%;
-    margin-bottom: 20px;
-
-    .ui-widget-header {
-      display: inline-block;
-      border: 1px solid #DDDDDD;
-      border-right: none;
-
-      table {
-        width: auto;
-        th {
-          border-radius: 0px;
-          display: block !important;
-          font-family: 'Lucida Sans', sans-serif;
-          font-size: 0.9em;
-          background-image: none;
-          background-color: #F9F9F9;
-        }
-      }
-    }
-
-    .ui-datatable-scrollable-body {
-      display: inline-block;
-      margin-left: -4px;
-
-      table {
-        width: auto;
-        tr.ui-widget-content {
-          display: inline-block;
-          border: none;
-
-          td {
-            display: block !important;
-            border-color: #DDDDDD !important;
-            font-family: 'Lucida Sans', sans-serif;
-            font-size: 0.9em;
-          }
-        }
-      }
-    }
   }
 }

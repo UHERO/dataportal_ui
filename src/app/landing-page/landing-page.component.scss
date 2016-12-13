@@ -4,6 +4,11 @@
   min-height: 100%;
   overflow: auto;
 
+  .filters {
+    display: inline-block;
+    vertical-align: top;
+  }
+
   .content-links {
     padding-left: 5px;
     display: inline-block;
@@ -33,7 +38,7 @@
     display: inline-block;
     color: #1D667F;
     font-size: 1.5em;
-    margin: auto 15px 10px 0px;
+    margin: auto 5px 10px 0px;
     vertical-align: middle;
   }
 
@@ -101,7 +106,6 @@
 
     label:first-child.isActive {
       background-color: #5B93A7;
-      // font-weight: bold;
       color: #FFFFFF;
     }
   }
@@ -118,27 +122,8 @@
     text-decoration: none;
     font-size: 0.9em;
     color: #1D667F;
-    margin-left: 10px;
+    // margin-left: 10px;
   }
-
-  // margin: 25% 0 0 0;
-  // margin-left: 4%;
-  // margin-right: -4%;
-  // width: 960px;
-  // margin: 0 auto;
-  // background: #F6F5F5;
-
-  /* .all-chart-container {
-    margin: 2% 5%;
-  } */
-
-  /* @media (min-width: 767px) and (max-width: 1000px) {
-    margin: 20% 0 0 0;
-  }
-
-  @media (min-width: 1001px) {
-    margin: 15% 0 0 0;
-  } */
 
   .multi-charts-row {
     display: block;
