@@ -2,14 +2,8 @@ import { Component, OnInit, AfterViewInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
-/* import * as Highcharts from 'highcharts';
-
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ','
-  }
-}); */
 
 @Component({
   selector: 'app-single-series',
@@ -33,7 +27,7 @@ export class SingleSeriesComponent implements OnInit {
   public regions = [];
   public currentGeo;
 
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute) {}
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -50,6 +44,7 @@ export class SingleSeriesComponent implements OnInit {
   // Draws chart & table on load
   drawChart(id: number) {
     let freqArray = [];
+    let dateArray = [];
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
@@ -69,9 +64,13 @@ export class SingleSeriesComponent implements OnInit {
       });
       this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
         let seriesObservations = observations;
-        console.log('series observations', observations);
+        let start = seriesObservations['start'];
+        let end = seriesObservations['end'];
+        this._helper.calculateDateArray(start, end, this.currentFreq.freq, dateArray);
+        console.log('dates', dateArray);
         this.chartData = seriesObservations['chart data'];
         this.tableData = seriesObservations['table data'];
+        console.log('table data', this.tableData);
       });
     });
   }

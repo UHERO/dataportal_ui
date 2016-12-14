@@ -36,26 +36,26 @@ export class HighstockComponent implements OnInit {
 
   ngOnInit() {
     let level = this.chartData['level'];
-    let perc = this.chartData['perc'];
+    let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
     let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, perc, name, unitsShort, dataFreq);
+    this.drawChart(level, yoy, name, unitsShort, dataFreq);
   }
 
   ngOnChanges() {
     let level = this.chartData['level'];
-    let perc = this.chartData['perc'];
+    let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'];
     let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, perc, name, unitsShort, dataFreq);
+    this.drawChart(level, yoy, name, unitsShort, dataFreq);
   }
 
 
-  drawChart(level, perc, name, units, freq) {
+  drawChart(level, yoy, name, units, freq) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -209,7 +209,7 @@ export class HighstockComponent implements OnInit {
         name: 'YOY % Change',
         type: 'column',
         color: '#727272',
-        data: perc,
+        data: yoy,
         dataGrouping: {
           enabled: false
         }
