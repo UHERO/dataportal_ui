@@ -24,20 +24,49 @@
     </ul>
     <hr>
   </template>
+  <div class="table-checkboxes">
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
+    </label>
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
+    </label>
+  </div>
   <div *ngFor="let series of seriesData" class="table-row">
-    <h3 class="sublist" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
     <div class="table" #tableScroll on-mouseover="userMouse()">
       <table class="category-table">
+        <!-- <thead>
+          <th>Series</th>
+          <th *ngFor="let date of series['sublist']['date range']; let i = index">{{date['table date']}}</th>
+        </thead> -->
         <thead>
           <th>Series</th>
-          <th *ngFor="let date of series['sublist']['date range']">{{date['table date']}}</th>
+          <template ngFor let-date [ngForOf]="series['sublist']['date range']" let-i="index">
+            <th *ngIf="date['date'] >= series['firstDateWrapper']['firstDate']">{{date['table date']}}</th>
+          </template>
         </thead>
         <tbody>
           <template ngFor let-serie [ngForOf]="series['series']">
               <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted'] && serie['category table']">
                 <td><a [routerLink]="['/series', serie['serie']['id']]" [title]="serie['serie']['title']">{{serie['serie']['title']}}</a></td>
-                <td *ngFor="let item of serie['category table']">{{item.value}}</td>
+                <!-- <td *ngFor="let item of serie['category table']">{{item.value}}</td> -->
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.level}}</td>
+                </template>
+              </tr>
+              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted'] && serie['category table'] && yoyIsActive">
+                <td>&emsp; YOY (%)</td>
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.yoy}}</td>
+                </template>
+              </tr>
+              <tr *ngIf="saIsActive === serie['serie']['seasonallyAdjusted'] && serie['category table'] && ytdIsActive">
+                <td>&emsp; YTD (%)</td>
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.ytd}}</td>
+                </template>
               </tr>
           </template>
         </tbody>

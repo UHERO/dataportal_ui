@@ -34,6 +34,23 @@ export class HelperService {
     }
   }
 
+  seriesTable(tableData, dateRange) {
+    let results = [];
+    if (dateRange && tableData) {
+      for (let i = 0; i < dateRange.length; i++) {
+        results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'value': ' ', 'yoy': ' ', 'ytd': ' '});
+        for (let j = 0; j < tableData.length; j++) {
+          if (results[i].date === tableData[j]['date']) {
+            results[i].value = tableData[j]['value'];
+            results[i].yoy = tableData[j]['']
+            break;
+          }
+        }
+      }
+      return results;
+    }
+  }
+
   // Get a unique array of available regions for a category
   uniqueGeos(geo, geoList) {
     let exist = false;

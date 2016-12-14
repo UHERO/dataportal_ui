@@ -4,6 +4,7 @@ import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
+import { FirstDateWrapper } from '../first-date-wrapper';
 
 import { error } from 'util';
 
@@ -18,12 +19,15 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
 
   private selectedCategory;
+  private firstDateWrapper: FirstDateWrapper;
   private sublist: Array<any> = [];
   private categories;
   private id: number;
   
   // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
+  private yoyIsActive: boolean = false;
+  private ytdIsActive: boolean = false;
   private userEvent: boolean = false;
   private errorMessage: string;
 
@@ -92,8 +96,10 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
             this.defaultGeo = '';
           }
 
+          // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
-            this.initSettings(this.sublist[index], geoArray, freqArray);
+            this.firstDateWrapper = {firstDate: ''};
+            this.initSettings(this.sublist[index], geoArray, freqArray, this.firstDateWrapper);
           });
         } else {
           return
@@ -104,7 +110,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   // Get regions and frequencies available for a selected category
-  initSettings(sublistIndex, regions: Array<any>, freqs: Array<any>) {
+  initSettings(sublistIndex, regions: Array<any>, freqs: Array<any>, firstDateWrapper: FirstDateWrapper) {
     let dateArray = [];
 
     this._uheroAPIService.fetchGeographies(sublistIndex['id']).subscribe((geos) => {
@@ -137,20 +143,21 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         });
 
         // Fetch data for current region/frequency settings
-        this.sublistData(sublistIndex, this.currentGeo.handle, this.currentFreq.freq, dateArray);
+        this.sublistData(sublistIndex, this.currentGeo.handle, this.currentFreq.freq, dateArray, firstDateWrapper);
       });
     });
   }
 
   // Get series for each subcategory
-  sublistData(sublistIndex, geoHandle: string, freqFrequency: string, dates: Array<any>) {
+  sublistData(sublistIndex, geoHandle: string, freqFrequency: string, dates: Array<any>, firstDateWrapper: FirstDateWrapper) {
     this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
       this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], freqFrequency, dates);
     });
 
-    this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates).subscribe((results) => {
+    this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates, firstDateWrapper).subscribe((results) => {
       sublistIndex['date range'] = dates;
-      this.seriesData.push({'sublist': sublistIndex, 'series': results[0]});
+      this.seriesData.push({'firstDateWrapper':firstDateWrapper, 'sublist': sublistIndex, 'series': results[0]});
+      console.log('series data', this.seriesData);
     });
   }
 
@@ -167,7 +174,8 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.sublistData(this.sublist[index], this.geoHandle, this.currentFreq.freq, dateArray);
+            this.firstDateWrapper = {firstDate: ''};
+            this.sublistData(this.sublist[index], this.geoHandle, this.currentFreq.freq, dateArray, this.firstDateWrapper);
           });
         } else {
           return;
@@ -190,7 +198,8 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
           this.sublist = categories[index]['children'];
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.sublistData(this.sublist[index], this.currentGeo.handle, this.freqHandle, dateArray);
+            this.firstDateWrapper = {firstDate: ''};
+            this.sublistData(this.sublist[index], this.currentGeo.handle, this.freqHandle, dateArray, this.firstDateWrapper);
           });
         } else {
           return;
@@ -202,8 +211,15 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   saActive(e) {
-    // console.log('checkbox', e)
     this.saIsActive = e.target.checked;
+  }
+
+  yoyActive(e) {
+    this.yoyIsActive = e.target.checked;
+  }
+
+  ytdActive(e) {
+    this.ytdIsActive = e.target.checked;
   }
 
   scrollTo(location: string): void {

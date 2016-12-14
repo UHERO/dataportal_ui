@@ -1,4 +1,4 @@
-<div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12">
+<div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12 col-xl-11">
   <h3 class="series-title">{{seriesDetail.title}}</h3>
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawGeo($event)" class="geo-selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)" class="freq-selector"></app-freq-selector>
@@ -7,6 +7,6 @@
   <p-dataTable [value]="newTableData.length === 0 ? tableData : newTableData" scrollable="true">
     <p-column field="date" header="Date" [sortable]="true"></p-column>
     <p-column field="value" header="Level"></p-column>
-    <p-column field="percValue" header=" YOY % Change"></p-column>
+    <p-column field="yoyValue" header=" YOY % Change"></p-column>
   </p-dataTable>
 </div>

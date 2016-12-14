@@ -11,6 +11,7 @@ import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
+import { FirstDateWrapper } from './first-date-wrapper';
 
 @Injectable()
 export class UheroApiService {
@@ -228,7 +229,7 @@ export class UheroApiService {
   } */
 
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>) {
+  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, firstDateWrapper: FirstDateWrapper) {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
@@ -239,8 +240,9 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              let categoryTable = catTable(seriesObservations, dates);
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'date range': dates, 'category table': categoryTable});
+              let categoryTable = catTable(seriesObservations, dates, firstDateWrapper);
+              // categoryTable = tableSlice(categoryTable, firstDateWrapper);
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'firstDate': firstDateWrapper['firstDate'], 'category table': categoryTable});
             });
           });
         } else {
@@ -257,14 +259,19 @@ export class UheroApiService {
 }
 
 // create array of dates & values to be used for the category level table view
-function catTable(seriesObservations, dateRange) {
+function catTable(seriesObservations: Array<any>, dateRange: Array<any>, firstDateWrapper: FirstDateWrapper) {
   let results = [];
   if (dateRange && seriesObservations['table data']) {
     for (let i = 0; i < dateRange.length; i++) {
-      results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'value': ' '})
+      results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
       for (let j = 0; j < seriesObservations['table data'].length; j++) {
+        if (firstDateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < firstDateWrapper.firstDate) {
+          firstDateWrapper.firstDate = seriesObservations['table data'][j]['date'];
+        } 
         if (results[i].date === seriesObservations['table data'][j]['date']) {
-          results[i].value = seriesObservations['table data'][j]['value'];
+          results[i].level = seriesObservations['table data'][j]['value'];
+          results[i].yoy = seriesObservations['table data'][j]['yoyValue'];
+          results[i].ytd = seriesObservations['table data'][j]['ytdValue'];
           break;
         }
       }
@@ -272,6 +279,19 @@ function catTable(seriesObservations, dateRange) {
     return results;
   }
 }
+
+function tableSlice(categoryTable: Array<any>, firstDateWrapper: Object) {
+    console.log('date array', categoryTable.length);
+    let tableStart;
+    let tableEnd = categoryTable.length - 1;
+    for (let i = 0; i < categoryTable.length; i++) {
+      if (categoryTable[i]['date'] === firstDateWrapper['firstDate']) {
+        tableStart = i;
+      }
+    }
+    console.log('table start', firstDateWrapper);
+    return categoryTable.slice(tableStart);
+  }
 
 // Create a nested JSON of parent and child categories
 // Used for landing-page.component
@@ -304,11 +324,11 @@ function mapObservations(response: Response): ObservationResults {
   let start = observations.observationStart;
   let end = observations.observationEnd;
   let level = observations.transformationResults[0].observations;
-  let perc = observations.transformationResults[1].observations;
+  let yoy = observations.transformationResults[1].observations;
   let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
-  let percValue = [];
+  let yoyValue = [];
   let ytdValue = [];
 
   if (level) {
@@ -318,10 +338,10 @@ function mapObservations(response: Response): ObservationResults {
     });
   }
 
-  if (perc) {
-    perc.forEach((entry, index) => {
+  if (yoy) {
+    yoy.forEach((entry, index) => {
       // Create [date, value] percent pairs for charts
-      percValue.push([Date.parse(perc[index].date), +perc[index].value]);
+      yoyValue.push([Date.parse(yoy[index].date), +yoy[index].value]);
     });
   }
 
@@ -332,35 +352,38 @@ function mapObservations(response: Response): ObservationResults {
     });
   }
 
-  let tableData = combineObsData(level, perc);
-  let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
+  let tableData = combineObsData(level, yoy, ytd);
+  let chartData = {level: levelValue, yoy: yoyValue, ytd: ytdValue};
   let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 
 // Combine level and percent arrays from Observation data
 // Used to construct table data for single series view
-function combineObsData(level, perc) {
+function combineObsData(level, yoy, ytd) {
   // Check that level and perc arrays are not null
-  if (level && perc) {
+  if (level && yoy && ytd) {
     let table = level;
     for (let i = 0; i < level.length; i++) {
-      table[i].percValue = 'NA';
+      table[i].yoyValue = ' ';
+      table[i].ytdValue = ' ';
       // table[i].value = parseFloat((+level[i].value).toFixed(2));
       table[i].value = formatNum(+level[i].value, 2);
-      for (let j = 0; j < perc.length; j++) {
-        if (level[i].date === perc[j].date) {
-          // table[i].percValue = parseFloat((+perc[j].value).toFixed(2));
-          table[i].percValue = formatNum(+perc[j].value, 2);
+      for (let j = 0; j < yoy.length; j++) {
+        if (level[i].date === yoy[j].date) {
+          // table[i].yoyValue = parseFloat((+yoy[j].value).toFixed(2));
+          table[i].yoyValue = formatNum(+yoy[j].value, 2);
+          table[i].ytdValue = formatNum(+ytd[j].value, 2)
           break;
         }
       }
     }
     return table;
-  } else if (level && !perc) {
+  } else if (level && (!yoy || !ytd)) {
     let table = level;
     for (let i = 0; i < level.length; i++) {
-      table[i].percValue = 'NA';
+      table[i].yoyValue = ' ';
+      table[i].ytdValue = ' ';
       table[i].value = formatNum(+level[i].value, 2);
     }
     return table;
