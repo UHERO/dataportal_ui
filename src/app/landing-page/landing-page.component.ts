@@ -1,5 +1,5 @@
 // Component for landing page category tabs
-import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -17,7 +17,6 @@ import { error } from 'util';
 })
 export class LandingPageComponent implements OnInit, AfterViewInit {
   private selectedCategory;
-  /// private firstDateWrapper: FirstDateWrapper;
   private sublist: Array<any> = [];
   private categories;
   private id: number;
@@ -142,7 +141,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
     this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates, firstDateWrapper).subscribe((results) => {
       sublistIndex['date range'] = dates;
-      this.seriesData.push({'sublist': sublistIndex, 'series': results[0]});
+      this.seriesData.push({'firstDateWrapper':firstDateWrapper, 'sublist': sublistIndex, 'series': results[0]});
+      console.log('chart view', this.seriesData);
     });
   }
 

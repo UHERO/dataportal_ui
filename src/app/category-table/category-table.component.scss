@@ -12,21 +12,20 @@
 
   .content-links {
     padding-left: 0px;
-    display: inline-block;
+    display: block;
     // margin-bottom: 0px;
-    // margin-top: 10px;
+    margin-top: 5px;
 
     li {
       display: inline-block;
-      margin-right: 10px;
+      margin-right: 25px;
 
        a {
          font-family: 'Lucida Sans', sans-serif;
          text-decoration: none;
-         font-weight: bold;
          font-size: 0.9em;
          color: #1D667F;
-         padding-bottom: 2px;
+         padding-bottom: 3px;
          border-bottom: 1px solid #A5A9AA;
 
          &:hover {
@@ -83,8 +82,8 @@
   .sublist:before {
     display: block;
     content: ' ';
-    margin-top: -60px;
-    height: 60px;
+    margin-top: -15px;
+    height: 15px;
     visibility: hidden;
   }
 
@@ -155,13 +154,77 @@
 
   // Freeze first column
   .table-row {
+    position: relative;
+    margin-bottom: 20px;
+
+    .table {
+      overflow-x: scroll;
+      overflow-y: visible;
+      width: 64%;
+      margin-left: 32%;
+
+      .category-table {
+        table-layout: fixed;
+        width: 100%;
+        *margin-left: -32%;
+
+        td, th {
+          vertical-align: top;
+          width: 125px;
+          text-align: right;
+          font-size: 0.9em;
+          padding: 2px 10px;
+        }
+
+        th {
+          position: absolute;
+          *position: relative;
+          left: 0;
+          width: 32%;
+          white-space: nowrap;
+          border-right: 1px solid #CCCCCC;
+          text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          font-family: 'Lucida Sans', sans-serif;
+          font-size: 0.9em;
+          font-weight: normal;
+          // padding: 3px 0px 0px 0px;
+        }
+
+        tr:nth-child(odd) {
+          background-color: #ECECEC;
+
+          td:first-child, th:first-child {
+            background: #ECECEC;
+          }
+        }
+
+        a {
+          display: inline-block;
+          width: 80%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: middle;
+          font-family: 'Lucida Sans', sans-serif;
+          color: #505050;
+        }
+
+        .tag-primary {
+          background-color: #1D667F;
+        }
+      }
+    }
+  }
+  /* .table-row {
     margin-bottom: 60px;
     // width: 99%;
     // overflow-x: auto;
 
     .table {
       width: 64%;
-      overflow-x: auto;
+      overflow-x: scroll;
+      overflow-y: visible;
       margin-left: 32%;
 
       .category-table {
@@ -216,8 +279,8 @@
           background-color: #1D667F;
         }
       }
-    }
-  }
+    } 
+  } */
 
   .series-table {
     margin-top: 20px;

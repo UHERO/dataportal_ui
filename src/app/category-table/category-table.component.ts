@@ -19,7 +19,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
 
   private selectedCategory;
-  // private firstDateWrapper: FirstDateWrapper;
   private sublist: Array<any> = [];
   private categories;
   private id: number;
@@ -223,6 +222,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   scrollTo(location: string): void {
+    console.log(location)
     window.location.hash = location;
   }
 
