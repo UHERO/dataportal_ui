@@ -17,7 +17,7 @@ import { error } from 'util';
 })
 export class LandingPageComponent implements OnInit, AfterViewInit {
   private selectedCategory;
-  private firstDateWrapper: FirstDateWrapper;
+  /// private firstDateWrapper: FirstDateWrapper;
   private sublist: Array<any> = [];
   private categories;
   private id: number;
@@ -84,8 +84,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
           // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
-            this.firstDateWrapper = {firstDate: ''};
-            this.initSettings(this.sublist[index], geoArray, freqArray, this.firstDateWrapper);
+            let firstDateWrapper = {firstDate: ''};
+            this.initSettings(this.sublist[index], geoArray, freqArray, firstDateWrapper);
           });
         } else {
           return
@@ -159,8 +159,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.firstDateWrapper = {firstDate: ''};
-            this.sublistData(this.sublist[index], this.geoHandle, this.currentFreq.freq, dateArray, this.firstDateWrapper);
+            let firstDateWrapper = {firstDate: ''};
+            this.sublistData(this.sublist[index], this.geoHandle, this.currentFreq.freq, dateArray, firstDateWrapper);
           });
         } else {
           return;
@@ -182,8 +182,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
-            this.firstDateWrapper = {firstDate: ''};
-            this.sublistData(this.sublist[index], this.currentGeo.handle, this.freqHandle, dateArray, this.firstDateWrapper);
+            let firstDateWrapper = {firstDate: ''};
+            this.sublistData(this.sublist[index], this.currentGeo.handle, this.freqHandle, dateArray, firstDateWrapper);
           });
         } else {
           return;

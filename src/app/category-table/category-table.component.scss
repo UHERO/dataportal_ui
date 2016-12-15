@@ -11,9 +11,9 @@
   }
 
   .content-links {
-    padding-left: 5px;
+    padding-left: 0px;
     display: inline-block;
-    margin-bottom: 0px;
+    // margin-bottom: 0px;
     // margin-top: 10px;
 
     li {
@@ -23,8 +23,10 @@
        a {
          font-family: 'Lucida Sans', sans-serif;
          text-decoration: none;
+         font-weight: bold;
          font-size: 0.9em;
          color: #1D667F;
+         padding-bottom: 2px;
          border-bottom: 1px solid #A5A9AA;
 
          &:hover {
@@ -57,7 +59,9 @@
   }
 
   .table-checkboxes {
-    margin: -10px auto 10px auto;
+    font-family: 'Lucida Sans', sans-serif;
+    color: #505050;
+    margin-bottom: 10px;
   }
 
   .top-anchor {
@@ -197,10 +201,19 @@
         }
 
         a {
+          display: inline-block;
+          width: 80%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: middle;
           font-family: 'Lucida Sans', sans-serif;
           // font-size: 0.9em;
           color: #505050;
           // text-decoration: none;
+        }
+
+        .tag-primary {
+          background-color: #1D667F;
         }
       }
     }
