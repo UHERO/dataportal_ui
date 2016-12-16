@@ -67,9 +67,21 @@ export class SingleSeriesComponent implements OnInit {
         let start = seriesObservations['start'];
         let end = seriesObservations['end'];
         this._helper.calculateDateArray(start, end, this.currentFreq.freq, dateArray);
-        console.log('dates', dateArray);
         this.chartData = seriesObservations['chart data'];
         this.tableData = seriesObservations['table data'];
+
+        let seriesTableData = this._helper.seriesTable(this.tableData, dateArray);
+        console.log('new table', seriesTableData);
+        let beginTable, endTable;
+        for (let i = 0; i < seriesTableData.length; i++) {
+          if (seriesTableData[i] === start) {
+            beginTable = i;
+          }
+          if (seriesTableData[i] === end) {
+            endTable = i;
+          }
+        }
+        seriesTableData = seriesTableData.slice(beginTable, endTable + 1);
         console.log('table data', this.tableData);
       });
     });
@@ -108,6 +120,7 @@ export class SingleSeriesComponent implements OnInit {
     this.chartData = [];
     this.tableData = [];
     this.newTableData = [];
+    let dateArray = [];
     this.seriesSiblings.forEach((sibling, index) => {
       if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.freq === this.seriesSiblings[index]['frequencyShort']) {
         let id = this.seriesSiblings[index]['id'];
@@ -118,8 +131,25 @@ export class SingleSeriesComponent implements OnInit {
 
         this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
           let seriesObservations = observations;
+          let start = seriesObservations['start'];
+          let end = seriesObservations['end'];
+          this._helper.calculateDateArray(start, end, this.currentFreq.freq, dateArray);
           this.chartData = seriesObservations['chart data'];
           this.tableData = seriesObservations['table data'];
+
+          let seriesTableData = this._helper.seriesTable(this.tableData, dateArray);
+          console.log('new table', seriesTableData);
+          let beginTable, endTable;
+          for (let i = 0; i < seriesTableData.length; i++) {
+            if (seriesTableData[i] === start) {
+              beginTable = i;
+            }
+            if (seriesTableData[i] === end) {
+              endTable = i;
+            }
+          } 
+          seriesTableData = seriesTableData.slice(beginTable, endTable + 1);
+          console.log('table data', this.tableData);
         });
       } else {
         return;

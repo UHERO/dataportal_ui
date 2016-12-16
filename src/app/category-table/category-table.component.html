@@ -33,7 +33,7 @@
           <tr>
           <th><b>Series</b></th>
           <template ngFor let-date [ngForOf]="series['sublist']['date range']" let-i="index">
-            <td *ngIf="date['date'] >= series['firstDateWrapper']['firstDate']"><b>{{date['table date']}}</b></td>
+            <td *ngIf="date['date'] >= series['dateWrapper']['firstDate'] && date['date'] <= series['dateWrapper']['endDate']"><b>{{date['table date']}}</b></td>
           </template>
           </tr>
           <template ngFor let-serie [ngForOf]="series['series']">
@@ -45,19 +45,19 @@
                   <span class="tag tag-pill tag-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === true">SA</span>
                 </th>
                 <template ngFor let-item [ngForOf]="serie['category table']">
-                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.level}}</td>
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.level}}</td>
                 </template>
               </tr>
               <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && yoyIsActive">
                 <th>&emsp; YOY (%)</th>
                 <template ngFor let-item [ngForOf]="serie['category table']">
-                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.yoy}}</td>
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.yoy}}</td>
                 </template>
               </tr>
               <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && ytdIsActive">
                 <th>&emsp; YTD (%)</th>
                 <template ngFor let-item [ngForOf]="serie['category table']">
-                  <td *ngIf="item['date'] >= series['firstDateWrapper']['firstDate']">{{item.ytd}}</td>
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
                 </template>
               </tr>
           </template>
