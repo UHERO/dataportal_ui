@@ -79,11 +79,11 @@
   }
 
   @media (min-width: 768px) {
-    margin-top: 70px;
+    margin-top: 60px;
   }
 
   @media (max-width: 767px) {
-    margin-top: 60px;
+    margin-top: 45px;
   }
   
   .sa-toggle {
@@ -129,6 +129,10 @@
     font-size: 0.9em;
     color: #1D667F;
     // margin-left: 10px;
+
+    @media(max-width: 767px) {
+      display: none;
+    }
   }
 
   .multi-charts-row {

@@ -141,6 +141,17 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
     this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates, firstDateWrapper).subscribe((results) => {
       sublistIndex['date range'] = dates;
+
+      // Get first date wrapper from cached data
+      results.forEach((res, index) => {
+        let series = results[index];
+        series.forEach((serie, index) => {
+          if (firstDateWrapper.firstDate === '' || series[index].firstDate < firstDateWrapper.firstDate) {
+            firstDateWrapper.firstDate = series[index].firstDate;
+          }
+        });
+      });
+
       this.seriesData.push({'firstDateWrapper':firstDateWrapper, 'sublist': sublistIndex, 'series': results[0]});
       console.log('chart view', this.seriesData);
     });
@@ -156,7 +167,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       categories.forEach((category, index) => {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
-          // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
             let firstDateWrapper = {firstDate: ''};
@@ -179,7 +189,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       categories.forEach((category, index) => {
         if (categories[index]['id'] === this.id) {
           this.sublist = categories[index]['children'];
-          // this.firstDateWrapper = {firstDate: ''};
           this.sublist.forEach((sub, index) => {
             let dateArray = [];
             let firstDateWrapper = {firstDate: ''};
