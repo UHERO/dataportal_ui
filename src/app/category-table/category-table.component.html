@@ -45,13 +45,13 @@
                 </template>
               </tr>
               <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && yoyIsActive">
-                <th>&emsp; YOY (%)</th>
+                <th>{{(serie['serie']['percent'] === true) ? '&emsp; YOY' : '&emsp; YOY (%)'}}</th>
                 <template ngFor let-item [ngForOf]="serie['category table']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.yoy}}</td>
                 </template>
               </tr>
               <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && ytdIsActive">
-                <th>&emsp; YTD (%)</th>
+                <th>{{(serie['serie']['percent'] === true)? '&emsp; YTD' : '&emsp; YTD (%)'}}</th>
                 <template ngFor let-item [ngForOf]="serie['category table']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
                 </template>

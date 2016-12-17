@@ -63,23 +63,23 @@ export class HighchartComponent implements OnInit {
         backgroundColor: 'transparent',
         // backgroundColor: 'rgba(247, 247, 247, 0.5)',
         formatter: function () {
-          let s = '<b>' + title;
+          let s = '<b>' + title + '</b><br>';
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
-            s = s + 'Q1'
+            s = s + 'Q1 '
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
-            s = s + 'Q2'
+            s = s + 'Q2 '
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
-            s = s + 'Q3'
+            s = s + 'Q3 '
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
-            s = s + 'Q4'
+            s = s + 'Q4 '
           };
           if (dataFreq === 'M') {
-            s = s + Highcharts.dateFormat('%b', this.x);
+            s = s + Highcharts.dateFormat('%b', this.x) + ' ';
           }
-          s = s + '<b><br>' + Highcharts.dateFormat('%Y', this.x) + '';
+          s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point, index) => {
             s += '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
           });
