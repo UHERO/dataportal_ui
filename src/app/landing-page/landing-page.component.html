@@ -20,7 +20,7 @@
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>
       <div *ngIf="serie['serie']['seasonallyAdjusted'] != false" class="multi-charts">
         <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
-          <app-highchart [seriesData]="serie"></app-highchart>
+          <app-highchart [seriesData]="serie" [currentFreq]="currentFreq"></app-highchart>
         </a>
       </div>
     </template>

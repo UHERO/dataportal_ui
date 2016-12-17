@@ -35,10 +35,11 @@ export class HighstockComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.seriesDetail);
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
     let dataFreq = this.currentFreq.freq;
 
     this.drawChart(level, yoy, name, unitsShort, dataFreq);
@@ -48,7 +49,7 @@ export class HighstockComponent implements OnInit {
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
     let dataFreq = this.currentFreq.freq;
 
     this.drawChart(level, yoy, name, unitsShort, dataFreq);
@@ -183,7 +184,7 @@ export class HighstockComponent implements OnInit {
        opposite: false
       }, {
         title: {
-          text: 'In ' + units,
+          text: units,
           style: {
             color: '#1D667F'
           }

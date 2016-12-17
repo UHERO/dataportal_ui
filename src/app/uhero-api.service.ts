@@ -316,7 +316,7 @@ function mapObservations(response: Response): ObservationResults {
   if (ytd) {
     ytd.forEach((entry, index) => {
       // Create [date, value] YTD pairs
-      ytdValue.push([ytd[index].date, +ytd[index].value]);
+      ytdValue.push([Date.parse(ytd[index].date), +ytd[index].value]);
     });
   }
 
