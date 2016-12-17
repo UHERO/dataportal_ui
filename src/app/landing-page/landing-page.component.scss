@@ -10,20 +10,26 @@
   }
 
   .content-links {
-    padding-left: 5px;
-    display: inline-block;
-    margin-bottom: 0px;
-    // margin-top: 10px;
+    padding-left: 0px;
+    display: block;
+    // margin-bottom: 0px;
+    margin-top: 5px;
 
     li {
       display: inline-block;
-      margin-right: 10px;
+      margin-right: 25px;
 
        a {
          font-family: 'Lucida Sans', sans-serif;
          text-decoration: none;
          font-size: 0.9em;
          color: #1D667F;
+         padding-bottom: 3px;
+         border-bottom: 1px solid #A5A9AA;
+
+         &:hover {
+           border-bottom: 1px solid #1D667F;
+         }
        }
 
        @media (max-width: 767px) {
@@ -73,11 +79,11 @@
   }
 
   @media (min-width: 768px) {
-    margin-top: 70px;
+    margin-top: 60px;
   }
 
   @media (max-width: 767px) {
-    margin-top: 60px;
+    margin-top: 45px;
   }
   
   .sa-toggle {
@@ -123,6 +129,10 @@
     font-size: 0.9em;
     color: #1D667F;
     // margin-left: 10px;
+
+    @media(max-width: 767px) {
+      display: none;
+    }
   }
 
   .multi-charts-row {

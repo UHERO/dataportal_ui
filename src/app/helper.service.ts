@@ -9,11 +9,11 @@ export class HelperService {
 
   constructor() { }
 
-  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>): void {
+  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
 
-    while (start < end) {
+    while (start <= end) {
       if (currentFreq === 'A') {
         dateArray.push({'date': start.toString() + '-01-01', 'table date': start.toString()});
         start+=1;
@@ -32,6 +32,7 @@ export class HelperService {
         start+=1;
       }
     }
+    return dateArray;
   }
 
   seriesTable(tableData, dateRange) {
@@ -42,7 +43,7 @@ export class HelperService {
         for (let j = 0; j < tableData.length; j++) {
           if (results[i].date === tableData[j]['date']) {
             results[i].value = tableData[j]['value'];
-            results[i].yoy = tableData[j]['']
+            results[i].yoy = tableData[j]['yoyValue']
             break;
           }
         }

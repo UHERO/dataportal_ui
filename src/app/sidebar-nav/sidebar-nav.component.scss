@@ -2,6 +2,9 @@
   @media (max-width: 767px) {
     background-color: #FFFFFF;
     padding: 0;
+    box-shadow: 0 4px 6px -6px black;
+    -moz-box-shadow: 0 4px 6px -6px black;
+    -webkit-box-shadow: 0 4px 6px -6px black;
   }
 }
 
@@ -28,7 +31,7 @@
   }
 
   @media (min-width: 768px) {
-    margin-top: 80px;
+    margin-top: 65px;
     position: relative;
     padding: 0;
   }

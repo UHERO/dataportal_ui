@@ -14,7 +14,7 @@
     </ul>
   </template>
   <div *ngFor="let series of seriesData" class="multi-charts-row">
-    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1"[routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
     <template ngFor let-serie [ngForOf]="series['series']">
       <p *ngIf="!serie['serie']['id']"> No Data Available </p>

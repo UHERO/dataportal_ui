@@ -11,7 +11,7 @@ import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
-import { FirstDateWrapper } from './first-date-wrapper';
+import { dateWrapper } from './date-wrapper';
 
 @Injectable()
 export class UheroApiService {
@@ -206,30 +206,8 @@ export class UheroApiService {
 
   }
 
-  // Get series and observation data for landing page component charts
-  /* fetchChartData(id: number) {
-    if(this.cachedChartData[id]) {
-      return this.cachedChartData[id];
-    } else {
-      let chartData = [];
-      this.fetchSeries(id).subscribe((series) => {
-        let seriesData = series;
-        console.log('service', seriesData);
-        seriesData.forEach((serie, index) => {
-          this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-            let seriesObservations = obs;
-            chartData.push({'serie': seriesData[index], 'observations': seriesObservations});
-          });
-        });
-      },
-      error => this.errorMessage = error);
-      this.cachedChartData[id] = (Observable.forkJoin(Observable.of(chartData)));
-      return this.cachedChartData[id];
-    }
-  } */
-
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, firstDateWrapper: FirstDateWrapper) {
+  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, dateWrapper: dateWrapper) {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
@@ -240,9 +218,9 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              let categoryTable = catTable(seriesObservations, dates, firstDateWrapper);
+              let categoryTable = catTable(seriesObservations, dates, dateWrapper);
               // categoryTable = tableSlice(categoryTable, firstDateWrapper);
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'firstDate': firstDateWrapper['firstDate'], 'category table': categoryTable});
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'dateWrapper': dateWrapper, 'category table': categoryTable});
             });
           });
         } else {
@@ -259,15 +237,18 @@ export class UheroApiService {
 }
 
 // create array of dates & values to be used for the category level table view
-function catTable(seriesObservations: Array<any>, dateRange: Array<any>, firstDateWrapper: FirstDateWrapper) {
+function catTable(seriesObservations: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
   let results = [];
   if (dateRange && seriesObservations['table data']) {
     for (let i = 0; i < dateRange.length; i++) {
       results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
       for (let j = 0; j < seriesObservations['table data'].length; j++) {
-        if (firstDateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < firstDateWrapper.firstDate) {
-          firstDateWrapper.firstDate = seriesObservations['table data'][j]['date'];
+        if (dateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < dateWrapper.firstDate) {
+          dateWrapper.firstDate = seriesObservations['table data'][j]['date'];
         } 
+        if (dateWrapper.endDate === '' || seriesObservations['table data'][j]['date'] > dateWrapper.endDate) {
+          dateWrapper.endDate = seriesObservations['table data'][j]['date'];
+        }
         if (results[i].date === seriesObservations['table data'][j]['date']) {
           results[i].level = seriesObservations['table data'][j]['value'];
           results[i].yoy = seriesObservations['table data'][j]['yoyValue'];
@@ -279,19 +260,6 @@ function catTable(seriesObservations: Array<any>, dateRange: Array<any>, firstDa
     return results;
   }
 }
-
-function tableSlice(categoryTable: Array<any>, firstDateWrapper: Object) {
-    console.log('date array', categoryTable.length);
-    let tableStart;
-    let tableEnd = categoryTable.length - 1;
-    for (let i = 0; i < categoryTable.length; i++) {
-      if (categoryTable[i]['date'] === firstDateWrapper['firstDate']) {
-        tableStart = i;
-      }
-    }
-    console.log('table start', firstDateWrapper);
-    return categoryTable.slice(tableStart);
-  }
 
 // Create a nested JSON of parent and child categories
 // Used for landing-page.component

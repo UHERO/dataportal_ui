@@ -21,7 +21,6 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log('chart data', this.seriesData);
     let level = this.seriesData['observations']['chart data']['level'];
     let ytd = this.seriesData['observations']['chart data']['ytd'];
     let title = this.seriesData['serie']['title'] === undefined? this.seriesData['serie']['name'] : this.seriesData['serie']['title'];
