@@ -26,10 +26,6 @@
     <hr class="sublist-separator">
     <div class="table" #tableScroll on-mouseover="userMouse()">
       <table class="category-table">
-        <!-- <thead>
-          <th>Series</th>
-          <th *ngFor="let date of series['sublist']['date range']; let i = index">{{date['table date']}}</th>
-        </thead> -->
           <tr>
           <th><b>Series</b></th>
           <template ngFor let-date [ngForOf]="series['sublist']['date range']" let-i="index">
@@ -59,7 +55,7 @@
                 <template ngFor let-item [ngForOf]="serie['category table']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
                 </template>
-              </tr>
+             </tr>
           </template>
       </table>
     </div>
