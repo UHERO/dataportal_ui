@@ -2,6 +2,9 @@
   @media (max-width: 767px) {
     background-color: #FFFFFF;
     padding: 0;
+    box-shadow: 0 4px 6px -6px black;
+    -moz-box-shadow: 0 4px 6px -6px black;
+    -webkit-box-shadow: 0 4px 6px -6px black;
   }
 }
 
@@ -28,7 +31,7 @@
   }
 
   @media (min-width: 768px) {
-    margin-top: 80px;
+    margin-top: 65px;
     position: relative;
     padding: 0;
   }
@@ -117,7 +120,7 @@
     padding: 5px 0px 0px 0px;
     cursor: pointer;
     white-space: nowrap;
-    font-weight: bold;
+    // font-weight: bold;
 
     /* @media (min-width: 768px) and (max-width: 991px) {
       white-space: normal;
@@ -138,7 +141,7 @@
 
     a {
       font-family: 'Lucida Sans', sans-serif;
-      font-size: 0.9em;
+      font-size: 1em;
       display: block;
       text-decoration: none;
       color: #505050;

@@ -1,5 +1,7 @@
 export interface Category {
   id: number,
   name: string,
-  parent?: number
+  parent?: number,
+  observationStart?: string,
+  observationEnd?: string
 }

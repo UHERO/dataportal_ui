@@ -15,144 +15,222 @@ Highcharts.setOptions({
 })
 export class HighchartComponent implements OnInit {
   @Input() seriesData;
+  @Input() currentFreq;
   private options: Object;
+  private chart;
+  private SA: boolean;
+  private dataAvail: boolean;
   constructor() { }
 
   ngOnInit() {
     let level = this.seriesData['observations']['chart data']['level'];
     let ytd = this.seriesData['observations']['chart data']['ytd'];
-    let title;
-    if (this.seriesData['serie']['title'] === undefined) {
-      title = this.seriesData['serie']['name'];
-    } else {
-      title = this.seriesData['serie']['title'];
-    }
+    let title = this.seriesData['serie']['title'] === undefined? this.seriesData['serie']['name'] : this.seriesData['serie']['title'];
+    let dataFreq = this.currentFreq.freq;
+    this.SA = this.seriesData['serie']['seasonallyAdjusted'] === true? true : false;
+    this.dataAvail = this.seriesData['series'] === 'No data available'? false : true;
     if (this.seriesData['serie'] === 'No data available' || level.length === 0) {
-      this.options = {
-        chart: {
-          backgroundColor: '#F9F9F9'
-        },
-        title: {
-          text: '<b>' + title + '</b><br>' + 'No Data Available',
-          // verticalAlign: 'middle',
-          align: 'left',
-          widthAdjust: 0,
-          style: {
-            color: '#505050',
-            fontSize: '0.9em',
-            letterSpacing: '0.05em'
-          }
-        },
-        legend: {
-          enabled: false
-        },
-        credits: {
-          enabled: false
-        },
-        yAxis: [{
-          title: {
-            text: ''
-          }
-        }],
-        xAxis: {
-          lineWidth: 0
-        },
-        series: [{
-          data: []
-        }],
-        lang: {
-          noData: "No Data Available"
-        },
-        noData: {
-          style: {
-            color: '#505050',
-            fontSize: '0.85em'
-          }
-        }
-      }
+      this.noDataChart(title);
     } else {
       let unitsShort = this.seriesData['serie']['unitsLabelShort'];
-      let lastYtd;
-      let lastDate;
-      if (ytd.length > 0) {
-        lastYtd = ytd[ytd.length - 1][1].toLocaleString();
-        lastDate = ytd[ytd.length - 1][0];
-      } else {
-        return;
-      }
-      this.options = {
-        chart: {
-          // height: 200,
-          // width: 200,
-          // backgroundColor: '#3E3E40'
-          backgroundColor: '#F7F7F7',
-          // borderColor: '#F5F5F5',
-          // borderWidth: 1
+      this.drawChart(title, level, ytd, dataFreq);
+    }
+  }
+
+  drawChart(title: string, level: Array<any>, ytd: Array<any>, dataFreq) {
+    this.options = {
+      chart: {
+        backgroundColor: '#F7F7F7',
+        spacingTop: 20 /* Add spacing to draw plot below fixed tooltip */
+      },
+      exporting: {
+        enabled: false
+      },
+      title: {
+        text: '<br>',
+        useHTML: true,
+        align: 'left',
+        widthAdjust: 0,
+        style: {
+          margin: 75
+        }
+      },
+      tooltip: {
+        positioner: function() {
+          return {x: 0, y: 0};
         },
-        exporting: {
+        shadow: false,
+        borderWidth: 0,
+        shared: true,
+        backgroundColor: 'transparent',
+        // backgroundColor: 'rgba(247, 247, 247, 0.5)',
+        formatter: function () {
+          let s = '<b>' + title + '</b><br>';
+          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
+            s = s + 'Q1 '
+          };
+          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
+            s = s + 'Q2 '
+          };
+          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
+            s = s + 'Q3 '
+          };
+          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
+            s = s + 'Q4 '
+          };
+          if (dataFreq === 'M') {
+            s = s + Highcharts.dateFormat('%b', this.x) + ' ';
+          }
+          s = s + Highcharts.dateFormat('%Y', this.x) + '';
+          this.points.forEach((point, index) => {
+            s += '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+          });
+          return s;
+        },
+        style: {
+          color: '#505050',
+          fontSize: '0.9em',
+          letterSpacing: '0.05em',
+          width: '190px',
+          marginBottom: '5px',
+          // whiteSpace: 'normal'
+        }
+      },
+      legend: {
+        enabled: false
+      },
+      credits: {
+        enabled: false
+      },
+      xAxis: {
+        type: 'datetime',
+        labels: {
+          enabled: false
+        },
+        lineWidth: 0,
+        tickLength: 0
+      },
+      yAxis: [{
+        labels: {
           enabled: false
         },
         title: {
-          text: '<b>' + title + '</b>' + '<br>' + lastDate + '<br>' + 'YTD: ' + lastYtd,
-          align: 'left',
-          widthAdjust: 0,
-          style: {
-            // color: '#FFFFFF',
-            color: '#505050',
-            fontSize: '0.9em',
-            letterSpacing: '0.05em'
+          text: ''
+        },
+        gridLineColor: 'transparent'
+      }, {
+        title: {
+          text: ''
+        },
+        labels: {
+          enabled: false
+        },
+        gridLineColor: 'transparent',
+        opposite: true
+      }],
+      plotOptions: {
+        line: {
+          marker: {
+            enabled: false
           }
-        },
-        tooltip: {
+        }
+      },
+      series: [{
+        name: 'Level',
+        type: 'line',
+        yAxis: 1,
+        color: '#1D667F',
+        data: level,
+        dataGrouping: {
+          enabled: false
+        }
+      }, {
+        name: 'YTD',
+        type: 'column',
+        color: 'transparent',
+        borderColor: 'transparent',
+        data: ytd,
+        dataGrouping: {
           enabled: false
         },
-        legend: {
-          enabled: false
-        },
-        credits: {
-          enabled: false
-        },
-        xAxis: {
-          type: 'datetime',
-          labels: {
-            enabled: false
-          },
-          lineWidth: 0,
-          tickLength: 0
-        },
-        yAxis: [{
-          labels: {
-            enabled: false
-          },
-          title: {
-            text: ''
-          },
-          gridLineColor: 'transparent'
-        }, {
-          title: {
-            text: ''
-          },
-          labels: {
-            enabled: false
-          },
-          gridLineColor: 'transparent',
-          opposite: true
-        }],
-        plotOptions: {
-          line: {
-            marker: {
-              enabled: false
-            }
-          }
-        },
-        series: [{
-          name: title,
-          type: 'line',
-          yAxis: 1,
-          color: '#1D667F',
-          data: level,
-        }],
-      };
+        // visible: false 
+      }],
     }
+  }
+
+  saLabel(chart, SA) {
+    if (SA) {
+      chart.renderer.label('<span class="tag tag-pill" style="font-size: 100%; background-color: #1D667F">SA</span>', 160, 170, null, null, null, true)
+        .css({
+          size: '16px'
+        })
+        .add();
+    }
+  }
+
+  noDataChart(title) {
+    this.options = {
+      chart: {
+        backgroundColor: '#F9F9F9'
+      },
+      title: {
+        text: '<b>' + title + '</b><br>' + 'No Data Available',
+        // verticalAlign: 'middle',
+        align: 'left',
+        widthAdjust: 0,
+        style: {
+          color: '#505050',
+          fontSize: '0.9em',
+          letterSpacing: '0.05em'
+        }
+      },
+      exporting: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      credits: {
+        enabled: false
+      },
+      yAxis: [{
+        title: {
+          text: ''
+        }
+      }],
+      xAxis: {
+        lineWidth: 0
+      },
+      series: [{
+        data: []
+      }],
+      lang: {
+        noData: "No Data Available"
+      },
+      noData: {
+        style: {
+          color: '#505050',
+          fontSize: '0.85em'
+        }
+      }
+    }
+  }
+
+  render(event) {
+    this.chart = event;
+    // Prevent tooltip from being hidden
+    this.chart.tooltip.hide = function(){};
+
+    // Display tooltip when chart loads
+    let level = this.chart.series[0];
+    let ytd = this.chart.series[1];
+    let latestLevel = (level !== undefined) ? level.points.length - 1 : null;;
+    let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+    if (latestLevel > 0 && latestYtd > 0) {
+      this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
+    }
+
+    // Display pill tag to indicate if series is seasonally adjusted
+    this.saLabel(this.chart, this.SA);
   }
 }

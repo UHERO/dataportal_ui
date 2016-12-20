@@ -1,0 +1,64 @@
+<div class="category-tables">
+  <p class="top-anchor" id="top"></p>
+  <h2 class="selected-category">{{selectedCategory}}</h2>
+  <div class="filters">
+    <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
+    <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
+    <a [routerLink]="['/category', id]" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
+  </div>
+  <template [ngIf]="sublist.length > 1">
+    <ul class="content-links">
+      <li *ngFor="let sub of sublist">
+        <a [routerLink]="" (click)="scrollTo(sub.id)">{{sub.name}}</a>
+      </li>
+    </ul>
+  </template>
+  <div class="table-checkboxes">
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
+    </label>
+    <label class="form-check-inline">
+      <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
+    </label>
+  </div>
+  <div *ngFor="let series of seriesData" class="table-row">
+    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <hr class="sublist-separator">
+    <div class="table" #tableScroll on-mouseover="userMouse()">
+      <table class="category-table">
+          <tr>
+          <th><b>Series</b></th>
+          <template ngFor let-date [ngForOf]="series['sublist']['date range']" let-i="index">
+            <td *ngIf="date['date'] >= series['dateWrapper']['firstDate'] && date['date'] <= series['dateWrapper']['endDate']"><b>{{date['table date']}}</b></td>
+          </template>
+          </tr>
+          <template ngFor let-serie [ngForOf]="series['series']">
+              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table']">
+                <th>
+                  <a [routerLink]="['/series', serie['serie']['id']]" [title]="serie['serie']['title']">
+                    {{serie['serie']['title']}}
+                  </a>
+                  <span class="tag tag-pill tag-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === true">SA</span>
+                </th>
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.level}}</td>
+                </template>
+              </tr>
+              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && yoyIsActive">
+                <th>{{(serie['serie']['percent'] === true) ? '&emsp; YOY' : '&emsp; YOY (%)'}}</th>
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.yoy}}</td>
+                </template>
+              </tr>
+              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && ytdIsActive">
+                <th>{{(serie['serie']['percent'] === true)? '&emsp; YTD' : '&emsp; YTD (%)'}}</th>
+                <template ngFor let-item [ngForOf]="serie['category table']">
+                  <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
+                </template>
+             </tr>
+          </template>
+      </table>
+      <p *ngIf="series['serie'] !== 'No data available'">No Data Available</p>
+    </div>
+  </div>
+</div>

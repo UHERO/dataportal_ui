@@ -4,12 +4,14 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 import 'rxjs/add/operator/mergeMap';
 
+import { Category } from './category';
 import { CategoryTree } from './category-tree';
 import { SelectedSeries } from './selected-series';
 import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
+import { dateWrapper } from './date-wrapper';
 
 @Injectable()
 export class UheroApiService {
@@ -17,8 +19,10 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
+  private cachedSelectedCategory = [];
   // private cachedChartData = [];
-  private cachedMultiChartData = {};
+  private cachedMultiChartData = [];
+  private cachedFrequencies = [];
   private cachedGeographies = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
@@ -48,9 +52,24 @@ export class UheroApiService {
         .map(mapCategories)
         .do(val => {
           this.cachedCategories = val;
-          // categories$ = null;
+          categories$ = null;
         });
       return categories$;
+    }
+  }
+
+  // Gets a particular category. Used to identify a category's date ranges
+  fetchSelectedCategory(id: number): Observable<Category> {
+    if (this.cachedSelectedCategory[id]) {
+      return Observable.of(this.cachedSelectedCategory[id]);
+    } else {
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSelectedCategory[id] = val;
+          selectedCat$ = null;
+        });
+      return selectedCat$;
     }
   }
 
@@ -110,6 +129,20 @@ export class UheroApiService {
           siblingFreqs$ = null;
         });
       return siblingFreqs$;
+    }
+  }
+
+  fetchFrequencies(id: number): Observable<Frequency[]> {
+    if(this.cachedFrequencies[id]) {
+      return Observable.of(this.cachedFrequencies[id]);
+    } else {
+      let frequencies$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedFrequencies[id] = val;
+          frequencies$ = null;
+        });
+      return frequencies$;
     }
   }
 
@@ -173,30 +206,8 @@ export class UheroApiService {
 
   }
 
-  // Get series and observation data for landing page component charts
-  /* fetchChartData(id: number) {
-    if(this.cachedChartData[id]) {
-      return this.cachedChartData[id];
-    } else {
-      let chartData = [];
-      this.fetchSeries(id).subscribe((series) => {
-        let seriesData = series;
-        console.log('service', seriesData);
-        seriesData.forEach((serie, index) => {
-          this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-            let seriesObservations = obs;
-            chartData.push({'serie': seriesData[index], 'observations': seriesObservations});
-          });
-        });
-      },
-      error => this.errorMessage = error);
-      this.cachedChartData[id] = (Observable.forkJoin(Observable.of(chartData)));
-      return this.cachedChartData[id];
-    }
-  } */
-
   // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string) {
+  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, dateWrapper: dateWrapper) {
     if (this.cachedMultiChartData[id + geo + freq]) {
       return this.cachedMultiChartData[id + geo + freq];
     } else {
@@ -207,7 +218,9 @@ export class UheroApiService {
           seriesData.forEach((serie, index) => {
             this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
               let seriesObservations = obs;
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations});
+              let categoryTable = catTable(seriesObservations, dates, dateWrapper);
+              // categoryTable = tableSlice(categoryTable, firstDateWrapper);
+              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'dateWrapper': dateWrapper, 'category table': categoryTable});
             });
           });
         } else {
@@ -215,12 +228,37 @@ export class UheroApiService {
         }
       },
       error => this.errorMessage = error);
-      this.cachedMultiChartData[id + geo + freq] = (Observable.forkJoin(Observable.of(multiChartData)));
+      this.cachedMultiChartData[id + geo + freq] = Observable.forkJoin(Observable.of(multiChartData));
       return this.cachedMultiChartData[id + geo + freq];
     }
   }
 
   // End get data from API
+}
+
+// create array of dates & values to be used for the category level table view
+function catTable(seriesObservations: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
+  let results = [];
+  if (dateRange && seriesObservations['table data']) {
+    for (let i = 0; i < dateRange.length; i++) {
+      results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
+      for (let j = 0; j < seriesObservations['table data'].length; j++) {
+        if (dateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < dateWrapper.firstDate) {
+          dateWrapper.firstDate = seriesObservations['table data'][j]['date'];
+        } 
+        if (dateWrapper.endDate === '' || seriesObservations['table data'][j]['date'] > dateWrapper.endDate) {
+          dateWrapper.endDate = seriesObservations['table data'][j]['date'];
+        }
+        if (results[i].date === seriesObservations['table data'][j]['date']) {
+          results[i].level = seriesObservations['table data'][j]['value'];
+          results[i].yoy = seriesObservations['table data'][j]['yoyValue'];
+          results[i].ytd = seriesObservations['table data'][j]['ytdValue'];
+          break;
+        }
+      }
+    }
+    return results;
+  }
 }
 
 // Create a nested JSON of parent and child categories
@@ -250,13 +288,15 @@ function mapData(response: Response): any {
 }
 
 function mapObservations(response: Response): ObservationResults {
-  let observations = response.json().data.transformationResults;
-  let level = observations[0].observations;
-  let perc = observations[1].observations;
-  let ytd = observations[2].observations;
+  let observations = response.json().data;
+  let start = observations.observationStart;
+  let end = observations.observationEnd;
+  let level = observations.transformationResults[0].observations;
+  let yoy = observations.transformationResults[1].observations;
+  let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
-  let percValue = [];
+  let yoyValue = [];
   let ytdValue = [];
 
   if (level) {
@@ -266,58 +306,72 @@ function mapObservations(response: Response): ObservationResults {
     });
   }
 
-  if (perc) {
-    perc.forEach((entry, index) => {
+  if (yoy) {
+    yoy.forEach((entry, index) => {
       // Create [date, value] percent pairs for charts
-      percValue.push([Date.parse(perc[index].date), +perc[index].value]);
+      yoyValue.push([Date.parse(yoy[index].date), +yoy[index].value]);
     });
   }
 
   if (ytd) {
     ytd.forEach((entry, index) => {
       // Create [date, value] YTD pairs
-      ytdValue.push([ytd[index].date, +ytd[index].value]);
+      ytdValue.push([Date.parse(ytd[index].date), +ytd[index].value]);
     });
   }
 
-  let tableData = combineObsData(level, perc);
-  let chartData = {level: levelValue, perc: percValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData};
+  let tableData = combineObsData(level, yoy, ytd);
+  let chartData = {level: levelValue, yoy: yoyValue, ytd: ytdValue};
+  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
 
 // Combine level and percent arrays from Observation data
 // Used to construct table data for single series view
-function combineObsData(level, perc) {
+function combineObsData(level, yoy, ytd) {
   // Check that level and perc arrays are not null
-  if (level && perc) {
+  if (level && yoy && ytd) {
     let table = level;
     for (let i = 0; i < level.length; i++) {
-      table[i].percValue = 'NA';
+      table[i].yoyValue = ' ';
+      table[i].ytdValue = ' ';
+      // table[i].value = parseFloat((+level[i].value).toFixed(2));
       table[i].value = formatNum(+level[i].value, 2);
-      for (let j = 0; j < perc.length; j++) {
-        if (level[i].date === perc[j].date) {
-          table[i].percValue = formatNum(+perc[j].value, 2);
+      for (let j = 0; j < yoy.length; j++) {
+        if (level[i].date === yoy[j].date) {
+          // table[i].yoyValue = parseFloat((+yoy[j].value).toFixed(2));
+          table[i].yoyValue = formatNum(+yoy[j].value, 2);
+          table[i].ytdValue = formatNum(+ytd[j].value, 2)
           break;
         }
       }
     }
     return table;
+  } else if (level && (!yoy || !ytd)) {
+    let table = level;
+    for (let i = 0; i < level.length; i++) {
+      table[i].yoyValue = ' ';
+      table[i].ytdValue = ' ';
+      table[i].value = formatNum(+level[i].value, 2);
+    }
+    return table;
   }
+}
 
-  function formatNum(num: number, decimal: number) {
-    //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    let fixedNum: any;
-    fixedNum = num.toFixed(decimal);
-    // remove decimals 
-    let int = fixedNum|0;
-    let signCheck = num < 0 ? 1 : 0;
-    // store deicmal value
-    let remainder = Math.abs(fixedNum - int);
-    let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
-    let intString = '' + int, i = intString.length;
-    let r = '';
-    while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
-    return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
-  }
+function formatNum(num: number, decimal: number) {
+  //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  let fixedNum: any;
+  let formattedNum: string;
+  fixedNum = num.toFixed(decimal);
+  // remove decimals 
+  let int = fixedNum|0;
+  let signCheck = num < 0 ? 1 : 0;
+  // store deicmal value
+  let remainder = Math.abs(fixedNum - int);
+  let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
+  let intString = '' + int, i = intString.length;
+  let r = '';
+  while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
+  return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
+  // return +formattedNum;
 }

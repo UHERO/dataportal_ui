@@ -1,12 +1,12 @@
-<div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12">
+<div id="single-series-view" *ngIf="chartData && seriesDetail" class="col-xs-12 col-sm-12 col-xl-11">
   <h3 class="series-title">{{seriesDetail.title}}</h3>
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawGeo($event)" class="geo-selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)" class="freq-selector"></app-freq-selector>
-  <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail" (chartExtremes)="redrawTable($event)"></app-highstock>
+  <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail"  [currentFreq]="currentFreq" (chartExtremes)="redrawTable($event)"></app-highstock>
 
-  <p-dataTable [value]="newTableData.length === 0 ? tableData : newTableData" scrollable="true">
-    <p-column field="date" header="Date" [sortable]="true"></p-column>
-    <p-column field="value" header="Value" [sortable]="true"></p-column>
-    <p-column field="percValue" header="Percent" [sortable]="true"></p-column>
+  <p-dataTable [value]="newTableData.length === 0 ? seriesTableData : newTableData" scrollable="true">
+    <p-column field="table date" header="Date" [sortable]="true"></p-column>
+    <p-column field="value" header="Level"></p-column>
+    <p-column field="yoy" header=" YOY % Change"></p-column>
   </p-dataTable>
 </div>

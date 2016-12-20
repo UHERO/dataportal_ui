@@ -2,12 +2,16 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
+// const Highcharts = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/highstock.src');
+// const exporting = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/modules/exporting.src');
 const Highcharts = require('../../../node_modules/highcharts/highstock.src');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
+const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 
 // Plug in export module for Highstock chart
 exporting(Highcharts);
+offlineExport(Highcharts);
 exportCSV(Highcharts);
 
 Highcharts.setOptions({
@@ -23,6 +27,7 @@ Highcharts.setOptions({
 })
 export class HighstockComponent implements OnInit {
   @Input() chartData;
+  @Input() currentFreq;
   @Input() seriesDetail;
   @Output() chartExtremes = new EventEmitter();
   private options: Object;
@@ -30,25 +35,28 @@ export class HighstockComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.seriesDetail);
     let level = this.chartData['level'];
-    let perc = this.chartData['perc'];
+    let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, perc, name, unitsShort);
+    this.drawChart(level, yoy, name, unitsShort, dataFreq);
   }
 
   ngOnChanges() {
     let level = this.chartData['level'];
-    let perc = this.chartData['perc'];
+    let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, perc, name, unitsShort);
+    this.drawChart(level, yoy, name, unitsShort, dataFreq);
   }
 
 
-  drawChart(level, perc, name, units) {
+  drawChart(level, yoy, name, units, freq) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -101,10 +109,46 @@ export class HighstockComponent implements OnInit {
         // inputDateFormat: '%Y-01-01',
         // inputEditDateFormat: '%Y-01-01',
       },
+      exporting: {
+        chartOptions: {
+          navigator: {
+            enabled: false
+          },
+          scrollbar: {
+            enabled: false
+          },
+          rangeSelector: {
+            enabled: false
+          }
+        }
+      },
       tooltip: {
         borderWidth: 0,
         shadow: false,
-        valueDecimals: 2
+        valueDecimals: 2,
+        formatter: function () {
+          let s = '<b>';
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
+            s = s + 'Q1'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
+            s = s + 'Q2'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
+            s = s + 'Q3'
+          };
+          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
+            s = s + 'Q4'
+          };
+          if (freq === 'M') {
+            s = s + Highcharts.dateFormat('%b', this.x);
+          }
+          s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
+          this.points.forEach((point, index) => {
+            s += '<br><span style="color:' + point.series.color + '">\u25CF</span> ' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+          })
+          return s;
+        }
       },
       title: {
         text: '',
@@ -140,7 +184,7 @@ export class HighstockComponent implements OnInit {
        opposite: false
       }, {
         title: {
-          text: 'In ' + units,
+          text: units,
           style: {
             color: '#1D667F'
           }
@@ -157,23 +201,28 @@ export class HighstockComponent implements OnInit {
           data: level
         }
       },
+      plotOptions: {
+        series: {
+          cropThreshold: 0
+        }
+      },
       series: [{
-        name: 'Percent',
+        name: 'YOY % Change',
         type: 'column',
         color: '#727272',
-        data: perc,
-        /* dataGrouping: {
+        data: yoy,
+        dataGrouping: {
           enabled: false
-        } */
+        }
       }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
         color: '#1D667F',
         data: level,
-        /* dataGrouping: {
+        dataGrouping: {
           enabled: false
-        } */
+        }
       }]
     };
   }
