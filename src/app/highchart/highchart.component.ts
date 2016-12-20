@@ -19,6 +19,7 @@ export class HighchartComponent implements OnInit {
   private options: Object;
   private chart;
   private SA: boolean;
+  private dataAvail: boolean;
   constructor() { }
 
   ngOnInit() {
@@ -27,6 +28,7 @@ export class HighchartComponent implements OnInit {
     let title = this.seriesData['serie']['title'] === undefined? this.seriesData['serie']['name'] : this.seriesData['serie']['title'];
     let dataFreq = this.currentFreq.freq;
     this.SA = this.seriesData['serie']['seasonallyAdjusted'] === true? true : false;
+    this.dataAvail = this.seriesData['series'] === 'No data available'? false : true;
     if (this.seriesData['serie'] === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
@@ -220,9 +222,13 @@ export class HighchartComponent implements OnInit {
     this.chart.tooltip.hide = function(){};
 
     // Display tooltip when chart loads
-    let latestLevel = this.chart.series[0].points.length - 1;
-    let latestYtd = this.chart.series[1].points.length - 1;
-    this.chart.tooltip.refresh([this.chart.series[0].points[latestLevel], this.chart.series[1].points[latestYtd]]);
+    let level = this.chart.series[0];
+    let ytd = this.chart.series[1];
+    let latestLevel = (level !== undefined) ? level.points.length - 1 : null;;
+    let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+    if (latestLevel > 0 && latestYtd > 0) {
+      this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
+    }
 
     // Display pill tag to indicate if series is seasonally adjusted
     this.saLabel(this.chart, this.SA);

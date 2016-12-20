@@ -160,11 +160,13 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       results.forEach((res, index) => {
         let series = results[index];
         series.forEach((serie, index) => {
-          if (dateWrapper.firstDate === '' || series[index].dateWrapper.firstDate < dateWrapper.firstDate) {
-            dateWrapper.firstDate = series[index].dateWrapper.firstDate;
-          }
-          if (dateWrapper.endDate === '' || series[index].dateWrapper.endDate > dateWrapper.endDate) {
-            dateWrapper.endDate = series[index].dateWrapper.endDate;
+          if (series[index]['serie'] !== 'No data available') {
+            if (dateWrapper.firstDate === '' || series[index].dateWrapper.firstDate < dateWrapper.firstDate) {
+              dateWrapper.firstDate = series[index].dateWrapper.firstDate;
+            }
+            if (dateWrapper.endDate === '' || series[index].dateWrapper.endDate > dateWrapper.endDate) {
+              dateWrapper.endDate = series[index].dateWrapper.endDate;
+            }
           }
         });
       });
