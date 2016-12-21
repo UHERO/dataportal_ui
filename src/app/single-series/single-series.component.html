@@ -7,6 +7,6 @@
   <p-dataTable [value]="newTableData.length === 0 ? seriesTableData : newTableData" scrollable="true">
     <p-column field="table date" header="Date" [sortable]="true"></p-column>
     <p-column field="value" header="Level"></p-column>
-    <p-column field="yoy" header=" YOY % Change"></p-column>
+    <p-column field="yoy" [header]=change></p-column>
   </p-dataTable>
 </div>

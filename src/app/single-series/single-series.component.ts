@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnChanges, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -14,12 +14,15 @@ export class SingleSeriesComponent implements OnInit {
   private errorMessage: string;
   private seriesSiblings;
   private options: Object;
-  private seriesTableData = [];
+  public seriesTableData = [];
+  // private initTableData = [];
   private newTableData = [];
   
   // Vars used in highstock component
   public chartData;
   public seriesDetail;
+
+  private change;
 
   // Vars used in selectors
   public freqs;
@@ -27,7 +30,7 @@ export class SingleSeriesComponent implements OnInit {
   public regions = [];
   public currentGeo;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) {}
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -48,6 +51,7 @@ export class SingleSeriesComponent implements OnInit {
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
+      this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
       this.currentFreq = {'freq': this.seriesDetail['frequencyShort'], 'label': this.seriesDetail['frequency']};
 
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
@@ -89,8 +93,9 @@ export class SingleSeriesComponent implements OnInit {
             endTable = i;
           }
         }
-      this.seriesTableData = this.seriesTableData.slice(beginTable, endTable + 1);
+      this.seriesTableData = this.seriesTableData.slice(beginTable, endTable + 1).reverse();
     });
+
   }
 
   // Redraw chart when selecting a new region
@@ -105,6 +110,7 @@ export class SingleSeriesComponent implements OnInit {
         let id = this.seriesSiblings[index]['id'];
         this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
           this.seriesDetail = series;
+          this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
         });
         this.getSeriesObservations(id, dateArray);
       } else {
@@ -126,6 +132,7 @@ export class SingleSeriesComponent implements OnInit {
         let id = this.seriesSiblings[index]['id'];
         this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
           this.seriesDetail = series;
+          this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
         });
         this.getSeriesObservations(id, dateArray);
       } else {
@@ -142,10 +149,10 @@ export class SingleSeriesComponent implements OnInit {
     maxDate = e['max date'];
 
     for (let i = 0; i < this.seriesTableData.length; i++) {
-      if (this.seriesTableData[i].date === minDate) {
+      if (this.seriesTableData[i].date === maxDate) {
         tableStart = i;
       }
-      if (this.seriesTableData[i].date === maxDate) {
+      if (this.seriesTableData[i].date === minDate) {
         tableEnd = i;
       }
     }
