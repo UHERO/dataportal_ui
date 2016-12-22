@@ -53,9 +53,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.id = Number.parseInt(params['id']);
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
-      console.log('params', params)
-      console.log('route geo', this.routeGeo);
-      console.log('route freq', this.routeFreq);
       if (isNaN(this.id)) {
         this.id = 42;
         this.initContent(42);

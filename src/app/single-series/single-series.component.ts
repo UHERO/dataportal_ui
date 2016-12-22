@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, OnChanges, Input, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -30,7 +30,7 @@ export class SingleSeriesComponent implements OnInit {
   public regions = [];
   public currentGeo;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) { }
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private cdf: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -42,6 +42,12 @@ export class SingleSeriesComponent implements OnInit {
       let seriesId = Number.parseInt(params['id']);
       this.drawChart(seriesId);
     });
+  }
+
+  ngAfterViewChecked() {
+    // Trigger change detection to check newTableData for table displayed in single series view
+    // Highstock component emits chartExtremes on load - set default to last 10 years
+    this.cdf.detectChanges();
   }
 
   // Draws chart & table on load
