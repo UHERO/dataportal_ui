@@ -4,7 +4,7 @@
   <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
-    <a [routerLink]="(routeGeo && routeFreq)? ['/category/table', id, routeGeo, routeFreq] : ['/category/table', id]" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
+    <a [routerLink]="(routeGeo && routeFreq)? ['/category', id, routeGeo, routeFreq] : ['/category', id]" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
   </div>
   <template [ngIf]="sublist.length > 1">
     <ul class="content-links">
