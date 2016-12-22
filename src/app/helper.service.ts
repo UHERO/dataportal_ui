@@ -12,10 +12,12 @@ export class HelperService {
   calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let start = +dateStart.substring(0,4);
     let end = +dateEnd.substring(0,4);
+    let i = 0;
 
     while (start <= end) {
       if (currentFreq === 'A') {
-        dateArray.push({'date': start.toString() + '-01-01', 'table date': start.toString()});
+        dateArray[i] = {'date': start.toString() + '-01-01', 'table date': start.toString()};
+        i+=1;
         start+=1;
       } else if (currentFreq === 'M') {
         let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
