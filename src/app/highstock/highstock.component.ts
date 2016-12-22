@@ -39,10 +39,12 @@ export class HighstockComponent implements OnInit {
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
+    let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
+    let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, yoy, name, unitsShort, dataFreq);
+    this.drawChart(level, yoy, name, unitsShort, change, dataFreq, yoyLabel);
   }
 
   ngOnChanges() {
@@ -50,13 +52,15 @@ export class HighstockComponent implements OnInit {
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
+    let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq.freq;
 
-    this.drawChart(level, yoy, name, unitsShort, dataFreq);
+    this.drawChart(level, yoy, name, unitsShort, change, dataFreq, yoyLabel);
   }
 
 
-  drawChart(level, yoy, name, units, freq) {
+  drawChart(level, yoy, name, units, change, freq, yoyLabel) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -71,7 +75,7 @@ export class HighstockComponent implements OnInit {
         }
       },
       rangeSelector: {
-        selected: 'All',
+        selected: 2,
         buttons: [{
           type: 'year',
           count: 1,
@@ -119,6 +123,14 @@ export class HighstockComponent implements OnInit {
           },
           rangeSelector: {
             enabled: false
+          },
+          credits: {
+            enabled: true,
+            text: 'data.uhero.hawaii.edu',
+            position: {
+              align: 'right',
+              verticalAlign: 'bottom'
+            }
           }
         }
       },
@@ -176,7 +188,7 @@ export class HighstockComponent implements OnInit {
           },
         },
         title: {
-          text: 'Percent',
+          text: change,
           style: {
             color: '#727272'
           }
@@ -207,7 +219,7 @@ export class HighstockComponent implements OnInit {
         }
       },
       series: [{
-        name: 'YOY % Change',
+        name: yoyLabel,
         type: 'column',
         color: '#727272',
         data: yoy,

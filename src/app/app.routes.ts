@@ -14,14 +14,26 @@ const routes: Routes = [
   },
 
   // map /:id to the multi chart display
-
   {
     path: 'category/:id',
     component: LandingPageComponent
   },
 
+  // map multi chart display to selected region/frequency
+  {
+    path: 'category/:id/:geo/:freq',
+    component: LandingPageComponent
+  },
+
+  // map /:id to the table view
   {
     path: 'category/table/:id',
+    component: CategoryTableComponent
+  },
+
+  // map table display to selected region/frequency
+  {
+    path: 'category/table/:id/:geo/:freq',
     component: CategoryTableComponent
   },
 
