@@ -29,13 +29,14 @@ export class HighstockComponent implements OnInit {
   @Input() chartData;
   @Input() currentFreq;
   @Input() seriesDetail;
-  @Output() chartExtremes = new EventEmitter();
+
+  // Async EventEmitter, emit chart extremes on load and when selecting a new range using the range selector
+  @Output() chartExtremes = new EventEmitter(true);
   private options: Object;
 
   constructor() { }
 
   ngOnInit() {
-    console.log(this.seriesDetail);
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];

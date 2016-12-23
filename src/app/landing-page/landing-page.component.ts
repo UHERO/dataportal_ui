@@ -54,11 +54,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       if (isNaN(this.id)) {
+        // If no id present, load At A Glance category by default
         this.id = 42;
         this.initContent(42);
       } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
         this.initContent(this.id)
       } else {
+        console.log('after view init', this.currentGeo);
         this.initContent(this.id, this.routeGeo, this.routeFreq);
       }
     });
@@ -109,7 +111,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         this._helper.uniqueGeos(geos[index], regions);
       });
       this.regions = regions;
-
+      // If geo. available as URL param, use as current geo
       if (routeGeo) {
         this.regions.forEach((geo, index) => {
           if (routeGeo === this.regions[index]['handle']) {
@@ -117,6 +119,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           }
         });
       } else {
+        // If a default region is available, export as current geo on page load
         this.regions.forEach((geo, index) => {
           if (this.defaultGeo === this.regions[index]['handle']) {
             this.currentGeo = this.regions[index];
@@ -131,7 +134,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this._helper.uniqueFreqs(frequencies[index], freqs);
         });
         this.freqs = freqs;
-
+        // If freq. available as URL param, use as current frequency
         if (routeFreq) {
           this.freqs.forEach((freq, index) => {
             if (routeFreq === this.freqs[index]['freq']) {

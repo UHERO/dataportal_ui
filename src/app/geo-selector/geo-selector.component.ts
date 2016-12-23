@@ -15,11 +15,13 @@ export class GeoSelectorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
+    console.log('selector current geo', this.selectedGeo);
   }
 
   onChange(newGeo) {
+    console.log('selector change', newGeo);
     this.selectedGeo = this.regions.find(region => region.handle === newGeo);
     this.selectedGeoChange.emit(this.selectedGeo);
+    console.log('selected geo', this.selectedGeo);
   }
 }

@@ -41,6 +41,12 @@ const routes: Routes = [
   {
     path: 'series/:id',
     component: SingleSeriesComponent,
+  },
+  
+  // map series view to selected region/frequency
+  {
+    path: 'series/:id/:geo/:freq',
+    component: SingleSeriesComponent
   }
 
 ];
