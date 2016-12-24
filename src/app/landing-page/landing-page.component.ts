@@ -60,7 +60,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
         this.initContent(this.id)
       } else {
-        console.log('after view init', this.currentGeo);
         this.initContent(this.id, this.routeGeo, this.routeFreq);
       }
     });
