@@ -78,7 +78,11 @@ export class SingleSeriesComponent implements OnInit {
       } else {
         this.currentGeo = this.seriesDetail['geography'];
       }
-    
+    },
+    (error) => {
+      error = this.errorMessage = error;
+    },
+    () => {
       this.getSeriesObservations(id, dateArray);
     });
   }
