@@ -118,7 +118,7 @@ export class UheroApiService {
   }
 
   // Get available frequencies for a series' siblings
-  fetchSiblingFreqs(seriesId: number): Observable<Frequency> {
+  fetchSiblingFreqs(seriesId: number): Observable<Frequency[]> {
     if (this.cachedSiblingFreqs[seriesId]) {
       return Observable.of(this.cachedSiblingFreqs[seriesId]);
     } else {

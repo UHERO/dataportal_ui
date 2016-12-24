@@ -15,7 +15,6 @@ export class GeoSelectorComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
   }
 
   onChange(newGeo) {

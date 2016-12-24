@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnChanges, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
+import { Geography } from '../geography';
 
 @Component({
   selector: 'app-single-series',
@@ -13,39 +14,40 @@ import { Frequency } from '../frequency';
 export class SingleSeriesComponent implements OnInit {
   private errorMessage: string;
   private seriesSiblings;
+
   private options: Object;
   public seriesTableData = [];
-  // private initTableData = [];
   private newTableData = [];
   
   // Vars used in highstock component
   public chartData;
   public seriesDetail;
 
+  // Table header to indicate % change if series is not a rate
   private change;
 
   // Vars used in selectors
-  public freqs;
-  public currentFreq;
+  public freqs = [];
+  public currentFreq: Frequency;
   public regions = [];
-  public currentGeo;
+  public currentGeo: Geography;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute) { }
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) {}
 
   ngOnInit() {
-    this.currentGeo = {fips: null, name: null, handle: null};
+    this.currentGeo = {fips: null, handle: null, name: null};
     this.currentFreq = {freq: null, label: null};
   }
 
   ngAfterViewInit() {
-   this.route.params.subscribe(params => {
+  this.route.params.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       this.drawChart(seriesId);
     });
   }
 
   // Draws chart & table on load
-  drawChart(id: number) {
+  drawChart(id: number, routeGeo?: string, routeFreq?: string) {
     let freqArray = [];
     let dateArray = [];
 
@@ -56,17 +58,27 @@ export class SingleSeriesComponent implements OnInit {
 
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesSiblings = siblings;
-      })
-
-      this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
-        this.freqs = frequencies;
       });
 
-      this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
+      // Prevent frequency select menu from resetting when navigating from another series
+      if (this.freqs.length === 0) {
+        this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
+          this.freqs = frequencies;
+        });
+      } else {
+        return;
+      }
+
+      // Prevent region select menu from resetting when navigating from another series
+      if (this.regions.length === 0) {
+        this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
         this.regions = geos;
         this.currentGeo = this.seriesDetail['geography'];
-      });
-      
+        });
+      } else {
+        this.currentGeo = this.seriesDetail['geography'];
+      }
+    
       this.getSeriesObservations(id, dateArray);
     });
   }
@@ -100,19 +112,11 @@ export class SingleSeriesComponent implements OnInit {
 
   // Redraw chart when selecting a new region
   redrawGeo(event) {
-    // Reset chart and table data
-    this.chartData = [];
-    this.seriesTableData = [];
-    this.newTableData = [];
-    let dateArray = [];
     this.seriesSiblings.forEach((sibling, index) => {
       if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.freq === this.seriesSiblings[index]['frequencyShort']) {
         let id = this.seriesSiblings[index]['id'];
-        this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
-          this.seriesDetail = series;
-          this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
-        });
-        this.getSeriesObservations(id, dateArray);
+        // Update id param in URL to reflect selected series ID
+        this._router.navigate(['/series/' + id]);
       } else {
         return;
       }
@@ -122,19 +126,11 @@ export class SingleSeriesComponent implements OnInit {
 
   // Redraw chart when selecting a new frequency
   redrawFreq(event) {
-    // Reset Chart and Table data
-    this.chartData = [];
-    this.seriesTableData = [];
-    this.newTableData = [];
-    let dateArray = [];
     this.seriesSiblings.forEach((sibling, index) => {
       if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.freq === this.seriesSiblings[index]['frequencyShort']) {
         let id = this.seriesSiblings[index]['id'];
-        this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
-          this.seriesDetail = series;
-          this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
-        });
-        this.getSeriesObservations(id, dateArray);
+        // Update id param in URL to reflect selected series ID
+        this._router.navigate(['/series/' + id]);
       } else {
         return;
       }
