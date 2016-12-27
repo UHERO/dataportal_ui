@@ -17,9 +17,9 @@
     <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
     <hr class="sublist-separator">
     <template ngFor let-serie [ngForOf]="series['series']">
-      <p *ngIf="!serie['serie']['id']"> No Data Available </p>
-      <div *ngIf="serie['serie']['seasonallyAdjusted'] != false" class="multi-charts">
-        <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
+      <p *ngIf="!serie['seriesInfo']['id']"> No Data Available </p>
+      <div *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false" class="multi-charts">
+        <a href="#" [routerLink]="['/series', serie['seriesInfo']['id']]" *ngIf="serie['seriesInfo']['id']">
           <app-highchart [seriesData]="serie" [currentFreq]="currentFreq"></app-highchart>
         </a>
       </div>

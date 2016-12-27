@@ -23,16 +23,17 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    let level = this.seriesData['observations']['chart data']['level'];
-    let ytd = this.seriesData['observations']['chart data']['ytd'];
-    let title = this.seriesData['serie']['title'] === undefined? this.seriesData['serie']['name'] : this.seriesData['serie']['title'];
+    // console.log('highcharts', this.seriesData);
+    let level = this.seriesData.chartData.level;
+    let ytd = this.seriesData.chartData.ytd;
+    let title = this.seriesData.seriesInfo.title === undefined? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     let dataFreq = this.currentFreq.freq;
-    this.SA = this.seriesData['serie']['seasonallyAdjusted'] === true? true : false;
-    this.dataAvail = this.seriesData['series'] === 'No data available'? false : true;
-    if (this.seriesData['serie'] === 'No data available' || level.length === 0) {
+    this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true? true : false;
+    this.dataAvail = this.seriesData.seriesInfo === 'No data available'? false : true;
+    if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      let unitsShort = this.seriesData['serie']['unitsLabelShort'];
+      let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
       this.drawChart(title, level, ytd, dataFreq);
     }
   }

@@ -28,31 +28,31 @@
       <table class="category-table">
           <tr>
           <th><b>Series</b></th>
-          <template ngFor let-date [ngForOf]="series['sublist']['date range']" let-i="index">
+          <template ngFor let-date [ngForOf]="series['sublist']['dateRange']" let-i="index">
             <td *ngIf="date['date'] >= series['dateWrapper']['firstDate'] && date['date'] <= series['dateWrapper']['endDate']"><b>{{date['table date']}}</b></td>
           </template>
           </tr>
           <template ngFor let-serie [ngForOf]="series['series']">
-              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table']">
+              <tr *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false && serie['categoryTable']">
                 <th>
-                  <a [routerLink]="['/series', serie['serie']['id']]" [title]="serie['serie']['title']">
-                    {{serie['serie']['title']}}
+                  <a [routerLink]="['/series', serie['seriesInfo']['id']]" [title]="serie['seriesInfo']['title']">
+                    {{serie['seriesInfo']['title']}}
                   </a>
-                  <span class="tag tag-pill tag-primary" *ngIf="serie['serie']['seasonallyAdjusted'] === true">SA</span>
+                  <span class="tag tag-pill tag-primary" *ngIf="serie['seriesInfo']['seasonallyAdjusted'] === true">SA</span>
                 </th>
-                <template ngFor let-item [ngForOf]="serie['category table']">
+                <template ngFor let-item [ngForOf]="serie['categoryTable']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.level}}</td>
                 </template>
               </tr>
-              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && yoyIsActive">
-                <th>{{(serie['serie']['percent'] === true) ? '&emsp; YOY' : '&emsp; YOY (%)'}}</th>
-                <template ngFor let-item [ngForOf]="serie['category table']">
+              <tr *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false && serie['categoryTable'] && yoyIsActive">
+                <th>{{(serie['seriesInfo']['percent'] === true) ? '&emsp; YOY' : '&emsp; YOY (%)'}}</th>
+                <template ngFor let-item [ngForOf]="serie['categoryTable']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.yoy}}</td>
                 </template>
               </tr>
-              <tr *ngIf="serie['serie']['seasonallyAdjusted'] != false && serie['category table'] && ytdIsActive">
-                <th>{{(serie['serie']['percent'] === true)? '&emsp; YTD' : '&emsp; YTD (%)'}}</th>
-                <template ngFor let-item [ngForOf]="serie['category table']">
+              <tr *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false && serie['categoryTable'] && ytdIsActive">
+                <th>{{(serie['seriesInfo']['percent'] === true)? '&emsp; YTD' : '&emsp; YTD (%)'}}</th>
+                <template ngFor let-item [ngForOf]="serie['categoryTable']">
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
                 </template>
              </tr>

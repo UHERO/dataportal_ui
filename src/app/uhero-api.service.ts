@@ -19,6 +19,7 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
+  private cachedExpanded = [];
   private cachedSelectedCategory = [];
   // private cachedChartData = [];
   private cachedMultiChartData = [];
@@ -55,6 +56,21 @@ export class UheroApiService {
           categories$ = null;
         });
       return categories$;
+    }
+  }
+
+  // Gets observations for series in a (sub) category
+  fetchExpanded(id: number, geo: string, freq:string): Observable<any> {
+    if (this.cachedExpanded[id + geo + freq]) {
+      return Observable.of(this.cachedExpanded[id + geo + freq]);
+    } else {
+      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedExpanded[id + geo + freq] = val;
+          expanded$ = null;
+        });
+      return expanded$;
     }
   }
 
@@ -203,59 +219,7 @@ export class UheroApiService {
         });
       return observations$;
     }
-
   }
-
-  // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, dateWrapper: dateWrapper) {
-    if (this.cachedMultiChartData[id + geo + freq]) {
-      return this.cachedMultiChartData[id + geo + freq];
-    } else {
-      let multiChartData = [];
-      this.fetchSeries(id, geo, freq).subscribe((series) => {
-        let seriesData = series;
-        if (seriesData !== null) {
-          seriesData.forEach((serie, index) => {
-            this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-              let seriesObservations = obs;
-              let categoryTable = catTable(seriesObservations, dates, dateWrapper);
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'dateWrapper': dateWrapper, 'category table': categoryTable});
-            });
-          });
-        } else {
-          multiChartData.push({'serie': 'No data available'});
-        }
-      },
-      error => this.errorMessage = error);
-      this.cachedMultiChartData[id + geo + freq] = Observable.forkJoin(Observable.of(multiChartData));
-      return this.cachedMultiChartData[id + geo + freq];
-    }
-  }
-
-  // End get data from API
-}
-
-// create array of dates & values to be used for the category level table view
-function catTable(seriesObservations: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
-  let results = [];
-  for (let i = 0; i < dateRange.length; i++) {
-    results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
-      for (let j = 0; j < seriesObservations['table data'].length; j++) {
-        if (dateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < dateWrapper.firstDate) {
-          dateWrapper.firstDate = seriesObservations['table data'][j]['date'];
-        } 
-        if (dateWrapper.endDate === '' || seriesObservations['table data'][j]['date'] > dateWrapper.endDate) {
-          dateWrapper.endDate = seriesObservations['table data'][j]['date'];
-        }
-        if (results[i].date === seriesObservations['table data'][j]['date']) {
-          results[i].level = seriesObservations['table data'][j]['value'];
-          results[i].yoy = seriesObservations['table data'][j]['yoyValue'];
-          results[i].ytd = seriesObservations['table data'][j]['ytdValue'];
-          break;
-        }
-      }
-    }
-  return results;
 }
 
 // Create a nested JSON of parent and child categories

@@ -33,6 +33,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private errorMessage: string;
 
   private seriesData = [];
+  private expandedResults = [];
   private categoryData = [];
 
   // Variables for geo and freq selectors
@@ -171,52 +172,24 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         // When date array is completed, call sublistData()
         () => {
           // Fetch data for current region/frequency settings
-          this.sublistData(sublistIndex, this.currentGeo.handle, this.currentFreq.freq, dateArray, dateWrapper, routeGeo, routeFreq);
+          this._uheroAPIService.fetchExpanded(sublistIndex['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((expanded) => {
+            this.expandedResults = expanded;
+            console.log('expanded results', this.expandedResults);
+          },
+          (error) => {
+            error = this.errorMessage = error;
+          },
+          () => {
+            let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
+            sublistIndex.dateRange = dateArray;
+            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
+            console.log('seriesData', this.seriesData)
+          });
+
         });
       });
     });
   }
-
-  // Get series for each subcategory
-  sublistData(sublistIndex, geoHandle: string, freqFrequency: string, dates: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
-    if (routeGeo && routeFreq) {
-      this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], routeGeo, routeFreq, dates, dateWrapper).subscribe((results) => {
-        sublistIndex['date range'] = dates;
-
-        // Get dateWrapper from cached data
-        this.checkCachedData(results, dateWrapper);
-        this.seriesData.push({'dateWrapper': dateWrapper, 'sublist': sublistIndex, 'series': results[0]});
-        console.log('route table date', this.seriesData);
-      });
-    } else {
-      this._uheroAPIService.fetchMultiChartData(sublistIndex['id'], geoHandle, freqFrequency, dates, dateWrapper).subscribe((results) => {
-        sublistIndex['date range'] = dates;
-        
-        // Get dateWrapper from cached data
-        this.checkCachedData(results, dateWrapper);
-        this.seriesData.push({'dateWrapper': dateWrapper, 'sublist': sublistIndex, 'series': results[0]});
-        console.log('table data', this.seriesData);
-      });
-    }
-  }
-
-  checkCachedData(results: Array<any>, dateWrapper: dateWrapper) {
-    results.forEach((res, index) => {
-      let series = results[index];
-      series.forEach((serie, index) => {
-        if (series[index]['serie'] !== 'No data available') {
-          if (dateWrapper.firstDate === '' || series[index].dateWrapper.firstDate < dateWrapper.firstDate) {
-            dateWrapper.firstDate = series[index].dateWrapper.firstDate;
-          }
-          if (dateWrapper.endDate === '' || series[index].dateWrapper.endDate > dateWrapper.endDate) {
-            dateWrapper.endDate = series[index].dateWrapper.endDate;
-          }
-        }
-      });
-    });
-    return dateWrapper;
-  }
-
 
   // Update table data when a new region/frequency is selected
   redrawTableGeo(event) {
