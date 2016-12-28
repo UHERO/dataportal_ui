@@ -62,6 +62,7 @@ export class HighchartComponent implements OnInit {
         },
         shadow: false,
         borderWidth: 0,
+        valueDecimals: 2,
         shared: true,
         backgroundColor: 'transparent',
         // backgroundColor: 'rgba(247, 247, 247, 0.5)',

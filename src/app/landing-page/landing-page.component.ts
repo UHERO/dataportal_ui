@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -22,6 +22,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
+  private routeSearch: string;
 
   // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
@@ -54,16 +55,93 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.id = Number.parseInt(params['id']);
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
-      if (isNaN(this.id)) {
-        // If no id present, load At A Glance category by default
-        this.id = 42;
-        this.initContent(42);
-      } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
-        this.initContent(this.id)
+      this.routeSearch = params['search'];
+      console.log('route search', this.routeSearch)
+      if (this.routeSearch) {
+        if (this.routeGeo && this.routeFreq) {
+          this.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
+        } else {
+          this.initSearch(this.routeSearch);
+        }
       } else {
-        this.initContent(this.id, this.routeGeo, this.routeFreq);
+        if (isNaN(this.id)) {
+          this.id = 42;
+          this.initContent(42);
+        } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
+          this.initContent(this.id);
+        } else {
+          this.initContent(this.id, this.routeGeo, this.routeFreq);
+        }
       }
     });
+  }
+
+  // Set up search results
+  initSearch(search: string, routeGeo?: string, routeFreq?: string) {
+    let geoArray = [];
+    let freqArray = [];
+
+    this._uheroAPIService.fetchSearchSeries(search).subscribe((series) => {
+      let searchSeries = series;
+      let dateWrapper = {firstDate: '', endDate: ''};
+      this.searchSettings(search, searchSeries, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+    });
+  }
+
+  searchSettings(search: string, searchSeries: Array<any>, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
+    let dateArray = [];
+    searchSeries.forEach((series, index) => {
+      this._helper.uniqueGeos(searchSeries[index].geography, regions);
+      this._helper.uniqueFreqs({freq: searchSeries[index].frequencyShort, label: searchSeries[index].frequency}, freqs);
+    });
+    this.regions = regions;
+    this.freqs = freqs;
+
+    // If geo. is available as URL param, use as current geo.
+    if (routeGeo) {
+      this.regions.forEach((geo, index) => {
+        if (routeGeo === this.regions[index].handle) {
+          this.currentGeo = this.regions[index];
+        }
+      });
+    } else {
+      this.regions.forEach((geo, index) => {
+        this.currentGeo = this.regions[0];
+      });
+    }
+
+    // If freq. is available as URL param, use as current freq.
+    if (this.routeFreq) {
+      this.freqs.forEach((freq, index) => {
+        if (routeFreq === this.freqs[index].freq) {
+          this.currentFreq = this.freqs[index];
+        }
+      });
+    } else {
+      this.freqs.forEach((freq, index) => {
+        this.currentFreq = this.freqs[0];
+      })
+    }
+
+    let i = 0;
+    searchSeries.forEach((series, index) => {
+      this._uheroAPIService.fetchObservations(searchSeries[index].id).subscribe((obs) => {
+        searchSeries[index].seriesObservations = obs;
+        i += 1;
+      },
+      (error) => {
+        error = this.errorMessage = error;
+      },
+      () => {
+        if (i === searchSeries.length) {
+          let data = this._helper.searchTransform(searchSeries, dateArray, dateWrapper, this.currentGeo.handle, this.currentFreq.freq);
+          this.seriesData.push({dateWrapper: dateWrapper, series: data});
+          this.selectedCategory = search;
+          console.log(this.seriesData);
+        }
+      });
+    },
+    this.seriesData = []);
   }
 
   // Called on page load
@@ -183,13 +261,27 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // Redraw series when a new region is selected
   redrawSeriesGeo(event) {
     this.geoHandle = event.handle;
-    this._router.navigate(['/category/' + this.id + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
+    if (this.routeSearch) {
+      this._router.navigate(['/category/search/' + this.routeSearch + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
+    } else {
+      this._router.navigate(['/category/' + this.id + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
+    }
   }
 
   redrawSeriesFreq(event) {
     this.freqHandle = event.freq;
-    this._router.navigate(['/category/' + this.id + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
+    if (this.routeSearch) {
+      this._router.navigate(['/category/search/' + this.routeSearch + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
+    } else {
+      this._router.navigate(['/category/' + this.id + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
+    }
   }
+
+  onSearch(event) {
+    console.log('search results', event);
+    this._router.navigate(['/category/search/' + event])
+  }
+
 
   saActive(e) {
     // console.log('checkbox', e)

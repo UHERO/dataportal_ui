@@ -32,6 +32,7 @@ export class UheroApiService {
   private cachedSiblings = [];
   private cachedSiblingFreqs = [];
   private cachedSiblingGeos = [];
+  private cachedSearch = [];
   private errorMessage: string;
 
   constructor(private http: Http) {
@@ -203,6 +204,20 @@ export class UheroApiService {
         geoSeries$ = null;
       });
     return geoSeries$;
+    }
+  }
+
+  fetchSearchSeries(search: string): Observable<Series[]> {
+    if (this.cachedSearch[search]) {
+      return Observable.of(this.cachedSearch[search]);
+    } else {
+      let search$ = this.http.get(`${this.baseUrl}/series?search_text=` + search, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearch[search] = val;
+          search$ = null
+        });
+      return search$;
     }
   }
 

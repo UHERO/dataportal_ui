@@ -25,6 +25,18 @@ const routes: Routes = [
     component: LandingPageComponent
   },
 
+  // map multi chart display to search term
+  {
+    path: 'category/search/:search',
+    component: LandingPageComponent
+  },
+
+  // map multi chart display to search term and selected region/frequency
+  {
+    path: 'category/search/:search/:geo/:freq',
+    component: LandingPageComponent
+  },
+
   // map /:id to the table view
   {
     path: 'category/table/:id',
@@ -37,6 +49,18 @@ const routes: Routes = [
     component: CategoryTableComponent
   },
 
+  // map table display to search term
+  {
+    path: 'category/table/search/:search',
+    component: CategoryTableComponent
+  },
+
+  // map table display to search term and selected region/frequency
+  {
+    path: 'category/table/search/:search/:geo/:freq',
+    component: CategoryTableComponent
+  },
+  
   // map /series/:id to the single series graph/table display
   {
     path: 'series/:id',

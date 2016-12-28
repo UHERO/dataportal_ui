@@ -54,6 +54,18 @@ export class HelperService {
     }
   }
 
+  searchTransform(searchResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper, currentGeo, currentFreq) {
+    let results = [];
+    searchResults.forEach((result, index) => {
+      if (searchResults[index]['geography']['handle'] === currentGeo && searchResults[index]['frequencyShort'] === currentFreq) {
+        results.push({seriesInfo: searchResults[index], chartData: searchResults[index]['seriesObservations']['chart data'], seriesTableData: searchResults[index]['seriesObservations']['table data'], start: searchResults[index]['seriesObservations']['start'], end: searchResults[index]['seriesObservations']['end']});
+      } else {
+        return;
+      }
+    });
+    return results;
+  }
+
   dataTransform(expandedResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
     let results = [];
     expandedResults.forEach((res, index) => {
