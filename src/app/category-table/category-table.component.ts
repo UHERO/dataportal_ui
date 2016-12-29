@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, Renderer } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy, Renderer } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
@@ -21,11 +21,13 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private selectedCategory;
   private sublist: Array<any> = [];
   private categories;
+  private sub;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
   private routeSearch: string;
-  
+  private queryParams: any = {};
+
   // Check if seasonally adjusted data is displayed, default to true
   private saIsActive: boolean = true;
   private yoyIsActive: boolean = false;
@@ -55,12 +57,38 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.route.params.subscribe(params => {
+    this.sub = this.route.queryParams.subscribe((params) => {
+      this.id = +params['id'] || 42;
+      this.routeGeo = params['geo'];
+      this.routeFreq = params['freq'];
+      this.routeSearch = params['search'];
+      if (this.id) this.queryParams.id = this.id;
+      if (this.routeGeo) this.queryParams.geo = this.routeGeo;
+      if (this.routeFreq) this.queryParams.freq = this.routeFreq;
+      if (this.routeSearch) this.queryParams.search = this.routeSearch;
+      /* console.log('id', this.id);
+      console.log('geo', this.routeGeo);
+      console.log('freq', this.routeFreq);
+      console.log('search', this.routeSearch);
+      console.log('params', params); */
+      if (this.routeGeo && this.routeFreq) {
+        console.log(this.routeGeo);
+        this.initContent(this.id, this.routeGeo, this.routeFreq);
+      } else {
+        this.initContent(this.id);
+      }
+    },
+    (error) => {
+      error = this.errorMessage = error;
+    },
+    () => {
+      console.log('done')
+    });
+    /* this.route.params.subscribe(params => {
       this.id = Number.parseInt(params['id']);
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
-      console.log('table params', params);
       console.log('route search', this.routeSearch)
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
@@ -78,7 +106,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
           this.initContent(this.id, this.routeGeo, this.routeFreq);
         }
       }
-    });
+    }); */
   }
 
   ngAfterViewChecked() {
@@ -87,6 +115,10 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     if (!this.userEvent) {
       this.tableScroll();
     }
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
     // Set up search results
@@ -260,12 +292,16 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
             error = this.errorMessage = error;
           },
           () => {
-            let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
-            sublistIndex.dateRange = dateArray;
-            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
-            console.log('seriesData', this.seriesData)
+            if (this.expandedResults) {
+              let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
+              sublistIndex.dateRange = dateArray;
+              this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
+              console.log('seriesData', this.seriesData)
+            } else {
+              let series = [{seriesInfo: 'No data available'}];
+              this.seriesData.push({sublist: sublistIndex, series: series})
+            }
           });
-
         });
       });
     });
@@ -276,27 +312,29 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     // Reset table scrollbar position to the right when new region is selected
     this.userEvent = false;
     this.geoHandle = event.handle;
-    if (this.routeSearch) {
+    this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: this.geoHandle, freq: this.currentFreq.freq} });
+    /* if (this.routeSearch) {
       this._router.navigate(['/category/table/search/' + this.routeSearch + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
     } else {
       this._router.navigate(['/category/table/' + this.id + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
-    }
+    } */
   }
 
   redrawTableFreq(event) {
     // Reset table scrollbar position to the right when new frequency is selected
     this.userEvent = false;
     this.freqHandle = event.freq;
-    if (this.routeSearch) {
+    this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: this.currentGeo.handle, freq: this.freqHandle} });
+    /* if (this.routeSearch) {
       this._router.navigate(['/category/table/search/' + this.routeSearch + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
     } else {
       this._router.navigate(['/category/table/' + this.id + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
-    }
+    } */
   }
 
   onSearch(event) {
     console.log('search results', event);
-    this._router.navigate(['/category/table/search/' + event])
+    this._router.navigate(['/category/table/search'], {queryParams: {search: event} })
   }
 
 
@@ -312,9 +350,12 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     this.ytdIsActive = e.target.checked;
   }
 
-  scrollTo(location: string): void {
-    console.log(location)
-    window.location.hash = location;
+  scrollTo(): void {
+    this.route.fragment.subscribe(frag => {
+      const el = <HTMLElement>document.querySelector('#id_' + frag);
+      if (el) el.scrollIntoView(el);
+      if (frag === 'top') el.scrollTop;
+    });
   }
 
   // On load, table scrollbars should start at the right -- showing most recent data

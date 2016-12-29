@@ -15,11 +15,32 @@ const routes: Routes = [
 
   // map /:id to the multi chart display
   {
-    path: 'category/:id',
+    path: 'category',
     component: LandingPageComponent
   },
 
-  // map multi chart display to selected region/frequency
+  {
+    path: 'category/search',
+    component: LandingPageComponent
+  },
+
+  {
+    path: 'category/table',
+    component: CategoryTableComponent
+  },
+
+  {
+    path: 'category/table/search',
+    component: CategoryTableComponent
+  },
+
+  // map /series/:id to the single series graph/table display
+  {
+    path: 'series/:id',
+    component: SingleSeriesComponent
+  }
+
+  /* // map multi chart display to selected region/frequency
   {
     path: 'category/:id/:geo/:freq',
     component: LandingPageComponent
@@ -65,7 +86,7 @@ const routes: Routes = [
   {
     path: 'series/:id',
     component: SingleSeriesComponent,
-  }
+  } */
 
 ];
 

@@ -115,18 +115,20 @@ catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWr
   let categoryTable = [];
   for (let i = 0; i < dateRange.length; i++) {
     categoryTable.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
-      for (let j = 0; j < seriesTableData.length; j++) {
-        if (dateWrapper.firstDate === '' || seriesTableData[j]['date'] < dateWrapper.firstDate) {
-          dateWrapper.firstDate = seriesTableData[j]['date'];
-        } 
-        if (dateWrapper.endDate === '' || seriesTableData[j]['date'] > dateWrapper.endDate) {
-          dateWrapper.endDate = seriesTableData[j]['date'];
-        }
-        if (categoryTable[i].date === seriesTableData[j]['date']) {
-          categoryTable[i].level = this.formatNum(+seriesTableData[j]['value'], 2);
-          categoryTable[i].yoy = this.formatNum(+seriesTableData[j]['yoyValue'], 2);
-          categoryTable[i].ytd = this.formatNum(+seriesTableData[j]['ytdValue'], 2);
-          break;
+      if (seriesTableData) {
+        for (let j = 0; j < seriesTableData.length; j++) {
+          if (dateWrapper.firstDate === '' || seriesTableData[j]['date'] < dateWrapper.firstDate) {
+            dateWrapper.firstDate = seriesTableData[j]['date'];
+          } 
+          if (dateWrapper.endDate === '' || seriesTableData[j]['date'] > dateWrapper.endDate) {
+            dateWrapper.endDate = seriesTableData[j]['date'];
+          }
+          if (categoryTable[i].date === seriesTableData[j]['date']) {
+            categoryTable[i].level = this.formatNum(+seriesTableData[j]['value'], 2);
+            categoryTable[i].yoy = this.formatNum(+seriesTableData[j]['yoyValue'], 2);
+            categoryTable[i].ytd = this.formatNum(+seriesTableData[j]['ytdValue'], 2);
+            break;
+          }
         }
       }
     }
