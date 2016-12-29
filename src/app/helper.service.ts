@@ -58,7 +58,9 @@ export class HelperService {
     let results = [];
     searchResults.forEach((result, index) => {
       if (searchResults[index]['geography']['handle'] === currentGeo && searchResults[index]['frequencyShort'] === currentFreq) {
-        results.push({seriesInfo: searchResults[index], chartData: searchResults[index]['seriesObservations']['chart data'], seriesTableData: searchResults[index]['seriesObservations']['table data'], start: searchResults[index]['seriesObservations']['start'], end: searchResults[index]['seriesObservations']['end']});
+        // this.calculateDateArray(searchResults[index]['seriesObservations']['start'], searchResults[index]['seriesObservations']['end'], currentFreq, dateArray)
+        let catTable = this.catTable(searchResults[index]['seriesObservations']['table data'], dateArray, dateWrapper);
+        results.push({seriesInfo: searchResults[index], chartData: searchResults[index]['seriesObservations']['chart data'], seriesTableData: searchResults[index]['seriesObservations']['table data'], start: searchResults[index]['seriesObservations']['start'], end: searchResults[index]['seriesObservations']['end'], dates: dateArray, categoryTable: catTable});
       } else {
         return;
       }

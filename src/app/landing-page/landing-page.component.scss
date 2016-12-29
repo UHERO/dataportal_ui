@@ -1,6 +1,8 @@
 .search {
-  position: absolute;
+  position: fixed;
   z-index: 2;
+  // right: 15px;
+  top: 12px;
 }
 
 .multi-series-container {
@@ -85,11 +87,11 @@
   }
 
   @media (min-width: 768px) {
-    margin-top: 60px;
+    margin-top: 70px;
   }
 
   @media (max-width: 767px) {
-    margin-top: 45px;
+    margin-top: 55px;
   }
   
   .sa-toggle {

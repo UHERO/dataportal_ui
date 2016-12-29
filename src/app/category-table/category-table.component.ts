@@ -65,24 +65,25 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       if (this.id) this.queryParams.id = this.id;
       if (this.routeGeo) this.queryParams.geo = this.routeGeo;
       if (this.routeFreq) this.queryParams.freq = this.routeFreq;
-      if (this.routeSearch) this.queryParams.search = this.routeSearch;
+      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
       /* console.log('id', this.id);
       console.log('geo', this.routeGeo);
       console.log('freq', this.routeFreq);
       console.log('search', this.routeSearch);
       console.log('params', params); */
-      if (this.routeGeo && this.routeFreq) {
-        console.log(this.routeGeo);
-        this.initContent(this.id, this.routeGeo, this.routeFreq);
+      if (this.routeSearch) {
+        if (this.routeGeo && this.routeFreq) {
+          this.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
+        } else {
+          this.initSearch(this.routeSearch);
+        }
       } else {
-        this.initContent(this.id);
+        if (this.routeGeo && this.routeFreq) {
+          this.initContent(this.id, this.routeGeo, this.routeFreq);
+        } else {
+          this.initContent(this.id);
+        }
       }
-    },
-    (error) => {
-      error = this.errorMessage = error;
-    },
-    () => {
-      console.log('done')
     });
     /* this.route.params.subscribe(params => {
       this.id = Number.parseInt(params['id']);
@@ -169,9 +170,13 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     }
 
     let i = 0;
+    let displaySeries = [];
     searchSeries.forEach((series, index) => {
       this._uheroAPIService.fetchObservations(searchSeries[index].id).subscribe((obs) => {
         searchSeries[index].seriesObservations = obs;
+        if (searchSeries[index].geography.handle === this.currentGeo.handle && searchSeries[index].frequencyShort === this.currentFreq.freq) {
+          displaySeries.push(searchSeries[index]);
+        }
         i += 1;
       },
       (error) => {
@@ -179,9 +184,19 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       },
       () => {
         if (i === searchSeries.length) {
+          displaySeries.forEach((serie, index) => {
+            if (dateWrapper.firstDate === '' || searchSeries[index].seriesObservations.start < dateWrapper.firstDate) {
+              dateWrapper.firstDate = searchSeries[index].seriesObservations.start;
+            }
+            if (dateWrapper.endDate === '' || searchSeries[index].seriesObservations.start > dateWrapper.endDate) {
+              dateWrapper.endDate = searchSeries[index].seriesObservations.end;
+            }
+          });
+          this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, this.currentFreq.freq, dateArray);
           let data = this._helper.searchTransform(searchSeries, dateArray, dateWrapper, this.currentGeo.handle, this.currentFreq.freq);
-          this.seriesData.push({dateWrapper: dateWrapper, series: data});
-          this.selectedCategory = search;
+          let sublist = {name: this.routeSearch, dateRange: dateArray};
+          this.seriesData.push({dateWrapper: dateWrapper, series: data, sublist: sublist});
+          this.selectedCategory = this.routeSearch;
           console.log(this.seriesData);
         }
       });

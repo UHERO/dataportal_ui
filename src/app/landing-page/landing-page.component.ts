@@ -59,33 +59,14 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
       if (this.id) this.queryParams.id = this.id;
+      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
       if (this.routeGeo) this.queryParams.geo = this.routeGeo;
       if (this.routeFreq) this.queryParams.freq = this.routeFreq;
-      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
       /* console.log('id', this.id);
       console.log('geo', this.routeGeo);
       console.log('freq', this.routeFreq);
       console.log('search', this.routeSearch);
       console.log('params', params); */
-      if (this.routeGeo && this.routeFreq) {
-        console.log(this.routeGeo);
-        this.initContent(this.id, this.routeGeo, this.routeFreq);
-      } else {
-        this.initContent(this.id);
-      }
-    },
-    (error) => {
-      error = this.errorMessage = error;
-    },
-    () => {
-      console.log('done')
-    });
-    /* this.route.params.subscribe(params => {
-      this.id = Number.parseInt(params['id']);
-      this.routeGeo = params['geo'];
-      this.routeFreq = params['freq'];
-      this.routeSearch = params['search'];
-      console.log('route search', this.routeSearch)
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
           this.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
@@ -93,16 +74,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           this.initSearch(this.routeSearch);
         }
       } else {
-        if (isNaN(this.id)) {
-          this.id = 42;
-          this.initContent(42);
-        } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
-          this.initContent(this.id);
-        } else {
+        if (this.routeGeo && this.routeFreq) {
           this.initContent(this.id, this.routeGeo, this.routeFreq);
+        } else {
+          this.initContent(this.id);
         }
       }
-    }); */
+    });
   }
 
   ngOnDestroy() {
@@ -157,9 +135,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     }
 
     let i = 0;
+    let displaySeries = [];
     searchSeries.forEach((series, index) => {
       this._uheroAPIService.fetchObservations(searchSeries[index].id).subscribe((obs) => {
         searchSeries[index].seriesObservations = obs;
+        if (searchSeries[index].geography.handle === this.currentGeo.handle && searchSeries[index].frequencyShort === this.currentFreq.freq) {
+          displaySeries.push(searchSeries[index]);
+        }
         i += 1;
       },
       (error) => {
@@ -167,9 +149,19 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       },
       () => {
         if (i === searchSeries.length) {
+          displaySeries.forEach((serie, index) => {
+            if (dateWrapper.firstDate === '' || searchSeries[index].seriesObservations.start < dateWrapper.firstDate) {
+              dateWrapper.firstDate = searchSeries[index].seriesObservations.start;
+            }
+            if (dateWrapper.endDate === '' || searchSeries[index].seriesObservations.start > dateWrapper.endDate) {
+              dateWrapper.endDate = searchSeries[index].seriesObservations.end;
+            }
+          });
+          this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, this.currentFreq.freq, dateArray);
           let data = this._helper.searchTransform(searchSeries, dateArray, dateWrapper, this.currentGeo.handle, this.currentFreq.freq);
-          this.seriesData.push({dateWrapper: dateWrapper, series: data});
-          this.selectedCategory = search;
+          let sublist = {name: this.routeSearch, dateRange: dateArray};
+          this.seriesData.push({dateWrapper: dateWrapper, series: data, sublist: sublist});
+          this.selectedCategory = this.routeSearch;
           console.log(this.seriesData);
         }
       });
@@ -300,7 +292,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // Redraw series when a new region is selected
   redrawSeriesGeo(event) {
     this.geoHandle = event.handle;
-    this._router.navigate(['/category'], {queryParams: {id: this.id, geo: this.geoHandle, freq: this.currentFreq.freq} });
+    if (this.routeSearch) {
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, geo: this.geoHandle, freq: this.currentFreq.freq} });
+    } else {
+      this._router.navigate(['/category'], {queryParams: {id: this.id, geo: this.geoHandle, freq: this.currentFreq.freq} });
+    }
     /* if (this.routeSearch) {
       this._router.navigate(['/category/search/' + this.routeSearch + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
     } else {
@@ -310,7 +306,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
 
   redrawSeriesFreq(event) {
     this.freqHandle = event.freq;
-    this._router.navigate(['/category'], {queryParams: {id: this.id, geo: this.currentGeo.handle, freq: this.freqHandle} });
+    if (this.routeSearch) {
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, geo: this.currentGeo.handle, freq: this.freqHandle} });
+    } else {
+      this._router.navigate(['/category'], {queryParams: {id: this.id, geo: this.currentGeo.handle, freq: this.freqHandle} });
+    }
     /* if (this.routeSearch) {
       this._router.navigate(['/category/search/' + this.routeSearch + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
     } else {
