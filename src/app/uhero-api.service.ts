@@ -311,13 +311,14 @@ function combineObsData(level, yoy, ytd) {
     for (let i = 0; i < level.length; i++) {
       table[i].yoyValue = ' ';
       table[i].ytdValue = ' ';
-      // table[i].value = parseFloat((+level[i].value).toFixed(2));
-      table[i].value = formatNum(+level[i].value, 2);
+      // table[i].value = formatNum(+level[i].value, 2);
+      table[i].value = +level[i].value;
       for (let j = 0; j < yoy.length; j++) {
         if (level[i].date === yoy[j].date) {
-          // table[i].yoyValue = parseFloat((+yoy[j].value).toFixed(2));
-          table[i].yoyValue = formatNum(+yoy[j].value, 2);
-          table[i].ytdValue = formatNum(+ytd[j].value, 2)
+          // table[i].yoyValue = formatNum(+yoy[j].value, 2);
+          table[i].yoyValue = +yoy[j].value;
+          // table[i].ytdValue = formatNum(+ytd[j].value, 2)
+          table[i].ytdValue = +ytd[j].value;
           break;
         }
       }
@@ -328,7 +329,8 @@ function combineObsData(level, yoy, ytd) {
     for (let i = 0; i < level.length; i++) {
       table[i].yoyValue = ' ';
       table[i].ytdValue = ' ';
-      table[i].value = formatNum(+level[i].value, 2);
+      // table[i].value = formatNum(+level[i].value, 2);
+      table[i].value = +level[i].value;
     }
     return table;
   }

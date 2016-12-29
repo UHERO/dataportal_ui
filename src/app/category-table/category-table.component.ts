@@ -57,20 +57,17 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    // Get (optional) query parameters from URL
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
       if (this.id) this.queryParams.id = this.id;
+      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
       if (this.routeGeo) this.queryParams.geo = this.routeGeo;
       if (this.routeFreq) this.queryParams.freq = this.routeFreq;
-      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
-      /* console.log('id', this.id);
-      console.log('geo', this.routeGeo);
-      console.log('freq', this.routeFreq);
-      console.log('search', this.routeSearch);
-      console.log('params', params); */
+
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
           this.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
@@ -85,29 +82,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    /* this.route.params.subscribe(params => {
-      this.id = Number.parseInt(params['id']);
-      this.routeGeo = params['geo'];
-      this.routeFreq = params['freq'];
-      this.routeSearch = params['search'];
-      console.log('route search', this.routeSearch)
-      if (this.routeSearch) {
-        if (this.routeGeo && this.routeFreq) {
-          this.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
-        } else {
-          this.initSearch(this.routeSearch);
-        }
-      } else {
-        if (isNaN(this.id)) {
-          this.id = 42;
-          this.initContent(42);
-        } else if (this.routeGeo === undefined && this.routeFreq === undefined) {
-          this.initContent(this.id);
-        } else {
-          this.initContent(this.id, this.routeGeo, this.routeFreq);
-        }
-      }
-    }); */
   }
 
   ngAfterViewChecked() {
@@ -122,7 +96,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     this.sub.unsubscribe();
   }
 
-    // Set up search results
+  // Set up search results
   initSearch(search: string, routeGeo?: string, routeFreq?: string) {
     let geoArray = [];
     let freqArray = [];
@@ -170,6 +144,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     }
 
     let i = 0;
+    // Display series that match the currently selected region/Frequency
     let displaySeries = [];
     searchSeries.forEach((series, index) => {
       this._uheroAPIService.fetchObservations(searchSeries[index].id).subscribe((obs) => {
@@ -184,6 +159,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       },
       () => {
         if (i === searchSeries.length) {
+          // Set date wrapper based on start/end dates of series returned from search
           displaySeries.forEach((serie, index) => {
             if (dateWrapper.firstDate === '' || searchSeries[index].seriesObservations.start < dateWrapper.firstDate) {
               dateWrapper.firstDate = searchSeries[index].seriesObservations.start;
@@ -328,11 +304,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     this.userEvent = false;
     this.geoHandle = event.handle;
     this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: this.geoHandle, freq: this.currentFreq.freq} });
-    /* if (this.routeSearch) {
-      this._router.navigate(['/category/table/search/' + this.routeSearch + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
-    } else {
-      this._router.navigate(['/category/table/' + this.id + '/' + this.geoHandle + '/' + this.currentFreq.freq]);
-    } */
   }
 
   redrawTableFreq(event) {
@@ -340,11 +311,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     this.userEvent = false;
     this.freqHandle = event.freq;
     this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: this.currentGeo.handle, freq: this.freqHandle} });
-    /* if (this.routeSearch) {
-      this._router.navigate(['/category/table/search/' + this.routeSearch + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
-    } else {
-      this._router.navigate(['/category/table/' + this.id + '/' + this.currentGeo.handle + '/' + this.freqHandle]);
-    } */
   }
 
   onSearch(event) {
