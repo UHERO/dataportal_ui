@@ -315,7 +315,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   onSearch(event) {
     console.log('search results', event);
-    this._router.navigate(['/category/table/search'], {queryParams: {search: event} })
+    this._router.navigate(['/category/search'], {queryParams: {search: event} })
   }
 
 

@@ -5,8 +5,6 @@
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
     <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
-    <!-- <a [routerLink]="(routeGeo && routeFreq)? ['/category/table', id, routeGeo, routeFreq] : ['/category/table', id]" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a> -->
-    <!-- a [routerLink]="(routeSearch)? ['/category/table/search', {search: routeSearch, geo: routeGeo, freq: routeFreq}] : ['/category/table', {id: id, geo: routeGeo, freq: routeFreq}]" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a> -->
   </div>
   <template [ngIf]="sublist.length > 1">
     <ul class="content-links">

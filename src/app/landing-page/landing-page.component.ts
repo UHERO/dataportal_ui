@@ -53,7 +53,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Get (optional) query parameters from URL
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
@@ -161,7 +160,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           let sublist = {name: this.routeSearch, dateRange: dateArray};
           this.seriesData.push({dateWrapper: dateWrapper, series: data, sublist: sublist});
           this.selectedCategory = this.routeSearch;
-          console.log(this.seriesData);
         }
       });
     },
@@ -181,7 +179,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
         if (categories[index]['id'] === catId) {
           this.selectedCategory = categories[index]['name'];
           this.sublist = categories[index]['children'];
-          console.log('sublist', this.sublist)
 
           // Get a sublist's default geo/freq if available
           if (categories[index]['defaults']) {
@@ -198,7 +195,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
           });
         } else {
-          return
+          return;
         }
       },
       this.seriesData = []);
@@ -267,7 +264,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
           // Fetch data for current region/frequency settings
           this._uheroAPIService.fetchExpanded(sublistIndex['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((expanded) => {
             this.expandedResults = expanded;
-            console.log('expanded results', this.expandedResults);
           },
           (error) => {
             error = this.errorMessage = error;
@@ -277,7 +273,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
               let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
               sublistIndex.dateRange = dateArray;
               this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
-              console.log('seriesData', this.seriesData)
             } else {
               let series = [{seriesInfo: 'No data available'}];
               this.seriesData.push({sublist: sublistIndex, series: series})

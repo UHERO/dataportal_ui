@@ -159,4 +159,9 @@ export class SingleSeriesComponent implements OnInit {
 
     this.newTableData = this.seriesTableData.slice(tableStart, tableEnd + 1);
   }
+
+  onSearch(event) {
+    console.log('search results', event);
+    this._router.navigate(['/category/search'], {queryParams: {search: event} })
+  }
 }

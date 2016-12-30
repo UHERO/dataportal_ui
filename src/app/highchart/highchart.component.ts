@@ -219,10 +219,28 @@ export class HighchartComponent implements OnInit {
   }
 
   render(event) {
+    console.log('chart', event);
     this.chart = event;
     // Prevent tooltip from being hidden
-    this.chart.tooltip.hide = function(){};
-
+    this.chart.tooltip.hide = function(){
+      /* let lastHoverPoint = {'lastHover': []}
+      let hover = this.chart.tooltip.chart.hoverPoints;
+      if (hover !== null && hover.length !== 0) {
+        lastHoverPoint.lastHover = hover;
+      } else {
+        return;
+      } */
+      // this.chart.options.series.push({data: lastHoverPoint.lastHover[0].x});
+    };
+    this.chart.series.forEach((series, index) => {
+      console.log(this.chart.series[index]);
+      if (this.chart.series[index].stateMarkerGraphic) {
+        this.chart.series[index].stateMarkerGraphic.hide = function(){};
+        this.chart.series[index].stateMarkerGraphic.destroy = function(){}
+      }
+      this.chart.series[index].markerGroup.hide = function(){};
+      // this.chart.series[index].stateMarkerGraphic.hide = function() {}
+    });
     // Display tooltip when chart loads
     let level = this.chart.series[0];
     let ytd = this.chart.series[1];
