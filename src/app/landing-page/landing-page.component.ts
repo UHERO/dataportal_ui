@@ -176,6 +176,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       if (searchReults) {
         let series = this._helper.dataTransform(searchReults, dateArray, dateWrapper);
         let sublist = {name: this.routeSearch, dateRange: dateArray};
+        this.selectedCategory = this.routeSearch;
         this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: series});
       };
     });

@@ -15,7 +15,7 @@
     </label>
   </div>
   <div *ngFor="let series of seriesData" class="table-row">
-    <ul class="content-links" [attr.id]="'id_' + series['sublist']['id']">
+    <ul class="content-links" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">
       <li *ngFor="let sub of sublist">
         <a [routerLink]="['/category/table']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
       </li>
