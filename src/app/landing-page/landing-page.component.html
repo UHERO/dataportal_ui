@@ -1,25 +1,30 @@
-<div class="multi-series-container">
-  <p class="top-anchor" id="top"></p>
-  <h2 class="selected-category">{{selectedCategory}}</h2>
+<app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
+<div class="multi-series-container" (searchItem)="search(searchItem)">
+  <h2 class="selected-category" id="id_top">{{selectedCategory}}</h2>
   <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeriesGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
-    <a [routerLink]="(routeGeo && routeFreq)? ['/category/table', id, routeGeo, routeFreq] : ['/category/table', id]" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
+    <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
   </div>
-  <template [ngIf]="sublist.length > 1">
+  <!-- <template [ngIf]="sublist.length > 1">
     <ul class="content-links">
       <li *ngFor="let sub of sublist">
-        <a [routerLink]="" (click)="scrollTo(sub.id)">{{sub.name}}</a>
+        <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()">{{sub.name}}</a>
       </li>
     </ul>
-  </template>
+  </template> -->
   <div *ngFor="let series of seriesData" class="multi-charts-row">
-    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="" (click)="scrollTo('top')"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <!-- <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="['/category']" [queryParams]="queryParams" fragment="top" (click)="scrollTo()"><i class="material-icons md-18">arrow_upward</i></a></h3> -->
+    <ul class="content-links" [attr.id]="'id_' + series['sublist']['id']">
+      <li *ngFor="let sub of sublist">
+        <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
+      </li>
+    </ul>
     <hr class="sublist-separator">
     <template ngFor let-serie [ngForOf]="series['series']">
-      <p *ngIf="!serie['serie']['id']"> No Data Available </p>
-      <div *ngIf="serie['serie']['seasonallyAdjusted'] != false" class="multi-charts">
-        <a href="#" [routerLink]="['/series', serie['serie']['id']]" *ngIf="serie['serie']['id']">
+      <p *ngIf="!serie['seriesInfo']['id']"> No Data Available </p>
+      <div *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false" class="multi-charts">
+        <a href="#" [routerLink]="['/series', serie['seriesInfo']['id']]" *ngIf="serie['seriesInfo']['id']">
           <app-highchart [seriesData]="serie" [currentFreq]="currentFreq"></app-highchart>
         </a>
       </div>

@@ -41,28 +41,4 @@ export class SidebarNavComponent implements OnInit, Input {
     // Expands top level category
     this.expand = this.expand === expand ? null : expand;
   }
-
-  /* expandSublist(expand: string, cat, childCat, subcat: string, catId: number): void {
-    // Keep top level category expanded
-    this.expandItem(expand, cat);
-
-    // Adds class of selected to a sublist on click
-    this.selectedSublist = childCat;
-
-    // Expand subcategory list with series
-    this.subcat = this.subcat === subcat ? null : subcat;
-
-    // Get series to append to subcategory
-    this.expandSeries(catId);
-  }
-
-  expandSeries(catId: number) {
-    this._uheroAPIService.fetchSeries(catId).subscribe(
-      series => this.series = series,
-      error => this.errorMessage = error
-    );
-    // Clear array of series
-    // Prevents series from displaying under the wrong category while loading
-    this.series = [];
-  } */
 }

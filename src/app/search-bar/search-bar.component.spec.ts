@@ -1,11 +1,11 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async } from '@angular/core/testing';
-import { CategoryTableComponent } from './category-table.component';
+import { SearchBarComponent } from './search-bar.component';
 
-/* describe('Component: CategoryTable', () => {
+describe('Component: SearchBar', () => {
   it('should create an instance', () => {
-    let component = new CategoryTableComponent();
+    let component = new SearchBarComponent();
     expect(component).toBeTruthy();
   });
-}); */
+});

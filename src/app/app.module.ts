@@ -19,6 +19,7 @@ import { HighchartComponent } from './highchart/highchart.component';
 import { FreqSelectorComponent } from './freq-selector/freq-selector.component';
 import { HighstockComponent } from './highstock/highstock.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
+import { SearchBarComponent } from './search-bar/search-bar.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { CategoryTableComponent } from './category-table/category-table.componen
     FreqSelectorComponent,
     HighstockComponent,
     CategoryTableComponent,
+    SearchBarComponent,
   ],
   imports: [
     BrowserModule,

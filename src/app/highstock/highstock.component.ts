@@ -28,6 +28,7 @@ Highcharts.setOptions({
 export class HighstockComponent implements OnInit {
   @Input() chartData;
   @Input() currentFreq;
+  @Input() currentGeo;
   @Input() seriesDetail;
 
   // Async EventEmitter, emit chart extremes on load and when selecting a new range using the range selector
@@ -43,9 +44,10 @@ export class HighstockComponent implements OnInit {
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
     let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
     let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
-    let dataFreq = this.currentFreq.freq;
+    let dataFreq = this.currentFreq;
+    let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
   }
 
   ngOnChanges() {
@@ -55,13 +57,14 @@ export class HighstockComponent implements OnInit {
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
     let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
     let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
-    let dataFreq = this.currentFreq.freq;
+    let dataFreq = this.currentFreq;
+    let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
   }
 
 
-  drawChart(level, yoy, name, units, change, freq, yoyLabel) {
+  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -132,6 +135,14 @@ export class HighstockComponent implements OnInit {
               align: 'right',
               verticalAlign: 'bottom'
             }
+          },
+          title: {
+            text: name + ' (' + geo.name + ', ' + freq.label + ')',
+            align: 'left',
+            style: {
+              color: '#1D667F',
+              fontFamily: 'Lucida Sans'
+            }
           }
         }
       },
@@ -141,19 +152,19 @@ export class HighstockComponent implements OnInit {
         valueDecimals: 2,
         formatter: function () {
           let s = '<b>';
-          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
+          if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1'
           };
-          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
+          if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
             s = s + 'Q2'
           };
-          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
+          if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
             s = s + 'Q3'
           };
-          if (freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
+          if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
             s = s + 'Q4'
           };
-          if (freq === 'M') {
+          if (freq.freq === 'M') {
             s = s + Highcharts.dateFormat('%b', this.x);
           }
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';

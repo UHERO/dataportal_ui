@@ -19,6 +19,7 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
+  private cachedExpanded = [];
   private cachedSelectedCategory = [];
   // private cachedChartData = [];
   private cachedMultiChartData = [];
@@ -31,6 +32,9 @@ export class UheroApiService {
   private cachedSiblings = [];
   private cachedSiblingFreqs = [];
   private cachedSiblingGeos = [];
+  private cachedSearch = [];
+  private cachedSearchExpand = [];
+  private cachedSearchFilters = [];
   private errorMessage: string;
 
   constructor(private http: Http) {
@@ -55,6 +59,21 @@ export class UheroApiService {
           categories$ = null;
         });
       return categories$;
+    }
+  }
+
+  // Gets observations for series in a (sub) category
+  fetchExpanded(id: number, geo: string, freq:string): Observable<any> {
+    if (this.cachedExpanded[id + geo + freq]) {
+      return Observable.of(this.cachedExpanded[id + geo + freq]);
+    } else {
+      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedExpanded[id + geo + freq] = val;
+          expanded$ = null;
+        });
+      return expanded$;
     }
   }
 
@@ -190,6 +209,48 @@ export class UheroApiService {
     }
   }
 
+  fetchSearchFilters(search: string) {
+    if (this.cachedSearchFilters[search]) {
+      return Observable.of(this.cachedSearchFilters[search]);
+    } else {
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearchFilters[search] = val;
+          filters$ = null;
+        });
+      return filters$;
+    }
+  }
+
+  fetchSearchSeries(search: string): Observable<Series[]> {
+    if (this.cachedSearchExpand[search]) {
+      return Observable.of(this.cachedSearchExpand[search]);
+    } else {
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearchExpand[search] = val;
+          search$ = null;
+        });
+      return search$;
+    }
+  }
+
+  fetchSearchSeriesExpand(search: string, geo: string, freq: string): Observable<Series[]> {
+    if (this.cachedSearchExpand[search + geo + freq]) {
+      return Observable.of(this.cachedSearchExpand[search + geo +freq]);
+    } else {
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearchExpand[search + geo + freq] = val;
+          search$ = null;
+        });
+      return search$;
+    }
+  }
+
   // Gets observation data for a series
   fetchObservations(id: number) {
     if (this.cachedObservations[id]) {
@@ -203,59 +264,7 @@ export class UheroApiService {
         });
       return observations$;
     }
-
   }
-
-  // Get series and observation data for landing page component charts; filtered by region
-  fetchMultiChartData(id: number, geo: string, freq: string, dates: Array<any>, dateWrapper: dateWrapper) {
-    if (this.cachedMultiChartData[id + geo + freq]) {
-      return this.cachedMultiChartData[id + geo + freq];
-    } else {
-      let multiChartData = [];
-      this.fetchSeries(id, geo, freq).subscribe((series) => {
-        let seriesData = series;
-        if (seriesData !== null) {
-          seriesData.forEach((serie, index) => {
-            this.fetchObservations(+seriesData[index]['id']).subscribe((obs) => {
-              let seriesObservations = obs;
-              let categoryTable = catTable(seriesObservations, dates, dateWrapper);
-              multiChartData.push({'serie': seriesData[index], 'observations': seriesObservations, 'dateWrapper': dateWrapper, 'category table': categoryTable});
-            });
-          });
-        } else {
-          multiChartData.push({'serie': 'No data available'});
-        }
-      },
-      error => this.errorMessage = error);
-      this.cachedMultiChartData[id + geo + freq] = Observable.forkJoin(Observable.of(multiChartData));
-      return this.cachedMultiChartData[id + geo + freq];
-    }
-  }
-
-  // End get data from API
-}
-
-// create array of dates & values to be used for the category level table view
-function catTable(seriesObservations: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
-  let results = [];
-  for (let i = 0; i < dateRange.length; i++) {
-    results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'level': '', 'yoy': '', 'ytd': ''});
-      for (let j = 0; j < seriesObservations['table data'].length; j++) {
-        if (dateWrapper.firstDate === '' || seriesObservations['table data'][j]['date'] < dateWrapper.firstDate) {
-          dateWrapper.firstDate = seriesObservations['table data'][j]['date'];
-        } 
-        if (dateWrapper.endDate === '' || seriesObservations['table data'][j]['date'] > dateWrapper.endDate) {
-          dateWrapper.endDate = seriesObservations['table data'][j]['date'];
-        }
-        if (results[i].date === seriesObservations['table data'][j]['date']) {
-          results[i].level = seriesObservations['table data'][j]['value'];
-          results[i].yoy = seriesObservations['table data'][j]['yoyValue'];
-          results[i].ytd = seriesObservations['table data'][j]['ytdValue'];
-          break;
-        }
-      }
-    }
-  return results;
 }
 
 // Create a nested JSON of parent and child categories
@@ -332,13 +341,14 @@ function combineObsData(level, yoy, ytd) {
     for (let i = 0; i < level.length; i++) {
       table[i].yoyValue = ' ';
       table[i].ytdValue = ' ';
-      // table[i].value = parseFloat((+level[i].value).toFixed(2));
-      table[i].value = formatNum(+level[i].value, 2);
+      // table[i].value = formatNum(+level[i].value, 2);
+      table[i].value = +level[i].value;
       for (let j = 0; j < yoy.length; j++) {
         if (level[i].date === yoy[j].date) {
-          // table[i].yoyValue = parseFloat((+yoy[j].value).toFixed(2));
-          table[i].yoyValue = formatNum(+yoy[j].value, 2);
-          table[i].ytdValue = formatNum(+ytd[j].value, 2)
+          // table[i].yoyValue = formatNum(+yoy[j].value, 2);
+          table[i].yoyValue = +yoy[j].value;
+          // table[i].ytdValue = formatNum(+ytd[j].value, 2)
+          table[i].ytdValue = +ytd[j].value;
           break;
         }
       }
@@ -349,7 +359,8 @@ function combineObsData(level, yoy, ytd) {
     for (let i = 0; i < level.length; i++) {
       table[i].yoyValue = ' ';
       table[i].ytdValue = ' ';
-      table[i].value = formatNum(+level[i].value, 2);
+      // table[i].value = formatNum(+level[i].value, 2);
+      table[i].value = +level[i].value;
     }
     return table;
   }

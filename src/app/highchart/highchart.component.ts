@@ -23,16 +23,17 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    let level = this.seriesData['observations']['chart data']['level'];
-    let ytd = this.seriesData['observations']['chart data']['ytd'];
-    let title = this.seriesData['serie']['title'] === undefined? this.seriesData['serie']['name'] : this.seriesData['serie']['title'];
+    // console.log('highcharts', this.seriesData);
+    let level = this.seriesData.chartData.level;
+    let ytd = this.seriesData.chartData.ytd;
+    let title = this.seriesData.seriesInfo.title === undefined? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     let dataFreq = this.currentFreq.freq;
-    this.SA = this.seriesData['serie']['seasonallyAdjusted'] === true? true : false;
-    this.dataAvail = this.seriesData['series'] === 'No data available'? false : true;
-    if (this.seriesData['serie'] === 'No data available' || level.length === 0) {
+    this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true? true : false;
+    this.dataAvail = this.seriesData.seriesInfo === 'No data available'? false : true;
+    if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      let unitsShort = this.seriesData['serie']['unitsLabelShort'];
+      let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
       this.drawChart(title, level, ytd, dataFreq);
     }
   }
@@ -61,6 +62,7 @@ export class HighchartComponent implements OnInit {
         },
         shadow: false,
         borderWidth: 0,
+        valueDecimals: 2,
         shared: true,
         backgroundColor: 'transparent',
         // backgroundColor: 'rgba(247, 247, 247, 0.5)',
@@ -219,7 +221,25 @@ export class HighchartComponent implements OnInit {
   render(event) {
     this.chart = event;
     // Prevent tooltip from being hidden
-    this.chart.tooltip.hide = function(){};
+    this.chart.tooltip.hide = function(){
+      // Get last points hovered over
+      let lastHoverPoint = {'lastHover': []}
+      let hover = this.chart.tooltip.chart.hoverPoints;
+      if (hover !== null && hover.length !== 0) {
+        lastHoverPoint.lastHover = hover;
+      } else {
+        return;
+      }
+      let levelData = this.chart.series[0].data;
+      let xHover = lastHoverPoint.lastHover[0].x;
+      let yHover = lastHoverPoint.lastHover[0].y;
+      // If lastHoverPoint matches level data, set state to 'hover' to prevent marker from disappearing
+      levelData.forEach((lev, index) => {
+        if (levelData[index].x === xHover && levelData[index].y === yHover) {
+          levelData[index].setState('hover');
+        }
+      })
+    };
 
     // Display tooltip when chart loads
     let level = this.chart.series[0];

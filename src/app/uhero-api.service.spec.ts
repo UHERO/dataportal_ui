@@ -100,7 +100,7 @@ describe('Service: UheroApi', () => {
     it('should have expected fake series data', async(inject([], () => {
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(response));
 
-      service.fetchSeries(1)
+      service.fetchSeries(1, 'HI', 'A')
         .do(series => {
           expect(series.length).toBeGreaterThan(0);
         });

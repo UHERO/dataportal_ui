@@ -1,0 +1,24 @@
+.search-bar {
+  float: right;
+
+  .form-control {
+    padding: 0.25rem 1rem;
+  }
+
+  .btn {
+    line-height: 1.15;
+    padding: 0.25rem 1rem;
+    background-color: #1D667F;
+    
+    .material-icons.md-18 {
+      font-size: 18px;
+      color: #FFFFFF;
+      // color: #1D667F;
+      vertical-align: middle;
+    }
+  }
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
