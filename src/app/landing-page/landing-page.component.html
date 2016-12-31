@@ -6,15 +6,20 @@
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeriesFreq($event)" class="selector"></app-freq-selector>
     <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
   </div>
-  <template [ngIf]="sublist.length > 1">
+  <!-- <template [ngIf]="sublist.length > 1">
     <ul class="content-links">
       <li *ngFor="let sub of sublist">
         <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()">{{sub.name}}</a>
       </li>
     </ul>
-  </template>
+  </template> -->
   <div *ngFor="let series of seriesData" class="multi-charts-row">
-    <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="['/category']" [queryParams]="queryParams" fragment="top" (click)="scrollTo()"><i class="material-icons md-18">arrow_upward</i></a></h3>
+    <!-- <h3 class="sublist" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">{{series['sublist']['name']}} <a *ngIf="sublist.length > 1" [routerLink]="['/category']" [queryParams]="queryParams" fragment="top" (click)="scrollTo()"><i class="material-icons md-18">arrow_upward</i></a></h3> -->
+    <ul class="content-links" [attr.id]="'id_' + series['sublist']['id']">
+      <li *ngFor="let sub of sublist">
+        <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
+      </li>
+    </ul>
     <hr class="sublist-separator">
     <template ngFor let-serie [ngForOf]="series['series']">
       <p *ngIf="!serie['seriesInfo']['id']"> No Data Available </p>
