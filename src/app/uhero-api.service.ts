@@ -33,6 +33,8 @@ export class UheroApiService {
   private cachedSiblingFreqs = [];
   private cachedSiblingGeos = [];
   private cachedSearch = [];
+  private cachedSearchExpand = [];
+  private cachedSearchFilters = [];
   private errorMessage: string;
 
   constructor(private http: Http) {
@@ -207,15 +209,43 @@ export class UheroApiService {
     }
   }
 
-  fetchSearchSeries(search: string): Observable<Series[]> {
-    if (this.cachedSearch[search]) {
-      return Observable.of(this.cachedSearch[search]);
+  fetchSearchFilters(search: string) {
+    if (this.cachedSearchFilters[search]) {
+      return Observable.of(this.cachedSearchFilters[search]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/series?search_text=` + search, this.requestOptionsArgs)
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
-          this.cachedSearch[search] = val;
-          search$ = null
+          this.cachedSearchFilters[search] = val;
+          filters$ = null;
+        });
+      return filters$;
+    }
+  }
+
+  fetchSearchSeries(search: string): Observable<Series[]> {
+    if (this.cachedSearchExpand[search]) {
+      return Observable.of(this.cachedSearchExpand[search]);
+    } else {
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearchExpand[search] = val;
+          search$ = null;
+        });
+      return search$;
+    }
+  }
+
+  fetchSearchSeriesExpand(search: string, geo: string, freq: string): Observable<Series[]> {
+    if (this.cachedSearchExpand[search + geo + freq]) {
+      return Observable.of(this.cachedSearchExpand[search + geo +freq]);
+    } else {
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSearchExpand[search + geo + freq] = val;
+          search$ = null;
         });
       return search$;
     }

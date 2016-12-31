@@ -35,6 +35,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   private expandedResults = [];
 
   // Variables for geo and freq selectors
+  private defaults;
+  private geoFreqs;
+  private freqGeos;
   private geoHandle: string;
   private freqHandle: string;
   private defaultFreq: string;
@@ -88,82 +91,94 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     let geoArray = [];
     let freqArray = [];
 
-    this._uheroAPIService.fetchSearchSeries(search).subscribe((series) => {
-      let searchSeries = series;
-      let dateWrapper = {firstDate: '', endDate: ''};
-      this.searchSettings(search, searchSeries, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+    this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
+      let searchFilters = filters;
+      this.defaults = searchFilters.defaults;
+      this.freqGeos = searchFilters.freqGeos;
+      this.geoFreqs = searchFilters.geoFreqs;
+    },
+    (error) => {
+      error = this.errorMessage = error;
+    },
+    () => {
+      this._uheroAPIService.fetchSearchSeries(search).subscribe((series) => {
+        let allResults = series;
+        let dateWrapper = {firstDate: '', endDate: ''};
+        this.searchSettings(search, allResults, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+      });
     });
   }
 
-  searchSettings(search: string, searchSeries: Array<any>, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
+  searchSettings(search: string, allResults: Array<any>, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-    searchSeries.forEach((series, index) => {
-      this._helper.uniqueGeos(searchSeries[index].geography, regions);
-      this._helper.uniqueFreqs({freq: searchSeries[index].frequencyShort, label: searchSeries[index].frequency}, freqs);
+    let selectedFreq = routeFreq? routeFreq : this.defaults.freq;
+    let selectedGeo = routeGeo? routeGeo : this.defaults.geo;
+    // Get all frequencies and regions available in all search results  
+    allResults.forEach((series, index) => {
+      this._helper.uniqueGeos(allResults[index].geography, regions);
+      this._helper.uniqueFreqs({freq: allResults[index].frequencyShort, label: allResults[index].frequency}, freqs);
     });
-    this.regions = regions;
-    this.freqs = freqs;
-
-    // If geo. is available as URL param, use as current geo.
-    if (routeGeo) {
-      this.regions.forEach((geo, index) => {
-        if (routeGeo === this.regions[index].handle) {
-          this.currentGeo = this.regions[index];
+    // Check that region & frequency combinations are available
+    let availRegions = [];
+    for (let i = 0; i < regions.length; i++) {
+      for (let j = 0; j < this.freqGeos[selectedFreq].length; j++) {
+        if (regions[i].handle === this.freqGeos[selectedFreq][j]) {
+          availRegions.push(regions[i]);
         }
-      });
-    } else {
-      this.regions.forEach((geo, index) => {
-        this.currentGeo = this.regions[0];
-      });
+      }
     }
-
-    // If freq. is available as URL param, use as current freq.
-    if (this.routeFreq) {
-      this.freqs.forEach((freq, index) => {
-        if (routeFreq === this.freqs[index].freq) {
-          this.currentFreq = this.freqs[index];
+    let availFreqs = [];
+    for (let i = 0; i < freqs.length; i++) {
+      for (let j = 0; j < this.geoFreqs[selectedGeo].length; j++) {
+        if (freqs[i].freq === this.geoFreqs[selectedGeo][j]) {
+          availFreqs.push(freqs[i]);
         }
-      });
-    } else {
-      this.freqs.forEach((freq, index) => {
-        this.currentFreq = this.freqs[0];
-      })
+      }
     }
+    this.regions = availRegions;
+    this.freqs = availFreqs;
 
-    let i = 0;
-    // Display series that match the currently selected region/Frequency
-    let displaySeries = [];
-    searchSeries.forEach((series, index) => {
-      this._uheroAPIService.fetchObservations(searchSeries[index].id).subscribe((obs) => {
-        searchSeries[index].seriesObservations = obs;
-        if (searchSeries[index].geography.handle === this.currentGeo.handle && searchSeries[index].frequencyShort === this.currentFreq.freq) {
-          displaySeries.push(searchSeries[index]);
-        }
-        i += 1;
-      },
-      (error) => {
-        error = this.errorMessage = error;
-      },
-      () => {
-        if (i === searchSeries.length) {
-          // Set date wrapper based on start/end dates of series returned from search
-          displaySeries.forEach((serie, index) => {
-            if (dateWrapper.firstDate === '' || searchSeries[index].seriesObservations.start < dateWrapper.firstDate) {
-              dateWrapper.firstDate = searchSeries[index].seriesObservations.start;
-            }
-            if (dateWrapper.endDate === '' || searchSeries[index].seriesObservations.start > dateWrapper.endDate) {
-              dateWrapper.endDate = searchSeries[index].seriesObservations.end;
-            }
-          });
-          this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, this.currentFreq.freq, dateArray);
-          let data = this._helper.searchTransform(searchSeries, dateArray, dateWrapper, this.currentGeo.handle, this.currentFreq.freq);
-          let sublist = {name: this.routeSearch, dateRange: dateArray};
-          this.seriesData.push({dateWrapper: dateWrapper, series: data, sublist: sublist});
-          this.selectedCategory = this.routeSearch;
-        }
-      });
+    this.regions.forEach((geo, index) => {
+      if (selectedGeo === this.regions[index].handle) {
+        this.currentGeo = this.regions[index];
+      }
+    });
+
+    this.freqs.forEach((freq, index) => {
+      if (selectedFreq === this.freqs[index].freq) {
+        this.currentFreq = this.freqs[index];
+      }
+    });
+
+    this.getSearchData(search, selectedGeo, selectedFreq, dateArray, dateWrapper);
+  }
+
+  getSearchData(search: string, geo: string, freq: string, dateArray: Array<any>, dateWrapper: dateWrapper) {
+    let searchReults;
+    // Get expanded search results for a selected region & frequency
+    this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((search) => {
+      searchReults = search;
     },
-    this.seriesData = []);
+    (error) => {
+      error = this.errorMessage = error;
+    },
+    () => {
+      this.seriesData = [];
+      searchReults.forEach((search, index) => {
+        if (dateWrapper.firstDate === '' || searchReults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
+          dateWrapper.firstDate = searchReults[index].seriesObservations.observationStart;
+        }
+        if (dateWrapper.endDate === '' || searchReults[index].seriesObservations.observationEnd > dateWrapper.endDate) {
+          dateWrapper.endDate = searchReults[index].seriesObservations.observationEnd;
+        }
+      });
+      this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, this.currentFreq.freq, dateArray);
+      if (searchReults) {
+        let series = this._helper.dataTransform(searchReults, dateArray, dateWrapper);
+        let sublist = {name: this.routeSearch, dateRange: dateArray};
+        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: series});
+      };
+    });
   }
 
   // Called on page load
