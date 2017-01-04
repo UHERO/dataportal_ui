@@ -54,7 +54,7 @@ export class HighstockComponent implements OnInit {
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
     let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
     let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;

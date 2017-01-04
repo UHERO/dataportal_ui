@@ -17,8 +17,9 @@ export class FreqSelectorComponent implements OnInit {
   ngOnInit() {
   }
 
- onChange(newFreq) {
+ onChange(newFreq: Object) {
     this.selectedFreq = this.freqs.find(freq => freq.freq === newFreq);
+    console.log('dropdown selected', this.selectedFreq);
     this.selectedFreqChange.emit(this.selectedFreq);
   }
 }

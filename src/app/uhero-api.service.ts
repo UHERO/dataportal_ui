@@ -85,6 +85,7 @@ export class UheroApiService {
       let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
+          console.log('selected cat', val);
           this.cachedSelectedCategory[id] = val;
           selectedCat$ = null;
         });
