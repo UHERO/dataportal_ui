@@ -107,61 +107,48 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;
-      this.freqGeos = searchFilters.freqGeos;
-      this.geoFreqs = searchFilters.geoFreqs;
+      this.freqGeos = searchFilters.freq_geos;
+      this.geoFreqs = searchFilters.geo_freqs;
     },
     (error) => {
       error = this.errorMessage = error;
     },
     () => {
-      this._uheroAPIService.fetchSearchSeries(search).subscribe((series) => {
-        let allResults = series;
-        let dateWrapper = {firstDate: '', endDate: ''};
-        this.searchSettings(search, allResults, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
-      });
+      let dateWrapper = {firstDate: '', endDate: ''};
+      this.searchSettings(search, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
     });
   }
 
-  searchSettings(search: string, allResults: Array<any>, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
+  searchSettings(search: string, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-    let selectedFreq = routeFreq? routeFreq : this.defaults.freq;
-    let selectedGeo = routeGeo? routeGeo : this.defaults.geo;
-    // Get all frequencies and regions available in all search results    
-    allResults.forEach((series, index) => {
-      this._helper.uniqueGeos(allResults[index].geography, regions);
-      this._helper.uniqueFreqs({freq: allResults[index].frequencyShort, label: allResults[index].frequency}, freqs);
-    });
-    // Check that region & frequency combinations are available
-    let availRegions = [];
-    for (let i = 0; i < regions.length; i++) {
-      for (let j = 0; j < this.freqGeos[selectedFreq].length; j++) {
-        if (regions[i].handle === this.freqGeos[selectedFreq][j]) {
-          availRegions.push(regions[i]);
-        }
-      }
-    }
-    let availFreqs = [];
-    for (let i = 0; i < freqs.length; i++) {
-      for (let j = 0; j < this.geoFreqs[selectedGeo].length; j++) {
-        if (freqs[i].freq === this.geoFreqs[selectedGeo][j]) {
-          availFreqs.push(freqs[i]);
-        }
-      }
-    }
-    this.regions = availRegions;
-    this.freqs = availFreqs;
-
-    this.regions.forEach((geo, index) => {
-      if (selectedGeo === this.regions[index].handle) {
-        this.currentGeo = this.regions[index];
+    let selectedFreq = routeFreq? routeFreq : this.defaults.freq.freq;
+    let selectedGeo = routeGeo? routeGeo : this.defaults.geo.handle;
+    
+    // Get frequencies available for a selected region
+    this.geoFreqs.forEach((geo, index) => {
+      if (selectedGeo === this.geoFreqs[index].handle) {
+        this.freqs = this.geoFreqs[index].freqs;
       }
     });
 
-    this.freqs.forEach((freq, index) => {
-      if (selectedFreq === this.freqs[index].freq) {
-        this.currentFreq = this.freqs[index];
+    // Get regions available for a selected frequency
+    this.freqGeos.forEach((freq, index) => {
+      if (selectedFreq === this.freqGeos[index].freq) {
+        this.regions = this.freqGeos[index].geos;
       }
     });
+
+    if (selectedGeo) {
+      this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
+    } else {
+      this.currentGeo = this.regions[0];
+    }
+
+    if (selectedFreq) {
+      this.currentFreq = this.freqs.find(freq => freq.freq === selectedFreq);
+    } else {
+      this.currentFreq = this.freqs[0];
+    }
 
     this.getSearchData(search, selectedGeo, selectedFreq, dateArray, dateWrapper);
   }

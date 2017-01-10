@@ -1,11 +1,11 @@
 <app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
 <div class="category-tables">
   <h2 class="selected-category" id="id_top">{{selectedCategory}}</h2>
-  <div class="filters">
+  <!-- <div class="filters">
     <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
     <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
-  </div>
+  </div> -->
   <div class="table-checkboxes">
     <label class="form-check-inline">
       <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
@@ -20,6 +20,11 @@
         <a [routerLink]="['/category/table']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
       </li>
     </ul>
+    <div class="filters">
+      <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
+      <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
+      <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
+    </div>
     <hr class="sublist-separator">
     <div class="table" #tableScroll on-mouseover="userMouse()">
       <table class="category-table">
