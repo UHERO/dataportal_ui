@@ -220,32 +220,22 @@ export class HighchartComponent implements OnInit {
 
   render(event) {
     this.chart = event;
-    // Prevent tooltip from being hidden
-    this.chart.tooltip.hide = function(){
-      // Get last points hovered over
-      let lastHoverPoint = {'lastHover': []}
-      let hover = this.chart.tooltip.chart.hoverPoints;
-      if (hover !== null && hover.length !== 0) {
-        lastHoverPoint.lastHover = hover;
-      } else {
-        return;
+    let level = this.chart.series[0];
+    let ytd = this.chart.series[1];
+    let latestLevel = (level !== undefined) ? level.points.length - 1 : null;
+    let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+
+    // Prevent tooltip from being hidden on mouseleave
+    // Reset toolip value and marker to most recent observation
+    this.chart.tooltip.hide = function() {
+      if (latestLevel > 0 && latestYtd > 0) {
+        this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
+        console.log(level.points[latestLevel])
+        level.points[latestLevel].setState('hover');
       }
-      let levelData = this.chart.series[0].data;
-      let xHover = lastHoverPoint.lastHover[0].x;
-      let yHover = lastHoverPoint.lastHover[0].y;
-      // If lastHoverPoint matches level data, set state to 'hover' to prevent marker from disappearing
-      levelData.forEach((lev, index) => {
-        if (levelData[index].x === xHover && levelData[index].y === yHover) {
-          levelData[index].setState('hover');
-        }
-      })
     };
 
     // Display tooltip when chart loads
-    let level = this.chart.series[0];
-    let ytd = this.chart.series[1];
-    let latestLevel = (level !== undefined) ? level.points.length - 1 : null;;
-    let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
     if (latestLevel > 0 && latestYtd > 0) {
       this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
     }

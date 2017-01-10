@@ -6,14 +6,6 @@
     <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
     <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
   </div> -->
-  <div class="table-checkboxes">
-    <label class="form-check-inline">
-      <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
-    </label>
-    <label class="form-check-inline">
-      <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
-    </label>
-  </div>
   <div *ngFor="let series of seriesData" class="table-row">
     <ul class="content-links" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">
       <li *ngFor="let sub of sublist">
@@ -26,6 +18,14 @@
       <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
     </div>
     <hr class="sublist-separator">
+    <div class="table-checkboxes">
+      <label class="form-check-inline">
+        <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
+      </label>
+      <label class="form-check-inline">
+        <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
+      </label>
+    </div>
     <div class="table" #tableScroll on-mouseover="userMouse()">
       <table class="category-table">
           <tr>
