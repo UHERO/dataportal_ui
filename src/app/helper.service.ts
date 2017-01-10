@@ -45,9 +45,11 @@ export class HelperService {
         for (let j = 0; j < tableData.length; j++) {
           if (results[i].date === tableData[j]['date']) {
             // results[i].value = tableData[j]['value'];
-            results[i].value = this.formatNum(+tableData[j]['value'], 2);
+            //results[i].value = this.formatNum(+tableData[j]['value'], 2);
+            results[i].value = tableData[j]['value'] === ' ' ? ' ' : this.formatNum(+tableData[j]['value'], 2);
             // results[i].yoy = tableData[j]['yoyValue']
-            results[i].yoy = this.formatNum(+tableData[j]['yoyValue'], 2);
+            //results[i].yoy = this.formatNum(+tableData[j]['yoyValue'], 2);
+            results[i].yoy = tableData[j]['yoyValue'] === ' ' ? ' ' : this.formatNum(+tableData[j]['yoyValue'], 2)
             break;
           }
         }
