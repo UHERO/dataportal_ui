@@ -230,7 +230,6 @@ export class HighchartComponent implements OnInit {
     this.chart.tooltip.hide = function() {
       if (latestLevel > 0 && latestYtd > 0) {
         this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
-        console.log(level.points[latestLevel])
         level.points[latestLevel].setState('hover');
       }
     };

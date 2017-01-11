@@ -158,6 +158,8 @@ export class SingleSeriesComponent implements OnInit {
     }
 
     this.newTableData = this.seriesTableData.slice(tableStart, tableEnd + 1);
+
+    this._helper.summaryStats(this.newTableData);
   }
 
   onSearch(event) {

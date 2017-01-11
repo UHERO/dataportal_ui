@@ -44,18 +44,51 @@ export class HelperService {
         results.push({'date': dateRange[i]['date'], 'table date': dateRange[i]['table date'], 'value': ' ', 'yoy': ' ', 'ytd': ' '});
         for (let j = 0; j < tableData.length; j++) {
           if (results[i].date === tableData[j]['date']) {
-            // results[i].value = tableData[j]['value'];
-            //results[i].value = this.formatNum(+tableData[j]['value'], 2);
-            results[i].value = tableData[j]['value'] === ' ' ? ' ' : this.formatNum(+tableData[j]['value'], 2);
-            // results[i].yoy = tableData[j]['yoyValue']
-            //results[i].yoy = this.formatNum(+tableData[j]['yoyValue'], 2);
-            results[i].yoy = tableData[j]['yoyValue'] === ' ' ? ' ' : this.formatNum(+tableData[j]['yoyValue'], 2)
+            results[i].value = tableData[j]['value'];
+            results[i].formattedValue = tableData[j]['value'] === ' ' ? ' ' : this.formatNum(+tableData[j]['value'], 2);
+            results[i].yoy = tableData[j]['yoyValue']
+            results[i].formattedYoy = tableData[j]['yoyValue'] === ' ' ? ' ' : this.formatNum(+tableData[j]['yoyValue'], 2)
             break;
           }
         }
       }
       return results;
     }
+  }
+
+  // Get summary statistics for single series displays
+  // Min & Max values (and their dates) for the selected date range; (%) change from first to last observation; standard deviation
+  summaryStats(seriesData) {
+    let stats = {minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', change: Infinity, sd: Infinity};
+    let formatStats = {minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', change: '', sd: ''}
+    let levelSum = 0;
+    seriesData.forEach((item, index) => {
+      if (stats.minValue === Infinity || seriesData[index].value < stats.minValue) {
+        stats.minValue = seriesData[index].value;
+        stats.minValueDate  = seriesData[index].date;
+      }
+      if (stats.maxValue === Infinity || seriesData[index].value > stats.maxValue) {
+        stats.maxValue = seriesData[index].value;
+        stats.maxValueDate = seriesData[index].date;
+      }
+      levelSum += seriesData[index].value;
+    });
+
+    // Calculate standard deviation
+    let avg = levelSum / seriesData.length;
+    let sqDiff = 0;
+    seriesData.forEach((item, index) => {
+      sqDiff += (seriesData[index].value - avg) ^ 2;
+    });
+    console.log('average', avg);
+    stats.change = ((stats.maxValue - stats.minValue) / stats.minValue) * 100;
+    console.log('stats', stats)
+    formatStats.minValue = this.formatNum(stats.minValue, 2);
+    formatStats.minValueDate = stats.minValueDate;
+    formatStats.maxValue = this.formatNum(stats.maxValue, 2);
+    formatStats.maxValueDate = stats.maxValueDate;
+    formatStats.change = this.formatNum(stats.change, 2);
+    console.log('formatted stats', formatStats)
   }
 
   searchTransform(searchResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper, currentGeo, currentFreq) {

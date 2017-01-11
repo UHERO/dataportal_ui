@@ -7,7 +7,7 @@
 
   <p-dataTable [value]="newTableData" scrollable="true">
     <p-column field="table date" header="Date" [sortable]="true"></p-column>
-    <p-column field="value" header="Level"></p-column>
-    <p-column field="yoy" [header]=change></p-column>
+    <p-column field="formattedValue" header="Level"></p-column>
+    <p-column field="formattedYoy" [header]=change></p-column>
   </p-dataTable>
 </div>
