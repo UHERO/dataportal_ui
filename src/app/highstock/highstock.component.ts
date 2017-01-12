@@ -2,9 +2,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
-// const Highcharts = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/highstock.src');
-// const exporting = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/modules/exporting.src');
-const Highcharts = require('../../../node_modules/highcharts/highstock.src');
+const Highcharts = require('highcharts');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
 const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
