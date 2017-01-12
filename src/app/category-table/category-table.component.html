@@ -1,40 +1,43 @@
 <app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
 <div class="category-tables">
   <h2 class="selected-category" id="id_top">{{selectedCategory}}</h2>
-  <!-- <div class="filters">
-    <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
-    <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
-    <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
-  </div> -->
-  <div *ngFor="let series of seriesData" class="table-row">
-    <ul class="content-links" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">
-      <li *ngFor="let sub of sublist">
-        <a [routerLink]="['/category/table']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
-      </li>
-    </ul>
-    <div class="filters">
-      <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
-      <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
-      <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">view_list</i></a>
-    </div>
-    <hr class="sublist-separator">
-    <div class="table-checkboxes">
-      <label class="form-check-inline">
-        <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
-      </label>
-      <label class="form-check-inline">
-        <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
-      </label>
-    </div>
-    <div class="table" #tableScroll on-mouseover="userMouse()">
-      <table class="category-table">
-          <tr>
-          <th><b>Series</b></th>
-          <template ngFor let-date [ngForOf]="series['sublist']['dateRange']" let-i="index">
-            <td *ngIf="date['date'] >= series['dateWrapper']['firstDate'] && date['date'] <= series['dateWrapper']['endDate']"><b>{{date['table date']}}</b></td>
-          </template>
-          </tr>
-          <template ngFor let-serie [ngForOf]="series['series']">
+  <template ngFor let-sub [ngForOf]="sublist">
+    <template ngFor let-series [ngForOf]="seriesData">
+      <div class="table-row" *ngIf="sub['id'] === series['sublist']['id']">
+        <ul class="content-links" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">
+          <li *ngFor="let sub of sublist">
+            <a [routerLink]="['/category/table']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>
+          </li>
+        </ul>
+
+        <hr class="sublist-separator" *ngIf="sublist.length > 1">
+        <div class="table-checkboxes">
+          <label class="form-check-inline">
+            <input class="form-check-input" type="checkbox" (change)="yoyActive($event)">YOY
+          </label>
+          <label class="form-check-inline">
+            <input class="form-check-input" type="checkbox" (change)="ytdActive($event)">YTD
+          </label>
+        </div>
+
+        <div class="filters">
+          <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawTableGeo($event)" class="selector"></app-geo-selector>
+          <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawTableFreq($event)" class="selector"></app-freq-selector>
+          <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
+        </div>
+
+
+        <div class="table" #tableScroll (click)="userMouse()">
+          <table class="category-table">
+            <!-- row of dates -->
+            <tr>
+              <th><b>Series</b></th>
+              <template ngFor let-date [ngForOf]="series['sublist']['dateRange']" let-i="index">
+                <td *ngIf="date['date'] >= series['dateWrapper']['firstDate'] && date['date'] <= series['dateWrapper']['endDate']"><b>{{date['table date']}}</b></td>
+              </template>
+            </tr>
+            <!-- series data -->
+            <template ngFor let-serie [ngForOf]="series['series']">
               <tr *ngIf="serie['seriesInfo']['seasonallyAdjusted'] != false && serie['categoryTable']">
                 <th>
                   <a [routerLink]="['/series', serie['seriesInfo']['id']]" [title]="serie['seriesInfo']['title']">
@@ -58,8 +61,10 @@
                   <td *ngIf="item['date'] >= series['dateWrapper']['firstDate'] && item['date'] <= series['dateWrapper']['endDate']">{{item.ytd}}</td>
                 </template>
              </tr>
-          </template>
-      </table>
-    </div>
-  </div>
+            </template>
+        </table>
+      </div>
+      </div>
+    </template>
+  </template>
 </div>

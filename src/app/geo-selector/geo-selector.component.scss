@@ -1,8 +1,10 @@
 .custom-select {
-  border-radius: 0;
   color: #1D667F;
   font-family: 'Montserrat', sans-serif;
   font-size: 0.9em;
   height: calc(1.75rem - 2px);
   padding: 0.175rem 1.75rem 0.175rem 0.75rem;
+  // remove fill='#333' from background - causes parsing error in firefox
+  background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+  background-size: 8px 10px;
 }

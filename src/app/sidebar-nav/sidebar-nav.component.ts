@@ -31,7 +31,6 @@ export class SidebarNavComponent implements OnInit, Input {
       error => this.errorMessage = error);
 
     this.route.queryParams.subscribe((params) => {
-      console.log('sidebar', params);
       this.id = +params['id'];
       let search = params['search'];
       if (this.id) {

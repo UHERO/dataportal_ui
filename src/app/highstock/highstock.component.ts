@@ -38,6 +38,7 @@ export class HighstockComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.chartData);
     let level = this.chartData['level'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];

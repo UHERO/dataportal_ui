@@ -19,7 +19,6 @@ export class FreqSelectorComponent implements OnInit {
 
  onChange(newFreq: Object) {
     this.selectedFreq = this.freqs.find(freq => freq.freq === newFreq);
-    console.log('dropdown selected', this.selectedFreq);
     this.selectedFreqChange.emit(this.selectedFreq);
   }
 }
