@@ -199,21 +199,24 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((category) => {
               let catInfo = category;
               this.freqGeos = catInfo.freq_geos;
-              console.log('freqgeos', this.freqGeos);
               this.geoFreqs = catInfo.geo_freqs;
-            },
-            (error) => {
-              error = this.errorMessage = error;
-            },
-            () => {
               this.geoFreqs.forEach((geo, index) => {
                 this._helper.uniqueGeos(this.geoFreqs[index], geoArray);
               });
               this.freqGeos.forEach((freq, index) => {
                 this._helper.uniqueFreqs(this.freqGeos[index], freqArray);
               });
-              console.log('freq array', freqArray);
-              this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+              i += 1
+            },
+            (error) => {
+              error = this.errorMessage = error;
+            },
+            () => {
+              if (i === this.sublist.length) {
+                this.sublist.forEach((sub, index) => {
+                  this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+                });
+              }
             });
           });
         } else {
@@ -239,12 +242,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     // Get regions available for a selected frequency
     freqs.forEach((freq, index) => {
       if (selectedFreq === freqs[index].freq) {
-        console.log('freq regions', freqs[index].geos);
         this.regions = freqs[index].geos;
       }
     });
 
-
+    console.log('regions', this.regions);
     if (selectedGeo) {
       this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
     } else {

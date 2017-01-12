@@ -23,8 +23,8 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    // console.log('highcharts', this.seriesData);
     let level = this.seriesData.chartData.level;
+    let pseudoLevel = this.seriesData.chartData.pseudoLevel;
     let ytd = this.seriesData.chartData.ytd;
     let title = this.seriesData.seriesInfo.title === undefined? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     let dataFreq = this.currentFreq.freq;
@@ -34,11 +34,11 @@ export class HighchartComponent implements OnInit {
       this.noDataChart(title);
     } else {
       let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-      this.drawChart(title, level, ytd, dataFreq);
+      this.drawChart(title, level, pseudoLevel, ytd, dataFreq);
     }
   }
 
-  drawChart(title: string, level: Array<any>, ytd: Array<any>, dataFreq) {
+  drawChart(title: string, level: Array<any>, pseudoLevel, ytd: Array<any>, dataFreq) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -147,6 +147,15 @@ export class HighchartComponent implements OnInit {
           enabled: false
         }
       }, {
+        name: 'Pseudo History Level',
+        type: 'line',
+        yAxis: 1,
+        data: pseudoLevel,
+        dataGrouping: {
+          enabled: false
+        },
+        dashStyle: 'Dash'
+      }, {
         name: 'YTD',
         type: 'column',
         color: 'transparent',
@@ -155,7 +164,6 @@ export class HighchartComponent implements OnInit {
         dataGrouping: {
           enabled: false
         },
-        // visible: false 
       }],
     }
   }
@@ -221,7 +229,8 @@ export class HighchartComponent implements OnInit {
   render(event) {
     this.chart = event;
     let level = this.chart.series[0];
-    let ytd = this.chart.series[1];
+    let pseudoLevel = this.chart.series[1];
+    let ytd = this.chart.series[2];
     let latestLevel = (level !== undefined) ? level.points.length - 1 : null;
     let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy, Renderer } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
@@ -21,7 +21,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private selectedCategory;
   private sublist: Array<any> = [];
   private categories;
-  private sub;
+  private arSub;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
@@ -52,7 +52,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   public currentGeo: Geography;
   public currentFreq: Frequency;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private renderer: Renderer, private _router: Router) { }
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) { }
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -61,7 +61,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // Get (optional) query parameters from URL
-    this.sub = this.route.queryParams.subscribe((params) => {
+    this.arSub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
@@ -85,6 +85,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         }
       }
     });
+    console.log(this._router.parseUrl(this._router.url));
   }
 
   ngAfterViewChecked() {
@@ -92,11 +93,15 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     // Prevents scrollbar from resetting to the right afer manually scrolling
     if (!this.userEvent) {
       this.tableScroll();
+      /* this.route.fragment.subscribe(frag => {
+        const el = <HTMLElement>document.querySelector('#id_' + frag);
+        if (el) el.scrollIntoView(el);
+      });*/
     }
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.arSub.unsubscribe();
   }
 
   // Set up search results

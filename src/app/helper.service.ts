@@ -261,21 +261,23 @@ formatNum(num: number, decimal: number) {
   // Get a unique array of available regions for a category
   uniqueGeos(geo, geoList) {
     let exist = false;
-    let freqs = geo.freqs;
-    let freqExist = false;
     for (let i in geoList) {
       if (geo.name === geoList[i].name) {
         exist = true;
-      }
-      // Get a unique list of frequencies available for a region
-      for (let j in freqs) {
-        for (let n in geoList[i].freqs) {
-          if (freqs[j].freq === geoList[i].freqs[n].freq) {
-            freqExist = true;
+        
+        // If region already exists, check it's list of frequencies
+        // Get a unique list of frequencies available for a region
+        let freqs = geo.freqs;
+        for (let j in freqs) {
+          let freqExist = false;
+          for (let n in geoList[i].freqs) {
+            if (freqs[j].freq === geoList[i].freqs[n].freq) {
+              freqExist = true;
+            }
           }
-        }
-        if (!freqExist) {
-          geoList[i].freqs.push(freqs[j]);
+          if (!freqExist) {
+            geoList[i].freqs.push(freqs[j]);
+          }
         }
       }
     }
@@ -288,28 +290,29 @@ formatNum(num: number, decimal: number) {
   // Get a unique array of available frequencies for a category
   uniqueFreqs(freq, freqList) {
     let exist = false;
-    let geos = freq.geos;
-    let geoExist = false;
     for (let i in freqList) {
       if (freq.label === freqList[i].label) {
         exist = true;
-      }
-      // Get a unique list of regions available for a frequency
-      for (let j in geos) {
-        for (let n in freqList[i].geos) {
-          if (geos[j].handle === freqList[i].geos[n].handle) {
-            geoExist = true;
+
+        // If frequency already exists, check it's list of regions
+        // Get a unique list of regions available for a frequency
+        let geos = freq.geos;
+        for (let j in geos) {
+          let geoExist = false;
+          for (let n in freqList[i].geos) {
+            if (geos[j].handle === freqList[i].geos[n].handle) {
+              geoExist = true;
+            }
           }
-        }
-        if (!geoExist) {
-          freqList[i].geos.push(geos[j]);
+          if (!geoExist) {
+            freqList[i].geos.push(geos[j]);
+          }
         }
       }
     }
 
-    if (!exist && (freq.freq === 'A' || freq.freq === 'M' || freq.freq === 'Q')) {
+    if (!exist) {
       freqList.push(freq);
     }
-    console.log('helper', freqList);
   }
 }
