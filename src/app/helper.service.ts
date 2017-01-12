@@ -122,13 +122,18 @@ export class HelperService {
       let ytd = observations['transformationResults'][2]['observations'];
 
       let levelValue = [];
+      let pseudoValue = [];
       let yoyValue = [];
       let ytdValue = [];
 
       if (level) {
         level.forEach((entry, index) => {
           // Create [date, value] level pairs for charts
-          levelValue.push([Date.parse(level[index].date), +level[index].value]);
+          if (level[index].pseudoHistory) {
+            pseudoValue.push([Date.parse(level[index].date), +level[index].value, level[index].pseudoHistory]);
+          } else {
+            levelValue.push([Date.parse(level[index].date), +level[index].value]);
+          }
         });
       }
 
@@ -147,7 +152,7 @@ export class HelperService {
       }
 
       let tableData = this.combineObsData(level, yoy, ytd);
-      let chartData = {level: levelValue, yoy: yoyValue, ytd: ytdValue};
+      let chartData = {level: levelValue, pseudoLevel: pseudoValue, yoy: yoyValue, ytd: ytdValue};
       let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
       let categoryTable = this.catTable(data['table data'], dateArray, dateWrapper);
       results.push({seriesInfo: expandedResults[index], chartData: chartData, seriesTableData: tableData, start: start, end: end, categoryTable: categoryTable});
@@ -305,5 +310,6 @@ formatNum(num: number, decimal: number) {
     if (!exist && (freq.freq === 'A' || freq.freq === 'M' || freq.freq === 'Q')) {
       freqList.push(freq);
     }
+    console.log('helper', freqList);
   }
 }

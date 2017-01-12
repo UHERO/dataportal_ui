@@ -199,6 +199,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
             this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((category) => {
               let catInfo = category;
               this.freqGeos = catInfo.freq_geos;
+              console.log('freqgeos', this.freqGeos);
               this.geoFreqs = catInfo.geo_freqs;
             },
             (error) => {
@@ -210,7 +211,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
               });
               this.freqGeos.forEach((freq, index) => {
                 this._helper.uniqueFreqs(this.freqGeos[index], freqArray);
-              })
+              });
+              console.log('freq array', freqArray);
               this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
             });
           });
@@ -237,6 +239,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     // Get regions available for a selected frequency
     freqs.forEach((freq, index) => {
       if (selectedFreq === freqs[index].freq) {
+        console.log('freq regions', freqs[index].geos);
         this.regions = freqs[index].geos;
       }
     });

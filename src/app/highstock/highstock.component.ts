@@ -40,6 +40,7 @@ export class HighstockComponent implements OnInit {
   ngOnInit() {
     console.log(this.chartData);
     let level = this.chartData['level'];
+    let pseudoLevel = this.chartData['pseudoLevel'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
@@ -48,11 +49,12 @@ export class HighstockComponent implements OnInit {
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel);
   }
 
   ngOnChanges() {
     let level = this.chartData['level'];
+    let pseudoLevel = this.chartData['pseudoLevel'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
@@ -61,11 +63,11 @@ export class HighstockComponent implements OnInit {
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel);
   }
 
 
-  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel) {
+  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -221,11 +223,6 @@ export class HighstockComponent implements OnInit {
           },
         }
       }],
-      navigator: {
-        series: {
-          data: level
-        }
-      },
       plotOptions: {
         series: {
           cropThreshold: 0
@@ -236,6 +233,7 @@ export class HighstockComponent implements OnInit {
         type: 'column',
         color: '#727272',
         data: yoy,
+        showInNavigator: false,
         dataGrouping: {
           enabled: false
         }
@@ -245,6 +243,17 @@ export class HighstockComponent implements OnInit {
         yAxis: 1,
         color: '#1D667F',
         data: level,
+        showInNavigator: true,
+        dataGrouping: {
+          enabled: false
+        }
+      }, {
+        name: 'Pseudo History Level',
+        type: 'line',
+        dashStyle: 'dash',
+        yAxis: 1,
+        data: pseudoLevel,
+        showInNavigator: true,
         dataGrouping: {
           enabled: false
         }

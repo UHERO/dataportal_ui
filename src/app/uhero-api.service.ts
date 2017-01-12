@@ -302,13 +302,18 @@ function mapObservations(response: Response): ObservationResults {
   let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
+  let pseudoValue = [];
   let yoyValue = [];
   let ytdValue = [];
 
   if (level) {
     level.forEach((entry, index) => {
       // Create [date, value] level pairs for charts
-      levelValue.push([Date.parse(level[index].date), +level[index].value]);
+      if (level[index].pseudoHistory) {
+        pseudoValue.push([Date.parse(level[index].date), +level[index].value, level[index].pseudoHistory]);
+      } else {
+        levelValue.push([Date.parse(level[index].date), +level[index].value]);
+      }
     });
   }
 
@@ -327,7 +332,7 @@ function mapObservations(response: Response): ObservationResults {
   }
 
   let tableData = combineObsData(level, yoy, ytd);
-  let chartData = {level: levelValue, yoy: yoyValue, ytd: ytdValue};
+  let chartData = {level: levelValue, pseudoLevel: pseudoValue, yoy: yoyValue, ytd: ytdValue};
   let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
   return data;
 }
