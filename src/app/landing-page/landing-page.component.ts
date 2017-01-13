@@ -90,7 +90,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   initSearch(search: string, routeGeo?: string, routeFreq?: string) {
     let geoArray = [];
     let freqArray = [];
-
+    this.sublist = [search];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;
@@ -249,14 +249,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     console.log('regions', this.regions);
     if (selectedGeo) {
       this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
-    } else {
-      this.currentGeo = this.regions[0];
     }
 
     if (selectedFreq) {
       this.currentFreq = this.freqs.find(freq => freq.freq === selectedFreq);
-    } else {
-      this.currentFreq = this.freqs[0];
     }
 
     this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {

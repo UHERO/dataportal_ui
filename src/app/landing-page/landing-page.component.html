@@ -3,7 +3,7 @@
   <h2 class="selected-category" id="id_top">{{selectedCategory}}</h2>
   <template ngFor let-sub [ngForOf]="sublist">
     <template ngFor let-series [ngForOf]="seriesData">
-      <div class="multi-charts-row" *ngIf="sub['id'] === series['sublist']['id']">
+      <div class="multi-charts-row" *ngIf="sub['id'] === series['sublist']['id'] || routeSearch">
       <ul class="content-links" *ngIf="sublist.length > 1" [attr.id]="'id_' + series['sublist']['id']">
         <li *ngFor="let sub of sublist">
           <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub['id']" (click)="scrollTo()" [class.currentSub]="sub['id'] === series['sublist']['id']">{{sub.name}}</a>

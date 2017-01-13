@@ -108,7 +108,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   initSearch(search: string, routeGeo?: string, routeFreq?: string) {
     let geoArray = [];
     let freqArray = [];
-
+    this.sublist = [search];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;

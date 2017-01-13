@@ -2,7 +2,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
-const Highcharts = require('highcharts');
+const Highcharts = require('../../../node_modules/highcharts/highstock.src');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
 const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
@@ -134,7 +134,9 @@ export class HighstockComponent implements OnInit {
             text: 'data.uhero.hawaii.edu',
             position: {
               align: 'right',
-              verticalAlign: 'bottom'
+              x: -90,
+              y: -40
+              // verticalAlign: 'bottom'
             }
           },
           title: {
@@ -142,7 +144,7 @@ export class HighstockComponent implements OnInit {
             align: 'left',
             style: {
               color: '#1D667F',
-              fontFamily: 'Lucida Sans'
+              fontFamily: 'sans-serif'
             }
           }
         }
