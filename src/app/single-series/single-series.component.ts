@@ -18,6 +18,7 @@ export class SingleSeriesComponent implements OnInit {
   private options: Object;
   public seriesTableData = [];
   private newTableData = [];
+  private summaryStats;
   
   // Vars used in highstock component
   public chartData;
@@ -158,6 +159,8 @@ export class SingleSeriesComponent implements OnInit {
     }
 
     this.newTableData = this.seriesTableData.slice(tableStart, tableEnd + 1);
+
+    this.summaryStats = this._helper.summaryStats(this.newTableData, this.currentFreq.freq);
   }
 
   onSearch(event) {

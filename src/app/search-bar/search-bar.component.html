@@ -1,6 +1,6 @@
 <div class="col-md-6 col-lg-4 search-bar">
     <div class="input-group">
-        <input type="text" class="form-control" #searchTerm>
+        <input type="text" class="form-control" (keyup.enter)="search(searchTerm)"#searchTerm>
         <span class="input-group-btn">
             <button type="button" (click)="search(searchTerm)" class="btn"><i class="material-icons md-18">search</i></button>
         </span>

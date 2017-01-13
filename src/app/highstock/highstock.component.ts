@@ -2,8 +2,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
-// const Highcharts = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/highstock.src');
-// const exporting = require('../../../node_modules/angular2-highcharts/node_modules/highcharts/modules/exporting.src');
 const Highcharts = require('../../../node_modules/highcharts/highstock.src');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
 const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
@@ -38,7 +36,9 @@ export class HighstockComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log(this.chartData);
     let level = this.chartData['level'];
+    let pseudoLevel = this.chartData['pseudoLevel'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
     let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
@@ -47,24 +47,25 @@ export class HighstockComponent implements OnInit {
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel);
   }
 
   ngOnChanges() {
     let level = this.chartData['level'];
+    let pseudoLevel = this.chartData['pseudoLevel'];
     let yoy = this.chartData['yoy'];
     let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : 'In ' + this.seriesDetail['unitsLabelShort'];
+    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
     let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
     let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel);
   }
 
 
-  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel) {
+  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -133,7 +134,9 @@ export class HighstockComponent implements OnInit {
             text: 'data.uhero.hawaii.edu',
             position: {
               align: 'right',
-              verticalAlign: 'bottom'
+              x: -90,
+              y: -40
+              // verticalAlign: 'bottom'
             }
           },
           title: {
@@ -141,7 +144,7 @@ export class HighstockComponent implements OnInit {
             align: 'left',
             style: {
               color: '#1D667F',
-              fontFamily: 'Lucida Sans'
+              fontFamily: 'sans-serif'
             }
           }
         }
@@ -220,11 +223,6 @@ export class HighstockComponent implements OnInit {
           },
         }
       }],
-      navigator: {
-        series: {
-          data: level
-        }
-      },
       plotOptions: {
         series: {
           cropThreshold: 0
@@ -235,6 +233,7 @@ export class HighstockComponent implements OnInit {
         type: 'column',
         color: '#727272',
         data: yoy,
+        showInNavigator: false,
         dataGrouping: {
           enabled: false
         }
@@ -244,6 +243,17 @@ export class HighstockComponent implements OnInit {
         yAxis: 1,
         color: '#1D667F',
         data: level,
+        showInNavigator: true,
+        dataGrouping: {
+          enabled: false
+        }
+      }, {
+        name: 'Pseudo History Level',
+        type: 'line',
+        dashStyle: 'dash',
+        yAxis: 1,
+        data: pseudoLevel,
+        showInNavigator: true,
         dataGrouping: {
           enabled: false
         }

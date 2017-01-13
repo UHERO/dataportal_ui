@@ -10,13 +10,6 @@
   vertical-align: top;
   display: inline-block;
   
-  /* @media (min-width: 767px) and (max-width: 1000px) {
-    margin: 20% 0 0 0;
-  }
-
-  @media (min-width: 1001px) {
-    margin: 15% 0 0 0;
-  } */
   @media (min-width: 768px) {
     margin-top: 80px;
   }
@@ -24,7 +17,6 @@
   .series-title {
     display: block;
     // vertical-align: middle;
-    font-family: 'Lucida Sans', sans-serif;
     font-size: 1.5em;
     color: #1D667F;
     // text-transform: uppercase;
@@ -35,6 +27,25 @@
       margin: auto 15px auto 0;
       display: inline-block;
       vertical-align: middle;
+    }
+  }
+
+  .summary-stats {
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+    background-color: #F9F9F9;
+    padding: 10px 0;
+    
+    .stat {
+      display: table-cell;
+      text-align: center;
+      font-size: 0.9em;
+
+      p {
+        margin-bottom: 0;
+        color: #1D667F;
+      }
     }
   }
   

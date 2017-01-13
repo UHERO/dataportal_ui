@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy, Renderer } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
@@ -21,7 +21,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private selectedCategory;
   private sublist: Array<any> = [];
   private categories;
-  private sub;
+  private arSub;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
@@ -52,7 +52,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   public currentGeo: Geography;
   public currentFreq: Frequency;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private renderer: Renderer, private _router: Router) { }
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) { }
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -61,7 +61,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // Get (optional) query parameters from URL
-    this.sub = this.route.queryParams.subscribe((params) => {
+    this.arSub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
@@ -85,6 +85,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         }
       }
     });
+    console.log(this._router.parseUrl(this._router.url));
   }
 
   ngAfterViewChecked() {
@@ -92,76 +93,67 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     // Prevents scrollbar from resetting to the right afer manually scrolling
     if (!this.userEvent) {
       this.tableScroll();
+      /* this.route.fragment.subscribe(frag => {
+        const el = <HTMLElement>document.querySelector('#id_' + frag);
+        if (el) el.scrollIntoView(el);
+      });*/
     }
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    this.arSub.unsubscribe();
   }
 
   // Set up search results
   initSearch(search: string, routeGeo?: string, routeFreq?: string) {
     let geoArray = [];
     let freqArray = [];
-
+    this.sublist = [search];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;
-      this.freqGeos = searchFilters.freqGeos;
-      this.geoFreqs = searchFilters.geoFreqs;
+      this.freqGeos = searchFilters.freq_geos;
+      this.geoFreqs = searchFilters.geo_freqs;
     },
     (error) => {
       error = this.errorMessage = error;
     },
     () => {
-      this._uheroAPIService.fetchSearchSeries(search).subscribe((series) => {
-        let allResults = series;
-        let dateWrapper = {firstDate: '', endDate: ''};
-        this.searchSettings(search, allResults, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
-      });
+      let dateWrapper = {firstDate: '', endDate: ''};
+      this.searchSettings(search, geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
     });
   }
 
-  searchSettings(search: string, allResults: Array<any>, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
+  searchSettings(search: string, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-    let selectedFreq = routeFreq? routeFreq : this.defaults.freq;
-    let selectedGeo = routeGeo? routeGeo : this.defaults.geo;
-    // Get all frequencies and regions available in all search results    
-    allResults.forEach((series, index) => {
-      this._helper.uniqueGeos(allResults[index].geography, regions);
-      this._helper.uniqueFreqs({freq: allResults[index].frequencyShort, label: allResults[index].frequency}, freqs);
-    });
-    // Check that region & frequency combinations are available
-    let availRegions = [];
-    for (let i = 0; i < regions.length; i++) {
-      for (let j = 0; j < this.freqGeos[selectedFreq].length; j++) {
-        if (regions[i].handle === this.freqGeos[selectedFreq][j]) {
-          availRegions.push(regions[i]);
-        }
-      }
-    }
-    let availFreqs = [];
-    for (let i = 0; i < freqs.length; i++) {
-      for (let j = 0; j < this.geoFreqs[selectedGeo].length; j++) {
-        if (freqs[i].freq === this.geoFreqs[selectedGeo][j]) {
-          availFreqs.push(freqs[i]);
-        }
-      }
-    }
-    this.regions = availRegions;
-    this.freqs = availFreqs;
-
-    this.regions.forEach((geo, index) => {
-      if (selectedGeo === this.regions[index].handle) {
-        this.currentGeo = this.regions[index];
+    let selectedFreq = routeFreq? routeFreq : this.defaults.freq.freq;
+    let selectedGeo = routeGeo? routeGeo : this.defaults.geo.handle;
+    
+    // Get frequencies available for a selected region
+    this.geoFreqs.forEach((geo, index) => {
+      if (selectedGeo === this.geoFreqs[index].handle) {
+        this.freqs = this.geoFreqs[index].freqs;
       }
     });
 
-    this.freqs.forEach((freq, index) => {
-      if (selectedFreq === this.freqs[index].freq) {
-        this.currentFreq = this.freqs[index];
+    // Get regions available for a selected frequency
+    this.freqGeos.forEach((freq, index) => {
+      if (selectedFreq === this.freqGeos[index].freq) {
+        this.regions = this.freqGeos[index].geos;
       }
     });
+
+    if (selectedGeo) {
+      this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
+    } else {
+      this.currentGeo = this.regions[0];
+    }
+
+    if (selectedFreq) {
+      this.currentFreq = this.freqs.find(freq => freq.freq === selectedFreq);
+    } else {
+      this.currentFreq = this.freqs[0];
+    }
 
     this.getSearchData(search, selectedGeo, selectedFreq, dateArray, dateWrapper);
   }
@@ -197,7 +189,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: number, routeGeo?: string, routeFreq?: string) {
+  initContent(catId: number, routeGeo?:string, routeFreq?:string) {
     let geoArray = [];
     let freqArray = [];
 
@@ -218,13 +210,30 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
             this.defaultGeo = '';
           }
 
-          // this.firstDateWrapper = {firstDate: ''};
+          let i = 0;
           this.sublist.forEach((sub, index) => {
             let dateWrapper = {firstDate: '', endDate: ''};
-            this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+            // Get all regions available in a given category
+            this._uheroAPIService.fetchSelectedCategory(this.sublist[index]['id']).subscribe((category) => {
+              let catInfo = category;
+              this.freqGeos = catInfo.freq_geos;
+              this.geoFreqs = catInfo.geo_freqs;
+            },
+            (error) => {
+              error = this.errorMessage = error;
+            },
+            () => {
+              this.geoFreqs.forEach((geo, index) => {
+                this._helper.uniqueGeos(this.geoFreqs[index], geoArray);
+              });
+              this.freqGeos.forEach((freq, index) => {
+                this._helper.uniqueFreqs(this.freqGeos[index], freqArray);
+              })
+              this.initSettings(this.sublist[index], geoArray, freqArray, dateWrapper, routeGeo, routeFreq);
+            });
           });
         } else {
-          return
+          return;
         }
       },
       this.seriesData = []);
@@ -234,82 +243,60 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   // Get regions and frequencies available for a selected category
   initSettings(sublistIndex, regions: Array<any>, freqs: Array<any>, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-
-    this._uheroAPIService.fetchGeographies(sublistIndex['id']).subscribe((geos) => {
-      geos.forEach((geo, index) => {
-        this._helper.uniqueGeos(geos[index], regions);
-      });
-      this.regions = regions;
-
-      if (routeGeo) {
-        this.regions.forEach((geo, index) => {
-          if (routeGeo === this.regions[index]['handle']) {
-            this.currentGeo = this.regions[index];
-          }
-        });
-      } else {
-        this.regions.forEach((geo, index) => {
-          if (this.defaultGeo === this.regions[index]['handle']) {
-            this.currentGeo = this.regions[index];
-          } else {
-            this.currentGeo = this.regions[0];
-          }
-        });
+    let selectedFreq = routeFreq? routeFreq : this.defaultFreq ? this.defaultFreq : freqs[0].freq;
+    let selectedGeo = routeGeo? routeGeo :  this.defaultGeo? this.defaultGeo : regions[0].handle;
+    // Get frequencies available for a selected region
+    regions.forEach((geo, index) => {
+      if (selectedGeo === regions[index].handle) {
+        this.freqs = regions[index].freqs;
       }
+    });
 
-      this._uheroAPIService.fetchFrequencies(sublistIndex['id']).subscribe((frequencies) => {
-        frequencies.forEach((frequency, index) => {
-          this._helper.uniqueFreqs(frequencies[index], freqs);
-        });
-        this.freqs = freqs;
+    // Get regions available for a selected frequency
+    freqs.forEach((freq, index) => {
+      if (selectedFreq === freqs[index].freq) {
+        this.regions = freqs[index].geos;
+      }
+    });
 
-        if (routeFreq) {
-          this.freqs.forEach((freq, index) => {
-            if (routeFreq === this.freqs[index]['freq']) {
-              this.currentFreq = this.freqs[index];
-            }
-          });
-        } else {
-          // If a default freq. is available, export as current frequency on page load
-          this.freqs.forEach((freq, index) => {
-            if (this.defaultFreq === this.freqs[index]['label']) {
-              this.currentFreq = this.freqs[index];
-            } else {
-              this.currentFreq = this.freqs[0];
-            }
-          });
-        }
 
-        // Get array of dates for a sublist
-        this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
-          this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], this.currentFreq.freq, dateArray);
+    if (selectedGeo) {
+      this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
+    } else {
+      this.currentGeo = this.regions[0];
+    }
+
+    if (selectedFreq) {
+      this.currentFreq = this.freqs.find(freq => freq.freq === selectedFreq);
+    } else {
+      this.currentFreq = this.freqs[0];
+    }
+
+    this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
+      this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], this.currentFreq.freq, dateArray);
+    },
+    (error) => {
+      error = this.errorMessage = error
+    },
+    // When date array is completed, call sublistData()
+      () => {
+        // Fetch data for current region/frequency settings
+        this._uheroAPIService.fetchExpanded(sublistIndex['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((expanded) => {
+          this.expandedResults = expanded;
         },
         (error) => {
-          this.errorMessage = error
+          error = this.errorMessage = error;
         },
-        // When date array is completed, call sublistData()
         () => {
-          // Fetch data for current region/frequency settings
-          this._uheroAPIService.fetchExpanded(sublistIndex['id'], this.currentGeo.handle, this.currentFreq.freq).subscribe((expanded) => {
-            this.expandedResults = expanded;
-            console.log('expanded results', this.expandedResults);
-          },
-          (error) => {
-            error = this.errorMessage = error;
-          },
-          () => {
-            if (this.expandedResults) {
-              let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
-              sublistIndex.dateRange = dateArray;
-              this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
-              console.log('seriesData', this.seriesData)
-            } else {
-              let series = [{seriesInfo: 'No data available'}];
-              this.seriesData.push({sublist: sublistIndex, series: series})
-            }
-          });
+          if (this.expandedResults) {
+            let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
+            sublistIndex.dateRange = dateArray;
+            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
+          } else {
+            let series = [{seriesInfo: 'No data available'}];
+            this.seriesData.push({sublist: sublistIndex, series: series});
+          }
         });
-      });
     });
   }
 

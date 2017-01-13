@@ -4,10 +4,23 @@
   <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawGeo($event)" class="geo-selector"></app-geo-selector>
   <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawFreq($event)" class="freq-selector"></app-freq-selector>
   <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail"  [currentFreq]="currentFreq" [currentGeo]="currentGeo" (chartExtremes)="redrawTable($event)"></app-highstock>
-
+  <div class="summary-stats" *ngIf="summaryStats">
+    <div class="stat">
+      <p>Min:</p>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}
+    </div>
+    <div class="stat">
+      <p>Max:</p>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}
+    </div>
+    <div class="stat">
+      <p>{{seriesDetail['percent'] === true ? 'Change ' : '% Change '}}From Selected: </p>{{summaryStats.change}}
+    </div>
+    <div class="stat">
+      <p>Standard Deviation:</p>{{summaryStats.sd}}
+    </div>
+  </div>
   <p-dataTable [value]="newTableData" scrollable="true">
     <p-column field="table date" header="Date" [sortable]="true"></p-column>
-    <p-column field="value" header="Level"></p-column>
-    <p-column field="yoy" [header]=change></p-column>
+    <p-column field="formattedValue" header="Level"></p-column>
+    <p-column field="formattedYoy" [header]=change></p-column>
   </p-dataTable>
 </div>

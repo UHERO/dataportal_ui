@@ -11,9 +11,8 @@
   min-height: 100%;
   overflow: auto;
 
-  .filters {
-    display: inline-block;
-    vertical-align: top;
+  .chart-filters {
+    display: block;
   }
 
   .content-links:before {
@@ -26,17 +25,16 @@
 
   .content-links {
     padding-left: 0px;
-    display: block;
+    display: inline-block;
     // margin-bottom: 0px;
     margin-top: 15px;
     margin-bottom: 0;
 
     li {
       display: inline-block;
-      margin-right: 15px;
+      margin-right: 5px;
 
        a {
-         font-family: 'Lucida Sans', sans-serif;
          text-decoration: none;
          font-size: 0.9em;
          color: #505050;
@@ -68,13 +66,16 @@
   }
 
   .selected-category {
-    font-family: 'Lucida Sans', sans-serif;
     display: inline-block;
     color: #1D667F;
     font-size: 1.5em;
     margin: auto 5px 10px 0px;
     vertical-align: middle;
     text-transform: capitalize;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 
   .top-anchor {
@@ -87,7 +88,6 @@
 
 
   .sublist {
-    font-family: 'Lucida Sans', sans-serif;
     color: #1D667F;
     font-size: 1.2em;
     margin-bottom: 0px;
@@ -118,7 +118,6 @@
       display: inline-block;
       background-color: #FFFFFF;
       color: #1D667F;
-      font-family: 'Lucia Sans', sans-serif;
       font-size: 0.9em;
       font-weight: normal;
       border-radius: 0px;
@@ -145,7 +144,6 @@
   }
 
   .switch-view {
-    font-family: 'Lucida Sans', sans-serif;
     text-decoration: none;
     font-size: 0.9em;
     color: #1D667F;
@@ -167,7 +165,7 @@
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    margin: 10px;
+    margin: 10px 10px 10px 3px;
     background: #F7F7F7
   }
 }

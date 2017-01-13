@@ -6,7 +6,7 @@
     <img src="../../assets/UHEROdata-Logo-color.png">
   </a>
     <ul id="navbarSide" class="navbar-side" [class.reveal]="reveal">
-      <li class="list-item" *ngFor="let category of categories, let cat = index" (click)="expandItem(category.children, category.name, cat)" [class.selectedCategory]="cat === selectedCategory">
+      <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category['id'] === selectedCategory">
         <a [routerLink]="['/category']" [queryParams]="{id: category['id']}">&nbsp; {{category.name}}</a>
       </li>
     </ul>
