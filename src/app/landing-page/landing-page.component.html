@@ -19,7 +19,7 @@
 
       <template ngFor let-serie [ngForOf]="series['series']">
         <p *ngIf="!serie['seriesInfo']['id']"> No Data Available </p>
-        <div *ngIf="serie['seriesInfo']['seasonallyAdjusted'] ?  serie['seriesInfo']['seasonallyAdjusted'] != false : true" class="multi-charts">
+        <div *ngIf="serie['seriesInfo']['seasonallyAdjusted'] !== false" class="multi-charts">
           <a href="#" [routerLink]="['/series', serie['seriesInfo']['id']]" *ngIf="serie['seriesInfo']['id']">
             <app-highchart [seriesData]="serie" [currentFreq]="currentFreq"></app-highchart>
           </a>

@@ -246,7 +246,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       }
     });
 
-    console.log('regions', this.regions);
     if (selectedGeo) {
       this.currentGeo = this.regions.find(region => region.handle === selectedGeo);
     }

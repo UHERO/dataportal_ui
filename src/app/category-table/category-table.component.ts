@@ -85,7 +85,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    console.log(this._router.parseUrl(this._router.url));
   }
 
   ngAfterViewChecked() {
