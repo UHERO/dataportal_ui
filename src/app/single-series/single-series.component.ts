@@ -19,6 +19,7 @@ export class SingleSeriesComponent implements OnInit {
   public seriesTableData = [];
   private newTableData = [];
   private summaryStats;
+  private saIsActive: boolean = true;
   
   // Vars used in highstock component
   public chartData;
@@ -59,6 +60,7 @@ export class SingleSeriesComponent implements OnInit {
 
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesSiblings = siblings;
+        console.log('siblings', this.seriesSiblings);
       });
 
       // Prevent frequency select menu from resetting when navigating from another series
@@ -167,4 +169,11 @@ export class SingleSeriesComponent implements OnInit {
     console.log('search results', event);
     this._router.navigate(['/category/search'], {queryParams: {search: event} })
   }
+
+  saActive(e) {
+    // console.log('checkbox', e)
+    this.saIsActive = e.target.checked;
+    console.log('SA On', this.saIsActive)
+  }
+
 }
