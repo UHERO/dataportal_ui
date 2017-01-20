@@ -333,7 +333,7 @@ function mapObservations(response: Response): ObservationResults {
 
   let tableData = combineObsData(level, yoy, ytd);
   let chartData = {level: levelValue, pseudoLevel: pseudoValue, yoy: yoyValue, ytd: ytdValue};
-  let data = {'chart data': chartData, 'table data': tableData, 'start': start, 'end': end};
+  let data = {chartData: chartData, tableData: tableData, start: start, end: end};
   return data;
 }
 

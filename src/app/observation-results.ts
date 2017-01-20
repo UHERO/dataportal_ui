@@ -1,4 +1,4 @@
 export interface ObservationResults {
-  'chart data': Object,
-  'table data': Array<Object>
+  chartData: Object,
+  tableData: Array<Object>
 }
