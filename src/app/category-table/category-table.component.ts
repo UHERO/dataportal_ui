@@ -90,7 +90,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   getCategoryData(id: number, routeGeo?: string, routeFreq?: string) {
     this.categoryData = this._catHelper.initContent(id, routeGeo, routeFreq);
-    console.log('table data', this.categoryData);
   }
 
   getSearchData(search: string, routeGeo?: string, routeFreq?: string) {

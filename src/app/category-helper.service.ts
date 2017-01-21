@@ -136,8 +136,22 @@ export class CategoryHelperService {
         () => {
           if (this.expandedResults) {
             let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
+            // Check if a subcateogry has seasonally adjusted series
+            let hasSeasonallyAdjusted;
+            let falseCount = 0;
+            series.forEach((serie, index) => {
+              if (series[index].seriesInfo.seasonallyAdjusted === false) {
+                hasSeasonallyAdjusted = false;
+                falseCount +=1;
+              }
+            });
+            if (falseCount === series.length) {
+              hasSeasonallyAdjusted = false;
+            } else {
+              hasSeasonallyAdjusted = true;
+            }
             sublistIndex.dateRange = dateArray;
-            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series});
+            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series, seasonallyAdjusted: hasSeasonallyAdjusted});
           } else {
             let series = [{seriesInfo: 'No data available'}];
             this.seriesData.push({sublist: sublistIndex, series: series});
@@ -229,9 +243,24 @@ export class CategoryHelperService {
       this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
       if (searchReults) {
         let series = this._helper.dataTransform(searchReults, dateArray, dateWrapper);
+        // Check if a subcateogry has seasonally adjusted series
+        let hasSeasonallyAdjusted;
+        let falseCount = 0;
+        series.forEach((serie, index) => {
+          if (series[index].seriesInfo.seasonallyAdjusted === false) {
+            hasSeasonallyAdjusted = false;
+            falseCount +=1;
+          }
+        });
+        if (falseCount === series.length) {
+          hasSeasonallyAdjusted = false;
+        } else {
+          hasSeasonallyAdjusted = true;
+        }
+
         let sublist = {name: search, dateRange: dateArray};
         this.categoryData.sublist = [sublist];
-        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: series});
+        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: series, seasonallyAdjusted: hasSeasonallyAdjusted});
       };
     });
   }

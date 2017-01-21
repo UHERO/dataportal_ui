@@ -24,7 +24,9 @@
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
-          <div class="table" #tableScroll (click)="userMouse()">
+          <p *ngIf="series.dateWrapper && series.seasonallyAdjusted === false">No Seasonally Adjusted Series Available</p>
+          <p *ngIf="!series.dateWrapper && !series.seasonallyAdjusted">No Data Available</p>
+          <div class="table" #tableScroll (click)="userMouse()" *ngIf="series.dateWrapper && series.seasonallyAdjusted">
             <table class="category-table">
               <!-- row of dates -->
               <tr>

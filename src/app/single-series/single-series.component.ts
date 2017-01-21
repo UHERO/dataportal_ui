@@ -55,8 +55,8 @@ export class SingleSeriesComponent implements OnInit {
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
-      this.change = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
-      this.currentFreq = {'freq': this.seriesDetail['frequencyShort'], 'label': this.seriesDetail['frequency']};
+      this.change = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
+      this.currentFreq = {freq: this.seriesDetail.frequencyShort, label: this.seriesDetail.frequency};
 
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesSiblings = siblings;
@@ -76,10 +76,10 @@ export class SingleSeriesComponent implements OnInit {
       if (this.regions.length === 0) {
         this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
         this.regions = geos;
-        this.currentGeo = this.seriesDetail['geography'];
+        this.currentGeo = this.seriesDetail.geography;
         });
       } else {
-        this.currentGeo = this.seriesDetail['geography'];
+        this.currentGeo = this.seriesDetail.geography;
       }
     },
     (error) => {
@@ -93,13 +93,13 @@ export class SingleSeriesComponent implements OnInit {
   getSeriesObservations(id: number, dateArray: Array<any>) {
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
       let seriesObservations = observations;
-      let start = seriesObservations['start'];
-      let end = seriesObservations['end'];
+      let start = seriesObservations.start;
+      let end = seriesObservations.end;
 
       // Use to format dates for table
       this._helper.calculateDateArray(start, end, this.currentFreq.freq, dateArray);
-      this.chartData = seriesObservations['chart data'];
-      let tableData = seriesObservations['table data'];
+      this.chartData = seriesObservations.chartData;
+      let tableData = seriesObservations.tableData;
 
       // Create table with formatted dates and slice table to starting & ending observation dates
       this.seriesTableData = this._helper.seriesTable(tableData, dateArray);
@@ -120,8 +120,8 @@ export class SingleSeriesComponent implements OnInit {
   // Redraw chart when selecting a new region
   redrawGeo(event) {
     this.seriesSiblings.forEach((sibling, index) => {
-      if (event.handle === this.seriesSiblings[index]['geography']['handle'] && this.currentFreq.freq === this.seriesSiblings[index]['frequencyShort']) {
-        let id = this.seriesSiblings[index]['id'];
+      if (event.handle === this.seriesSiblings[index].geography.handle && this.currentFreq.freq === this.seriesSiblings[index].frequencyShort) {
+        let id = this.seriesSiblings[index].id;
         // Update id param in URL to reflect selected series ID
         this._router.navigate(['/series/' + id]);
       } else {
@@ -134,7 +134,7 @@ export class SingleSeriesComponent implements OnInit {
   // Redraw chart when selecting a new frequency
   redrawFreq(event) {
     this.seriesSiblings.forEach((sibling, index) => {
-      if (this.currentGeo.handle === this.seriesSiblings[index]['geography']['handle'] && event.freq === this.seriesSiblings[index]['frequencyShort']) {
+      if (this.currentGeo.handle === this.seriesSiblings[index].geography.handle && event.freq === this.seriesSiblings[index].frequencyShort) {
         let id = this.seriesSiblings[index]['id'];
         // Update id param in URL to reflect selected series ID
         this._router.navigate(['/series/' + id]);
@@ -148,8 +148,8 @@ export class SingleSeriesComponent implements OnInit {
   // Update table when selecting new ranges in the chart
   redrawTable(e) {
     let minDate, maxDate, tableStart, tableEnd;
-    minDate = e['min date'];
-    maxDate = e['max date'];
+    minDate = e.minDate;
+    maxDate = e.maxDate;
 
     for (let i = 0; i < this.seriesTableData.length; i++) {
       if (this.seriesTableData[i].date === maxDate) {

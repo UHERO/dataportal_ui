@@ -37,13 +37,13 @@ export class HighstockComponent implements OnInit {
 
   ngOnInit() {
     console.log(this.chartData);
-    let level = this.chartData['level'];
-    let pseudoLevel = this.chartData['pseudoLevel'];
-    let yoy = this.chartData['yoy'];
-    let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
-    let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
-    let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
+    let level = this.chartData.level;
+    let pseudoLevel = this.chartData.pseudoLevel;
+    let yoy = this.chartData.yoy;
+    let name = this.seriesDetail.title;
+    let unitsShort = this.seriesDetail.unitsLabelShort === '' ? ' ' : this.seriesDetail.unitsLabelShort;
+    let change = this.seriesDetail.percent === true ? 'Change' : '% Change';
+    let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
@@ -51,13 +51,13 @@ export class HighstockComponent implements OnInit {
   }
 
   ngOnChanges() {
-    let level = this.chartData['level'];
-    let pseudoLevel = this.chartData['pseudoLevel'];
-    let yoy = this.chartData['yoy'];
-    let name = this.seriesDetail['title'];
-    let unitsShort = this.seriesDetail['unitsLabelShort'] === ''? ' ' : this.seriesDetail['unitsLabelShort'];
-    let change = this.seriesDetail['percent'] === true ? 'Change' : '% Change';
-    let yoyLabel = this.seriesDetail['percent'] === true? 'YOY Change' : 'YOY % Change';
+    let level = this.chartData.level;
+    let pseudoLevel = this.chartData.pseudoLevel;
+    let yoy = this.chartData.yoy;
+    let name = this.seriesDetail.title;
+    let unitsShort = this.seriesDetail.unitsLabelShort === '' ? ' ' : this.seriesDetail.unitsLabelShort;
+    let change = this.seriesDetail.percent === true ? 'Change' : '% Change';
+    let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
 
@@ -271,6 +271,6 @@ export class HighstockComponent implements OnInit {
     xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
     xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0]
 
-    this.chartExtremes.emit({'min date': xMin, 'max date': xMax})
+    this.chartExtremes.emit({minDate: xMin, maxDate: xMax})
   }
 }
