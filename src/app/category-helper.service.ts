@@ -1,3 +1,4 @@
+// Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 

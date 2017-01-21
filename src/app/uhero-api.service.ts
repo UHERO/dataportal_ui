@@ -272,7 +272,6 @@ export class UheroApiService {
 // And side bar navigation on single-series & table views
 function mapCategories(response: Response): CategoryTree {
   let categories = response.json().data;
-  // console.log('categories', categories);
   let dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   let categoryTree = [];
   categories.forEach((value) => {

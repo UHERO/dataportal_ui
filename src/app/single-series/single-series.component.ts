@@ -14,12 +14,15 @@ import { Geography } from '../geography';
 export class SingleSeriesComponent implements OnInit {
   private errorMessage: string;
   private seriesSiblings;
+  private checkSiblings;
 
   private options: Object;
   public seriesTableData = [];
   private newTableData = [];
   private summaryStats;
-  private saIsActive: boolean = true;
+  private noSeriesData;
+  private saIsActive: boolean;
+  private disableToggle: boolean = false;
   
   // Vars used in highstock component
   public chartData;
@@ -42,7 +45,7 @@ export class SingleSeriesComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-  this.route.params.subscribe(params => {
+    this.route.params.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       this.drawChart(seriesId);
     });
@@ -55,15 +58,13 @@ export class SingleSeriesComponent implements OnInit {
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesDetail = series;
+      let seriesFreq, seriesGeo;
+      this.saIsActive = this.seriesDetail.seasonallyAdjusted;
       this.change = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
       this.currentFreq = {freq: this.seriesDetail.frequencyShort, label: this.seriesDetail.frequency};
 
-      this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
-        this.seriesSiblings = siblings;
-        console.log('siblings', this.seriesSiblings);
-      });
-
       // Prevent frequency select menu from resetting when navigating from another series
+    
       if (this.freqs.length === 0) {
         this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
           this.freqs = frequencies;
@@ -75,8 +76,8 @@ export class SingleSeriesComponent implements OnInit {
       // Prevent region select menu from resetting when navigating from another series
       if (this.regions.length === 0) {
         this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
-        this.regions = geos;
-        this.currentGeo = this.seriesDetail.geography;
+          this.regions = geos;
+          this.currentGeo = this.seriesDetail.geography;
         });
       } else {
         this.currentGeo = this.seriesDetail.geography;
@@ -86,6 +87,10 @@ export class SingleSeriesComponent implements OnInit {
       error = this.errorMessage = error;
     },
     () => {
+      this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
+        this.seriesSiblings = siblings;
+        this.checkSaPairs(this.seriesSiblings);
+      });
       this.getSeriesObservations(id, dateArray);
     });
   }
@@ -114,35 +119,40 @@ export class SingleSeriesComponent implements OnInit {
         }
       this.seriesTableData = this.seriesTableData.slice(beginTable, endTable + 1).reverse();
     });
-
   }
 
-  // Redraw chart when selecting a new region
-  redrawGeo(event) {
+  // Check if both seasonally and non-seasonally adjusted series exists for a given region & frequency combination
+  // If only one is available, disable checkbox & do not display checkbox in annual frequencies
+  checkSaPairs(seriesSiblings) {
+    this.checkSiblings = [];
     this.seriesSiblings.forEach((sibling, index) => {
-      if (event.handle === this.seriesSiblings[index].geography.handle && this.currentFreq.freq === this.seriesSiblings[index].frequencyShort) {
-        let id = this.seriesSiblings[index].id;
-        // Update id param in URL to reflect selected series ID
-        this._router.navigate(['/series/' + id]);
-      } else {
-        return;
+      if (this.currentGeo.handle === this.seriesSiblings[index].geography.handle && this.currentFreq.freq === this.seriesSiblings[index].frequencyShort) {
+        this.checkSiblings.push(this.seriesSiblings[index]);
       }
-    },
-    error => this.errorMessage = error);
+    });
+    if (this.checkSiblings.length < 2) {
+      this.disableToggle = true;
+    } else {
+      this.disableToggle = false;
+    }
   }
 
-  // Redraw chart when selecting a new frequency
-  redrawFreq(event) {
-    this.seriesSiblings.forEach((sibling, index) => {
-      if (this.currentGeo.handle === this.seriesSiblings[index].geography.handle && event.freq === this.seriesSiblings[index].frequencyShort) {
-        let id = this.seriesSiblings[index]['id'];
-        // Update id param in URL to reflect selected series ID
-        this._router.navigate(['/series/' + id]);
-      } else {
-        return;
+  // Redraw chart when selecting a new region or frequency
+  redrawSeries(event) {
+    this.checkSaPairs(this.seriesSiblings);
+    let id;
+    let series;
+    if (this.currentFreq.freq === 'A') {
+      id = this.checkSiblings[0].id
+    } else {
+      series = this.checkSiblings.find(series => series.seasonallyAdjusted === this.saIsActive);
+      if (series === undefined) {
+        this.saIsActive = !this.saIsActive;
+        series = this.checkSiblings.find(series => series.seasonallyAdjusted === this.saIsActive);
       }
-    },
-    error => this.errorMessage = error);
+      id = series.id;
+    }
+    this._router.navigate(['/series/' + id]);
   }
 
   // Update table when selecting new ranges in the chart
@@ -161,19 +171,25 @@ export class SingleSeriesComponent implements OnInit {
     }
 
     this.newTableData = this.seriesTableData.slice(tableStart, tableEnd + 1);
-
     this.summaryStats = this._helper.summaryStats(this.newTableData, this.currentFreq.freq);
   }
 
   onSearch(event) {
-    console.log('search results', event);
     this._router.navigate(['/category/search'], {queryParams: {search: event} })
   }
 
   saActive(e) {
-    // console.log('checkbox', e)
     this.saIsActive = e.target.checked;
-    console.log('SA On', this.saIsActive)
+    this.checkSaPairs(this.seriesSiblings);
+    let id;
+    let series;
+    series = this.checkSiblings.find(series => series.seasonallyAdjusted === this.saIsActive);
+    if (series === undefined) {
+      this.saIsActive = !this.saIsActive;
+      series = this.checkSiblings.find(series => series.seasonallyAdjusted === this.saIsActive);
+    }
+    id = series.id;
+    this._router.navigate(['/series/' + id]);
   }
 
 }

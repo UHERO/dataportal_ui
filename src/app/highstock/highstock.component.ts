@@ -36,7 +36,6 @@ export class HighstockComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.chartData);
     let level = this.chartData.level;
     let pseudoLevel = this.chartData.pseudoLevel;
     let yoy = this.chartData.yoy;
