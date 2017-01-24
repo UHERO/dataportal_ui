@@ -7,24 +7,18 @@ import { CategoryHelperService } from '../category-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
-import { error } from 'util';
-
 @Component({
   selector: 'app-landing-page',
   templateUrl: 'landing-page.component.html',
   styleUrls: ['landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit {
+export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private sub;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
   private routeSearch: string;
   private queryParams: any = {};
-
-  // Check if seasonally adjusted data is displayed, default to true
-  private saIsActive: boolean = true;
-  private errorMessage: string;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -45,10 +39,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
-      if (this.id) this.queryParams.id = this.id;
+      if (this.id) {this.queryParams.id = this.id};
       if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
-      if (this.routeGeo) this.queryParams.geo = this.routeGeo;
-      if (this.routeFreq) this.queryParams.freq = this.routeFreq;
+      if (this.routeGeo) {this.queryParams.geo = this.routeGeo};
+      if (this.routeFreq) {this.queryParams.freq = this.routeFreq} ;
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
@@ -81,7 +75,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq) {
     let freq = currentFreq.freq;
-    let geoHandle = event.handle;  
+    let geoHandle = event.handle;
     if (this.routeSearch) {
       this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, geo: geoHandle, freq: freq} });
     } else {
@@ -107,7 +101,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit {
     this.route.fragment.subscribe(frag => {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) el.scrollIntoView(el);
-      if (frag === 'top') el.scrollTop;
+      if (frag === 'top') {el.scrollTop};
     });
   }
 }

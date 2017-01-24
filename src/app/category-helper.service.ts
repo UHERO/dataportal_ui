@@ -20,23 +20,21 @@ export class CategoryHelperService {
   private defaults;
   private geoFreqs;
   private freqGeos;
-  private geoHandle: string;
-  private freqHandle: string;
   private defaultFreq: string;
   private defaultGeo: string;
   private categoryData;
 
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
-  
+
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: number, routeGeo?:string, routeFreq?:string): Observable<any> {
-    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: []};
+  initContent(catId: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, seriesData: []};
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
       this.seriesData = [];
-      categories.forEach((category, index) => {
+      categories.forEach((cat, index) => {
         if (categories[index]['id'] === catId) {
           let selectedCategory = categories[index]['name'];
           let sublist = categories[index]['children'];
@@ -73,34 +71,34 @@ export class CategoryHelperService {
         let catInfo = category;
         this.freqGeos = catInfo.freq_geos;
         this.geoFreqs = catInfo.geo_freqs;
-        this.geoFreqs.forEach((geo, index) => {
-          this._helper.uniqueGeos(this.geoFreqs[index], geoArray);
+        this.geoFreqs.forEach((geo, indx) => {
+          this._helper.uniqueGeos(this.geoFreqs[indx], geoArray);
         });
-        this.freqGeos.forEach((freq, index) => {
-          this._helper.uniqueFreqs(this.freqGeos[index], freqArray);
+        this.freqGeos.forEach((freq, indx) => {
+          this._helper.uniqueFreqs(this.freqGeos[indx], freqArray);
         });
-        i += 1
+        i += 1;
       },
       (error) => {
         error = this.errorMessage = error;
       },
       () => {
         if (i === sublist.length) {
-          sublist.forEach((sub, index) => {
-            let selectedFreq = routeFreq? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-            let selectedGeo = routeGeo? routeGeo :  this.defaultGeo? this.defaultGeo : geoArray[0].handle;
+          sublist.forEach((subcat, indx) => {
+            let selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+            let selectedGeo = routeGeo ? routeGeo :  this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
             let freqs, regions, currentGeo, currentFreq;
             // Get frequencies available for a selected region
-            geoArray.forEach((geo, index) => {
-              if (selectedGeo === geoArray[index].handle) {
-                freqs = geoArray[index].freqs;
+            geoArray.forEach((geo, ind) => {
+              if (selectedGeo === geoArray[ind].handle) {
+                freqs = geoArray[ind].freqs;
               }
             });
 
             // Get regions available for a selected frequency
-            freqArray.forEach((freq, index) => {
-              if (selectedFreq === freqArray[index].freq) {
-                regions = freqArray[index].geos;
+            freqArray.forEach((freq, ind) => {
+              if (selectedFreq === freqArray[ind].freq) {
+                regions = freqArray[ind].geos;
               }
             });
             currentGeo = regions.find(region => region.handle === selectedGeo);
@@ -109,7 +107,7 @@ export class CategoryHelperService {
             this.categoryData.frequencies = freqs;
             this.categoryData.currentGeo = currentGeo;
             this.categoryData.currentFreq = currentFreq;
-            this.getSeriesData(sublist[index], geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
+            this.getSeriesData(sublist[indx], geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
           });
         }
       });
@@ -123,7 +121,7 @@ export class CategoryHelperService {
       this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
     },
     (error) => {
-      error = this.errorMessage = error
+      error = this.errorMessage = error;
     },
     // When date array is completed, call sublistData()
       () => {
@@ -143,7 +141,7 @@ export class CategoryHelperService {
             series.forEach((serie, index) => {
               if (series[index].seriesInfo.seasonallyAdjusted === false) {
                 hasSeasonallyAdjusted = false;
-                falseCount +=1;
+                falseCount += 1;
               }
             });
             if (falseCount === series.length) {
@@ -186,10 +184,8 @@ export class CategoryHelperService {
 
   searchSettings(search: string, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-    let geoArray = [];
-    let freqArray = [];
-    let selectedFreq = routeFreq? routeFreq : this.defaults.freq.freq;
-    let selectedGeo = routeGeo? routeGeo : this.defaults.geo.handle;
+    let selectedFreq = routeFreq ? routeFreq : this.defaults.freq.freq;
+    let selectedGeo = routeGeo ? routeGeo : this.defaults.geo.handle;
     let freqs, regions, currentFreq, currentGeo;
     // Get frequencies available for a selected region
     this.geoFreqs.forEach((geo, index) => {
@@ -226,14 +222,14 @@ export class CategoryHelperService {
   getSearchData(search: string, geo: string, freq: string, dateArray: Array<any>, dateWrapper: dateWrapper) {
     let searchReults;
     // Get expanded search results for a selected region & frequency
-    this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((search) => {
-      searchReults = search;
+    this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
+      searchReults = searchRes;
     },
     (error) => {
       error = this.errorMessage = error;
     },
     () => {
-      searchReults.forEach((search, index) => {
+      searchReults.forEach((searchRes, index) => {
         if (dateWrapper.firstDate === '' || searchReults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
           dateWrapper.firstDate = searchReults[index].seriesObservations.observationStart;
         }
@@ -250,7 +246,7 @@ export class CategoryHelperService {
         series.forEach((serie, index) => {
           if (series[index].seriesInfo.seasonallyAdjusted === false) {
             hasSeasonallyAdjusted = false;
-            falseCount +=1;
+            falseCount += 1;
           }
         });
         if (falseCount === series.length) {

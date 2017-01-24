@@ -11,6 +11,7 @@ import { HeaderComponent } from './header/header.component';
 
 import { UheroApiService } from './uhero-api.service';
 import { CategoryHelperService } from './category-helper.service';
+import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
@@ -44,7 +45,7 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
     routing,
     DataTableModule, SharedModule
   ],
-  providers: [UheroApiService, CategoryHelperService, HelperService],
+  providers: [UheroApiService, CategoryHelperService, SeriesHelperService, HelperService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

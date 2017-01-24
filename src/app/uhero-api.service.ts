@@ -6,12 +6,10 @@ import 'rxjs/add/operator/mergeMap';
 
 import { Category } from './category';
 import { CategoryTree } from './category-tree';
-import { SelectedSeries } from './selected-series';
 import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
-import { dateWrapper } from './date-wrapper';
 
 @Injectable()
 export class UheroApiService {
@@ -21,8 +19,6 @@ export class UheroApiService {
   private cachedCategories;
   private cachedExpanded = [];
   private cachedSelectedCategory = [];
-  // private cachedChartData = [];
-  private cachedMultiChartData = [];
   private cachedFrequencies = [];
   private cachedGeographies = [];
   private cachedGeoSeries = [];
@@ -32,10 +28,8 @@ export class UheroApiService {
   private cachedSiblings = [];
   private cachedSiblingFreqs = [];
   private cachedSiblingGeos = [];
-  private cachedSearch = [];
   private cachedSearchExpand = [];
   private cachedSearchFilters = [];
-  private errorMessage: string;
 
   constructor(private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
@@ -63,7 +57,7 @@ export class UheroApiService {
   }
 
   // Gets observations for series in a (sub) category
-  fetchExpanded(id: number, geo: string, freq:string): Observable<any> {
+  fetchExpanded(id: number, geo: string, freq: string): Observable<any> {
     if (this.cachedExpanded[id + geo + freq]) {
       return Observable.of(this.cachedExpanded[id + geo + freq]);
     } else {
@@ -152,7 +146,7 @@ export class UheroApiService {
   }
 
   fetchFrequencies(id: number): Observable<Frequency[]> {
-    if(this.cachedFrequencies[id]) {
+    if (this.cachedFrequencies[id]) {
       return Observable.of(this.cachedFrequencies[id]);
     } else {
       let frequencies$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.requestOptionsArgs)
@@ -239,7 +233,7 @@ export class UheroApiService {
 
   fetchSearchSeriesExpand(search: string, geo: string, freq: string): Observable<Series[]> {
     if (this.cachedSearchExpand[search + geo + freq]) {
-      return Observable.of(this.cachedSearchExpand[search + geo +freq]);
+      return Observable.of(this.cachedSearchExpand[search + geo + freq]);
     } else {
       let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
         .map(mapData)
@@ -368,22 +362,4 @@ function combineObsData(level, yoy, ytd) {
     }
     return table;
   }
-}
-
-function formatNum(num: number, decimal: number) {
-  //return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  let fixedNum: any;
-  let formattedNum: string;
-  fixedNum = num.toFixed(decimal);
-  // remove decimals 
-  let int = fixedNum|0;
-  let signCheck = num < 0 ? 1 : 0;
-  // store deicmal value
-  let remainder = Math.abs(fixedNum - int);
-  let decimalString= ('' + remainder.toFixed(decimal)).substr(2, decimal);
-  let intString = '' + int, i = intString.length;
-  let r = '';
-  while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
-  return intString.substr(0, i + 3) + r + (decimalString ? '.'+decimalString: '');
-  // return +formattedNum;
 }

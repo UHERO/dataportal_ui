@@ -26,10 +26,10 @@ export class HighchartComponent implements OnInit {
     let level = this.seriesData.chartData.level;
     let pseudoLevel = this.seriesData.chartData.pseudoLevel;
     let ytd = this.seriesData.chartData.ytd;
-    let title = this.seriesData.seriesInfo.title === undefined? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
+    let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     let dataFreq = this.currentFreq.freq;
-    this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true? true : false;
-    this.dataAvail = this.seriesData.seriesInfo === 'No data available'? false : true;
+    this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true ? true : false;
+    this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
@@ -69,16 +69,16 @@ export class HighchartComponent implements OnInit {
         formatter: function () {
           let s = '<b>' + title + '</b><br>';
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
-            s = s + 'Q1 '
+            s = s + 'Q1 ';
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
-            s = s + 'Q2 '
+            s = s + 'Q2 ';
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
-            s = s + 'Q3 '
+            s = s + 'Q3 ';
           };
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
-            s = s + 'Q4 '
+            s = s + 'Q4 ';
           };
           if (dataFreq === 'M') {
             s = s + Highcharts.dateFormat('%b', this.x) + ' ';
@@ -165,7 +165,7 @@ export class HighchartComponent implements OnInit {
           enabled: false
         },
       }],
-    }
+    };
   }
 
   saLabel(chart, SA) {
@@ -215,7 +215,7 @@ export class HighchartComponent implements OnInit {
         data: []
       }],
       lang: {
-        noData: "No Data Available"
+        noData: 'No Data Available'
       },
       noData: {
         style: {
@@ -223,7 +223,7 @@ export class HighchartComponent implements OnInit {
           fontSize: '0.85em'
         }
       }
-    }
+    };
   }
 
   render(event) {
