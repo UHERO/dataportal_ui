@@ -1,13 +1,14 @@
 <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div class="multi-series-container" (searchItem)="search(searchItem)">
   <div *ngFor="let data of categoryData | async">
-    <h2 class="selected-category" id="id_top">{{data.selectedCategory}}</h2>
+    <h2 class="selected-category" [class.search-term]="routeSearch && data.sublist.length > 0" id="id_top">{{data.selectedCategory}}</h2>
+    <p *ngIf="routeSearch && data.seriesData.length === 0">No results found for "{{data.selectedCategory}}."</p>
     <template ngFor let-sub [ngForOf]="data.sublist">
       <template ngFor let-series [ngForOf]="data.seriesData">
         <div class="multi-charts-row" *ngIf="sub.id === series.sublist.id || routeSearch">
           <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
             <li *ngFor="let sub of data.sublist">
-              <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub.id" (click)="scrollTo()" [class.currentSub]="sub.id === series.sublist.id">{{sub.name}}</a>
+              <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub.id" (click)="scrollTo()" [class.current-sub]="sub.id === series.sublist.id">{{sub.name}}</a>
             </li>
           </ul>
           <hr class="sublist-separator" *ngIf="data.sublist.length > 1">

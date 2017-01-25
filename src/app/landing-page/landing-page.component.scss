@@ -42,7 +42,7 @@
          }
        }
 
-       .currentSub {
+       .current-sub {
          background: #1D667F;
          color: #FFFFFF;
 
@@ -69,6 +69,10 @@
     @media (min-width: 768px) {
       display: none;
     }
+  }
+
+  .search-term {
+    display: block;
   }
 
   .top-anchor {

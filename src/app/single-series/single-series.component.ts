@@ -14,6 +14,7 @@ import { Geography } from '../geography';
 })
 export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private errorMessage: string;
+  private noSelection: string;
   private newTableData;
   private summaryStats;
 
@@ -38,6 +39,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   getSeriesData(id: number) {
     this.seriesData = this._series.drawChart(id);
+    console.log(this.seriesData)
   }
 
   // Redraw chart when selecting a new region or frequency
@@ -45,29 +47,42 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     let newGeo = event.handle;
     let freq = currentFreq.freq;
     let id;
+    this.noSelection = null
     siblings.forEach((sib, index) => {
-      if (siblings[index].geography.handle === newGeo && siblings[index].frequencyShort === freq && sa === siblings[index].seasonallyAdjusted) {
-        id = siblings[index].id;
-      } else if (siblings[index].geography.handle === newGeo && siblings[index].frequencyShort === freq) {
-        id = siblings[index].id;
+      if (siblings[index].geography.handle === newGeo && siblings[index].frequencyShort === freq) {
+        if (sa === siblings[index].seasonallyAdjusted) {
+          id = siblings[index].id;
+        } else {
+          id = siblings[index].id;
+        }
       }
     });
-    this._router.navigate(['/series/' + id]);
+    if (id) {
+      this._router.navigate(['/series/' + id]);
+    } else {
+      this.noSelection = 'Selection Not Available';
+    }
   }
 
   redrawFreq(event, currentGeo, siblings, sa) {
-    console.log('sa', sa);
     let newFreq = event.freq;
     let geo = currentGeo.handle;
     let id;
+    this.noSelection = null
     siblings.forEach((sib, index) => {
-      if (siblings[index].frequencyShort === newFreq && siblings[index].geography.handle === geo && sa === siblings[index].seasonallyAdjusted) {
-        id = siblings[index].id;
-      } else if (siblings[index].frequencyShort === newFreq && siblings[index].geography.handle === geo) {
-        id = siblings[index].id;
+      if (siblings[index].frequencyShort === newFreq && siblings[index].geography.handle === geo) {
+        if (sa === siblings[index].seasonallyAdjusted) {
+          id = siblings[index].id;
+        } else {
+          id = siblings[index].id;
+        }
       }
     });
-    this._router.navigate(['/series/' + id]);
+    if (id) {
+      this._router.navigate(['/series/' + id]);
+    } else {
+      this.noSelection = 'Selection Not Available';
+    }
   }
 
   // Update table when selecting new ranges in the chart

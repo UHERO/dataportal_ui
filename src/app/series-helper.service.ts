@@ -21,7 +21,8 @@ export class SeriesHelperService {
     let freqArray = [];
     let geoArray = [];
     let dateArray = [];
-    this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: []};
+    let seriesDetail = null;
+    this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null};
 
     this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
       let freqs = frequencies;
@@ -34,7 +35,7 @@ export class SeriesHelperService {
     });
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
-      let seriesDetail = series;
+      seriesDetail = series;
       this.seriesData.seriesDetail = seriesDetail;
       this.seriesData.saIsActive = seriesDetail['seasonallyAdjusted'];
       this.seriesData.currentGeo = seriesDetail['geography'];
@@ -43,6 +44,7 @@ export class SeriesHelperService {
     },
     (error) => {
       error = this.errorMessage = error;
+      this.seriesData.error = true;
     },
     () => {
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {

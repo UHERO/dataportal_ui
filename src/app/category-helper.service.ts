@@ -161,23 +161,31 @@ export class CategoryHelperService {
 
   // Set up search results
   initSearch(search: string, routeGeo?: string, routeFreq?: string): Observable<any> {
+    let obsEnd, obsStart;
     this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: []};
     // let sublist = [search];
     this.seriesData = [];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
+      console.log('search filters', filters);
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;
       this.freqGeos = searchFilters.freq_geos;
       this.geoFreqs = searchFilters.geo_freqs;
+      obsEnd = searchFilters.observationEnd;
+      obsStart = searchFilters.observationStart;
     },
     (error) => {
       error = this.errorMessage = error;
     },
     () => {
-      let dateWrapper = {firstDate: '', endDate: ''};
-      this.searchSettings(search, dateWrapper, routeGeo, routeFreq);
-      this.categoryData.selectedCategory = search;
-      this.categoryData.seriesData = this.seriesData;
+      if (obsEnd && obsStart) {
+        let dateWrapper = {firstDate: '', endDate: ''};
+        this.searchSettings(search, dateWrapper, routeGeo, routeFreq);
+        this.categoryData.selectedCategory = 'Search: ' + search;
+        this.categoryData.seriesData = this.seriesData;
+      } else {
+        this.categoryData.selectedCategory = search;
+      }
     });
     return Observable.forkJoin(Observable.of(this.categoryData));
   }
