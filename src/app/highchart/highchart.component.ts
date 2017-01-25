@@ -24,7 +24,7 @@ export class HighchartComponent implements OnInit {
 
   ngOnInit() {
     let level = this.seriesData.chartData.level;
-    let pseudoLevel = this.seriesData.chartData.pseudoLevel;
+    let pseudoZones = this.seriesData.chartData.pseudoZones;
     let ytd = this.seriesData.chartData.ytd;
     let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     let dataFreq = this.currentFreq.freq;
@@ -34,11 +34,11 @@ export class HighchartComponent implements OnInit {
       this.noDataChart(title);
     } else {
       let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-      this.drawChart(title, level, pseudoLevel, ytd, dataFreq);
+      this.drawChart(title, level, pseudoZones, ytd, dataFreq);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoLevel, ytd: Array<any>, dataFreq) {
+  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -65,8 +65,8 @@ export class HighchartComponent implements OnInit {
         valueDecimals: 2,
         shared: true,
         backgroundColor: 'transparent',
-        // backgroundColor: 'rgba(247, 247, 247, 0.5)',
         formatter: function () {
+          let pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1 ';
@@ -80,12 +80,23 @@ export class HighchartComponent implements OnInit {
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
             s = s + 'Q4 ';
           };
-          if (dataFreq === 'M') {
+          if (dataFreq === 'M' || dataFreq === 'S') {
             s = s + Highcharts.dateFormat('%b', this.x) + ' ';
-          }
+          };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point, index) => {
-            s += '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+            let label = '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            if (pseudoZones.length > 0) {
+              pseudoZones.forEach((zone, index) => {
+                if (point.x < pseudoZones[index].value) {
+                  s += '<br>' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                } else {
+                  s += label;
+                }
+              });
+            } else {
+              s += label;
+            }
           });
           return s;
         },
@@ -95,7 +106,6 @@ export class HighchartComponent implements OnInit {
           letterSpacing: '0.05em',
           width: '190px',
           marginBottom: '5px',
-          // whiteSpace: 'normal'
         }
       },
       legend: {
@@ -145,16 +155,9 @@ export class HighchartComponent implements OnInit {
         data: level,
         dataGrouping: {
           enabled: false
-        }
-      }, {
-        name: 'Pseudo History Level',
-        type: 'line',
-        yAxis: 1,
-        data: pseudoLevel,
-        dataGrouping: {
-          enabled: false
         },
-        dashStyle: 'Dash'
+        zoneAxis: 'x',
+        zones: pseudoZones
       }, {
         name: 'YTD',
         type: 'column',
@@ -167,7 +170,7 @@ export class HighchartComponent implements OnInit {
       }],
     };
   }
-
+  
   saLabel(chart, SA) {
     if (SA) {
       chart.renderer.label('<span class="tag tag-pill" style="font-size: 100%; background-color: #1D667F">SA</span>', 160, 170, null, null, null, true)
@@ -185,7 +188,6 @@ export class HighchartComponent implements OnInit {
       },
       title: {
         text: '<b>' + title + '</b><br>' + 'No Data Available',
-        // verticalAlign: 'middle',
         align: 'left',
         widthAdjust: 0,
         style: {
@@ -229,8 +231,7 @@ export class HighchartComponent implements OnInit {
   render(event) {
     this.chart = event;
     let level = this.chart.series[0];
-    let pseudoLevel = this.chart.series[1];
-    let ytd = this.chart.series[2];
+    let ytd = this.chart.series[1];
     let latestLevel = (level !== undefined) ? level.points.length - 1 : null;
     let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
 

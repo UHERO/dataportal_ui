@@ -65,7 +65,6 @@ export class CategoryHelperService {
     let freqArray = [];
     let i = 0;
     sublist.forEach((sub, index) => {
-      let dateWrapper = {firstDate: '', endDate: ''};
       // Get all regions available in a given category
       this._uheroAPIService.fetchSelectedCategory(sublist[index]['id']).subscribe((category) => {
         let catInfo = category;
@@ -85,6 +84,7 @@ export class CategoryHelperService {
       () => {
         if (i === sublist.length) {
           sublist.forEach((subcat, indx) => {
+            let dateWrapper = {firstDate: '', endDate: ''};
             let selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
             let selectedGeo = routeGeo ? routeGeo :  this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
             let freqs, regions, currentGeo, currentFreq;
@@ -220,26 +220,33 @@ export class CategoryHelperService {
   }
 
   getSearchData(search: string, geo: string, freq: string, dateArray: Array<any>, dateWrapper: dateWrapper) {
-    let searchReults;
+    let searchResults;
     // Get expanded search results for a selected region & frequency
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
-      searchReults = searchRes;
+      searchResults = searchRes;
     },
     (error) => {
       error = this.errorMessage = error;
     },
     () => {
-      searchReults.forEach((searchRes, index) => {
-        if (dateWrapper.firstDate === '' || searchReults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
-          dateWrapper.firstDate = searchReults[index].seriesObservations.observationStart;
+      searchResults.forEach((searchRes, index) => {
+        // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
+        let seasonalFreq = true;
+        let freq = searchResults[index].frequencyShort;
+        let sa = searchResults[index].seasonallyAdjusted
+        if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
+          seasonalFreq = false;
         }
-        if (dateWrapper.endDate === '' || searchReults[index].seriesObservations.observationEnd > dateWrapper.endDate) {
-          dateWrapper.endDate = searchReults[index].seriesObservations.observationEnd;
+        if (dateWrapper.firstDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
+          dateWrapper.firstDate = searchResults[index].seriesObservations.observationStart;
         }
-      });
+        if (dateWrapper.endDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationEnd > dateWrapper.endDate) {
+          dateWrapper.endDate = searchResults[index].seriesObservations.observationEnd;
+        }
+      }); 
       this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
-      if (searchReults) {
-        let series = this._helper.dataTransform(searchReults, dateArray, dateWrapper);
+      if (searchResults) {
+        let series = this._helper.dataTransform(searchResults, dateArray, dateWrapper);
         // Check if a subcateogry has seasonally adjusted series
         let hasSeasonallyAdjusted;
         let falseCount = 0;

@@ -2,8 +2,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 declare var require: any;
-// const Highcharts = require('../../../node_modules/highcharts/highstock.src');
-const Highcharts = require('highcharts');
+const Highcharts = require('../../../node_modules/highcharts/highstock.src');
+// const Highcharts = require('highcharts');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
 const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
@@ -24,7 +24,7 @@ Highcharts.setOptions({
   templateUrl: './highstock.component.html',
   styleUrls: ['./highstock.component.scss']
 })
-export class HighstockComponent implements OnInit, OnChanges {
+export class HighstockComponent implements OnChanges {
   @Input() chartData;
   @Input() currentFreq;
   @Input() currentGeo;
@@ -36,25 +36,10 @@ export class HighstockComponent implements OnInit, OnChanges {
 
   constructor() { }
 
-  ngOnInit() {
-    /* console.log('chart data', this.chartData);
-    console.log('series detail', this.seriesDetail);
-    let level = this.chartData.level;
-    let pseudoLevel = this.chartData.pseudoLevel;
-    let yoy = this.chartData.yoy;
-    let name = this.seriesDetail.title;
-    let unitsShort = this.seriesDetail.unitsLabelShort === '' ? ' ' : this.seriesDetail.unitsLabelShort;
-    let change = this.seriesDetail.percent === true ? 'Change' : '% Change';
-    let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
-    let dataFreq = this.currentFreq;
-    let dataGeo = this.currentGeo;
-
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel); */
-  }
-
   ngOnChanges() {
     let level = this.chartData.level;
     let pseudoLevel = this.chartData.pseudoLevel;
+    let pseudoZones = this.chartData.pseudoZones;
     let yoy = this.chartData.yoy;
     let name = this.seriesDetail.title;
     let unitsShort = this.seriesDetail.unitsLabelShort === '' ? ' ' : this.seriesDetail.unitsLabelShort;
@@ -62,12 +47,10 @@ export class HighstockComponent implements OnInit, OnChanges {
     let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
-
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel);
+    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel, pseudoZones);
   }
 
-
-  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?) {
+  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?, pseudoZones?) {
     this.options = {
       chart: {
         zoomType: 'x',
@@ -117,8 +100,6 @@ export class HighstockComponent implements OnInit, OnChanges {
           visibility: 'hidden'
         },
         inputEnabled: false
-        // inputDateFormat: '%Y-01-01',
-        // inputEditDateFormat: '%Y-01-01',
       },
       exporting: {
         chartOptions: {
@@ -138,7 +119,6 @@ export class HighstockComponent implements OnInit, OnChanges {
               align: 'right',
               x: -90,
               y: -40
-              // verticalAlign: 'bottom'
             }
           },
           title: {
@@ -156,6 +136,7 @@ export class HighstockComponent implements OnInit, OnChanges {
         shadow: false,
         valueDecimals: 2,
         formatter: function () {
+          let pseudo = 'Pseudo History ';
           let s = '<b>';
           if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1';
@@ -169,19 +150,29 @@ export class HighstockComponent implements OnInit, OnChanges {
           if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
             s = s + 'Q4';
           };
-          if (freq.freq === 'M') {
+          if (freq.freq === 'M' || freq.freq === 'S') {
             s = s + Highcharts.dateFormat('%b', this.x);
           }
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
           this.points.forEach((point, index) => {
-            s += '<br><span style="color:' + point.series.color + '">\u25CF</span> ' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            let label = '<br><span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            if (pseudoZones.length > 0) {
+              pseudoZones.forEach((zone, index) => {
+                if (point.x < pseudoZones[index].value) {
+                  s += '<br><span style="color:' + point.color + '">\u25CF</span> ' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                } else {
+                  s += label;
+                }
+              });
+            } else {
+              s += label;
+            }
           });
           return s;
         }
       },
       title: {
         text: '',
-        // text: name + ' (' + units + ')',
         style: {
           color: '#505050'
         }
@@ -227,19 +218,10 @@ export class HighstockComponent implements OnInit, OnChanges {
       }],
       plotOptions: {
         series: {
-          cropThreshold: 0
+          cropThreshold: 0,
         }
       },
       series: [{
-        name: yoyLabel,
-        type: 'column',
-        color: '#727272',
-        data: yoy,
-        showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
@@ -248,14 +230,15 @@ export class HighstockComponent implements OnInit, OnChanges {
         showInNavigator: true,
         dataGrouping: {
           enabled: false
-        }
+        },
+        zoneAxis: 'x',
+        zones: pseudoZones
       }, {
-        name: 'Pseudo History Level',
-        type: 'line',
-        dashStyle: 'dash',
-        yAxis: 1,
-        data: pseudoLevel,
-        showInNavigator: true,
+        name: yoyLabel,
+        type: 'column',
+        color: '#727272',
+        data: yoy,
+        showInNavigator: false,
         dataGrouping: {
           enabled: false
         }
@@ -270,8 +253,8 @@ export class HighstockComponent implements OnInit, OnChanges {
 
     // Selected level data
     let selectedRange = null;
-    if (e.context.series[1].points) {
-      selectedRange = e.context.series[1].points;
+    if (e.context.series[0].points) {
+      selectedRange = e.context.series[0].points;
     }
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];

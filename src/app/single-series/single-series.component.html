@@ -1,11 +1,11 @@
-<app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
+<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div *ngFor="let data of seriesData | async" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
   <h3 class="series-title">{{data.seriesDetail.title}}</h3>
   <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawGeo($event, data.currentFreq, data.siblings, data.saIsActive)" class="geo-selector"></app-geo-selector>
   <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawFreq($event, data.currentGeo, data.siblings, data.saIsActive)" class="freq-selector"></app-freq-selector>
-  <div class="form-check" *ngIf="data.currentFreq.freq !== 'A'">
+  <div class="form-check" *ngIf="data.currentFreq.freq !== 'A' && data.currentFreq.freq !== 'S' && data.sibPairs.length > 1">
     <label class="form-check-label">
-      <input class="form-check-input" type="checkbox" [checked]="data.saIsActive" (change)="saActive($event, data.currentGeo, data.currentFreq, data.sibPairs)" [disabled]="data.sibPairs.length < 2">Seasonally Adjusted
+      <input class="form-check-input" type="checkbox" [checked]="data.saIsActive" (change)="saActive($event, data.currentGeo, data.currentFreq, data.sibPairs)">Seasonally Adjusted
     </label>
   </div>
   <app-highstock [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesTableData, data.currentFreq)"></app-highstock>
@@ -29,36 +29,3 @@
     <p-column field="formattedYoy" [header]=data.change></p-column>
   </p-dataTable>
 </div>
-
-<!-- <app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
-<p class="single-series-view" *ngIf="noSeriesData">{{noSeriesData}}</p>
-<div *ngIf="chartData && seriesDetail" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
-  <h3 class="series-title">{{seriesDetail.title}}</h3>
-  <app-geo-selector [regions]="regions" [(selectedGeo)]="currentGeo" (selectedGeoChange)="redrawSeries($event)" class="geo-selector"></app-geo-selector>
-  <app-freq-selector [freqs]="freqs" [(selectedFreq)]="currentFreq" (selectedFreqChange)="redrawSeries($event)" class="freq-selector"></app-freq-selector>
-  <div class="form-check" *ngIf="currentFreq.freq !== 'A'">
-    <label class="form-check-label">
-      <input class="form-check-input" type="checkbox" [checked]="saIsActive" (change)="saActive($event)" [disabled]="disableToggle">Seasonally Adjusted
-    </label>
-  </div>
-  <app-highstock [chartData]="chartData" [seriesDetail]="seriesDetail"  [currentFreq]="currentFreq" [currentGeo]="currentGeo" (chartExtremes)="redrawTable($event)"></app-highstock>
-  <div class="summary-stats" *ngIf="summaryStats">
-    <div class="stat">
-      <p>Min:</p>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}
-    </div>
-    <div class="stat">
-      <p>Max:</p>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}
-    </div>
-    <div class="stat">
-      <p>{{seriesDetail.percent === true ? 'Change ' : '% Change '}}From Selected: </p>{{summaryStats.change}}
-    </div>
-    <div class="stat">
-      <p>Standard Deviation:</p>{{summaryStats.sd}}
-    </div>
-  </div>
-  <p-dataTable [value]="newTableData" scrollable="true">
-    <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
-    <p-column field="formattedValue" header="Level"></p-column>
-    <p-column field="formattedYoy" [header]=change></p-column>
-  </p-dataTable>
-</div> -->

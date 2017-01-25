@@ -295,37 +295,34 @@ function mapObservations(response: Response): ObservationResults {
   let ytd = observations.transformationResults[2].observations;
 
   let levelValue = [];
-  let pseudoValue = [];
   let yoyValue = [];
   let ytdValue = [];
-
+  let pseudoZones = [];
+  
   if (level) {
     level.forEach((entry, index) => {
       // Create [date, value] level pairs for charts
-      if (level[index].pseudoHistory) {
-        pseudoValue.push([Date.parse(level[index].date), +level[index].value, level[index].pseudoHistory]);
-      } else {
-        levelValue.push([Date.parse(level[index].date), +level[index].value]);
+      levelValue.push([Date.parse(level[index].date), +level[index].value]);
+      if (level[index].pseudoHistory && !level[index + 1].pseudoHistory) {
+        pseudoZones.push({value: Date.parse(level[index].date), dashStyle: 'dash', color: '#7CB5EC'});
       }
     });
   }
-
   if (yoy) {
     yoy.forEach((entry, index) => {
       // Create [date, value] percent pairs for charts
       yoyValue.push([Date.parse(yoy[index].date), +yoy[index].value]);
     });
   }
-
   if (ytd) {
     ytd.forEach((entry, index) => {
       // Create [date, value] YTD pairs
       ytdValue.push([Date.parse(ytd[index].date), +ytd[index].value]);
     });
   }
-
+  
   let tableData = combineObsData(level, yoy, ytd);
-  let chartData = {level: levelValue, pseudoLevel: pseudoValue, yoy: yoyValue, ytd: ytdValue};
+  let chartData = {level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue};
   let data = {chartData: chartData, tableData: tableData, start: start, end: end};
   return data;
 }

@@ -1,4 +1,4 @@
-<app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
+<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div class="multi-series-container" (searchItem)="search(searchItem)">
   <div *ngFor="let data of categoryData | async">
     <h2 class="selected-category" id="id_top">{{data.selectedCategory}}</h2>

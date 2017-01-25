@@ -1,4 +1,4 @@
-<app-search-bar (onSearch)="onSearch($event)" class="search"></app-search-bar>
+<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div class="category-tables">
   <div *ngFor="let data of categoryData | async">
     <h2 class="selected-category" id="id_top">{{data.selectedCategory}}</h2>
@@ -26,7 +26,7 @@
           </div>
           <p *ngIf="series.dateWrapper && series.seasonallyAdjusted === false">No Seasonally Adjusted Series Available</p>
           <p *ngIf="!series.dateWrapper && !series.seasonallyAdjusted">No Data Available</p>
-          <div class="table" #tableScroll (click)="userMouse()" *ngIf="series.dateWrapper && series.seasonallyAdjusted">
+          <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper && series.seasonallyAdjusted">
             <table class="category-table">
               <!-- row of dates -->
               <tr>

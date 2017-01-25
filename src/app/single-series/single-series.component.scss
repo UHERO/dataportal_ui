@@ -1,17 +1,11 @@
-.search {
-  position: fixed;
-  z-index: 2;
-  // right: 15px;
-  top: 12px;
-}
-
 .single-series-view {
-  margin: 20% 0 0 0;
+  margin: 10% 0 2% 0;
   vertical-align: top;
   display: inline-block;
   
   @media (min-width: 768px) {
-    margin-top: 80px;
+    margin-top: 70px;
+    margin-bottom: 15px;
   }
 
   .series-title {

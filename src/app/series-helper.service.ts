@@ -82,7 +82,7 @@ export class SeriesHelperService {
   }
 
   // Check if both seasonally and non-seasonally adjusted series exists for a given region & frequency combination
-  // If only one is available, disable checkbox & do not display checkbox in annual frequencies
+  // If only one is available, disable checkbox & do not display checkbox in annual/semi-annual frequencies
   checkSaPairs(seriesSiblings) {
     let checkSiblings = [];
     seriesSiblings.forEach((sibling, index) => {

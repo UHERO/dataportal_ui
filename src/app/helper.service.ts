@@ -12,12 +12,16 @@ export class HelperService {
   calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let start = +dateStart.substring(0, 4);
     let end = +dateEnd.substring(0, 4);
-    let i = 0;
 
     while (start <= end) {
       if (currentFreq === 'A') {
-        dateArray[i] = {date: start.toString() + '-01-01', tableDate: start.toString()};
-        i += 1;
+        dateArray.push({date: start.toString() + '-01-01', tableDate: start.toString()});
+        start += 1;
+      } else if (currentFreq === 'S') {
+        let month = ['01', '07'];
+        month.forEach((mon, index) => {
+          dateArray.push({date: start.toString() + '-' + month[index] + '-01', tableDate: month[index] + '-' + start.toString()});
+        });
         start += 1;
       } else if (currentFreq === 'M') {
         let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
@@ -97,20 +101,7 @@ export class HelperService {
     return formatStats;
   }
 
-  searchTransform(searchResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper, currentGeo, currentFreq) {
-    let results = [];
-    searchResults.forEach((result, index) => {
-      if (searchResults[index].geography.handle === currentGeo && searchResults[index].frequencyShort === currentFreq) {
-        let catTable = this.catTable(searchResults[index].seriesObservations.tableData, dateArray, dateWrapper);
-        results.push({seriesInfo: searchResults[index], chartData: searchResults[index].seriesObservations.chartData, seriesTableData: searchResults[index].seriesObservations.tableData, start: searchResults[index].seriesObservations.start, end: searchResults[index].seriesObservations.end, dates: dateArray, categoryTable: catTable});
-      } else {
-        return;
-      }
-    });
-    return results;
-  }
-
-  dataTransform(expandedResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
+dataTransform(expandedResults: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
     let results = [];
     expandedResults.forEach((res, index) => {
       let observations = expandedResults[index].seriesObservations;
@@ -121,54 +112,58 @@ export class HelperService {
       let ytd = observations.transformationResults[2].observations;
 
       let levelValue = [];
-      let pseudoValue = [];
+      let pseudoZones = [];
       let yoyValue = [];
       let ytdValue = [];
 
       if (level) {
         level.forEach((entry, i) => {
           // Create [date, value] level pairs for charts
-          if (level[i].pseudoHistory) {
-            pseudoValue.push([Date.parse(level[i].date), +level[i].value, level[i].pseudoHistory]);
-          } else {
-            levelValue.push([Date.parse(level[i].date), +level[i].value]);
+          levelValue.push([Date.parse(level[i].date), +level[i].value]);
+          if (level[i].pseudoHistory && !level[i + 1].pseudoHistory) {
+            pseudoZones.push({value: Date.parse(level[i].date), dashStyle: 'dash', color: '#7CB5EC'});
           }
         });
       }
-
       if (yoy) {
         yoy.forEach((entry, i) => {
           // Create [date, value] percent pairs for charts
           yoyValue.push([Date.parse(yoy[i].date), +yoy[i].value]);
         });
       }
-
       if (ytd) {
         ytd.forEach((entry, i) => {
           // Create [date, value] YTD pairs
           ytdValue.push([Date.parse(ytd[i].date), +ytd[i].value]);
         });
       }
-
+      
       let tableData = this.combineObsData(level, yoy, ytd);
-      let chartData = {level: levelValue, pseudoLevel: pseudoValue, yoy: yoyValue, ytd: ytdValue};
+      let chartData = {level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue};
       let data = {chartData: chartData, tableData: tableData, start: start, end: end};
-      let categoryTable = this.catTable(data.tableData, dateArray, dateWrapper);
+      let sa = expandedResults[index].seasonallyAdjusted;
+      let freq = expandedResults[index].frequencyShort;
+      let categoryTable = this.catTable(data.tableData, dateArray, dateWrapper, sa, freq);
       results.push({seriesInfo: expandedResults[index], chartData: chartData, seriesTableData: tableData, start: start, end: end, categoryTable: categoryTable});
     });
     return results;
   }
 
-catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
+catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, sa?: Boolean, freq?: string) {
   let categoryTable = [];
+  // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
+  let seasonalFreq = true;
+  if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
+    seasonalFreq = false;
+  }
   for (let i = 0; i < dateRange.length; i++) {
     categoryTable.push({date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: ''});
       if (seriesTableData) {
         for (let j = 0; j < seriesTableData.length; j++) {
-          if (dateWrapper.firstDate === '' || seriesTableData[j].date < dateWrapper.firstDate) {
+          if (dateWrapper.firstDate === '' || seasonalFreq && seriesTableData[j].date < dateWrapper.firstDate) {
             dateWrapper.firstDate = seriesTableData[j].date;
           }
-          if (dateWrapper.endDate === '' || seriesTableData[j].date > dateWrapper.endDate) {
+          if (dateWrapper.endDate === '' || seasonalFreq && seriesTableData[j].date > dateWrapper.endDate) {
             dateWrapper.endDate = seriesTableData[j].date;
           }
           if (categoryTable[i].date === seriesTableData[j].date) {
@@ -235,7 +230,7 @@ formatDate(date: string, freq: string) {
       }
     });
   }
-  if (freq === 'M') {
+  if (freq === 'M' || freq == 'S') {
     formattedDate = month + '-' + year;
   }
    return formattedDate;
