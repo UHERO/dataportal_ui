@@ -11,15 +11,11 @@ import { SelectedSeries } from '../selected-series';
   styleUrls: ['./sidebar-nav.component.scss']
 })
 export class SidebarNavComponent implements OnInit, Input {
-  // @Input() categories: CategoryTree;
-  // private series: SelectedSeries;
   private categories: CategoryTree;
   private errorMessage: string;
   public expand: string = null;
-  // private subcat: string = null;
   private reveal: boolean = false;
   private overlay: boolean = false;
-  // private selectedSublist: number;
   private selectedCategory: number;
   private id: number;
 

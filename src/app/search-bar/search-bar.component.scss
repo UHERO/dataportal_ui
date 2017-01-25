@@ -1,5 +1,8 @@
 .search-bar {
-  float: right;
+  position: fixed;
+  top: 12px;
+  right: 0px;
+  z-index: 2;
 
   .form-control {
     padding: 0.25rem 1rem;

@@ -1,10 +1,3 @@
-.search {
-  position: fixed;
-  z-index: 2;
-  // right: 15px;
-  top: 12px;
-}
-
 .category-tables {
   vertical-align: top;
   display: inline-block;
@@ -52,7 +45,7 @@
          }
        }
 
-       .currentSub {
+       .current-sub {
          background: #1D667F;
          color: #FFFFFF;
 
@@ -79,6 +72,10 @@
     @media (min-width: 768px) {
       display: none;
     }
+  }
+
+  .search-term {
+    display: block;
   }
 
   .switch-view {
