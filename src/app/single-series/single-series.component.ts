@@ -39,7 +39,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   getSeriesData(id: number) {
     this.seriesData = this._series.drawChart(id);
-    console.log(this.seriesData)
   }
 
   // Redraw chart when selecting a new region or frequency

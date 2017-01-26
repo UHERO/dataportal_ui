@@ -11,11 +11,7 @@ import { dateWrapper } from './date-wrapper';
 @Injectable()
 export class CategoryHelperService {
   private errorMessage: string;
-
-  // seriesData array used as input in highchart.component
   private seriesData = [];
-  private expandedResults = [];
-
   // Variables for geo and freq selectors
   private defaults;
   private geoFreqs;
@@ -24,38 +20,33 @@ export class CategoryHelperService {
   private defaultGeo: string;
   private categoryData;
 
-
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
   initContent(catId: number, routeGeo?: string, routeFreq?: string): Observable<any> {
-    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, seriesData: []};
+    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, seriesData: [], invalid: ''};
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
       this.seriesData = [];
-      categories.forEach((cat, index) => {
-        if (categories[index]['id'] === catId) {
-          let selectedCategory = categories[index]['name'];
-          let sublist = categories[index]['children'];
-
-          // Get a sublist's default geo/freq if available
-          if (categories[index]['defaults']) {
-            this.defaultFreq = categories[index]['defaults']['freq'];
-            this.defaultGeo  = categories[index]['defaults']['geo'];
-          } else {
-            this.defaultFreq = '';
-            this.defaultGeo = '';
-          }
-          this.categoryData.selectedCategory = selectedCategory;
-          this.categoryData.sublist = sublist;
-          this.categoryData.seriesData = this.seriesData;
-
-          this.getSubcategoryData(sublist, routeGeo, routeFreq);
+      let cat = categories.find(cat => cat.id === catId);
+      if (cat) {
+        let selectedCategory = cat.name;
+        let sublist = cat.children;
+        if (cat.defaults) {
+          this.defaultFreq = cat.defaults['freq'];
+          this.defaultGeo = cat.defaults['geo'];
         } else {
-          return;
+          this.defaultFreq = '';
+          this.defaultGeo = '';
         }
-      });
+        this.categoryData.selectedCategory = selectedCategory;
+        this.categoryData.sublist = sublist;
+        this.categoryData.seriesData = this.seriesData;
+        this.getSubcategoryData(sublist, routeGeo, routeFreq);
+      } else {
+        this.categoryData.invalid = 'Category does not exist.';
+      }
     });
     return Observable.forkJoin(Observable.of(this.categoryData));
   }
@@ -126,32 +117,44 @@ export class CategoryHelperService {
     // When date array is completed, call sublistData()
       () => {
         // Fetch data for current region/frequency settings
+        let expandedResults;
         this._uheroAPIService.fetchExpanded(sublistIndex['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
-          this.expandedResults = expanded;
+          expandedResults = expanded;
         },
         (error) => {
           error = this.errorMessage = error;
         },
         () => {
-          if (this.expandedResults) {
-            let series = this._helper.dataTransform(this.expandedResults, dateArray, dateWrapper);
-            // Check if a subcateogry has seasonally adjusted series
+          if (expandedResults) {
+            let categorySeries = [];
+            expandedResults.forEach((result, index) => {
+              let series = this._helper.dataTransform(expandedResults[index].seriesObservations);
+              // Only add series that have data
+              if (series) {
+                let sa = expandedResults[index].seasonallyAdjusted;
+                let freq = expandedResults[index].frequencyShort;
+                series['seriesInfo'] = expandedResults[index];
+                series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
+                categorySeries.push(series);
+              }
+            });
             let hasSeasonallyAdjusted;
             let falseCount = 0;
-            series.forEach((serie, index) => {
-              if (series[index].seriesInfo.seasonallyAdjusted === false) {
+            categorySeries.forEach((serie, index) => {
+              if (categorySeries[index].seriesInfo.seasonallyAdjusted === false) {
                 hasSeasonallyAdjusted = false;
                 falseCount += 1;
               }
             });
-            if (falseCount === series.length) {
+            if (falseCount === categorySeries.length) {
               hasSeasonallyAdjusted = false;
             } else {
               hasSeasonallyAdjusted = true;
             }
             sublistIndex.dateRange = dateArray;
-            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: series, seasonallyAdjusted: hasSeasonallyAdjusted});
+            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, seasonallyAdjusted: hasSeasonallyAdjusted});
           } else {
+            // No series exist for a subcateogry
             let series = [{seriesInfo: 'No data available'}];
             this.seriesData.push({sublist: sublistIndex, series: series});
           }
@@ -162,11 +165,9 @@ export class CategoryHelperService {
   // Set up search results
   initSearch(search: string, routeGeo?: string, routeFreq?: string): Observable<any> {
     let obsEnd, obsStart;
-    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: []};
-    // let sublist = [search];
+    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: [], invalid: ''};
     this.seriesData = [];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
-      console.log('search filters', filters);
       let searchFilters = filters;
       this.defaults = searchFilters.defaults;
       this.freqGeos = searchFilters.freq_geos;
@@ -184,7 +185,7 @@ export class CategoryHelperService {
         this.categoryData.selectedCategory = 'Search: ' + search;
         this.categoryData.seriesData = this.seriesData;
       } else {
-        this.categoryData.selectedCategory = search;
+        this.categoryData.invalid = search;
       }
     });
     return Observable.forkJoin(Observable.of(this.categoryData));
@@ -254,17 +255,29 @@ export class CategoryHelperService {
       }); 
       this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
       if (searchResults) {
-        let series = this._helper.dataTransform(searchResults, dateArray, dateWrapper);
+        // let series = this._helper.dataTransform(searchResults, dateArray, dateWrapper);
+        let searchSeries = [];
+        searchResults.forEach((res, index) => {
+          let series = this._helper.dataTransform(searchResults[index].seriesObservations);
+          // Only add series that have data
+          if (series) {
+            let sa = searchResults[index].seasonallyAdjusted;
+            let freq = searchResults[index].frequencyShort;
+            series['seriesInfo'] = searchResults[index];
+            series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
+            searchSeries.push(series);
+          }
+        });
         // Check if a subcateogry has seasonally adjusted series
         let hasSeasonallyAdjusted;
         let falseCount = 0;
-        series.forEach((serie, index) => {
-          if (series[index].seriesInfo.seasonallyAdjusted === false) {
+        searchSeries.forEach((serie, index) => {
+          if (searchSeries[index].seriesInfo.seasonallyAdjusted === false) {
             hasSeasonallyAdjusted = false;
             falseCount += 1;
           }
         });
-        if (falseCount === series.length) {
+        if (falseCount === searchSeries.length) {
           hasSeasonallyAdjusted = false;
         } else {
           hasSeasonallyAdjusted = true;
@@ -272,7 +285,7 @@ export class CategoryHelperService {
 
         let sublist = {name: search, dateRange: dateArray};
         this.categoryData.sublist = [sublist];
-        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: series, seasonallyAdjusted: hasSeasonallyAdjusted});
+        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: searchSeries, seasonallyAdjusted: hasSeasonallyAdjusted});
       };
     });
   }
