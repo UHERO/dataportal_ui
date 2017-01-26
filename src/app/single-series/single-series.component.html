@@ -11,8 +11,9 @@
       </label>
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>
-    <app-highstock *ngIf="!noSelection" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesTableData, data.currentFreq)"></app-highstock>
-    <div class="summary-stats" *ngIf="!noSelection && summaryStats">
+    <p *ngIf="data.noData">{{data.noData}}</p>
+    <app-highstock *ngIf="!noSelection && !data.noData" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesTableData, data.currentFreq)"></app-highstock>
+    <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">
         <p>Min:</p>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}
       </div>
@@ -26,7 +27,7 @@
         <p>Standard Deviation:</p>{{summaryStats.sd}}
       </div>
     </div>
-    <p-dataTable *ngIf="!noSelection" [value]="newTableData" scrollable="true">
+    <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData" scrollable="true">
       <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
       <p-column field="formattedValue" header="Level"></p-column>
       <p-column field="formattedYoy" [header]=data.change></p-column>

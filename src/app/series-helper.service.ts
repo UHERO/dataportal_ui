@@ -22,7 +22,7 @@ export class SeriesHelperService {
     let geoArray = [];
     let dateArray = [];
     let seriesDetail = null;
-    this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null};
+    this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null, noData: ''};
 
     this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
       let freqs = frequencies;
@@ -58,28 +58,29 @@ export class SeriesHelperService {
 
   getSeriesObservations(id: number, dateArray: Array<any>) {
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
-      let seriesObservations = observations;
-      let start = seriesObservations.start;
-      let end = seriesObservations.end;
+      let obs = this._helper.dataTransform(observations);
+      if (obs) {
+        // Use to format dates for table
+        this._helper.calculateDateArray(obs.start, obs.end, this.seriesData.currentFreq.freq, dateArray);
+        let chartData = obs.chartData;
+        let tableData = obs.tableData;
 
-      // Use to format dates for table
-      this._helper.calculateDateArray(start, end, this.seriesData.currentFreq.freq, dateArray);
-      let chartData = seriesObservations.chartData;
-      let tableData = seriesObservations.tableData;
-
-      // Create table with formatted dates and slice table to starting & ending observation dates
-      let seriesTableData = this._helper.seriesTable(tableData, dateArray);
+        // Create table with formatted dates and slice table to starting & ending observation dates
+        let seriesTableData = this._helper.seriesTable(tableData, dateArray);
         let beginTable, endTable;
         for (let i = 0; i < seriesTableData.length; i++) {
-          if (seriesTableData[i].date === start) {
+          if (seriesTableData[i].date === obs.start) {
             beginTable = i;
           }
-          if (seriesTableData[i].date === end) {
+          if (seriesTableData[i].date === obs.end) {
             endTable = i;
           }
         }
-      this.seriesData.chartData = chartData;
-      this.seriesData.seriesTableData = seriesTableData;
+        this.seriesData.chartData = chartData;
+        this.seriesData.seriesTableData = seriesTableData;
+      } else {
+        this.seriesData.noData = 'Data not available'
+      }
     });
   }
 

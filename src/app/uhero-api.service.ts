@@ -19,8 +19,6 @@ export class UheroApiService {
   private cachedCategories;
   private cachedExpanded = [];
   private cachedSelectedCategory = [];
-  private cachedFrequencies = [];
-  private cachedGeographies = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
   private cachedSeries = [];
@@ -145,20 +143,6 @@ export class UheroApiService {
     }
   }
 
-  fetchFrequencies(id: number): Observable<Frequency[]> {
-    if (this.cachedFrequencies[id]) {
-      return Observable.of(this.cachedFrequencies[id]);
-    } else {
-      let frequencies$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.requestOptionsArgs)
-        .map(mapData)
-        .do(val => {
-          this.cachedFrequencies[id] = val;
-          frequencies$ = null;
-        });
-      return frequencies$;
-    }
-  }
-
   // Get available geographies for a series' siblings
   fetchSiblingGeos(seriesId: number): Observable<Geography[]> {
     if (this.cachedSiblingGeos[seriesId]) {
@@ -171,21 +155,6 @@ export class UheroApiService {
           siblingGeos$ = null;
         });
       return siblingGeos$;
-    }
-  }
-
-  // Gets available geographies for a particular category
-  fetchGeographies(id: number): Observable<Geography[]> {
-    if (this.cachedGeographies[id]) {
-      return Observable.of(this.cachedGeographies[id]);
-    } else {
-      let geographies$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.requestOptionsArgs)
-        .map(mapData)
-        .do(val => {
-          this.cachedGeographies[id] = val;
-          geographies$ = null;
-        });
-      return geographies$;
     }
   }
 
@@ -251,7 +220,7 @@ export class UheroApiService {
       return Observable.of(this.cachedObservations[id]);
     } else {
       let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=` + id, this.requestOptionsArgs)
-        .map(mapObservations)
+        .map(mapData)
         .do(val => {
           this.cachedObservations[id] = val;
           observations$ = null;
@@ -270,10 +239,8 @@ function mapCategories(response: Response): CategoryTree {
   let categoryTree = [];
   categories.forEach((value) => {
     let parent = dataMap[value.parentId];
-    // let defaults = dataMap[value.defaults];
     if (parent) {
       (parent.children || (parent.children = [])).push(value);
-      // (parent.defaults || (parent.defaults = [])).push(value);
     } else {
       categoryTree.push(value);
     }
@@ -284,79 +251,4 @@ function mapCategories(response: Response): CategoryTree {
 function mapData(response: Response): any {
   let data = response.json().data;
   return data;
-}
-
-function mapObservations(response: Response): ObservationResults {
-  let observations = response.json().data;
-  let start = observations.observationStart;
-  let end = observations.observationEnd;
-  let level = observations.transformationResults[0].observations;
-  let yoy = observations.transformationResults[1].observations;
-  let ytd = observations.transformationResults[2].observations;
-
-  let levelValue = [];
-  let yoyValue = [];
-  let ytdValue = [];
-  let pseudoZones = [];
-  
-  if (level) {
-    level.forEach((entry, index) => {
-      // Create [date, value] level pairs for charts
-      levelValue.push([Date.parse(level[index].date), +level[index].value]);
-      if (level[index].pseudoHistory && !level[index + 1].pseudoHistory) {
-        pseudoZones.push({value: Date.parse(level[index].date), dashStyle: 'dash', color: '#7CB5EC'});
-      }
-    });
-  }
-  if (yoy) {
-    yoy.forEach((entry, index) => {
-      // Create [date, value] percent pairs for charts
-      yoyValue.push([Date.parse(yoy[index].date), +yoy[index].value]);
-    });
-  }
-  if (ytd) {
-    ytd.forEach((entry, index) => {
-      // Create [date, value] YTD pairs
-      ytdValue.push([Date.parse(ytd[index].date), +ytd[index].value]);
-    });
-  }
-  
-  let tableData = combineObsData(level, yoy, ytd);
-  let chartData = {level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue};
-  let data = {chartData: chartData, tableData: tableData, start: start, end: end};
-  return data;
-}
-
-// Combine level and percent arrays from Observation data
-// Used to construct table data for single series view
-function combineObsData(level, yoy, ytd) {
-  // Check that level and perc arrays are not null
-  if (level && yoy && ytd) {
-    let table = level;
-    for (let i = 0; i < level.length; i++) {
-      table[i].yoyValue = ' ';
-      table[i].ytdValue = ' ';
-      // table[i].value = formatNum(+level[i].value, 2);
-      table[i].value = +level[i].value;
-      for (let j = 0; j < yoy.length; j++) {
-        if (level[i].date === yoy[j].date) {
-          // table[i].yoyValue = formatNum(+yoy[j].value, 2);
-          table[i].yoyValue = +yoy[j].value;
-          // table[i].ytdValue = formatNum(+ytd[j].value, 2)
-          table[i].ytdValue = +ytd[j].value;
-          break;
-        }
-      }
-    }
-    return table;
-  } else if (level && (!yoy || !ytd)) {
-    let table = level;
-    for (let i = 0; i < level.length; i++) {
-      table[i].yoyValue = ' ';
-      table[i].ytdValue = ' ';
-      // table[i].value = formatNum(+level[i].value, 2);
-      table[i].value = +level[i].value;
-    }
-    return table;
-  }
 }
