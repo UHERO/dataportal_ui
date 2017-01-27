@@ -34,6 +34,11 @@ const routes: Routes = [
     component: CategoryTableComponent
   },
 
+  {
+    path: 'series',
+    component: SingleSeriesComponent
+  },
+
   // map /series/:id to the single series graph/table display
   {
     path: 'series/:id',

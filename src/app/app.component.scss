@@ -17,9 +17,16 @@
 
    .sidebar-container {
      position: relative;
+     padding-left: 0px;
    }
 
    .sidebar-col {
+     @media (max-width: 767px) {
+       position: fixed;
+       width: 100%;
+       z-index: 1;
+     }
+
      @media (min-width: 768px) {
        position: fixed;
        top: 0;
@@ -28,6 +35,10 @@
    }
 
    .content-col {
-     padding-left: 30px;
+     // padding-left: 30px;
+
+     @media (min-width: 1200px) {
+       padding-left: 50px;
+     }
    }
 }

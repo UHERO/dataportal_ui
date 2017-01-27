@@ -16,7 +16,7 @@
       "mobile": false,
       "styles": [
         "../node_modules/bootstrap/dist/css/bootstrap.css",   
-        "../node_modules/primeng/resources/themes/bootstrap/theme.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
         "../node_modules/primeng/resources/primeng.min.css",
         "styles.scss"
       ],

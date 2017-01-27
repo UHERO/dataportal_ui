@@ -9,10 +9,6 @@
 }
 
 #sidebar-nav {
-  // min-height: 100%;
-  // background: #FFFFFF;
-  // margin: 25% 0;
-
   .navbar-brand {
     @media (min-width:768px) {
       display: none;
@@ -83,6 +79,10 @@
       background-color: #F7F7F9;
       overflow-y: scroll;
       z-index: 100;
+    }
+    
+    @media (min-width: 768px) {
+      width: fit-content;
     }
   }
 
@@ -156,30 +156,6 @@
       color: #FFFFFF;
     }
   }
-
-  /* .sub-list-item {
-    // margin: 1em;
-    font-size: 1.15em;
-    white-space: nowrap;
-    padding: 5px 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    background: #E5E5E5;
-
-    a {
-      display: block;
-      text-decoration: none;
-      color: #505050;
-
-      &:hover {
-        color: #FFFFFF;
-      }
-    }
-
-    @media (min-width: 768px) and (max-width: 991px) {
-      white-space: normal;
-    }
-  } */
 
   .selectedCategory {
     background-color: #1d667f;
