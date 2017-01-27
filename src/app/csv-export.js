@@ -49,6 +49,8 @@
                 }
                 return item.name + (keyLength > 1 ? ' ('+ key + ')' : '');
             };
+        // Get chart title (series name, region, and frequency)
+        var seriesInfo = this.title.textStr;
 
         // Loop the series and index values
         i = 0;
@@ -79,7 +81,9 @@
 
         // Add header row
         xTitle = columnHeaderFormatter(xAxis);
-        dataRows = [[xTitle].concat(names)];
+        dataRows = [['Series: ' + seriesInfo]];
+        dataRows.push([xTitle].concat(names));
+        // dataRows = [[xTitle].concat(names)];
 
         // Add the category column
         each(rowArr, function (row) {
@@ -102,7 +106,6 @@
             row.unshift(category);
             dataRows.push(row);
         });
-
         return dataRows;
     };
 
@@ -110,6 +113,7 @@
      * Get a CSV string
      */
     Highcharts.Chart.prototype.getCSV = function (useLocalDecimalPoint) {
+        // console.log('export', Highcharts.Chart);
         var csv = '',
             rows = this.getDataRows(),
             options = (this.options.exporting || {}).csv || {},
@@ -124,7 +128,8 @@
             while (j--) {
                 val = row[j];
                 if (typeof val === "string") {
-                    val = '"' + val + '"';
+                    // val = '"' + val + '"';
+                    val = val;
                 }
                 if (typeof val === 'number') {
                     if (n === ',') {

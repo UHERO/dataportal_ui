@@ -172,9 +172,9 @@ export class HighstockComponent implements OnChanges {
         }
       },
       title: {
-        text: '',
+        text: name + ' (' + geo.name + ' ' + freq.label + ')',
         style: {
-          color: '#505050'
+          display: 'none'
         }
       },
       credits: {

@@ -151,7 +151,11 @@
     -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     margin: 10px 10px 10px 3px;
-    background: #F7F7F7
+    background: #F7F7F7;
+
+    a:hover {
+      text-decoration: none;
+    }
   }
 
   @media (min-width: 768px) {
