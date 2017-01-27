@@ -24,6 +24,18 @@
     }
   }
 
+  .source {
+    width: 100%;
+    background-color: #F9F9F9;
+    padding: 10px 0px 0px;
+    font-size: 0.9em;
+    text-align: center;
+
+    a {
+      color: #1D667F;
+    }
+  }
+
   .summary-stats {
     width: 100%;
     display: table;
