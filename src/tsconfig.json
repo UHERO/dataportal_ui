@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -15,7 +15,7 @@
       "../node_modules/@types"
     ],
     "paths": {
-      "highcharts": ["../node_modules/highcharts/highstock.js"]
+      "highcharts": ["../node_modules/highcharts/highstock.src"]
     }
   }
 }

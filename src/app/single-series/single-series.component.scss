@@ -54,4 +54,16 @@
   .single-chart-container {
     margin: 2% 3%;
   }
+
+  .series-table {
+    th, td {
+      text-align: right;
+      font-family: 'Lucida Sans', sans-serif;
+    }
+    th.ui-state-active {
+      background: #ebedf0;
+      color: #555555;
+      outline: 0;
+    }
+  }
 }

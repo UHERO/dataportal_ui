@@ -1,9 +1,8 @@
 // Highstock chart component used for single-series view
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-
+// import * as highcharts from 'highcharts';
 declare var require: any;
-const Highcharts = require('../../../node_modules/highcharts/highstock.src');
-// const Highcharts = require('highcharts');
+const Highcharts = require('highcharts');
 const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
 const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
@@ -53,6 +52,7 @@ export class HighstockComponent implements OnChanges {
   drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?, pseudoZones?) {
     this.options = {
       chart: {
+        alignTicks: false,
         zoomType: 'x',
         backgroundColor: '#F9F9F9',
       },
@@ -201,7 +201,7 @@ export class HighstockComponent implements OnChanges {
             color: '#727272'
           }
         },
-       opposite: false
+       opposite: false,
       }, {
         title: {
           text: units,
@@ -214,7 +214,8 @@ export class HighstockComponent implements OnChanges {
           style: {
             color: '#1D667F'
           },
-        }
+        },
+        gridLineWidth: 0
       }],
       plotOptions: {
         series: {
@@ -222,6 +223,15 @@ export class HighstockComponent implements OnChanges {
         }
       },
       series: [{
+        name: yoyLabel,
+        type: 'column',
+        color: '#727272',
+        data: yoy,
+        showInNavigator: false,
+        dataGrouping: {
+          enabled: false
+        }
+      }, {
         name: 'Level',
         type: 'line',
         yAxis: 1,
@@ -233,15 +243,6 @@ export class HighstockComponent implements OnChanges {
         },
         zoneAxis: 'x',
         zones: pseudoZones
-      }, {
-        name: yoyLabel,
-        type: 'column',
-        color: '#727272',
-        data: yoy,
-        showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
       }]
     };
   }
@@ -253,8 +254,8 @@ export class HighstockComponent implements OnChanges {
 
     // Selected level data
     let selectedRange = null;
-    if (e.context.series[0].points) {
-      selectedRange = e.context.series[0].points;
+    if (e.context.series[1].points) {
+      selectedRange = e.context.series[1].points;
     }
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];

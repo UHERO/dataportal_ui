@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -10,7 +10,8 @@ import { Geography } from '../geography';
 @Component({
   selector: 'app-single-series',
   templateUrl: './single-series.component.html',
-  styleUrls: ['./single-series.component.scss']
+  styleUrls: ['./single-series.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private errorMessage: string;
