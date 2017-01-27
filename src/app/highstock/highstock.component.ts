@@ -37,24 +37,38 @@ export class HighstockComponent implements OnChanges {
 
   ngOnChanges() {
     let level = this.chartData.level;
-    let pseudoLevel = this.chartData.pseudoLevel;
+    // let pseudoLevel = this.chartData.pseudoLevel;
     let pseudoZones = this.chartData.pseudoZones;
     let yoy = this.chartData.yoy;
     let name = this.seriesDetail.title;
-    let unitsShort = this.seriesDetail.unitsLabelShort === '' ? ' ' : this.seriesDetail.unitsLabelShort;
+    let units = this.seriesDetail.unitsLabel ? this.seriesDetail.unitsLabel : this.seriesDetail.unitsLabelShort;
     let change = this.seriesDetail.percent === true ? 'Change' : '% Change';
     let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
     let dataFreq = this.currentFreq;
     let dataGeo = this.currentGeo;
-    this.drawChart(level, yoy, name, unitsShort, change, dataGeo, dataFreq, yoyLabel, pseudoLevel, pseudoZones);
+    let sourceDescription = this.seriesDetail.source_description;
+    let sourceLink = this.seriesDetail.source_link;
+    this.drawChart(level, yoy, name, units, change, dataGeo, dataFreq, yoyLabel, pseudoZones, sourceDescription, sourceLink);
   }
 
-  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoLevel?, pseudoZones?) {
+  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoZones?, sourceDescription?, sourceLink?) {
     this.options = {
       chart: {
         alignTicks: false,
         zoomType: 'x',
         backgroundColor: '#F9F9F9',
+      },
+      labels: {
+        items: [{
+          html: 'Source Description: ' + sourceDescription,
+        }, {
+          html: 'Source Link: ' + sourceLink,
+        }, {
+          html: 'The Economic Research Organization at the University of Hawaii (UHERO)',
+        }],
+        style: {
+          display: 'none'
+        }
       },
       navigation: {
         buttonOptions: {

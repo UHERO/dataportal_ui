@@ -49,8 +49,14 @@
                 }
                 return item.name + (keyLength > 1 ? ' ('+ key + ')' : '');
             };
-        // Get chart title (series name, region, and frequency)
-        var seriesInfo = this.title.textStr;
+        // Get chart title (series name, region, and frequency) and source info from chart labels
+        var series = this.title.textStr;
+        var chartLabels = this.userOptions.labels.items;
+        var source = [];
+        each(chartLabels, function(label) {
+            source.push(label.html);
+        });
+        var seriesInfo = ['Series: ' + series].concat(source);
 
         // Loop the series and index values
         i = 0;
@@ -81,9 +87,9 @@
 
         // Add header row
         xTitle = columnHeaderFormatter(xAxis);
-        dataRows = [['Series: ' + seriesInfo]];
-        dataRows.push([xTitle].concat(names));
-        // dataRows = [[xTitle].concat(names)];
+        // dataRows = [['Series: ' + series]];
+        // dataRows.push([xTitle].concat(names));
+        dataRows = [[xTitle].concat(names)];
 
         // Add the category column
         each(rowArr, function (row) {
@@ -106,6 +112,7 @@
             row.unshift(category);
             dataRows.push(row);
         });
+        dataRows.push(seriesInfo);
         return dataRows;
     };
 
