@@ -243,7 +243,7 @@ export class HelperService {
   uniqueGeos(geo, geoList) {
     let exist = false;
     for (let i in geoList) {
-      if (geo.name === geoList[i].name) {
+      if (geo.handle === geoList[i].handle) {
         exist = true;
         // If region already exists, check it's list of frequencies
         // Get a unique list of frequencies available for a region
