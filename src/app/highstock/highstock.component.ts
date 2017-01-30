@@ -131,14 +131,15 @@ export class HighstockComponent implements OnChanges {
             text: 'data.uhero.hawaii.edu',
             position: {
               align: 'right',
-              x: -90,
-              y: -40
+              x: -115,
+              y: -38
             }
           },
           title: {
             text: name + ' (' + geo.name + ', ' + freq.label + ')',
             align: 'left',
             style: {
+              display: 'block',
               color: '#1D667F',
               fontFamily: 'sans-serif'
             }

@@ -24,7 +24,7 @@ export class SeriesHelperService {
     let seriesDetail = null;
     this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null, noData: ''};
 
-    this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
+    /* this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
       let freqs = frequencies;
       this.seriesData.frequencies = freqs;
     });
@@ -32,15 +32,21 @@ export class SeriesHelperService {
     this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
       let regions = geos;
       this.seriesData.regions = regions;
-    });
+    }); */
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       seriesDetail = series;
+      let freqGeos = seriesDetail.freq_geos;
+      let geoFreqs = seriesDetail.geo_freqs;
+      let currentGeo = seriesDetail.geography;
+      let currentFreq = {freq: seriesDetail.frequencyShort, label: seriesDetail.frequency};
       this.seriesData.seriesDetail = seriesDetail;
       this.seriesData.saIsActive = seriesDetail['seasonallyAdjusted'];
-      this.seriesData.currentGeo = seriesDetail['geography'];
+      this.seriesData.currentGeo = currentGeo;
+      this.seriesData.regions = freqGeos.find(freq => freq.freq === currentFreq.freq).geos;
+      this.seriesData.frequencies = geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs;
       this.seriesData.change = seriesDetail['percent'] === true ? 'YOY Change' : 'YOY % Change';
-      this.seriesData.currentFreq = {freq: seriesDetail['frequencyShort'], label: series['frequency']};
+      this.seriesData.currentFreq = currentFreq;
     },
     (error) => {
       error = this.errorMessage = error;
