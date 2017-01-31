@@ -136,8 +136,14 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
-      if (el) el.scrollIntoView(el);
-      if (frag === 'top') el.scrollTop;
+      if (el) {
+        el.scrollIntoView(el);
+        let scrolledY = window.scrollY;
+        if(scrolledY){
+          window.scroll(0, scrolledY - 75);
+        }
+      }
+      if (frag === 'top') {el.scrollTop};
     });
   }
 

@@ -100,7 +100,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
-      if (el) el.scrollIntoView(el);
+      if (el) {
+        el.scrollIntoView(el);
+        let scrolledY = window.scrollY;
+        if(scrolledY){
+          window.scroll(0, scrolledY - 75);
+        }
+      }
       if (frag === 'top') {el.scrollTop};
     });
   }
