@@ -266,7 +266,7 @@ export class HighstockComponent implements OnChanges {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax;
-
+    
     // Selected level data
     let selectedRange = null;
     if (e.context.series[1].points) {
