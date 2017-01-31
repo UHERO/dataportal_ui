@@ -173,7 +173,7 @@ export class HighchartComponent implements OnInit {
   
   saLabel(chart, SA) {
     if (SA) {
-      chart.renderer.label('<span class="tag tag-pill" style="font-size: 100%; background-color: #1D667F">SA</span>', 160, 170, null, null, null, true)
+      chart.renderer.label('<span class="badge badge-pill" style="font-size: 100%; background-color: #1D667F">SA</span>', 160, 170, null, null, null, true)
         .css({
           size: '16px'
         })
