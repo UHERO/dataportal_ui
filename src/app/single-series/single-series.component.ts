@@ -32,7 +32,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.route.params.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       this.getSeriesData(seriesId);
     });

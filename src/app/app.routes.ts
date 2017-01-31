@@ -37,13 +37,13 @@ const routes: Routes = [
   {
     path: 'series',
     component: SingleSeriesComponent
-  },
+  }
 
   // map /series/:id to the single series graph/table display
-  {
+  /* {
     path: 'series/:id',
     component: SingleSeriesComponent
-  }
+  } */
 ];
 
 export const routing = RouterModule.forRoot(routes, {useHash: true});
