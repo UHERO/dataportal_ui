@@ -17,7 +17,6 @@
     visibility: hidden;
   }
 
-
   .content-links {
     padding-left: 0px;
     display: inline-block;
@@ -85,10 +84,15 @@
     display: inline-block;
     color: #505050;
     margin-bottom: 15px;
-    
-    .form-check-input {
-      margin-right: 0.25rem;
-      margin-left: 0rem;
+    margin-right: 10px;
+
+    .form-check-inline {
+      padding-left: 0;
+
+      .form-check-input {
+        margin-right: 0.25rem;
+        margin-left: 0rem;
+      }
     }
   }
 
