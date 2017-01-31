@@ -58,7 +58,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     });
     if (id) {
-      this._router.navigate(['/series/' + id]);
+      this._router.navigate(['/series/'], {queryParams: {'id': id}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -79,7 +79,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     });
     if (id) {
-      this._router.navigate(['/series/' + id]);
+      this._router.navigate(['/series/'], {queryParams: {'id': id}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -114,6 +114,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         id = siblingPairs[index].id;
       }
     });
-    this._router.navigate(['/series/' + id]);
+    this._router.navigate(['/series/'], {queryParams: {'id': id}});
   }
 }
