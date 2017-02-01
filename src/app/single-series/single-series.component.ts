@@ -34,12 +34,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
-      this.getSeriesData(seriesId);
+      this.seriesData = this._series.getSeriesData(seriesId);
     });
-  }
-
-  getSeriesData(id: number) {
-    this.seriesData = this._series.drawChart(id);
   }
 
   // Redraw chart when selecting a new region or frequency

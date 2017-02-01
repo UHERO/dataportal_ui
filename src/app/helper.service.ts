@@ -14,25 +14,25 @@ export class HelperService {
 
     while (start <= end) {
       if (currentFreq === 'A') {
-        dateArray.push({date: start.toString() + '-01-01', tableDate: start.toString()});
+        dateArray.push({ date: start.toString() + '-01-01', tableDate: start.toString() });
         start += 1;
       } else if (currentFreq === 'S') {
         let month = ['01', '07'];
         month.forEach((mon, index) => {
-          dateArray.push({date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index]});
+          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
         });
         start += 1;
       } else if (currentFreq === 'M') {
         let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
         month.forEach((mon, index) => {
-          dateArray.push({date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index]});
+          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
         });
         start += 1;
       } else {
         let quarterMonth = ['01', '04', '07', '10'];
         let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
         quarterMonth.forEach((quart, index) => {
-          dateArray.push({date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index]});
+          dateArray.push({ date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index] });
         });
         start += 1;
       }
@@ -44,7 +44,7 @@ export class HelperService {
     let results = [];
     if (dateRange && tableData) {
       for (let i = 0; i < dateRange.length; i++) {
-        results.push({date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' '});
+        results.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' ' });
         for (let j = 0; j < tableData.length; j++) {
           if (results[i].date === tableData[j].date) {
             results[i].value = tableData[j].value;
@@ -62,8 +62,8 @@ export class HelperService {
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from first to last observation; standard deviation
   summaryStats(seriesData, freq) {
-    let stats = {minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', change: Infinity, sd: Infinity};
-    let formatStats = {minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', change: '', sd: '', selectedStart: '', selectedEnd: ''};
+    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', change: Infinity, sd: Infinity };
+    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', change: '', sd: '', selectedStart: '', selectedEnd: '' };
     let levelSum = 0;
     seriesData.forEach((item, index) => {
       if (stats.minValue === Infinity || seriesData[index].value < stats.minValue) {
@@ -118,7 +118,7 @@ export class HelperService {
         // Create [date, value] level pairs for charts
         levelValue.push([Date.parse(level[i].date), +level[i].value]);
         if (level[i].pseudoHistory && !level[i + 1].pseudoHistory) {
-          pseudoZones.push({value: Date.parse(level[i].date), dashStyle: 'dash', color: '#7CB5EC'});
+          pseudoZones.push({ value: Date.parse(level[i].date), dashStyle: 'dash', color: '#7CB5EC' });
         }
       });
     }
@@ -136,9 +136,9 @@ export class HelperService {
     }
     if (level) {
       let tableData = this.combineObsData(level, yoy, ytd);
-      let chartData = {level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue};
-      let data = {chartData: chartData, tableData: tableData, start: start, end: end};
-      results = {chartData: chartData, tableData: tableData, start: start, end: end};
+      let chartData = { level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue };
+      let data = { chartData: chartData, tableData: tableData, start: start, end: end };
+      results = { chartData: chartData, tableData: tableData, start: start, end: end };
     }
     return results;
   }
@@ -151,25 +151,30 @@ export class HelperService {
       seasonalFreq = false;
     }
     for (let i = 0; i < dateRange.length; i++) {
-      categoryTable.push({date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: ''});
-        if (seriesTableData) {
-          for (let j = 0; j < seriesTableData.length; j++) {
-            if (dateWrapper.firstDate === '' || seasonalFreq && seriesTableData[j].date < dateWrapper.firstDate) {
-              dateWrapper.firstDate = seriesTableData[j].date;
-            }
-            if (dateWrapper.endDate === '' || seasonalFreq && seriesTableData[j].date > dateWrapper.endDate) {
-              dateWrapper.endDate = seriesTableData[j].date;
-            }
-            if (categoryTable[i].date === seriesTableData[j].date) {
-              categoryTable[i].level = this.formatNum(+seriesTableData[j].value, 2);
-              categoryTable[i].yoy = this.formatNum(+seriesTableData[j].yoyValue, 2);
-              categoryTable[i].ytd = this.formatNum(+seriesTableData[j].ytdValue, 2);
-              break;
-            }
-          }
-        }
+      categoryTable.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: '' });
+      if (seriesTableData) {
+        this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
       }
+    }
     return categoryTable;
+  }
+
+  catTableDateWrapper(categoryTable, seriesTable, dateWrapper, seasonal) {
+    for (let j = 0; j < seriesTable.length; j++) {
+      if (dateWrapper.firstDate === '' || seasonal && seriesTable[j].date < dateWrapper.firstDate) {
+        dateWrapper.firstDate = seriesTable[j].date;
+      }
+      if (dateWrapper.endDate === '' || seasonal && seriesTable[j].date > dateWrapper.endDate) {
+        dateWrapper.endDate = seriesTable[j].date;
+      }
+      // Format values for category table
+      if (categoryTable.date === seriesTable[j].date) {
+        categoryTable.level = this.formatNum(+seriesTable[j].value, 2);
+        categoryTable.yoy = this.formatNum(+seriesTable[j].yoyValue, 2);
+        categoryTable.ytd = this.formatNum(+seriesTable[j].ytdValue, 2);
+        break;
+      }
+    }
   }
 
   // Combine level and percent arrays from Observation data
@@ -235,7 +240,7 @@ export class HelperService {
     let decimalString = ('' + remainder.toFixed(decimal)).substr(2, decimal);
     let intString = '' + int, i = intString.length;
     let r = '';
-    while ( (i -= 3) > signCheck ) { r = ',' + intString.substr(i, 3) + r; }
+    while ((i -= 3) > signCheck) { r = ',' + intString.substr(i, 3) + r; }
     return intString.substr(0, i + 3) + r + (decimalString ? '.' + decimalString : '');
   }
 
@@ -249,13 +254,7 @@ export class HelperService {
         // Get a unique list of frequencies available for a region
         let freqs = geo.freqs;
         for (let j in freqs) {
-          let freqExist = false;
-          for (let n in geoList[i].freqs) {
-            if (freqs[j].freq === geoList[i].freqs[n].freq) {
-              freqExist = true;
-            }
-          }
-          if (!freqExist) {
+          if (!this.freqExist(geoList[i].freqs, freqs[j].freq)) {
             geoList[i].freqs.push(freqs[j]);
           }
         }
@@ -264,6 +263,15 @@ export class HelperService {
     if (!exist) {
       geoList.push(geo);
     }
+  }
+
+  freqExist(freqArray, freq) {
+    for (let n in freqArray) {
+      if (freq === freqArray[n].freq) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // Get a unique array of available frequencies for a category
@@ -276,13 +284,7 @@ export class HelperService {
         // Get a unique list of regions available for a frequency
         let geos = freq.geos;
         for (let j in geos) {
-          let geoExist = false;
-          for (let n in freqList[i].geos) {
-            if (geos[j].handle === freqList[i].geos[n].handle) {
-              geoExist = true;
-            }
-          }
-          if (!geoExist) {
+          if (!this.geoExist(freqList[i].geos, geos[j].handle)) {
             freqList[i].geos.push(geos[j]);
           }
         }
@@ -291,5 +293,14 @@ export class HelperService {
     if (!exist) {
       freqList.push(freq);
     }
+  }
+
+  geoExist(geoArray, geo) {
+    for (let n in geoArray) {
+      if (geo === geoArray[n].handle) {
+        return true;
+      }
+    }
+    return false;
   }
 }

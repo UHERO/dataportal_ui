@@ -17,22 +17,12 @@ export class SeriesHelperService {
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
-  drawChart(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+  getSeriesData(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
     let freqArray = [];
     let geoArray = [];
     let dateArray = [];
     let seriesDetail = null;
     this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null, noData: ''};
-
-    /* this._uheroAPIService.fetchSiblingFreqs(id).subscribe((frequencies) => {
-      let freqs = frequencies;
-      this.seriesData.frequencies = freqs;
-    });
-
-    this._uheroAPIService.fetchSiblingGeos(id).subscribe((geos) => {
-      let regions = geos;
-      this.seriesData.regions = regions;
-    }); */
 
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       seriesDetail = series;
