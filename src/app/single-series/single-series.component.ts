@@ -32,14 +32,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.route.params.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
-      this.getSeriesData(seriesId);
+      this.seriesData = this._series.getSeriesData(seriesId);
     });
-  }
-
-  getSeriesData(id: number) {
-    this.seriesData = this._series.drawChart(id);
   }
 
   // Redraw chart when selecting a new region or frequency
@@ -58,7 +54,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     });
     if (id) {
-      this._router.navigate(['/series/' + id]);
+      this._router.navigate(['/series/'], {queryParams: {'id': id}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -79,7 +75,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     });
     if (id) {
-      this._router.navigate(['/series/' + id]);
+      this._router.navigate(['/series/'], {queryParams: {'id': id}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -114,6 +110,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         id = siblingPairs[index].id;
       }
     });
-    this._router.navigate(['/series/' + id]);
+    this._router.navigate(['/series/'], {queryParams: {'id': id}});
   }
 }

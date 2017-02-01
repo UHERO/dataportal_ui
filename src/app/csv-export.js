@@ -52,11 +52,10 @@
         // Get chart title (series name, region, and frequency) and source info from chart labels
         var series = this.title.textStr;
         var chartLabels = this.userOptions.labels.items;
-        var source = [];
-        each(chartLabels, function(label) {
-            source.push(label.html);
-        });
-        var seriesInfo = ['Series: ' + series].concat(source);
+        var sourceDescription = [chartLabels[0].html];
+        var sourceLink = [chartLabels[1].html];
+        var uhero = [chartLabels[2].html];
+        var seriesInfo = ['Series: ' + series];
 
         // Loop the series and index values
         i = 0;
@@ -113,6 +112,10 @@
             dataRows.push(row);
         });
         dataRows.push(seriesInfo);
+        dataRows.push(sourceDescription);
+        dataRows.push(sourceLink);
+        dataRows.push(uhero);
+
         return dataRows;
     };
 

@@ -24,8 +24,6 @@ export class UheroApiService {
   private cachedSeries = [];
   private cachedSeriesDetail = [];
   private cachedSiblings = [];
-  private cachedSiblingFreqs = [];
-  private cachedSiblingGeos = [];
   private cachedSearchExpand = [];
   private cachedSearchFilters = [];
 
@@ -38,7 +36,6 @@ export class UheroApiService {
   }
 
   //  Get data from API
-
   // Gets all available categories. Used for navigation & displaying sublists 
   fetchCategories(): Observable<CategoryTree> {
     if (this.cachedCategories) {
@@ -125,36 +122,6 @@ export class UheroApiService {
           seriesSiblings$ = null;
         });
       return seriesSiblings$;
-    }
-  }
-
-  // Get available frequencies for a series' siblings
-  fetchSiblingFreqs(seriesId: number): Observable<Frequency[]> {
-    if (this.cachedSiblingFreqs[seriesId]) {
-      return Observable.of(this.cachedSiblingFreqs[seriesId]);
-    } else {
-      let siblingFreqs$ = this.http.get(`${this.baseUrl}/series/siblings/freq?id=` + seriesId, this.requestOptionsArgs)
-        .map(mapData)
-        .do(val => {
-          this.cachedSiblingFreqs[seriesId] = val;
-          siblingFreqs$ = null;
-        });
-      return siblingFreqs$;
-    }
-  }
-
-  // Get available geographies for a series' siblings
-  fetchSiblingGeos(seriesId: number): Observable<Geography[]> {
-    if (this.cachedSiblingGeos[seriesId]) {
-      return Observable.of(this.cachedSiblingGeos[seriesId]);
-    } else {
-      let siblingGeos$ = this.http.get(`${this.baseUrl}/series/siblings/geo?id=` + seriesId, this.requestOptionsArgs)
-        .map(mapData)
-        .do(val => {
-          this.cachedSiblingGeos[seriesId] = val;
-          siblingGeos$ = null;
-        });
-      return siblingGeos$;
     }
   }
 

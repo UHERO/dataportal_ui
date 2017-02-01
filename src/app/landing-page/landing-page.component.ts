@@ -42,7 +42,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.id) {this.queryParams.id = this.id};
       if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
       if (this.routeGeo) {this.queryParams.geo = this.routeGeo};
-      if (this.routeFreq) {this.queryParams.freq = this.routeFreq} ;
+      if (this.routeFreq) {this.queryParams.freq = this.routeFreq};
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {

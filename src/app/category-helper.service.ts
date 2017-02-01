@@ -62,10 +62,10 @@ export class CategoryHelperService {
         this.freqGeos = catInfo.freq_geos;
         this.geoFreqs = catInfo.geo_freqs;
         this.geoFreqs.forEach((geo, indx) => {
-          this._helper.uniqueGeos(this.geoFreqs[indx], geoArray);
+          this._helper.uniqueGeos(geo, geoArray);
         });
         this.freqGeos.forEach((freq, indx) => {
-          this._helper.uniqueFreqs(this.freqGeos[indx], freqArray);
+          this._helper.uniqueFreqs(freq, freqArray);
         });
         i += 1;
       },

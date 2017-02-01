@@ -41,10 +41,10 @@
               <template ngFor let-serie [ngForOf]="series.series">
                 <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable">
                   <th>
-                    <a [routerLink]="['/series', serie.seriesInfo.id]" [title]="serie.seriesInfo.title">
+                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title">
                       {{serie.seriesInfo.title}}
                     </a>
-                    <span class="tag tag-pill tag-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
+                    <span class="badge badge-pill badge-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
                   </th>
                   <template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.level}}</td>

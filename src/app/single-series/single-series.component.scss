@@ -8,6 +8,16 @@
     margin-bottom: 15px;
   }
 
+  .form-check {
+    display: inline-block;
+    margin-left: 10px;
+    margin-bottom: 0;
+    
+    .form-check-input {
+      margin-right: 0.25rem;
+    }
+  }
+
   .series-title {
     display: block;
     // vertical-align: middle;
@@ -18,7 +28,7 @@
     // margin: auto 15px auto 0;
 
     @media (min-width: 768px) {
-      margin: auto 15px auto 0;
+      margin: auto 10px auto 0;
       display: inline-block;
       vertical-align: middle;
     }
