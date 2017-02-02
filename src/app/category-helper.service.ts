@@ -128,7 +128,7 @@ export class CategoryHelperService {
           if (expandedResults) {
             let categorySeries = [];
             expandedResults.forEach((result, index) => {
-              let series = this._helper.dataTransform(expandedResults[index].seriesObservations);
+              let series = this._helper.dataTransform(expandedResults[index].seriesObservations, dateArray);
               // Only add series that have data
               if (series) {
                 let sa = expandedResults[index].seasonallyAdjusted;
@@ -258,7 +258,7 @@ export class CategoryHelperService {
         // let series = this._helper.dataTransform(searchResults, dateArray, dateWrapper);
         let searchSeries = [];
         searchResults.forEach((res, index) => {
-          let series = this._helper.dataTransform(searchResults[index].seriesObservations);
+          let series = this._helper.dataTransform(searchResults[index].seriesObservations, dateArray);
           // Only add series that have data
           if (series) {
             let sa = searchResults[index].seasonallyAdjusted;

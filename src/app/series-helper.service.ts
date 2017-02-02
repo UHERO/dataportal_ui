@@ -54,26 +54,16 @@ export class SeriesHelperService {
 
   getSeriesObservations(id: number, dateArray: Array<any>) {
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
-      let obs = this._helper.dataTransform(observations);
+      // let obs = this._helper.dataTransform(observations);
+      let obs = observations;
+      let obsStart = obs.observationStart;
+      let obsEnd = obs.observationEnd;
       if (obs) {
         // Use to format dates for table
-        this._helper.calculateDateArray(obs.start, obs.end, this.seriesData.currentFreq.freq, dateArray);
-        let chartData = obs.chartData;
-        let tableData = obs.tableData;
-
-        // Create table with formatted dates and slice table to starting & ending observation dates
-        let seriesTableData = this._helper.seriesTable(tableData, dateArray);
-        let beginTable, endTable;
-        for (let i = 0; i < seriesTableData.length; i++) {
-          if (seriesTableData[i].date === obs.start) {
-            beginTable = i;
-          }
-          if (seriesTableData[i].date === obs.end) {
-            endTable = i;
-          }
-        }
-        this.seriesData.chartData = chartData;
-        this.seriesData.seriesTableData = seriesTableData;
+        this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        let data = this._helper.dataTransform(obs, dateArray);
+        this.seriesData.chartData = data.chartData;
+        this.seriesData.seriesTableData = data.tableData; 
       } else {
         this.seriesData.noData = 'Data not available'
       }

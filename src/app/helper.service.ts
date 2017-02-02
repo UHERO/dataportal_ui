@@ -12,29 +12,39 @@ export class HelperService {
     let start = +dateStart.substring(0, 4);
     let end = +dateEnd.substring(0, 4);
 
-    while (start <= end) {
-      if (currentFreq === 'A') {
+    if (currentFreq === 'A') {
+      while (start + '-01-01' <= end + '-01-01') {
         dateArray.push({ date: start.toString() + '-01-01', tableDate: start.toString() });
         start += 1;
-      } else if (currentFreq === 'S') {
+      }
+    } else if (currentFreq === 'S') {
+      let startMonth = +dateStart.substring(5, 7);
+      let endMonth = +dateEnd.substring(5, 7);
+      let m = { 1: '01', 7: '07' };
+      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
         let month = ['01', '07'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else if (currentFreq === 'M') {
-        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else {
-        let quarterMonth = ['01', '04', '07', '10'];
-        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-        quarterMonth.forEach((quart, index) => {
-          dateArray.push({ date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index] });
-        });
-        start += 1;
+        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + '-' + m[startMonth] });
+        start = startMonth === 7 ? start += 1 : start;
+        startMonth = startMonth === 1 ? 7 : 1;
+      }
+    } else if (currentFreq === 'M') {
+      let startMonth = +dateStart.substring(5, 7);
+      let endMonth = +dateEnd.substring(5, 7);
+      let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
+      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + '-' + m[startMonth] });
+        start = startMonth === 12 ? start += 1 : start;
+        startMonth = startMonth === 12 ? 1 : startMonth += 1;
+      }
+    } else if (currentFreq == 'Q') {
+      let startMonth = +dateStart.substring(5, 7);
+      let endMonth = +dateEnd.substring(5, 7);
+      let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
+      let m = { 1: '01', 4: '04', 7: '07', 10: '10' };
+      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + ' ' + q[startMonth] })
+        start = startMonth === 10 ? start += 1 : start;
+        startMonth = startMonth === 10 ? 1 : startMonth += 3;
       }
     }
     return dateArray;
@@ -48,14 +58,36 @@ export class HelperService {
         for (let j = 0; j < tableData.length; j++) {
           if (results[i].date === tableData[j].date) {
             results[i].value = tableData[j].value;
-            results[i].formattedValue = tableData[j].value === ' ' ? ' ' : this.formatNum(+tableData[j].value, 2);
+            results[i].formattedValue = tableData[j].value === null ? ' ' : this.formatNum(+tableData[j].value, 2);
             results[i].yoy = tableData[j].yoyValue;
-            results[i].formattedYoy = tableData[j].yoyValue === ' ' ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
+            results[i].formattedYoy = tableData[j].yoyValue === null ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
             break;
           }
         }
       }
       return results;
+    }
+  }
+
+  seriesChart(data, dateRange) {
+    let levelValue = [];
+    let yoyValue = [];
+    let ytdValue = [];
+    if (dateRange && data) {
+      for (let i = 0; i < dateRange.length; i++) {
+        levelValue.push([Date.parse(dateRange[i].date), null]);
+        yoyValue.push([Date.parse(dateRange[i].date), null]);
+        ytdValue.push([Date.parse(dateRange[i].date), null]);
+        for (let j = 0; j < data.length; j++) {
+          if (dateRange[i].date === data[j].date) {
+            levelValue[i][1] = data[j].value;
+            yoyValue[i][1] = data[j].yoyValue;
+            ytdValue[i][1] = data[j].ytdValue;
+            break;
+          }
+        }
+      }
+      return [levelValue, yoyValue, ytdValue];
     }
   }
 
@@ -99,7 +131,7 @@ export class HelperService {
     return formatStats;
   }
 
-  dataTransform(seriesObs) {
+  dataTransform(seriesObs, dates) {
     let results = null;
     let observations = seriesObs;
     let start = observations.observationStart;
@@ -135,9 +167,11 @@ export class HelperService {
       });
     }
     if (level) {
-      let tableData = this.combineObsData(level, yoy, ytd);
-      let chartData = { level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue };
-      let data = { chartData: chartData, tableData: tableData, start: start, end: end };
+      // let tableData = this.combineObsData(level, yoy, ytd);
+      let combineData = this.combineObsData(level, yoy, ytd);
+      let tableData = this.seriesTable(combineData, dates);
+      let chart = this.seriesChart(combineData, dates);
+      let chartData = { level: chart[0], pseudoZones: pseudoZones, yoy: chart[1], ytd: chart[2] };
       results = { chartData: chartData, tableData: tableData, start: start, end: end };
     }
     return results;
@@ -184,8 +218,8 @@ export class HelperService {
     if (level && yoy && ytd) {
       let table = level;
       for (let i = 0; i < level.length; i++) {
-        table[i].yoyValue = ' ';
-        table[i].ytdValue = ' ';
+        table[i].yoyValue = null;
+        table[i].ytdValue = null;
         table[i].value = +level[i].value;
         for (let j = 0; j < yoy.length; j++) {
           if (level[i].date === yoy[j].date) {
@@ -199,8 +233,8 @@ export class HelperService {
     } else if (level && (!yoy || !ytd)) {
       let table = level;
       for (let i = 0; i < level.length; i++) {
-        table[i].yoyValue = ' ';
-        table[i].ytdValue = ' ';
+        table[i].yoyValue = null;
+        table[i].ytdValue = null;
         table[i].value = +level[i].value;
       }
       return table;
