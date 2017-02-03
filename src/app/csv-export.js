@@ -52,9 +52,15 @@
         // Get chart title (series name, region, and frequency) and source info from chart labels
         var series = this.title.textStr;
         var chartLabels = this.userOptions.labels.items;
-        var sourceDescription = [chartLabels[0].html];
-        var sourceLink = [chartLabels[1].html];
+        var sourceDescription, sourceLink;
+        if (chartLabels[0].html) {
+            sourceDescription = ['Source Description: ' + chartLabels[0].html];
+        };
+        if (chartLabels[1].html) {
+            sourceLink = ['Source Link: ' + chartLabels[1].html];
+        };
         var uhero = [chartLabels[2].html];
+        var dpLink = [chartLabels[3].html];
         var seriesInfo = ['Series: ' + series];
 
         // Loop the series and index values
@@ -111,10 +117,16 @@
             row.unshift(category);
             dataRows.push(row);
         });
+        dataRows.push([null], [null], [null], [null]);
         dataRows.push(seriesInfo);
-        dataRows.push(sourceDescription);
-        dataRows.push(sourceLink);
+        if (sourceDescription) {
+            dataRows.push(sourceDescription);
+        }
+        if (sourceLink) {
+            dataRows.push(sourceLink);
+        }
         dataRows.push(uhero);
+        dataRows.push(dpLink);
 
         return dataRows;
     };
@@ -145,6 +157,9 @@
                     if (n === ',') {
                         val = val.toString().replace(".", ",");
                     }
+                }
+                if (val === null) {
+                    val = ' ';
                 }
                 row[j] = val;
             }
@@ -185,7 +200,7 @@
                     html += '<' + tag + ' class="number">' + val + '</' + tag + '>';
 
                 } else {
-                    html += '<' + tag + '>' + (val === undefined ? '' : val) + '</' + tag + '>';
+                    html += '<' + tag + '>' + ((val === undefined || val === null) ? '' : val) + '</' + tag + '>';
                 }
             }
 
@@ -257,7 +272,7 @@
         var uri = 'data:application/vnd.ms-excel;base64,',
             template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
                 '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
-                '<x:Name>Ark1</x:Name>' +
+                '<x:Name>Sheet 1</x:Name>' +
                 '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
                 '<style>td{border:none;font-family: Calibri, sans-serif;} .number{mso-number-format:"0.00";}</style>' +
                 '<meta name=ProgId content=Excel.Sheet>' +

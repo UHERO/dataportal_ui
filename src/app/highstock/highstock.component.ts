@@ -60,11 +60,13 @@ export class HighstockComponent implements OnChanges {
       },
       labels: {
         items: [{
-          html: 'Source Description: ' + sourceDescription,
+          html: sourceDescription,
         }, {
-          html: 'Source Link: ' + sourceLink,
+          html: sourceLink,
         }, {
           html: 'The Economic Research Organization at the University of Hawaii (UHERO)',
+        }, {
+          html: 'Data Portal: http://data.uhero.hawaii.edu/' 
         }],
         style: {
           display: 'none'
