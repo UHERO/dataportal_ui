@@ -19,13 +19,16 @@ export class CategoryHelperService {
   private defaultFreq: string;
   private defaultGeo: string;
   private categoryData;
+  private categoryDates = [];
+  private seriesDates = [];
+  private series = [];
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
   initContent(catId: number, routeGeo?: string, routeFreq?: string): Observable<any> {
-    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, seriesData: [], invalid: ''};
+    this.categoryData = { selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, seriesData: [], invalid: '' };
     this._uheroAPIService.fetchCategories().subscribe((category) => {
       let categories = category;
       this.seriesData = [];
@@ -69,39 +72,39 @@ export class CategoryHelperService {
         });
         i += 1;
       },
-      (error) => {
-        error = this.errorMessage = error;
-      },
-      () => {
-        if (i === sublist.length) {
-          sublist.forEach((subcat, indx) => {
-            let dateWrapper = {firstDate: '', endDate: ''};
-            let selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-            let selectedGeo = routeGeo ? routeGeo :  this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
-            let freqs, regions, currentGeo, currentFreq;
-            // Get frequencies available for a selected region
-            geoArray.forEach((geo, ind) => {
-              if (selectedGeo === geoArray[ind].handle) {
-                freqs = geoArray[ind].freqs;
-              }
-            });
+        (error) => {
+          error = this.errorMessage = error;
+        },
+        () => {
+          if (i === sublist.length) {
+            sublist.forEach((subcat, indx) => {
+              let dateWrapper = { firstDate: '', endDate: '' };
+              let selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+              let selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+              let freqs, regions, currentGeo, currentFreq;
+              // Get frequencies available for a selected region
+              geoArray.forEach((geo, ind) => {
+                if (selectedGeo === geo.handle) {
+                  freqs = geo.freqs;
+                }
+              });
 
-            // Get regions available for a selected frequency
-            freqArray.forEach((freq, ind) => {
-              if (selectedFreq === freqArray[ind].freq) {
-                regions = freqArray[ind].geos;
-              }
+              // Get regions available for a selected frequency
+              freqArray.forEach((freq, ind) => {
+                if (selectedFreq === freq.freq) {
+                  regions = freq.geos;
+                }
+              });
+              currentGeo = regions.find(region => region.handle === selectedGeo);
+              currentFreq = freqs.find(freq => freq.freq === selectedFreq);
+              this.categoryData.regions = regions;
+              this.categoryData.frequencies = freqs;
+              this.categoryData.currentGeo = currentGeo;
+              this.categoryData.currentFreq = currentFreq;
+              this.getSeriesData(subcat, geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
             });
-            currentGeo = regions.find(region => region.handle === selectedGeo);
-            currentFreq = freqs.find(freq => freq.freq === selectedFreq);
-            this.categoryData.regions = regions;
-            this.categoryData.frequencies = freqs;
-            this.categoryData.currentGeo = currentGeo;
-            this.categoryData.currentFreq = currentFreq;
-            this.getSeriesData(sublist[indx], geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
-          });
-        }
-      });
+          }
+        });
     });
   }
 
@@ -109,63 +112,75 @@ export class CategoryHelperService {
   getSeriesData(sublistIndex, regions: Array<any>, currentGeo: Geography, freqs: Array<any>, currentFreq: Frequency, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
     this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
-      this._helper.calculateDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
+      // dateArray = this._helper.categoryDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
+      if(!this.categoryDates[sublistIndex['id'] + currentFreq.freq]) {
+        this.categoryDates[sublistIndex['id'] + currentFreq.freq] = [];
+        this.categoryDates[sublistIndex['id'] + currentFreq.freq] = this._helper.categoryDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
+      }
+      dateArray = this.categoryDates[sublistIndex['id'] + currentFreq.freq];
     },
-    (error) => {
-      error = this.errorMessage = error;
-    },
-    // When date array is completed, call sublistData()
+      (error) => {
+        error = this.errorMessage = error;
+      },
+      // When date array is completed, call sublistData()
       () => {
         // Fetch data for current region/frequency settings
         let expandedResults;
         this._uheroAPIService.fetchExpanded(sublistIndex['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
           expandedResults = expanded;
         },
-        (error) => {
-          error = this.errorMessage = error;
-        },
-        () => {
-          if (expandedResults) {
-            let categorySeries = [];
-            expandedResults.forEach((result, index) => {
-              let series = this._helper.dataTransform(expandedResults[index].seriesObservations, dateArray);
-              // Only add series that have data
-              if (series) {
-                let sa = expandedResults[index].seasonallyAdjusted;
-                let freq = expandedResults[index].frequencyShort;
-                series['seriesInfo'] = expandedResults[index];
-                series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
-                categorySeries.push(series);
-              }
-            });
-            let hasSeasonallyAdjusted;
-            let falseCount = 0;
-            categorySeries.forEach((serie, index) => {
-              if (categorySeries[index].seriesInfo.seasonallyAdjusted === false) {
+          (error) => {
+            error = this.errorMessage = error;
+          },
+          () => {
+            if (expandedResults) {
+              let categorySeries = [];
+              expandedResults.forEach((result, index) => {
+                let seriesObsStart = result.seriesObservations.observationStart;
+                let seriesObsEnd = result.seriesObservations.observationEnd;
+                let levelData = result.seriesObservations.transformationResults[0].observations;
+                // Get array of dates for each series and cache result
+                if (!this.seriesDates[result['id']] && levelData) {
+                  let seriesDates = [];
+                  this.seriesDates[result['id']] = this._helper.seriesDateArray(seriesObsStart, seriesObsEnd, currentFreq.freq, seriesDates);
+                }
+                let series = this._helper.dataTransform(result.seriesObservations, this.seriesDates[result['id']]);
+                if (series) {
+                  let sa = result.seasonallyAdjusted;
+                  let freq = result.frequencyShort;
+                  series['seriesInfo'] = result;
+                  series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
+                  categorySeries.push(series);
+                }
+              });
+              let hasSeasonallyAdjusted;
+              let falseCount = 0;
+              categorySeries.forEach((serie, index) => {
+                if (serie.seriesInfo.seasonallyAdjusted === false) {
+                  hasSeasonallyAdjusted = false;
+                  falseCount += 1;
+                }
+              });
+              if (falseCount === categorySeries.length) {
                 hasSeasonallyAdjusted = false;
-                falseCount += 1;
+              } else {
+                hasSeasonallyAdjusted = true;
               }
-            });
-            if (falseCount === categorySeries.length) {
-              hasSeasonallyAdjusted = false;
+              sublistIndex.dateRange = dateArray;
+              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, seasonallyAdjusted: hasSeasonallyAdjusted });
             } else {
-              hasSeasonallyAdjusted = true;
+              // No series exist for a subcateogry
+              let series = [{ seriesInfo: 'No data available' }];
+              this.seriesData.push({ sublist: sublistIndex, series: series });
             }
-            sublistIndex.dateRange = dateArray;
-            this.seriesData.push({dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, seasonallyAdjusted: hasSeasonallyAdjusted});
-          } else {
-            // No series exist for a subcateogry
-            let series = [{seriesInfo: 'No data available'}];
-            this.seriesData.push({sublist: sublistIndex, series: series});
-          }
-        });
-    });
+          });
+      });
   }
 
   // Set up search results
   initSearch(search: string, routeGeo?: string, routeFreq?: string): Observable<any> {
     let obsEnd, obsStart;
-    this.categoryData = {selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: [], invalid: ''};
+    this.categoryData = { selectedCategory: '', sublist: [], regions: [], currentGeo: {}, frequencies: {}, currentFreq: {}, seriesData: [], invalid: '' };
     this.seriesData = [];
     this._uheroAPIService.fetchSearchFilters(search).subscribe((filters) => {
       let searchFilters = filters;
@@ -175,19 +190,19 @@ export class CategoryHelperService {
       obsEnd = searchFilters.observationEnd;
       obsStart = searchFilters.observationStart;
     },
-    (error) => {
-      error = this.errorMessage = error;
-    },
-    () => {
-      if (obsEnd && obsStart) {
-        let dateWrapper = {firstDate: '', endDate: ''};
-        this.searchSettings(search, dateWrapper, routeGeo, routeFreq);
-        this.categoryData.selectedCategory = 'Search: ' + search;
-        this.categoryData.seriesData = this.seriesData;
-      } else {
-        this.categoryData.invalid = search;
-      }
-    });
+      (error) => {
+        error = this.errorMessage = error;
+      },
+      () => {
+        if (obsEnd && obsStart) {
+          let dateWrapper = { firstDate: '', endDate: '' };
+          this.searchSettings(search, dateWrapper, routeGeo, routeFreq);
+          this.categoryData.selectedCategory = 'Search: ' + search;
+          this.categoryData.seriesData = this.seriesData;
+        } else {
+          this.categoryData.invalid = search;
+        }
+      });
     return Observable.forkJoin(Observable.of(this.categoryData));
   }
 
@@ -234,59 +249,64 @@ export class CategoryHelperService {
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
       searchResults = searchRes;
     },
-    (error) => {
-      error = this.errorMessage = error;
-    },
-    () => {
-      searchResults.forEach((searchRes, index) => {
-        // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
-        let seasonalFreq = true;
-        let freq = searchResults[index].frequencyShort;
-        let sa = searchResults[index].seasonallyAdjusted
-        if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
-          seasonalFreq = false;
-        }
-        if (dateWrapper.firstDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
-          dateWrapper.firstDate = searchResults[index].seriesObservations.observationStart;
-        }
-        if (dateWrapper.endDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationEnd > dateWrapper.endDate) {
-          dateWrapper.endDate = searchResults[index].seriesObservations.observationEnd;
-        }
-      }); 
-      this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
-      if (searchResults) {
-        // let series = this._helper.dataTransform(searchResults, dateArray, dateWrapper);
-        let searchSeries = [];
-        searchResults.forEach((res, index) => {
-          let series = this._helper.dataTransform(searchResults[index].seriesObservations, dateArray);
-          // Only add series that have data
-          if (series) {
-            let sa = searchResults[index].seasonallyAdjusted;
-            let freq = searchResults[index].frequencyShort;
-            series['seriesInfo'] = searchResults[index];
-            series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
-            searchSeries.push(series);
+      (error) => {
+        error = this.errorMessage = error;
+      },
+      () => {
+        searchResults.forEach((searchRes, index) => {
+          // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
+          let seasonalFreq = true;
+          let freq = searchResults[index].frequencyShort;
+          let sa = searchResults[index].seasonallyAdjusted
+          if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
+            seasonalFreq = false;
+          }
+          if (dateWrapper.firstDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationStart < dateWrapper.firstDate) {
+            dateWrapper.firstDate = searchResults[index].seriesObservations.observationStart;
+          }
+          if (dateWrapper.endDate === '' || seasonalFreq && searchResults[index].seriesObservations.observationEnd > dateWrapper.endDate) {
+            dateWrapper.endDate = searchResults[index].seriesObservations.observationEnd;
           }
         });
-        // Check if a subcateogry has seasonally adjusted series
-        let hasSeasonallyAdjusted;
-        let falseCount = 0;
-        searchSeries.forEach((serie, index) => {
-          if (searchSeries[index].seriesInfo.seasonallyAdjusted === false) {
+        // Get array of dates for entire subcategory, used for table view
+        this._helper.categoryDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
+        if (searchResults) {
+          let searchSeries = [];
+          searchResults.forEach((res, index) => {
+            let seriesObsStart = res.seriesObservations.observationStart;
+            let seriesObsEnd = res.seriesObservations.observationEnd;
+            let seriesDates = [];
+            // Get array of dates for each series
+            seriesDates = this._helper.seriesDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
+            let series = this._helper.dataTransform(res.seriesObservations, seriesDates);
+            // Only add series that have data
+            if (series) {
+              let sa = searchResults[index].seasonallyAdjusted;
+              let freq = searchResults[index].frequencyShort;
+              series['seriesInfo'] = searchResults[index];
+              series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
+              searchSeries.push(series);
+            }
+          });
+          // Check if a subcateogry has seasonally adjusted series
+          let hasSeasonallyAdjusted;
+          let falseCount = 0;
+          searchSeries.forEach((serie, index) => {
+            if (searchSeries[index].seriesInfo.seasonallyAdjusted === false) {
+              hasSeasonallyAdjusted = false;
+              falseCount += 1;
+            }
+          });
+          if (falseCount === searchSeries.length) {
             hasSeasonallyAdjusted = false;
-            falseCount += 1;
+          } else {
+            hasSeasonallyAdjusted = true;
           }
-        });
-        if (falseCount === searchSeries.length) {
-          hasSeasonallyAdjusted = false;
-        } else {
-          hasSeasonallyAdjusted = true;
-        }
 
-        let sublist = {name: search, dateRange: dateArray};
-        this.categoryData.sublist = [sublist];
-        this.seriesData.push({dateWrapper: dateWrapper, sublist: sublist, series: searchSeries, seasonallyAdjusted: hasSeasonallyAdjusted});
-      };
-    });
+          let sublist = { name: search, dateRange: dateArray };
+          this.categoryData.sublist = [sublist];
+          this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublist, series: searchSeries, seasonallyAdjusted: hasSeasonallyAdjusted });
+        };
+      });
   }
 }

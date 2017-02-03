@@ -8,43 +8,69 @@ export class HelperService {
 
   constructor() { }
 
-  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+
+  categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let start = +dateStart.substring(0, 4);
     let end = +dateEnd.substring(0, 4);
 
-    if (currentFreq === 'A') {
-      while (start + '-01-01' <= end + '-01-01') {
+    while (start <= end) {
+      if (currentFreq === 'A') {
         dateArray.push({ date: start.toString() + '-01-01', tableDate: start.toString() });
         start += 1;
+      } else if (currentFreq === 'S') {
+        let month = ['01', '07'];
+        month.forEach((mon, index) => {
+          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
+        });
+        start += 1;
+      } else if (currentFreq === 'M') {
+        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        month.forEach((mon, index) => {
+          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
+        });
+        start += 1;
+      } else {
+        let quarterMonth = ['01', '04', '07', '10'];
+        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
+        quarterMonth.forEach((quart, index) => {
+          dateArray.push({ date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index] });
+        });
+        start += 1;
+      }
+    }
+    return dateArray;
+  }
+
+  seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+    let startYear = +dateStart.substring(0, 4);
+    let endYear = +dateEnd.substring(0, 4);
+    let startMonth = +dateStart.substring(5, 7);
+    let endMonth = +dateEnd.substring(5, 7);
+    let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
+    let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
+    if (currentFreq === 'A') {
+      while (startYear + '-01-01' <= endYear + '-01-01') {
+        dateArray.push({ date: startYear.toString() + '-01-01', tableDate: startYear.toString() });
+        startYear += 1;
       }
     } else if (currentFreq === 'S') {
-      let startMonth = +dateStart.substring(5, 7);
-      let endMonth = +dateEnd.substring(5, 7);
-      let m = { 1: '01', 7: '07' };
-      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
         let month = ['01', '07'];
-        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + '-' + m[startMonth] });
-        start = startMonth === 7 ? start += 1 : start;
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        startYear = startMonth === 7 ? startYear += 1 : startYear;
         startMonth = startMonth === 1 ? 7 : 1;
       }
     } else if (currentFreq === 'M') {
-      let startMonth = +dateStart.substring(5, 7);
-      let endMonth = +dateEnd.substring(5, 7);
-      let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
-      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
-        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + '-' + m[startMonth] });
-        start = startMonth === 12 ? start += 1 : start;
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        startYear = startMonth === 12 ? startYear += 1 : startYear;
         startMonth = startMonth === 12 ? 1 : startMonth += 1;
       }
     } else if (currentFreq == 'Q') {
-      let startMonth = +dateStart.substring(5, 7);
-      let endMonth = +dateEnd.substring(5, 7);
-      let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-      let m = { 1: '01', 4: '04', 7: '07', 10: '10' };
-      while (start + '-' + m[startMonth] + '-01' <= end + '-' + m[endMonth] + '-01') {
-        dateArray.push({ date: start.toString() + '-' + m[startMonth] + '-01', tableDate: start.toString() + ' ' + q[startMonth] })
-        start = startMonth === 10 ? start += 1 : start;
-        startMonth = startMonth === 10 ? 1 : startMonth += 3;
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + ' ' + q[startMonth] })
+        startYear = startMonth === 10 ? startYear += 1 : startYear;
+        startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
       }
     }
     return dateArray;
@@ -148,26 +174,13 @@ export class HelperService {
     if (level) {
       level.forEach((entry, i) => {
         // Create [date, value] level pairs for charts
-        levelValue.push([Date.parse(level[i].date), +level[i].value]);
-        if (level[i].pseudoHistory && !level[i + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(level[i].date), dashStyle: 'dash', color: '#7CB5EC' });
+        levelValue.push([Date.parse(entry.date), +entry.value]);
+        if (entry.pseudoHistory && !level[i + 1].pseudoHistory) {
+          pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
         }
       });
     }
-    if (yoy) {
-      yoy.forEach((entry, i) => {
-        // Create [date, value] percent pairs for charts
-        yoyValue.push([Date.parse(yoy[i].date), +yoy[i].value]);
-      });
-    }
-    if (ytd) {
-      ytd.forEach((entry, i) => {
-        // Create [date, value] YTD pairs
-        ytdValue.push([Date.parse(ytd[i].date), +ytd[i].value]);
-      });
-    }
     if (level) {
-      // let tableData = this.combineObsData(level, yoy, ytd);
       let combineData = this.combineObsData(level, yoy, ytd);
       let tableData = this.seriesTable(combineData, dates);
       let chart = this.seriesChart(combineData, dates);
