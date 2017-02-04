@@ -194,7 +194,7 @@ export class HelperService {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
     let seasonalFreq = true;
-    if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
+    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
       seasonalFreq = false;
     }
     for (let i = 0; i < dateRange.length; i++) {

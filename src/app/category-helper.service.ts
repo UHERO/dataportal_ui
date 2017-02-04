@@ -182,7 +182,6 @@ export class CategoryHelperService {
             this.categoryData[search + routeGeo + routeFreq].invalid = search;
           }
         });
-        console.log(this.categoryData[search + routeGeo + routeFreq])
       return Observable.forkJoin(Observable.of(this.categoryData[search + routeGeo + routeFreq]));
     }
   }
