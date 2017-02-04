@@ -76,47 +76,6 @@ export class HelperService {
     return dateArray;
   }
 
-  seriesTable(tableData, dateRange) {
-    let results = [];
-    if (dateRange && tableData) {
-      for (let i = 0; i < dateRange.length; i++) {
-        results.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' ' });
-        for (let j = 0; j < tableData.length; j++) {
-          if (results[i].date === tableData[j].date) {
-            results[i].value = tableData[j].value;
-            results[i].formattedValue = tableData[j].value === null ? ' ' : this.formatNum(+tableData[j].value, 2);
-            results[i].yoy = tableData[j].yoyValue;
-            results[i].formattedYoy = tableData[j].yoyValue === null ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
-            break;
-          }
-        }
-      }
-      return results;
-    }
-  }
-
-  seriesChart(data, dateRange) {
-    let levelValue = [];
-    let yoyValue = [];
-    let ytdValue = [];
-    if (dateRange && data) {
-      for (let i = 0; i < dateRange.length; i++) {
-        levelValue.push([Date.parse(dateRange[i].date), null]);
-        yoyValue.push([Date.parse(dateRange[i].date), null]);
-        ytdValue.push([Date.parse(dateRange[i].date), null]);
-        for (let j = 0; j < data.length; j++) {
-          if (dateRange[i].date === data[j].date) {
-            levelValue[i][1] = data[j].value;
-            yoyValue[i][1] = data[j].yoyValue;
-            ytdValue[i][1] = data[j].ytdValue;
-            break;
-          }
-        }
-      }
-      return [levelValue, yoyValue, ytdValue];
-    }
-  }
-
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from first to last observation; standard deviation
   summaryStats(seriesData, freq) {
@@ -190,6 +149,49 @@ export class HelperService {
     return results;
   }
 
+  seriesTable(tableData, dateRange) {
+    let results = [];
+    if (dateRange && tableData) {
+      for (let i = 0; i < dateRange.length; i++) {
+        results.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+        for (let j = 0; j < tableData.length; j++) {
+          if (results[i].date === tableData[j].date) {
+            results[i].value = tableData[j].value;
+            results[i].formattedValue = tableData[j].value === null ? ' ' : this.formatNum(+tableData[j].value, 2);
+            results[i].yoy = tableData[j].yoyValue;
+            results[i].formattedYoy = tableData[j].yoyValue === null ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
+            results[i].ytd = tableData[j].ytdValue;
+            results[i].formattedytd = tableData[j].ytdValue === null ? ' ' : this.formatNum(+tableData[j].ytdValue, 2);
+            break;
+          }
+        }
+      }
+      return results;
+    }
+  }
+
+  seriesChart(data, dateRange) {
+    let levelValue = [];
+    let yoyValue = [];
+    let ytdValue = [];
+    if (dateRange && data) {
+      for (let i = 0; i < dateRange.length; i++) {
+        levelValue.push([Date.parse(dateRange[i].date), null]);
+        yoyValue.push([Date.parse(dateRange[i].date), null]);
+        ytdValue.push([Date.parse(dateRange[i].date), null]);
+        for (let j = 0; j < data.length; j++) {
+          if (dateRange[i].date === data[j].date) {
+            levelValue[i][1] = data[j].value;
+            yoyValue[i][1] = data[j].yoyValue;
+            ytdValue[i][1] = data[j].ytdValue;
+            break;
+          }
+        }
+      }
+      return [levelValue, yoyValue, ytdValue];
+    }
+  }
+
   catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, sa?: Boolean, freq?: string) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
@@ -217,8 +219,8 @@ export class HelperService {
       // Format values for category table
       if (categoryTable.date === seriesTable[j].date) {
         categoryTable.level = this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = this.formatNum(+seriesTable[j].yoyValue, 2);
-        categoryTable.ytd = this.formatNum(+seriesTable[j].ytdValue, 2);
+        categoryTable.yoy = this.formatNum(+seriesTable[j].yoy, 2);
+        categoryTable.ytd = this.formatNum(+seriesTable[j].ytd, 2);
         break;
       }
     }
