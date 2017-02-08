@@ -218,9 +218,9 @@ export class HelperService {
       }
       // Format values for category table
       if (categoryTable.date === seriesTable[j].date) {
-        categoryTable.level = this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = this.formatNum(+seriesTable[j].yoy, 2);
-        categoryTable.ytd = this.formatNum(+seriesTable[j].ytd, 2);
+        categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
+        categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
+        categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
         break;
       }
     }

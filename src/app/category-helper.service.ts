@@ -133,17 +133,26 @@ export class CategoryHelperService {
                 if (levelData) {
                   seriesDates = this._helper.seriesDateArray(seriesObsStart, seriesObsEnd, currentFreq.freq, seriesDates);
                   series = this._helper.dataTransform(result.seriesObservations, seriesDates);
-                  let sa = result.seasonallyAdjusted;
-                  let freq = result.frequencyShort;
                   series['seriesInfo'] = result;
-                  series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
                   categorySeries.push(series);
                 }
               });
               // Check if (non-annual) category has seasonally adjusted data
+              // Returns true for annual data
               let hasSeasonallyAdjusted = this.checkSA(categorySeries);
+              categorySeries.forEach((series, index) => {
+                let freq = series.frequencyShort;
+                // Seasonal adjustment affects dateWrapper first and end dates
+                // If hasSeasonallyAdjusted === false, set dateWrapper based on non-seasonally adjusted data
+                if (hasSeasonallyAdjusted) {
+                  let sa = series.seasonallyAdjusted;
+                  series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, sa, freq);
+                } else {
+                  series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, freq);
+                }
+              });
               sublistIndex.dateRange = dateArray;
-              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, seasonallyAdjusted: hasSeasonallyAdjusted });
+              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
             } else {
               // No series exist for a subcateogry
               let series = [{ seriesInfo: 'No data available' }];

@@ -74,7 +74,6 @@ export class HighstockComponent implements OnChanges {
       },
       navigation: {
         buttonOptions: {
-          align: 'left',
           theme: {
             fill: '#F9F9F9'
           }
@@ -118,6 +117,22 @@ export class HighstockComponent implements OnChanges {
         inputEnabled: false
       },
       exporting: {
+        buttons: {
+          contextButton: {
+            enabled: false
+          },
+          exportButton: {
+            text: 'Download',
+            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
+          },
+          printButton: {
+            text: 'Print',
+            onclick: function () {
+              this.print();
+            }
+          }
+        },
+        filename: name + '_' + geo.name + '_' + freq.label,
         chartOptions: {
           navigator: {
             enabled: false
