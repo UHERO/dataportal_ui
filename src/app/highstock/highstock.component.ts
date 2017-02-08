@@ -80,6 +80,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       rangeSelector: {
+        //allButtonsEnabled: true,
         selected: 2,
         buttons: [{
           type: 'year',
@@ -213,6 +214,7 @@ export class HighstockComponent implements OnChanges {
         enabled: false
       },
       xAxis: {
+        minRange: 1000 * 3600 * 24 * 30 * 12,
         ordinal: false,
         labels: {
           style: {
@@ -269,6 +271,11 @@ export class HighstockComponent implements OnChanges {
         yAxis: 1,
         color: '#1D667F',
         data: level,
+        states: {
+          hover: {
+            lineWidth: 2
+          }
+        },
         showInNavigator: true,
         dataGrouping: {
           enabled: false
@@ -286,8 +293,8 @@ export class HighstockComponent implements OnChanges {
     
     // Selected level data
     let selectedRange = null;
-    if (e.context.series[1].points) {
-      selectedRange = e.context.series[1].points;
+    if (e.context.series[0].points) {
+      selectedRange = e.context.series[0].points;
     }
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];

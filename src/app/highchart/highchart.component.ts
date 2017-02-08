@@ -153,6 +153,11 @@ export class HighchartComponent implements OnInit {
         yAxis: 1,
         color: '#1D667F',
         data: level,
+        states: {
+          hover: {
+            lineWidth: 2
+          }
+        },
         dataGrouping: {
           enabled: false
         },

@@ -77,40 +77,37 @@ export class HelperService {
   }
 
   // Get summary statistics for single series displays
-  // Min & Max values (and their dates) for the selected date range; (%) change from first to last observation; standard deviation
-  summaryStats(seriesData, freq) {
-    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', change: Infinity, sd: Infinity };
-    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', change: '', sd: '', selectedStart: '', selectedEnd: '' };
-    let levelSum = 0;
-    seriesData.forEach((item, index) => {
-      if (stats.minValue === Infinity || seriesData[index].value < stats.minValue) {
-        stats.minValue = seriesData[index].value;
-        stats.minValueDate = seriesData[index].date;
-      }
-      if (stats.maxValue === Infinity || seriesData[index].value > stats.maxValue) {
-        stats.maxValue = seriesData[index].value;
-        stats.maxValueDate = seriesData[index].date;
-      }
-      levelSum += seriesData[index].value;
-    });
+  // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
+  summaryStats(seriesData, tableStart, tableEnd, freq) {
+    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };
+    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', percChange: '', levelChange: '', selectedStart: '', selectedEnd: '' };
 
-    // Calculate standard deviation
-    let avg = levelSum / seriesData.length;
-    let sqDiff = 0;
     seriesData.forEach((item, index) => {
-      sqDiff += Math.pow((seriesData[index].value - avg), 2);
+      if (stats.minValue === Infinity || item.value < stats.minValue) {
+        stats.minValue = item.value;
+        stats.minValueDate = item.date;
+      }
+      if (stats.maxValue === Infinity || item.value > stats.maxValue) {
+        stats.maxValue = item.value;
+        stats.maxValueDate = item.date;
+      }
+      if (tableStart === item.date) {
+        stats.tableStartValue = item.value;
+      }
+      if (tableEnd === item.date) {
+        stats.tableEndValue = item.value;
+      }
     });
-    let sd = Math.sqrt(sqDiff / seriesData.length);
-    stats.change = ((stats.maxValue - stats.minValue) / stats.minValue) * 100;
-    stats.sd = sd;
+    stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
+    stats.levelChange = stats.tableEndValue - stats.tableStartValue;
 
     // Format numbers
     formatStats.minValue = this.formatNum(stats.minValue, 2);
     formatStats.minValueDate = this.formatDate(stats.minValueDate, freq.freq);
     formatStats.maxValue = this.formatNum(stats.maxValue, 2);
     formatStats.maxValueDate = this.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.change = this.formatNum(stats.change, 2);
-    formatStats.sd = this.formatNum(stats.sd, 2);
+    formatStats.percChange = this.formatNum(stats.percChange, 2);
+    formatStats.levelChange = this.formatNum(stats.levelChange, 2)
     formatStats.selectedStart = this.formatDate(seriesData[0].date, freq.freq);
     formatStats.selectedEnd = this.formatDate(seriesData[seriesData.length - 1].date, freq);
     return formatStats;
