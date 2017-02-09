@@ -19,7 +19,8 @@ export class FeedbackComponent implements OnInit {
     this.feedbackForm = this.fb.group({
       'name': ['', Validators.required],
       'email': ['', Validators.required],
-      'feedback': ['', Validators.required]
+      'feedback': ['', Validators.required],
+      // 'captcha': [Boolean, Validators.required, Validators.requiredTrue]
     });
 
     this.feedbackForm.valueChanges.subscribe(data => console.log(data));

@@ -30,7 +30,7 @@
               <textarea type="text" class="form-control custom-input" formControlName="feedback" placeholder="Feedback" required></textarea>
             </div>
           </div>
-          <recaptcha (resolved)="resolved($event)" formControlName="captcha" name="captcha" required siteKey=" 6LcN3hQUAAAAAOUb0_Z_wpk3dLvbVz7S45Bgcv7c" class="captcha"></recaptcha>
+          <recaptcha (resolved)="resolved($event)" name="captcha" required siteKey=" 6LcN3hQUAAAAAOUb0_Z_wpk3dLvbVz7S45Bgcv7c" class="captcha"></recaptcha>
           <button type="submit" class="btn btn-submit" label="Submit" [disabled]="!feedbackForm.valid">Submit</button>
         </form>
       </div>
