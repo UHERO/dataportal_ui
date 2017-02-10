@@ -121,10 +121,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onSearch(event) {
-    this._router.navigate(['/category/search'], {queryParams: {search: event} })
-  }
-
   yoyActive(e) {
     this.yoyIsActive = e.target.checked;
   }

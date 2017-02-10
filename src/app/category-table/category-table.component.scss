@@ -217,14 +217,26 @@
 
         .indent1 {
           padding-left: 20px;
+          
+          a {
+            width: 79%;
+          }
         }
 
         .indent2 {
           padding-left: 40px;
+
+          a {
+            width: 78%;
+          }
         }
 
         .indent3 {
           padding-left: 60px;
+
+          a {
+            width: 76%;
+          }
         }
 
         tr:nth-child(odd) {

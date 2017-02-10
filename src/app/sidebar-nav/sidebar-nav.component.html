@@ -4,8 +4,9 @@
       &#9776;
     </button>
     <a class="navbar-brand" href="#">
-      <img src="../../assets/UHEROdata-Logo-color.png">
+      <img src="../../assets/UHEROdata-Logo-color.svg">
     </a>
+    <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
   </div>
   <ul id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category['id'] === selectedCategory">

@@ -15,6 +15,9 @@ class HeaderStubComponent {}
 @Component({selector: 'app-sidebar-nav', template: ''})
 class SidebarNavStubComponent {}
 
+@Component({selector: 'app-feedback', template: ''})
+class FeedbackStubComponent
+
 let comp: AppComponent;
 let fixture: ComponentFixture<AppComponent>;
 
@@ -23,7 +26,7 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,
-        HeaderStubComponent, SidebarNavStubComponent
+        HeaderStubComponent, SidebarNavStubComponent, FeedbackStubComponent
       ],
       imports: [ RouterTestingModule ]
     })

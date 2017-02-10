@@ -5,18 +5,14 @@ html, body {
 
 body {
    position: relative;
-   // padding: 120px 0 0 0;
    padding: 0;
    box-sizing: border-box;
    font-family: 'Lucida Sans', sans-serif;
 
    #header {
-    // position: absolute;
-    // height: 120px;
     top: 0;
     width: 100%;
     background-color: #FFFFFF;
-    // background: url(../../assets/bg_header.png) repeat-x 0 0;
     color: #ffffff;
     padding: 0;
     box-shadow: 0 4px 6px -6px black;
@@ -31,10 +27,6 @@ body {
 
     @media (min-width: 768px) {
         z-index: 1;
-        // position: fixed;
-        //background-color: #016E7D;
-        // padding-bottom: 3.5%;
-        //height: 120px;
     }
 
    a {
@@ -43,7 +35,7 @@ body {
    }
 
    img {
-     // width: 100%;
+     // max-width: 275px;
      padding: 5px;
    }
   }

@@ -99,10 +99,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.summaryStats = this._helper.summaryStats(this.newTableData, minDate, maxDate, freq);
   }
 
-  onSearch(event) {
-    this._router.navigate(['/category/search'], {queryParams: {search: event} });
-  }
-
   saActive(event, geo, freq, siblingPairs) {
     let id;
     siblingPairs.forEach((sib, index) => {

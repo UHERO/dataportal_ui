@@ -1,4 +1,3 @@
-<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div *ngFor="let data of seriesData | async" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">

@@ -10,7 +10,7 @@ import { NavigationExtras } from '@angular/router';
         '(click)': 'onclick()'
     }
 })
-export class RouterLinkStubDirective {
+class RouterLinkStubDirective {
     @Input('routerLink') linkParams: any;
     navigatedTo: any = null;
 
@@ -21,7 +21,7 @@ export class RouterLinkStubDirective {
 
 // RouterOutletStub
 @Component({selector: 'router-outlet', template: ''})
-export class RouterOutletStubComponent { }
+class RouterOutletStubComponent { }
 
 // RouterStub
 @Injectable()

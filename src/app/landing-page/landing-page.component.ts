@@ -93,10 +93,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onSearch(event) {
-    this._router.navigate(['/category/search'], {queryParams: {search: event}})
-  }
-
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {
       const el = <HTMLElement>document.querySelector('#id_' + frag);

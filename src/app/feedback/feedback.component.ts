@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -8,8 +9,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 export class FeedbackComponent implements OnInit {
   private feedbackForm: FormGroup;
-
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private http: Http) { }
 
   ngOnInit() {
     this.buildForm();
@@ -17,54 +17,17 @@ export class FeedbackComponent implements OnInit {
 
   buildForm(): void {
     this.feedbackForm = this.fb.group({
-      'name': ['', Validators.required],
-      'email': ['', Validators.required],
+      'name': [''],
+      'email': [''],
       'feedback': ['', Validators.required],
-      // 'captcha': [Boolean, Validators.required, Validators.requiredTrue]
+      'captcha': ['', Validators.required]
     });
-
-    this.feedbackForm.valueChanges.subscribe(data => console.log(data));
-
-    this.onValueChanged();
   }
 
-  onValueChanged(data? :any) {
-    if (!this.feedbackForm) {
-      return;
-    }
-    const form = this.feedbackForm;
-    for (const field in this.formErrors) {
-      this.formErrors[field] = '';
-      const control = form.get(field);
-
-      if (control && control.dirty && !control.valid) {
-        const message = this.validationMessages[field];
-        for (const key in control.errors) {
-          this.formErrors[field] += message[key] + ' ';
-        }
-      }
-    }
-  }
-
-  formErrors = {
-    'name': '',
-    'email': '',
-    'feedback': ''
-  }
-
-  validationMessages = {
-    'name': {
-      'required': 'Name is required.'
-    },
-    'email': {
-      'required': 'Email is required.'
-    },
-    'feedback': {
-      'required': 'Feedback is required.'
-    }
-  }
-
-  resolved(e) {
-    console.log('event', e)
+  onSubmit() {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    let feedback = JSON.stringify(this.feedbackForm.value);
+    return this.http.post('udaman.uhero.hawaii.edu/feedback', feedback, headers).map((res: Response) => res.json());
   }
 }

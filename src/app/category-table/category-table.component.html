@@ -1,4 +1,3 @@
-<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div class="category-tables">
   <div *ngFor="let data of categoryData | async">
     <h2 class="selected-category" [class.search-term]="routeSearch && data.sublist.length > 0" id="id_top">{{data.selectedCategory}}</h2>
