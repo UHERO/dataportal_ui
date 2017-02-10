@@ -1,9 +1,10 @@
 <header id="header" class="navbar navbar-fixed-top navbar-light">
     <!-- <div class="portal-header"> -->
         <a class="navbar-brand" id="uhero-header" routerLink="/">
-        <img src="../../assets/UHEROdata-Logo-color.png">
+        <img src="../../assets/UHEROdata-Logo-color.svg">
         </a>
     <!-- </div> -->
+    <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 </header>
 <!-- <div class="about-portal">
    <a href="/" [routerLink]="['/']">About the Data</a>

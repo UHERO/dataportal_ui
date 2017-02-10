@@ -51,4 +51,9 @@ export class SidebarNavComponent implements OnInit, Input {
     // Expands top level category
     this.expand = this.expand === expand ? null : expand;
   }
+
+  onSearch(event) {
+    this._router.navigate(['/category/search'], {queryParams: {search: event}})
+  }
+
 }

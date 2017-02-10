@@ -2,10 +2,28 @@
   position: fixed;
   top: 12px;
   right: 0px;
-  z-index: 2;
 
   .form-control {
     padding: 0.25rem 1rem;
+    font-family: "FontAwesome", "Lucida Sans", sans-serif;
+  }
+
+  ::-webkit-input-placeholder {
+    color: #E2E2E2;
+  }
+
+  :-moz-placeholder {
+    color: #E2E2E2;
+    opacity: 1;
+  }
+
+  ::-moz-placeholder {
+    color: #E2E2E2;
+    opacity: 1;
+  }
+
+  :-ms-input-placeholder {
+    color: #E2E2E2;
   }
 
   .btn {
@@ -22,6 +40,17 @@
   }
 
   @media (max-width: 767px) {
-    display: none;
+    width: 35%;
+    top: 5px;
+    right: 3px;
+
+    .form-control {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+
+    .input-group-btn {
+      display: none;
+    }
   }
 }

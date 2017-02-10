@@ -1,7 +1,6 @@
-<app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
 <div class="multi-series-container" (searchItem)="search(searchItem)">
   <div *ngFor="let data of categoryData | async">
-    <h2 class="selected-category" [class.search-term]="routeSearch && data.sublist.length > 0" id="id_top">{{data.selectedCategory}}</h2>
+    <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="!routeSearch && data.invalid">{{data.invalid}}</p>
     <template ngFor let-sub [ngForOf]="data.sublist">
@@ -18,10 +17,9 @@
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
             <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
           </div>
-          <p *ngIf="series.seasonallyAdjusted === false">No Seasonally Adjusted Series Available</p>
           <template ngFor let-serie [ngForOf]="series.series">
             <p *ngIf="!serie.seriesInfo.id"> No Data Available </p>
-            <div *ngIf="serie.seriesInfo.seasonallyAdjusted !== false" class="multi-charts">
+            <div *ngIf="serie.seriesInfo.seasonallyAdjusted !== false || series.hasSeasonallyAdjusted === false" class="multi-charts">
               <a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" *ngIf="serie.seriesInfo.id">
                 <app-highchart [seriesData]="serie" [currentFreq]="data.currentFreq"></app-highchart>
               </a>

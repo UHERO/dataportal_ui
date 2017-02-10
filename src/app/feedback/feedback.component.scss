@@ -1,0 +1,51 @@
+.btn-feedback {
+    background-color: #F9F9F9;
+    color: #505050;
+    position: fixed;
+    bottom: 0;
+    left: 15px;
+    line-height: 1;
+    font-size: 0.9em;
+    border: 1px solid #ADADAD;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.modal-title{
+    color: #1D667F;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 1em;
+}
+
+.col-form-label {
+    text-align: right;
+    color: #1D667F;
+}
+
+.custom-input {
+    border: 0 solid #1D667F;
+    border-bottom-width: 2px;
+    border-radius: 0;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
+    color: #505050;
+    padding: 0.5rem 0.25rem;
+}
+
+.captcha {
+    display: inline-block;
+    vertical-align: middle;
+
+    @media (max-width: 767px) {
+        transform: scale(0.7);
+        -webkit-transform: scale(0.7);
+        transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+    }
+}
+
+.btn-submit {
+    background-color: #1D667F;
+    color: #FFFFFF;
+}

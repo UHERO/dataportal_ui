@@ -1,9 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
 
 import { AppComponent } from './app.component';
@@ -22,6 +23,7 @@ import { FreqSelectorComponent } from './freq-selector/freq-selector.component';
 import { HighstockComponent } from './highstock/highstock.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
+import { FeedbackComponent } from './feedback/feedback.component';
 
 @NgModule({
   declarations: [
@@ -36,14 +38,17 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
     HighstockComponent,
     CategoryTableComponent,
     SearchBarComponent,
+    FeedbackComponent,
   ],
   imports: [
     BrowserModule,
     ChartModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     routing,
-    DataTableModule, SharedModule
+    DataTableModule, SharedModule,
+    RecaptchaModule.forRoot()
   ],
   providers: [UheroApiService, CategoryHelperService, SeriesHelperService, HelperService],
   bootstrap: [AppComponent]

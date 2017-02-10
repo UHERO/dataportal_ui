@@ -8,7 +8,8 @@ export class HelperService {
 
   constructor() { }
 
-  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+
+  categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let start = +dateStart.substring(0, 4);
     let end = +dateEnd.substring(0, 4);
 
@@ -40,66 +41,79 @@ export class HelperService {
     return dateArray;
   }
 
-  seriesTable(tableData, dateRange) {
-    let results = [];
-    if (dateRange && tableData) {
-      for (let i = 0; i < dateRange.length; i++) {
-        results.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' ' });
-        for (let j = 0; j < tableData.length; j++) {
-          if (results[i].date === tableData[j].date) {
-            results[i].value = tableData[j].value;
-            results[i].formattedValue = tableData[j].value === ' ' ? ' ' : this.formatNum(+tableData[j].value, 2);
-            results[i].yoy = tableData[j].yoyValue;
-            results[i].formattedYoy = tableData[j].yoyValue === ' ' ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
-            break;
-          }
-        }
+  seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+    let startYear = +dateStart.substring(0, 4);
+    let endYear = +dateEnd.substring(0, 4);
+    let startMonth = +dateStart.substring(5, 7);
+    let endMonth = +dateEnd.substring(5, 7);
+    let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
+    let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
+    if (currentFreq === 'A') {
+      while (startYear + '-01-01' <= endYear + '-01-01') {
+        dateArray.push({ date: startYear.toString() + '-01-01', tableDate: startYear.toString() });
+        startYear += 1;
       }
-      return results;
+    } else if (currentFreq === 'S') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        let month = ['01', '07'];
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        startYear = startMonth === 7 ? startYear += 1 : startYear;
+        startMonth = startMonth === 1 ? 7 : 1;
+      }
+    } else if (currentFreq === 'M') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        startYear = startMonth === 12 ? startYear += 1 : startYear;
+        startMonth = startMonth === 12 ? 1 : startMonth += 1;
+      }
+    } else if (currentFreq == 'Q') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + ' ' + q[startMonth] })
+        startYear = startMonth === 10 ? startYear += 1 : startYear;
+        startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
+      }
     }
+    return dateArray;
   }
 
   // Get summary statistics for single series displays
-  // Min & Max values (and their dates) for the selected date range; (%) change from first to last observation; standard deviation
-  summaryStats(seriesData, freq) {
-    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', change: Infinity, sd: Infinity };
-    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', change: '', sd: '', selectedStart: '', selectedEnd: '' };
-    let levelSum = 0;
-    seriesData.forEach((item, index) => {
-      if (stats.minValue === Infinity || seriesData[index].value < stats.minValue) {
-        stats.minValue = seriesData[index].value;
-        stats.minValueDate = seriesData[index].date;
-      }
-      if (stats.maxValue === Infinity || seriesData[index].value > stats.maxValue) {
-        stats.maxValue = seriesData[index].value;
-        stats.maxValueDate = seriesData[index].date;
-      }
-      levelSum += seriesData[index].value;
-    });
+  // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
+  summaryStats(seriesData, tableStart, tableEnd, freq) {
+    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };
+    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', percChange: '', levelChange: '', selectedStart: '', selectedEnd: '' };
 
-    // Calculate standard deviation
-    let avg = levelSum / seriesData.length;
-    let sqDiff = 0;
     seriesData.forEach((item, index) => {
-      sqDiff += Math.pow((seriesData[index].value - avg), 2);
+      if (stats.minValue === Infinity || item.value < stats.minValue) {
+        stats.minValue = item.value;
+        stats.minValueDate = item.date;
+      }
+      if (stats.maxValue === Infinity || item.value > stats.maxValue) {
+        stats.maxValue = item.value;
+        stats.maxValueDate = item.date;
+      }
+      if (tableStart === item.date) {
+        stats.tableStartValue = item.value;
+      }
+      if (tableEnd === item.date) {
+        stats.tableEndValue = item.value;
+      }
     });
-    let sd = Math.sqrt(sqDiff / seriesData.length);
-    stats.change = ((stats.maxValue - stats.minValue) / stats.minValue) * 100;
-    stats.sd = sd;
+    stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
+    stats.levelChange = stats.tableEndValue - stats.tableStartValue;
 
     // Format numbers
     formatStats.minValue = this.formatNum(stats.minValue, 2);
     formatStats.minValueDate = this.formatDate(stats.minValueDate, freq.freq);
     formatStats.maxValue = this.formatNum(stats.maxValue, 2);
     formatStats.maxValueDate = this.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.change = this.formatNum(stats.change, 2);
-    formatStats.sd = this.formatNum(stats.sd, 2);
+    formatStats.percChange = this.formatNum(stats.percChange, 2);
+    formatStats.levelChange = this.formatNum(stats.levelChange, 2)
     formatStats.selectedStart = this.formatDate(seriesData[0].date, freq.freq);
     formatStats.selectedEnd = this.formatDate(seriesData[seriesData.length - 1].date, freq);
     return formatStats;
   }
 
-  dataTransform(seriesObs) {
+  dataTransform(seriesObs, dates) {
     let results = null;
     let observations = seriesObs;
     let start = observations.observationStart;
@@ -116,38 +130,70 @@ export class HelperService {
     if (level) {
       level.forEach((entry, i) => {
         // Create [date, value] level pairs for charts
-        levelValue.push([Date.parse(level[i].date), +level[i].value]);
-        if (level[i].pseudoHistory && !level[i + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(level[i].date), dashStyle: 'dash', color: '#7CB5EC' });
+        levelValue.push([Date.parse(entry.date), +entry.value]);
+        if (entry.pseudoHistory && !level[i + 1].pseudoHistory) {
+          pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
         }
       });
     }
-    if (yoy) {
-      yoy.forEach((entry, i) => {
-        // Create [date, value] percent pairs for charts
-        yoyValue.push([Date.parse(yoy[i].date), +yoy[i].value]);
-      });
-    }
-    if (ytd) {
-      ytd.forEach((entry, i) => {
-        // Create [date, value] YTD pairs
-        ytdValue.push([Date.parse(ytd[i].date), +ytd[i].value]);
-      });
-    }
     if (level) {
-      let tableData = this.combineObsData(level, yoy, ytd);
-      let chartData = { level: levelValue, pseudoZones: pseudoZones, yoy: yoyValue, ytd: ytdValue };
-      let data = { chartData: chartData, tableData: tableData, start: start, end: end };
+      let combineData = this.combineObsData(level, yoy, ytd);
+      let tableData = this.seriesTable(combineData, dates);
+      let chart = this.seriesChart(combineData, dates);
+      let chartData = { level: chart[0], pseudoZones: pseudoZones, yoy: chart[1], ytd: chart[2] };
       results = { chartData: chartData, tableData: tableData, start: start, end: end };
     }
     return results;
+  }
+
+  seriesTable(tableData, dateRange) {
+    let results = [];
+    if (dateRange && tableData) {
+      for (let i = 0; i < dateRange.length; i++) {
+        results.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+        for (let j = 0; j < tableData.length; j++) {
+          if (results[i].date === tableData[j].date) {
+            results[i].value = tableData[j].value;
+            results[i].formattedValue = tableData[j].value === null ? ' ' : this.formatNum(+tableData[j].value, 2);
+            results[i].yoy = tableData[j].yoyValue;
+            results[i].formattedYoy = tableData[j].yoyValue === null ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
+            results[i].ytd = tableData[j].ytdValue;
+            results[i].formattedytd = tableData[j].ytdValue === null ? ' ' : this.formatNum(+tableData[j].ytdValue, 2);
+            break;
+          }
+        }
+      }
+      return results;
+    }
+  }
+
+  seriesChart(data, dateRange) {
+    let levelValue = [];
+    let yoyValue = [];
+    let ytdValue = [];
+    if (dateRange && data) {
+      for (let i = 0; i < dateRange.length; i++) {
+        levelValue.push([Date.parse(dateRange[i].date), null]);
+        yoyValue.push([Date.parse(dateRange[i].date), null]);
+        ytdValue.push([Date.parse(dateRange[i].date), null]);
+        for (let j = 0; j < data.length; j++) {
+          if (dateRange[i].date === data[j].date) {
+            levelValue[i][1] = data[j].value;
+            yoyValue[i][1] = data[j].yoyValue;
+            ytdValue[i][1] = data[j].ytdValue;
+            break;
+          }
+        }
+      }
+      return [levelValue, yoyValue, ytdValue];
+    }
   }
 
   catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, sa?: Boolean, freq?: string) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
     let seasonalFreq = true;
-    if ((freq !== 'A' && !sa) && (freq !== 'S' && !sa)) {
+    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
       seasonalFreq = false;
     }
     for (let i = 0; i < dateRange.length; i++) {
@@ -169,9 +215,9 @@ export class HelperService {
       }
       // Format values for category table
       if (categoryTable.date === seriesTable[j].date) {
-        categoryTable.level = this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = this.formatNum(+seriesTable[j].yoyValue, 2);
-        categoryTable.ytd = this.formatNum(+seriesTable[j].ytdValue, 2);
+        categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
+        categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
+        categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
         break;
       }
     }
@@ -184,8 +230,8 @@ export class HelperService {
     if (level && yoy && ytd) {
       let table = level;
       for (let i = 0; i < level.length; i++) {
-        table[i].yoyValue = ' ';
-        table[i].ytdValue = ' ';
+        table[i].yoyValue = null;
+        table[i].ytdValue = null;
         table[i].value = +level[i].value;
         for (let j = 0; j < yoy.length; j++) {
           if (level[i].date === yoy[j].date) {
@@ -199,8 +245,8 @@ export class HelperService {
     } else if (level && (!yoy || !ytd)) {
       let table = level;
       for (let i = 0; i < level.length; i++) {
-        table[i].yoyValue = ' ';
-        table[i].ytdValue = ' ';
+        table[i].yoyValue = null;
+        table[i].ytdValue = null;
         table[i].value = +level[i].value;
       }
       return table;

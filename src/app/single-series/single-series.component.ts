@@ -96,11 +96,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._helper.summaryStats(this.newTableData, freq);
-  }
-
-  onSearch(event) {
-    this._router.navigate(['/category/search'], {queryParams: {search: event} });
+    this.summaryStats = this._helper.summaryStats(this.newTableData, minDate, maxDate, freq);
   }
 
   saActive(event, geo, freq, siblingPairs) {

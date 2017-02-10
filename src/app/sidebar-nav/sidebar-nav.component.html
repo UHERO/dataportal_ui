@@ -1,11 +1,12 @@
 <nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light bg-white">
   <div>
-    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" data-target="#catNavbar" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
       &#9776;
     </button>
     <a class="navbar-brand" href="#">
-      <img src="../../assets/UHEROdata-Logo-color.png">
+      <img src="../../assets/UHEROdata-Logo-color.svg">
     </a>
+    <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
   </div>
   <ul id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category['id'] === selectedCategory">
