@@ -25,6 +25,9 @@ import { CategoryTableComponent } from './category-table/category-table.componen
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 
+// Testing
+import { RouterLinkStubDirective, QueryParamsStubDirective, RouterOutletStubComponent } from '../testing/router-stubs';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -39,6 +42,9 @@ import { FeedbackComponent } from './feedback/feedback.component';
     CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
+    RouterLinkStubDirective,
+    QueryParamsStubDirective,
+    RouterOutletStubComponent
   ],
   imports: [
     BrowserModule,

@@ -16,7 +16,7 @@ class HeaderStubComponent {}
 class SidebarNavStubComponent {}
 
 @Component({selector: 'app-feedback', template: ''})
-class FeedbackStubComponent
+class FeedbackStubComponent {}
 
 let comp: AppComponent;
 let fixture: ComponentFixture<AppComponent>;
