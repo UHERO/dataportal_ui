@@ -17,7 +17,7 @@ class SearchStubComponent {}
 
 let comp: SidebarNavComponent;
 let fixture: ComponentFixture<SidebarNavComponent>;
-let page: Page;
+/* let page: Page;
 
 describe('SidebarNavComponent', () => {
   beforeEach(async(() => {
@@ -66,4 +66,4 @@ class Page {
     const router = fixture.debugElement.injector.get(Router);
     this.navSpy = spyOn(router, 'navigate');
   }
-}
+} */

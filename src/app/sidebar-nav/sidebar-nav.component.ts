@@ -44,14 +44,6 @@ export class SidebarNavComponent implements OnInit, Input {
     this.overlay = this.overlay === false ? true : false;
   }
 
-  expandItem(sublist: Array<any>, expand: string, cat): void {
-    // Adds class of selected to a category on click
-    this.selectedCategory = cat;
-
-    // Expands top level category
-    this.expand = this.expand === expand ? null : expand;
-  }
-
   onSearch(event) {
     this._router.navigate(['/category/search'], {queryParams: {search: event}})
   }
