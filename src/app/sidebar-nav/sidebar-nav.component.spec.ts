@@ -3,29 +3,31 @@
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { DebugElement, Component } from '@angular/core';
 
 import { SidebarNavComponent } from './sidebar-nav.component';
 import { UheroApiService } from '../uhero-api.service';
 import { MockApiService } from '../../testing/mockapi-service';
-import { ActivatedRoute, ActivatedRouteStub, Router, RouterStub, RouterLinkStubDirective } from '../../testing/router-stubs';
+import { ActivatedRoute, ActivatedRouteStub, Router, RouterStub, QueryParamsStubDirective, RouterLinkStubDirective } from '../../testing/router-stubs';
 import { addMatchers, newEvent } from '../../testing/helpers';
 import { Observable } from 'rxjs/Observable';
 
+@Component({selector: 'app-search-bar', template: ''})
+class SearchStubComponent {}
+
 let comp: SidebarNavComponent;
 let fixture: ComponentFixture<SidebarNavComponent>;
-// TODO: Rewrite unit test for sidebar component
-// let page: Page;
+/* let page: Page;
 
-/* describe('SidebarNavComponent', () => {
+describe('SidebarNavComponent', () => {
   beforeEach(async(() => {
     addMatchers();
     TestBed.configureTestingModule({
-      declarations: [ SidebarNavComponent, RouterLinkStubDirective ],
+      declarations: [ SidebarNavComponent, SearchStubComponent, RouterLinkStubDirective, QueryParamsStubDirective ],
       providers: [
         { provide: UheroApiService, useClass: MockApiService },
         { provide: Router, useClass: RouterStub },
-        { provide: ActivatedRoute, useValue: { params: Observable.of({id: 1}) }}
+        { provide: ActivatedRoute, useValue: { queryParams: Observable.of({id: 1}) }}
       ]
     })
     .compileComponents()
@@ -39,15 +41,7 @@ let fixture: ComponentFixture<SidebarNavComponent>;
   it('1st category should match 1st test category', () => {
     const expectedCategory = page.categoryRows[0].textContent;
     expect(expectedCategory).toContain('Test Category', 'category name');
-  });
-
-  it('should expand the category on click', fakeAsync(() => {
-    const li = page.categoryRows[0];
-    li.dispatchEvent(newEvent('click'));
-    tick();
-    expect(comp.expand).toEqual('Test Category');
-  }));
-  
+  });  
 });
 
 function createComponent() {

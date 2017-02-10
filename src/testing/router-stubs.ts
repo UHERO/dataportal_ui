@@ -1,7 +1,7 @@
 export { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-
-import { Component, Directive, Injectable, Input } from '@angular/core';
-import { NavigationExtras } from '@angular/router';
+import { Observable } from 'rxjs';
+import { Component, Directive, Injectable, Input, Type } from '@angular/core';
+import { ActivatedRoute, Route, Params, ActivatedRouteSnapshot, UrlSegment, Data, NavigationExtras } from '@angular/router';
 
 // RouterLinkStub
 @Directive({
@@ -19,8 +19,23 @@ class RouterLinkStubDirective {
     }
 }
 
+@Directive({
+    selector: '[queryParams]',
+    host: {
+        '(click)': 'onclick()'
+    }
+})
+class QueryParamsStubDirective {
+    @Input('queryParams') linkParams: any;
+    navigatedTo: any = null;
+
+    onClick() {
+        this.navigatedTo = this.linkParams;
+    }
+}
+
 // RouterOutletStub
-@Component({selector: 'router-outlet', template: ''})
+@Component({ selector: 'router-outlet', template: '' })
 class RouterOutletStubComponent { }
 
 // RouterStub
@@ -29,8 +44,28 @@ export class RouterStub {
     navigate(commands: any[], extras?: NavigationExtras) { }
 }
 
+@Injectable()
+export class ActivatedRouteStub implements ActivatedRoute {
+    snapshot: ActivatedRouteSnapshot;
+    url: Observable<UrlSegment[]>;
+    params: Observable<Params>;
+    queryParams: Observable<Params>;
+    fragment: Observable<string>;
+    data: Observable<Data>;
+    outlet: string;
+    component: Type<any> | string;
+    routeConfig: Route;
+    root: ActivatedRoute;
+    parent: ActivatedRoute;
+    firstChild: ActivatedRoute;
+    children: ActivatedRoute[];
+    pathFromRoot: ActivatedRoute[];
+    toString(): string {
+        return "";
+    };
+}
 // Only implements params and part of snapshot.params
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+/* import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 @Injectable()
 export class ActivatedRouteStub {
 
@@ -50,4 +85,4 @@ export class ActivatedRouteStub {
   get snapshot() {
     return { params: this.testParams };
   }
-}
+} */
