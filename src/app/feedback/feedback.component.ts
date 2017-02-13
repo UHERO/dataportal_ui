@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -9,6 +9,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 export class FeedbackComponent implements OnInit {
   private feedbackForm: FormGroup;
+  private successMsg: string;
+  private errorMsg: string;
   constructor(private fb: FormBuilder, private http: Http) { }
 
   ngOnInit() {
@@ -24,10 +26,24 @@ export class FeedbackComponent implements OnInit {
     });
   }
 
+  reset() {
+    this.successMsg = '';
+    this.errorMsg = '';
+  }
+
   onSubmit() {
-    let headers = new Headers({ 'Content-Type': 'application/json' });
-    let options = new RequestOptions({ headers: headers });
-    let feedback = JSON.stringify(this.feedbackForm.value);
-    return this.http.post('udaman.uhero.hawaii.edu/feedback', feedback, headers).map((res: Response) => res.json());
+    let headers = new Headers();
+    headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
+    let requestOptionsArgs = {headers: headers};
+    let feedback = {data: {name: '', email: '', feedback: ''}, 'g-recaptcha-response': ''};
+    feedback.data.name = this.feedbackForm.value.name;
+    feedback.data.email = this.feedbackForm.value.email;
+    feedback.data.feedback = this.feedbackForm.value.feedback;
+    feedback['g-recaptcha-response'] = this.feedbackForm.value.captcha;
+    return this.http.post('http://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs).map((res: Response) => res.json())
+      .subscribe(
+        data => this.successMsg = 'Submission successful.',
+        error => this.errorMsg = 'Something went wrong. Try again.'
+      );
   }
 }
