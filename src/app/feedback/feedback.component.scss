@@ -12,10 +12,15 @@
     border-bottom-right-radius: 0;
 }
 
-.modal-title{
+.modal-title {
     color: #1D667F;
     font-family: 'Lucida Sans', sans-serif;
     font-size: 1em;
+}
+
+.text-success, .text-warning {
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: 0.9em;
 }
 
 .col-form-label {
