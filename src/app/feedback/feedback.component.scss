@@ -18,9 +18,24 @@
     font-size: 1em;
 }
 
-.text-success, .text-warning {
-    font-family: 'Lucida Sans', sans-serif;
+.alert {
+    position: fixed;
+    bottom: 0;
+    left: 120px;
+    border-bottom: 0px;
+    margin-bottom: 0;
+    line-height: 1.5em;
     font-size: 0.9em;
+    font-family: 'Lucida Sans', sans-serif;
+    padding: 0.25rem 1.25rem;
+
+    .close {
+        top: 0;
+        right: 0;
+        float: left;
+        padding: 0;
+        padding-right: 0.5rem;
+    }
 }
 
 .col-form-label {

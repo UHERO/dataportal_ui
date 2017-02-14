@@ -1,6 +1,18 @@
 <button type="button" class="btn btn-feedback" (click)="reset()" data-toggle="modal" data-target="#feedback">
   Feedback
 </button>
+<div *ngIf="successMsg" [hidden]="hideAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  {{successMsg}}
+</div>
+<div *ngIf="errorMsg" [hidden]="hideAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  {{errorMsg}}
+</div>
 <div class="modal fade" id="feedback" tabindex="-1" role="dialog" aria-labelledby="feedback" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -11,8 +23,6 @@
         </button>
       </div>
       <div class="modal-body form-horizontal">
-        <p *ngIf="successMsg" class="text-success">{{successMsg}}</p>
-        <p *ngIf="errorMsg" class="text-warning">{{errorMsg}}</p>
         <form [formGroup]="feedbackForm">
           <div class="form-group row">
             <label class="col-2 col-form-label"><i class="material-icons">&#xE7FD;</i></label>
@@ -45,7 +55,7 @@
           <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
-              <button type="button" (click)="onSubmit()" class="btn btn-submit" label="Submit" [disabled]="!feedbackForm.valid" [title]="!feedbackForm.valid ? 'Feedback is required.' : 'Submit feedback.'">Submit</button>
+              <button type="button" (click)="onSubmit()" data-dismiss="modal" class="btn btn-submit" label="Submit" [disabled]="!feedbackForm.valid" [title]="!feedbackForm.valid ? 'Feedback is required.' : 'Submit feedback.'">Submit</button>
             </div>
             <div class="col-4"></div>
           </div>
