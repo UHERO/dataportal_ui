@@ -3,6 +3,13 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
+// Temp workaround for build errors
+// See: https://github.com/gevgeny/angular2-highcharts/issues/160
+import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
+export function highchartsFactory() {
+  return require('highcharts/highstock');
+}
+
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
@@ -50,7 +57,16 @@ import { FeedbackComponent } from './feedback/feedback.component';
     DataTableModule, SharedModule,
     RecaptchaModule.forRoot()
   ],
-  providers: [UheroApiService, CategoryHelperService, SeriesHelperService, HelperService],
+  providers: [
+    UheroApiService,
+    CategoryHelperService,
+    SeriesHelperService,
+    HelperService,
+    {
+      provide: HighchartsStatic,
+      useFactory: highchartsFactory
+    }
+    ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

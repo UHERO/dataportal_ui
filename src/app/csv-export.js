@@ -269,26 +269,13 @@
      * Call this on click of 'Download XLS' button
      */
     Highcharts.Chart.prototype.downloadXLS = function () {
-        var uri = 'data:application/vnd.ms-excel;base64,',
-            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
-                '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
-                '<x:Name>Sheet 1</x:Name>' +
-                '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
-                '<style>td{border:none;font-family: Calibri, sans-serif;} .number{mso-number-format:"0.00";}</style>' +
-                '<meta name=ProgId content=Excel.Sheet>' +
-                '<meta charset=UTF-8>' +
-                '</head><body>' +
-                this.getTable(true) +
-                '</body></html>',
-            base64 = function (s) { 
-                return window.btoa(unescape(encodeURIComponent(s))); // #50
-            };
+        var csv = this.getCSV(true);
         getContent(
             this,
-            uri + base64(template),
-            'xls',
-            template,
-            'application/vnd.ms-excel'
+            'data:text/csv,\uFEFF' + csv.replace(/\n/g, '%0A'),
+            'csv',
+            csv,
+            'text/csv'
         );
     };
 
