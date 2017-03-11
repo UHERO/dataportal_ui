@@ -7,7 +7,15 @@ import { ChartModule } from 'angular2-highcharts';
 // See: https://github.com/gevgeny/angular2-highcharts/issues/160
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 export function highchartsFactory() {
-  return require('highcharts/highstock');
+  let highcharts = require('highcharts/highstock');
+  let exp = require('highcharts/modules/exporting');
+  let offlineExport = require('highcharts/modules/offline-exporting');
+  let csv = require('./csv-export');
+
+  exp(highcharts);
+  offlineExport(highcharts);
+  csv(highcharts);
+  return (highcharts);
 }
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
