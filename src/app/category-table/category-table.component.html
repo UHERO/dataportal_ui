@@ -21,21 +21,26 @@
             </label>
           </div>
           <div class="filters">
-            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawTableGeo($event, data.currentFreq)" class="selector"></app-geo-selector>
-            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
+            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawTableGeo($event, data.currentFreq)"
+              class="selector"></app-geo-selector>
+            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)"
+              class="selector"></app-freq-selector>
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
-          <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
+          <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="200px" frozenWidth="200px" unfrozenWidth="600px" [value]="data.seriesData" scrollable="true">
+            <p-column field="data.seriesData.series" header="Series" [style]="{'width':'250px'}" frozen="true"></p-column>
+            <p-column *ngFor="let date of series.sublist.dateRange" [field]="data.seriesData.series" [header]="date.date" [style]="{'width':'250px'}"></p-column>
+            <p-column field="data.seriesData.series" header="Source" [style]="{'width':'250px'}" frozen="true"></p-column>
+          </p-dataTable>
+          <!-- <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">
-              <!-- row of dates -->
               <tr>
                 <th><b>Series</b></th>
                 <template ngFor let-date [ngForOf]="series.sublist.dateRange" let-i="index">
                   <td *ngIf="date.date >= series.dateWrapper.firstDate && date.date <= series.dateWrapper.endDate"><b>{{date.tableDate}}</b></td>
                 </template>
               </tr>
-              <!-- series data -->
               <template ngFor let-serie [ngForOf]="series.series">
                 <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable || series.hasSeasonallyAdjusted === false && serie.categoryTable">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
@@ -66,7 +71,7 @@
                 </tr>
               </template>
             </table>
-          </div>
+          </div> -->
         </div>
       </template>
     </template>
