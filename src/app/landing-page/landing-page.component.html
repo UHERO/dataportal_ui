@@ -3,8 +3,8 @@
     <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="!routeSearch && data.invalid">{{data.invalid}}</p>
-    <template ngFor let-sub [ngForOf]="data.sublist">
-      <template ngFor let-series [ngForOf]="data.seriesData">
+    <ng-template ngFor let-sub [ngForOf]="data.sublist">
+      <ng-template ngFor let-series [ngForOf]="data.seriesData">
         <div class="multi-charts-row" *ngIf="sub.id === series.sublist.id || routeSearch">
           <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
             <li *ngFor="let sub of data.sublist">
@@ -17,16 +17,16 @@
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
             <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
           </div>
-          <template ngFor let-serie [ngForOf]="series.series">
+          <ng-template ngFor let-serie [ngForOf]="series.series">
             <p *ngIf="!serie.seriesInfo.id"> No Data Available </p>
             <div *ngIf="serie.seriesInfo.seasonallyAdjusted !== false || series.hasSeasonallyAdjusted === false" class="multi-charts">
               <a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" *ngIf="serie.seriesInfo.id">
                 <app-highchart [seriesData]="serie" [currentFreq]="data.currentFreq"></app-highchart>
               </a>
             </div>
-          </template>
+          </ng-template>
         </div>
-      </template>
-    </template>
+      </ng-template>
+    </ng-template>
   </div>
 </div>
