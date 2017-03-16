@@ -6,6 +6,7 @@ import { ChartModule } from 'angular2-highcharts';
 // Temp workaround for build errors
 // See: https://github.com/gevgeny/angular2-highcharts/issues/160
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
+declare var require: any;
 export function highchartsFactory() {
   let highcharts = require('highcharts/highstock');
   let exp = require('highcharts/modules/exporting');
