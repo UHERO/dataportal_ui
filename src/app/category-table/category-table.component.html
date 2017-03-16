@@ -28,23 +28,23 @@
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
-          <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="250px" frozenWidth="200px" unfrozenWidth="600px" [value]="series.categoryTable.table">
+          <!-- <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="250px" frozenWidth="200px" unfrozenWidth="600px" [value]="series.categoryTable.table">
             <p-column field="series" header="Series" [style]="{'width':'250px', 'white-space':'nowrap', 'border-right':'1px solid #000'}" frozen="true">
               <ng-template>
                 <span><a [routerLink]="['/series']" [queryParams]="{id: series.id}">{{series.title}}</a></span>
               </ng-template>
             </p-column>
             <p-column *ngFor="let date of series.categoryTable.dateHeader" [field]="date" [header]="date" [style]="{'width':'250px', 'text-align':'right'}"></p-column>
-          </p-dataTable>
-          <!-- <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
+          </p-dataTable> -->
+          <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">
               <tr>
                 <th><b>Series</b></th>
-                <template ngFor let-date [ngForOf]="series.sublist.dateRange" let-i="index">
+                <ng-template ngFor let-date [ngForOf]="series.sublist.dateRange" let-i="index">
                   <td *ngIf="date.date >= series.dateWrapper.firstDate && date.date <= series.dateWrapper.endDate"><b>{{date.tableDate}}</b></td>
-                </template>
+                </ng-template>
               </tr>
-              <template ngFor let-serie [ngForOf]="series.series">
+              <ng-template ngFor let-serie [ngForOf]="series.series">
                 <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable || series.hasSeasonallyAdjusted === false && serie.categoryTable">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                     <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title">
@@ -52,29 +52,29 @@
                     </a>
                     <span class="badge badge-pill badge-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.level}}</td>
-                  </template>
+                  </ng-template>
                 </tr>
                 <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable && yoyIsActive || series.hasSeasonallyAdjusted === false && serie.categoryTable && yoyIsActive">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                   {{(serie.seriesInfo.percent === true) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.yoy}}</td>
-                  </template>
+                  </ng-template>
                 </tr>
                 <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable && ytdIsActive || series.hasSeasonallyAdjusted === false && serie.categoryTable && ytdIsActive">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                   {{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.ytd}}</td>
-                  </template>
+                  </ng-template>
                 </tr>
-              </template>
+              </ng-template>
             </table>
-          </div> -->
+          </div>
         </div>
       </ng-template>
     </ng-template>

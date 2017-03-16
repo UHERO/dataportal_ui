@@ -198,7 +198,7 @@ export class HelperService {
     for (let i = 0; i < dateRange.length; i++) {
       categoryTable.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: '' });
       if (seriesTableData) {
-        //this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
+        this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
       }
     }
     return categoryTable;
@@ -215,7 +215,7 @@ export class HelperService {
     let dateHeader;
     categorySeries.forEach((series) => {
       let seriesData = {};
-      this.catTableDateWrapper(series.tableData, dateWrapper, seasonalFreq);
+      //this.catTableDateWrapper(series.tableData, dateWrapper, seasonalFreq);
       dateHeader = this.tableDateHeader(dateWrapper, freq);
       series.tableData.forEach((data) => {
         seriesData['series'] = series.seriesInfo.title;
@@ -263,7 +263,7 @@ export class HelperService {
     return dateHeader;
   }
 
-  catTableDateWrapper(seriesTable, dateWrapper, seasonal) {
+  catTableDateWrapper(categoryTable, seriesTable, dateWrapper, seasonal) {
     for (let j = 0; j < seriesTable.length; j++) {
       if (dateWrapper.firstDate === '' || seasonal && seriesTable[j].date < dateWrapper.firstDate) {
         dateWrapper.firstDate = seriesTable[j].date;
@@ -272,12 +272,12 @@ export class HelperService {
         dateWrapper.endDate = seriesTable[j].date;
       }
       // Format values for category table
-      /* if (categoryTable.date === seriesTable[j].date) {
+      if (categoryTable.date === seriesTable[j].date) {
         categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
         categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
         categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
         break;
-      } */
+      }
     }
   }
 
