@@ -28,9 +28,13 @@
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
-          <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="200px" frozenWidth="200px" unfrozenWidth="600px" [value]="data.seriesData" scrollable="true">
-            <p-column field="data.seriesData.series" header="Series" [style]="{'width':'250px'}" frozen="true"></p-column>
-            <p-column *ngFor="let date of series.sublist.dateRange" [field]="data.seriesData.series" [header]="date.date" [style]="{'width':'250px'}"></p-column>
+          <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="250px" frozenWidth="200px" unfrozenWidth="600px" [value]="series.categoryTable.table">
+            <p-column field="series" header="Series" [style]="{'width':'250px', 'white-space':'nowrap', 'border-right':'1px solid #000'}" frozen="true">
+              <ng-template>
+                <span><a [routerLink]="['/series']" [queryParams]="{id: series.id}">{{series.title}}</a></span>
+              </ng-template>
+            </p-column>
+            <p-column *ngFor="let date of series.categoryTable.dateHeader" [field]="date" [header]="date" [style]="{'width':'250px', 'text-align':'right'}"></p-column>
           </p-dataTable>
           <!-- <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">

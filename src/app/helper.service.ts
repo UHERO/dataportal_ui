@@ -10,8 +10,8 @@ export class HelperService {
 
 
   categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let start = +dateStart.substring(0, 4);
-    let end = +dateEnd.substring(0, 4);
+    let start = +dateStart.substr(0, 4);
+    let end = +dateEnd.substr(0, 4);
 
     while (start <= end) {
       if (currentFreq === 'A') {
@@ -42,10 +42,10 @@ export class HelperService {
   }
 
   seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let startYear = +dateStart.substring(0, 4);
-    let endYear = +dateEnd.substring(0, 4);
-    let startMonth = +dateStart.substring(5, 7);
-    let endMonth = +dateEnd.substring(5, 7);
+    let startYear = +dateStart.substr(0, 4);
+    let endYear = +dateEnd.substr(0, 4);
+    let startMonth = +dateStart.substr(5, 2);
+    let endMonth = +dateEnd.substr(5, 2);
     let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
     let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
     if (currentFreq === 'A') {
@@ -55,7 +55,6 @@ export class HelperService {
       }
     } else if (currentFreq === 'S') {
       while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
-        let month = ['01', '07'];
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 7 ? startYear += 1 : startYear;
         startMonth = startMonth === 1 ? 7 : 1;
@@ -199,13 +198,72 @@ export class HelperService {
     for (let i = 0; i < dateRange.length; i++) {
       categoryTable.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: '' });
       if (seriesTableData) {
-        this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
+        //this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
       }
     }
     return categoryTable;
   }
 
-  catTableDateWrapper(categoryTable, seriesTable, dateWrapper, seasonal) {
+  categoryTableData(categorySeries: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, seasonal?: Boolean, freq?: string) {
+    let table = [];
+    let sa = seasonal ? true : false;
+    // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
+    let seasonalFreq = true;
+    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
+      seasonalFreq = false;
+    }
+    let dateHeader;
+    categorySeries.forEach((series) => {
+      let seriesData = {};
+      this.catTableDateWrapper(series.tableData, dateWrapper, seasonalFreq);
+      dateHeader = this.tableDateHeader(dateWrapper, freq);
+      series.tableData.forEach((data) => {
+        seriesData['series'] = series.seriesInfo.title;
+        seriesData['seriesId'] = series.seriesInfo.id;
+        seriesData[data.tableDate] = data.formattedValue;
+      });
+      table.push(seriesData);
+    });
+    return { table: table, dateHeader: dateHeader };
+  }
+
+  tableDateHeader(dateWrapper: dateWrapper, freq) {
+    let startYear = +dateWrapper.firstDate.substr(0, 4);
+    let endYear = +dateWrapper.endDate.substr(0, 4);
+    let startMonth = +dateWrapper.firstDate.substr(5, 2);
+    let endMonth = +dateWrapper.endDate.substr(5, 2);
+    let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
+    let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
+
+    let dateHeader = [];
+    if (freq === 'A') {
+      while (startYear <= endYear) {
+        dateHeader.push(startYear.toString());
+        startYear += 1;
+      }
+    } else if (freq === 'S') {
+      while (startYear + '-' + m[startMonth] <= endYear + '-' + m[endMonth]) {
+        dateHeader.push(startYear.toString() + '-' + m[startMonth]);
+        startYear = startMonth === 7 ? startYear += 1 : startYear;
+        startMonth = startMonth === 1 ? 7 : 1;
+      }
+    } else if (freq === 'M') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateHeader.push(startYear.toString() + '-' + m[startMonth]);
+        startYear = startMonth === 12 ? startYear += 1 : startYear;
+        startMonth = startMonth === 12 ? 1 : startMonth += 1;
+      }
+    } else if (freq === 'Q') {
+      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+        dateHeader.push(startYear.toString() + ' ' + q[startMonth]);
+        startYear = startMonth === 10 ? startYear += 1 : startYear;
+        startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
+      }
+    }
+    return dateHeader;
+  }
+
+  catTableDateWrapper(seriesTable, dateWrapper, seasonal) {
     for (let j = 0; j < seriesTable.length; j++) {
       if (dateWrapper.firstDate === '' || seasonal && seriesTable[j].date < dateWrapper.firstDate) {
         dateWrapper.firstDate = seriesTable[j].date;
@@ -214,12 +272,12 @@ export class HelperService {
         dateWrapper.endDate = seriesTable[j].date;
       }
       // Format values for category table
-      if (categoryTable.date === seriesTable[j].date) {
+      /* if (categoryTable.date === seriesTable[j].date) {
         categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
         categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
         categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
         break;
-      }
+      } */
     }
   }
 

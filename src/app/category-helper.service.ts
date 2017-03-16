@@ -141,7 +141,8 @@ export class CategoryHelperService {
               // Check if (non-annual) category has seasonally adjusted data
               // Returns true for annual data
               let hasSeasonallyAdjusted = this.checkSA(categorySeries);
-              categorySeries.forEach((series, index) => {
+              let categoryTable = this._helper.categoryTableData(categorySeries, dateArray, dateWrapper, hasSeasonallyAdjusted, currentFreq.freq);
+              /* categorySeries.forEach((series, index) => {
                 let freq = series.frequencyShort;
                 // Seasonal adjustment affects dateWrapper first and end dates
                 // If hasSeasonallyAdjusted === false, set dateWrapper based on non-seasonally adjusted data
@@ -151,9 +152,9 @@ export class CategoryHelperService {
                 } else {
                   series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, freq);
                 }
-              });
+              }); */
               sublistIndex.dateRange = dateArray;
-              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
+              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, series: categorySeries, categoryTable: categoryTable, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
             } else {
               // No series exist for a subcateogry
               let series = [{ seriesInfo: 'No data available' }];
