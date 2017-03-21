@@ -96,7 +96,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    console.log('new table data', this.newTableData)
     this.summaryStats = this._helper.summaryStats(this.newTableData, minDate, maxDate, freq);
   }
 

@@ -54,7 +54,6 @@ export class CategoryHelperService {
           this.categoryData[catId + routeGeo + routeFreq].invalid = 'Category does not exist.';
         }
       });
-      console.log(this.categoryData[catId + routeGeo + routeFreq]);
       return Observable.forkJoin(Observable.of(this.categoryData[catId + routeGeo + routeFreq]));
     }
   }

@@ -16,6 +16,11 @@ export function highchartsFactory() {
   exp(highcharts);
   offlineExport(highcharts);
   csv(highcharts);
+  highcharts.setOptions({
+    lang: {
+      thousandsSep: ','
+    }
+  })
   return (highcharts);
 }
 
@@ -75,7 +80,7 @@ import { FeedbackComponent } from './feedback/feedback.component';
       provide: HighchartsStatic,
       useFactory: highchartsFactory
     }
-    ],
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

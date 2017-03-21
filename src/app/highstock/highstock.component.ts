@@ -12,12 +12,6 @@ exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
 
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ','
-  }
-});
-
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
