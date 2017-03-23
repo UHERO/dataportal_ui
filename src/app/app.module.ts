@@ -45,6 +45,7 @@ import { HighstockComponent } from './highstock/highstock.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { FeedbackComponent } from './feedback/feedback.component';
+import { CategoryDatatablesComponent } from './category-datatables/category-datatables.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { FeedbackComponent } from './feedback/feedback.component';
     CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
+    CategoryDatatablesComponent,
   ],
   imports: [
     BrowserModule,

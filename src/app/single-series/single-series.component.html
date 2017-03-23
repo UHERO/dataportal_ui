@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="series-table">
-    <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData" scrollable="true">
+    <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData">
       <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
       <p-column field="formattedValue" header="Level"></p-column>
       <p-column field="formattedYoy" [header]=data.change></p-column>

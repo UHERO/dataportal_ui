@@ -4,7 +4,7 @@
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="data.invalid">{{data.invalid}}</p>
     <ng-template ngFor let-sub [ngForOf]="data.sublist">
-      <ng-template ngFor let-series [ngForOf]="data.seriesData">
+      <ng-template ngFor let-series [ngForOf]="data.seriesData" let-i="index">
         <div class="table-row" *ngIf="sub.id === series.sublist.id || routeSearch">
           <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
             <li *ngFor="let sub of data.sublist">
@@ -28,6 +28,7 @@
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
+          <app-category-datatables [data]="series" [tableId]="i"></app-category-datatables>
           <!-- <p-dataTable *ngIf="!noSelection && !data.noData" scrollable="true" scrollHeight="250px" frozenWidth="200px" unfrozenWidth="600px" [value]="series.categoryTable.table">
             <p-column field="series" header="Series" [style]="{'width':'250px', 'white-space':'nowrap', 'border-right':'1px solid #000'}" frozen="true">
               <ng-template>
@@ -36,7 +37,7 @@
             </p-column>
             <p-column *ngFor="let date of series.categoryTable.dateHeader" [field]="date" [header]="date" [style]="{'width':'250px', 'text-align':'right'}"></p-column>
           </p-dataTable> -->
-          <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
+          <!-- <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">
               <tr>
                 <th><b>Series</b></th>
@@ -74,7 +75,7 @@
                 </tr>
               </ng-template>
             </table>
-          </div>
+          </div> -->
         </div>
       </ng-template>
     </ng-template>
