@@ -25,6 +25,7 @@
     "bootstrap": "^4.0.0-alpha.4",
     "core-js": "^2.4.1",
     "datatables.net": "^1.10.13",
+    "datatables.net-dt": "^1.10.13",
     "datatables.net-fixedcolumns": "^3.2.2",
     "datatables.net-fixedcolumns-dt": "^3.2.2",
     "highcharts-export-csv": "^1.4.3",
