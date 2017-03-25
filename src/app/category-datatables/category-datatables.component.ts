@@ -2,6 +2,9 @@ import { Component, OnInit, Input, AfterViewInit, ViewEncapsulation } from '@ang
 import * as $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-fixedcolumns';
+import 'datatables.net-buttons/js/dataTables.buttons.js';
+import 'datatables.net-buttons/js/buttons.html5.js';
+import 'datatables.net-buttons/js/buttons.flash.js';
 
 @Component({
   selector: 'app-category-datatables',
@@ -18,7 +21,6 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     console.log('datatables', this.data);
-    //this.initDatatable();
   }
 
   ngAfterViewInit() {
@@ -26,63 +28,19 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
   }
 
   initDatatable(): void {
-    let tableColumns = [];
     let tableElement: any = $('#indicator-table-' + this.tableId);
-    /* if (this.tableWidget) {
-      // Destroy table if table has already been initialized
-      this.tableWidget.destroy();
-      tableElement.empty();
-    } */
-    tableColumns.push({ title: 'Series', data: 'series' });
-    let dateStart = this.data.dateWrapper.firstDate;
-    let dateEnd = this.data.dateWrapper.endDate;
-    this.data.sublist.dateRange.forEach((date) => {
-      if (date.date >= dateStart && date.date <= dateEnd)
-        tableColumns.push({ title: date.tableDate, data: 'observations.' + date.tableDate });
-    });
-    let tableData = [];
-    this.data.series.forEach((series) => {
-      if (series.seriesInfo.seasonallyAdjusted !== false) {
-        let observations = {};
-        series.categoryTable.forEach((obs) => {
-          observations[obs.tableDate] = obs.level;
-        })
-        tableData.push({
-          series: series.seriesInfo.description ? series.seriesInfo.description : series.seriesInfo.title,
-          seriesId: series.seriesInfo.id,
-          indent: series.seriesInfo.indent,
-          seasonallyAdjusted: series.seriesInfo.seasonallyAdjusted,
-          observations: observations
-        });
-      }
-    })
-    console.log(tableData);
+    let tableColumns = this.data.tableColumns;
+    let tableData = this.data.tableData;
     this.tableWidget = tableElement.DataTable({
       data: tableData,
+      dom: 'B',
       columns: tableColumns,
-      columnDefs: [
-        {
-          targets: 0,
-          render: function (data, type, row, meta) {
-            if (type === 'display') {
-              // Display badge if series is seasonally adjusted
-              let sa = '<span class=indent' + row.indent + '><a href="/#/series?id=' + row.seriesId + '">' + row.series + '</a></span>' + '<span class="badge badge-pill badge-primary">SA</span>';
-              let ns = '<span class=indent' + row.indent + '><a href="/#/series?id=' + row.seriesId + '">' + row.series + '</a>';
-              data = row.seasonallyAdjusted ? sa : ns;
-            }
-            return data;
-          }
-        }
-      ],
+      buttons: ['csv'],
       bSort: false,
-      // scrollY: '400px',
-      scrollX: true,
       paging: false,
       searching: false,
       info: false,
-      fixedColumns: {
-        'leftColumns': 1
-      }
     });
+    tableElement.hide();
   }
 }

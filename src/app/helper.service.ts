@@ -188,43 +188,43 @@ export class HelperService {
     }
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, sa?: Boolean, freq?: string) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
-    let seasonalFreq = true;
-    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
-      seasonalFreq = false;
-    }
     for (let i = 0; i < dateRange.length; i++) {
       categoryTable.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: '' });
-      if (seriesTableData) {
-        this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
-      }
     }
+    categoryTable.forEach((item) => {
+      seriesTableData.forEach((seriesData) => {
+        if (item.date === seriesData.date) {
+          item.level = seriesData.value === ' ' ? ' ' : this.formatNum(+seriesData.value, 2);
+          item.yoy = seriesData.yoy === ' ' ? ' ' : this.formatNum(+seriesData.yoy, 2);
+          item.ytd = seriesData.ytd === ' ' ? ' ' : this.formatNum(+seriesData.ytd, 2);
+        }
+      });
+    });
+    let tableStart, tableEnd;
+    categoryTable.forEach((item, index) => {
+      if (item.date === dateWrapper.firstDate) {
+        tableStart = index;
+      }
+      if (item.date === dateWrapper.endDate) {
+        tableEnd = index;
+      }
+    });
+    categoryTable = categoryTable.slice(tableStart, tableEnd + 1);
     return categoryTable;
   }
 
-  categoryTableData(categorySeries: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, seasonal?: Boolean, freq?: string) {
-    let table = [];
-    let sa = seasonal ? true : false;
-    // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
-    let seasonalFreq = true;
-    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
-      seasonalFreq = false;
-    }
-    let dateHeader;
-    categorySeries.forEach((series) => {
-      let seriesData = {};
-      //this.catTableDateWrapper(series.tableData, dateWrapper, seasonalFreq);
-      dateHeader = this.tableDateHeader(dateWrapper, freq);
-      series.tableData.forEach((data) => {
-        seriesData['series'] = series.seriesInfo.title;
-        seriesData['seriesId'] = series.seriesInfo.id;
-        seriesData[data.tableDate] = data.formattedValue;
-      });
-      table.push(seriesData);
+  setDateWrapper(displaySeries: Array<any>, dateWrapper: dateWrapper) {
+    displaySeries.forEach((series) => {
+      if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
+        dateWrapper.firstDate = series.start;
+      }
+      if (dateWrapper.endDate === '' || series.end > dateWrapper.endDate) {
+        dateWrapper.endDate = series.end;
+      }
     });
-    return { table: table, dateHeader: dateHeader };
   }
 
   tableDateHeader(dateWrapper: dateWrapper, freq) {
@@ -263,22 +263,58 @@ export class HelperService {
     return dateHeader;
   }
 
-  catTableDateWrapper(categoryTable, seriesTable, dateWrapper, seasonal) {
+  catTableDateWrapper(categoryTable, seriesTable, dateWrapper) {
     for (let j = 0; j < seriesTable.length; j++) {
-      if (dateWrapper.firstDate === '' || seasonal && seriesTable[j].date < dateWrapper.firstDate) {
+      if (dateWrapper.firstDate === '' || seriesTable[j].date < dateWrapper.firstDate) {
         dateWrapper.firstDate = seriesTable[j].date;
       }
-      if (dateWrapper.endDate === '' || seasonal && seriesTable[j].date > dateWrapper.endDate) {
+      if (dateWrapper.endDate === '' || seriesTable[j].date > dateWrapper.endDate) {
         dateWrapper.endDate = seriesTable[j].date;
       }
       // Format values for category table
       if (categoryTable.date === seriesTable[j].date) {
-        categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
-        categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
+        categoryTable.level = seriesTable[j].value === ' ' ? ' ' : this.formatNum(+seriesTable[j].value, 2);
+        categoryTable.yoy = seriesTable[j].yoy === ' ' ? ' ' : this.formatNum(+seriesTable[j].yoy, 2);
+        categoryTable.ytd = seriesTable[j].ytd === ' ' ? ' ' : this.formatNum(+seriesTable[j].ytd, 2);
         break;
       }
     }
+  }
+
+  sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
+    let tableData = [];
+    let tableColumns = [];
+    let dateStart = dateWrapper.firstDate;
+    let dateEnd = dateWrapper.endDate;
+    tableColumns.push({ title: 'Series', data: 'series' });
+    tableDates.forEach((date) => {
+      tableColumns.push({ title: date, data: 'observations.' + date });
+    });
+    displaySeries.forEach((series) => {
+      if (series.seriesInfo.seasonallyAdjusted !== false) {
+        let observations = {};
+        let yoy = {};
+        let ytd = {};
+        series.categoryTable.forEach((obs) => {
+          observations[obs.tableDate] = obs.level;
+          yoy[obs.tableDate] = obs.yoy;
+          ytd[obs.tableDate] = obs.ytd;
+        });
+        tableData.push({
+          series: series.seriesInfo.title,
+          observations: observations
+        },
+        {
+          series: 'YOY',
+          observations: yoy
+        },
+        {
+          series: 'YTD',
+          observations: ytd
+        });
+      }
+    });
+    return {tableColumns: tableColumns, tableData: tableData};
   }
 
   // Combine level and percent arrays from Observation data
