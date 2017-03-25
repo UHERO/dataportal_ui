@@ -28,7 +28,7 @@
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
-          <app-category-datatables [data]="series.sublist.datatables" [tableId]="i"></app-category-datatables>
+          <app-category-datatables [sublist]="sub" [data]="series.sublist.datatables" [tableId]="i"></app-category-datatables>
           <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">
               <tr>

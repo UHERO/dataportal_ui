@@ -227,42 +227,6 @@ export class HelperService {
     });
   }
 
-  tableDateHeader(dateWrapper: dateWrapper, freq) {
-    let startYear = +dateWrapper.firstDate.substr(0, 4);
-    let endYear = +dateWrapper.endDate.substr(0, 4);
-    let startMonth = +dateWrapper.firstDate.substr(5, 2);
-    let endMonth = +dateWrapper.endDate.substr(5, 2);
-    let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
-    let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-
-    let dateHeader = [];
-    if (freq === 'A') {
-      while (startYear <= endYear) {
-        dateHeader.push(startYear.toString());
-        startYear += 1;
-      }
-    } else if (freq === 'S') {
-      while (startYear + '-' + m[startMonth] <= endYear + '-' + m[endMonth]) {
-        dateHeader.push(startYear.toString() + '-' + m[startMonth]);
-        startYear = startMonth === 7 ? startYear += 1 : startYear;
-        startMonth = startMonth === 1 ? 7 : 1;
-      }
-    } else if (freq === 'M') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
-        dateHeader.push(startYear.toString() + '-' + m[startMonth]);
-        startYear = startMonth === 12 ? startYear += 1 : startYear;
-        startMonth = startMonth === 12 ? 1 : startMonth += 1;
-      }
-    } else if (freq === 'Q') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
-        dateHeader.push(startYear.toString() + ' ' + q[startMonth]);
-        startYear = startMonth === 10 ? startYear += 1 : startYear;
-        startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
-      }
-    }
-    return dateHeader;
-  }
-
   sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
     let tableData = [];
     let tableColumns = [];
@@ -277,6 +241,9 @@ export class HelperService {
         let observations = {};
         let yoy = {};
         let ytd = {};
+        let percent = series.seriesInfo.percent;
+        let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
+        let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
         series.categoryTable.forEach((obs) => {
           observations[obs.tableDate] = obs.level;
           yoy[obs.tableDate] = obs.yoy;
@@ -287,16 +254,16 @@ export class HelperService {
           observations: observations
         },
         {
-          series: 'YOY',
+          series: yoyLabel,
           observations: yoy
         },
         {
-          series: 'YTD',
+          series: ytdLabel,
           observations: ytd
         });
       }
     });
-    return {tableColumns: tableColumns, tableData: tableData};
+    return { tableColumns: tableColumns, tableData: tableData };
   }
 
   // Combine level and percent arrays from Observation data

@@ -15,6 +15,7 @@ import 'datatables.net-buttons/js/buttons.flash.js';
 export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
   @Input() data;
   @Input() tableId;
+  @Input() sublist;
   private tableWidget;
 
   constructor() { }
@@ -35,7 +36,14 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
       data: tableData,
       dom: 'B',
       columns: tableColumns,
-      buttons: ['csv'],
+      buttons: [{
+        extend: 'csv',
+        text: '<i class="material-icons">&#xE2C4;</i> Download CSV',
+        filename: this.sublist.name,
+        customize: function(csv) {
+          return csv + '\n\n The Economic Research Organization at the University of Hawaii (UHERO) \n Data Portal: http://data.uhero.hawaii.edu/';
+        }
+      }],
       bSort: false,
       paging: false,
       searching: false,

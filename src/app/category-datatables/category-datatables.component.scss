@@ -1,11 +1,14 @@
-.indent1 {
-    padding-left: 30px;
-}
+.dataTables_wrapper {
+    display: inline-block;
 
-.indent2 {
-    padding-left: 50px;
-}
-
-.indent3 {
-    padding-left: 70px;
+    .buttons-csv {
+        color: #1D667F;
+        text-decoration: none;
+        font-size: 0.9em;
+        
+        .material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+        }
+    }
 }
