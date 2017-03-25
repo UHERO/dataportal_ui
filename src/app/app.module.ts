@@ -6,6 +6,7 @@ import { ChartModule } from 'angular2-highcharts';
 // Temp workaround for build errors
 // See: https://github.com/gevgeny/angular2-highcharts/issues/160
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
+declare var require: any;
 export function highchartsFactory() {
   let highcharts = require('highcharts/highstock');
   let exp = require('highcharts/modules/exporting');
@@ -15,6 +16,11 @@ export function highchartsFactory() {
   exp(highcharts);
   offlineExport(highcharts);
   csv(highcharts);
+  highcharts.setOptions({
+    lang: {
+      thousandsSep: ','
+    }
+  })
   return (highcharts);
 }
 
@@ -39,6 +45,7 @@ import { HighstockComponent } from './highstock/highstock.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { FeedbackComponent } from './feedback/feedback.component';
+import { CategoryDatatablesComponent } from './category-datatables/category-datatables.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +61,7 @@ import { FeedbackComponent } from './feedback/feedback.component';
     CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
+    CategoryDatatablesComponent,
   ],
   imports: [
     BrowserModule,
@@ -74,7 +82,7 @@ import { FeedbackComponent } from './feedback/feedback.component';
       provide: HighchartsStatic,
       useFactory: highchartsFactory
     }
-    ],
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

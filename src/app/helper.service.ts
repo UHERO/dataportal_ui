@@ -10,8 +10,8 @@ export class HelperService {
 
 
   categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let start = +dateStart.substring(0, 4);
-    let end = +dateEnd.substring(0, 4);
+    let start = +dateStart.substr(0, 4);
+    let end = +dateEnd.substr(0, 4);
 
     while (start <= end) {
       if (currentFreq === 'A') {
@@ -42,10 +42,10 @@ export class HelperService {
   }
 
   seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let startYear = +dateStart.substring(0, 4);
-    let endYear = +dateEnd.substring(0, 4);
-    let startMonth = +dateStart.substring(5, 7);
-    let endMonth = +dateEnd.substring(5, 7);
+    let startYear = +dateStart.substr(0, 4);
+    let endYear = +dateEnd.substr(0, 4);
+    let startMonth = +dateStart.substr(5, 2);
+    let endMonth = +dateEnd.substr(5, 2);
     let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
     let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
     if (currentFreq === 'A') {
@@ -55,7 +55,6 @@ export class HelperService {
       }
     } else if (currentFreq === 'S') {
       while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
-        let month = ['01', '07'];
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 7 ? startYear += 1 : startYear;
         startMonth = startMonth === 1 ? 7 : 1;
@@ -189,38 +188,82 @@ export class HelperService {
     }
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper, sa?: Boolean, freq?: string) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
-    let seasonalFreq = true;
-    if ((freq !== 'A' && sa === false) && (freq !== 'S' && sa === false)) {
-      seasonalFreq = false;
-    }
     for (let i = 0; i < dateRange.length; i++) {
       categoryTable.push({ date: dateRange[i].date, tableDate: dateRange[i].tableDate, level: '', yoy: '', ytd: '' });
-      if (seriesTableData) {
-        this.catTableDateWrapper(categoryTable[i], seriesTableData, dateWrapper, seasonalFreq);
-      }
     }
+    categoryTable.forEach((item) => {
+      seriesTableData.forEach((seriesData) => {
+        if (item.date === seriesData.date) {
+          item.level = seriesData.value === ' ' ? ' ' : this.formatNum(+seriesData.value, 2);
+          item.yoy = seriesData.yoy === null ? ' ' : this.formatNum(+seriesData.yoy, 2);
+          item.ytd = seriesData.ytd === null ? ' ' : this.formatNum(+seriesData.ytd, 2);
+        }
+      });
+    });
+    let tableStart, tableEnd;
+    categoryTable.forEach((item, index) => {
+      if (item.date === dateWrapper.firstDate) {
+        tableStart = index;
+      }
+      if (item.date === dateWrapper.endDate) {
+        tableEnd = index;
+      }
+    });
+    categoryTable = categoryTable.slice(tableStart, tableEnd + 1);
     return categoryTable;
   }
 
-  catTableDateWrapper(categoryTable, seriesTable, dateWrapper, seasonal) {
-    for (let j = 0; j < seriesTable.length; j++) {
-      if (dateWrapper.firstDate === '' || seasonal && seriesTable[j].date < dateWrapper.firstDate) {
-        dateWrapper.firstDate = seriesTable[j].date;
+  setDateWrapper(displaySeries: Array<any>, dateWrapper: dateWrapper) {
+    displaySeries.forEach((series) => {
+      if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
+        dateWrapper.firstDate = series.start;
       }
-      if (dateWrapper.endDate === '' || seasonal && seriesTable[j].date > dateWrapper.endDate) {
-        dateWrapper.endDate = seriesTable[j].date;
+      if (dateWrapper.endDate === '' || series.end > dateWrapper.endDate) {
+        dateWrapper.endDate = series.end;
       }
-      // Format values for category table
-      if (categoryTable.date === seriesTable[j].date) {
-        categoryTable.level = seriesTable[j].value === ' ' ?  ' ' : this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = seriesTable[j].yoy === ' ' ?  ' ' : this.formatNum(+seriesTable[j].yoy, 2);
-        categoryTable.ytd = seriesTable[j].ytd === ' ' ?  ' ' : this.formatNum(+seriesTable[j].ytd, 2);
-        break;
+    });
+  }
+
+  sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
+    let tableData = [];
+    let tableColumns = [];
+    let dateStart = dateWrapper.firstDate;
+    let dateEnd = dateWrapper.endDate;
+    tableColumns.push({ title: 'Series', data: 'series' });
+    tableDates.forEach((date) => {
+      tableColumns.push({ title: date, data: 'observations.' + date });
+    });
+    displaySeries.forEach((series) => {
+      if (series.seriesInfo.seasonallyAdjusted !== false) {
+        let observations = {};
+        let yoy = {};
+        let ytd = {};
+        let percent = series.seriesInfo.percent;
+        let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
+        let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
+        series.categoryTable.forEach((obs) => {
+          observations[obs.tableDate] = obs.level;
+          yoy[obs.tableDate] = obs.yoy;
+          ytd[obs.tableDate] = obs.ytd;
+        });
+        tableData.push({
+          series: series.seriesInfo.title,
+          observations: observations
+        },
+        {
+          series: yoyLabel,
+          observations: yoy
+        },
+        {
+          series: ytdLabel,
+          observations: ytd
+        });
       }
-    }
+    });
+    return { tableColumns: tableColumns, tableData: tableData };
   }
 
   // Combine level and percent arrays from Observation data

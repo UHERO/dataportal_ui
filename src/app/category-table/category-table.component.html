@@ -1,10 +1,10 @@
 <div class="category-tables">
   <div *ngFor="let data of categoryData | async">
-    <h2 class="selected-category" [class.search-term]="routeSearch && data.sublist.length > 0" id="id_top">{{data.selectedCategory}}</h2>
+    <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="data.invalid">{{data.invalid}}</p>
-    <template ngFor let-sub [ngForOf]="data.sublist">
-      <template ngFor let-series [ngForOf]="data.seriesData">
+    <ng-template ngFor let-sub [ngForOf]="data.sublist">
+      <ng-template ngFor let-series [ngForOf]="data.seriesData" let-i="index">
         <div class="table-row" *ngIf="sub.id === series.sublist.id || routeSearch">
           <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
             <li *ngFor="let sub of data.sublist">
@@ -21,54 +21,55 @@
             </label>
           </div>
           <div class="filters">
-            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawTableGeo($event, data.currentFreq)" class="selector"></app-geo-selector>
-            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
+            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawTableGeo($event, data.currentFreq)"
+              class="selector"></app-geo-selector>
+            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)"
+              class="selector"></app-freq-selector>
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
           </div>
           <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
+          <app-category-datatables [sublist]="sub" [data]="series.sublist.datatables" [tableId]="i"></app-category-datatables>
           <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="series.dateWrapper">
             <table class="category-table">
-              <!-- row of dates -->
               <tr>
                 <th><b>Series</b></th>
-                <template ngFor let-date [ngForOf]="series.sublist.dateRange" let-i="index">
-                  <td *ngIf="date.date >= series.dateWrapper.firstDate && date.date <= series.dateWrapper.endDate"><b>{{date.tableDate}}</b></td>
-                </template>
+                <ng-template ngFor let-date [ngForOf]="series.sublist.dateRange" let-i="index">
+                  <td><b>{{date}}</b></td>
+                </ng-template>
               </tr>
-              <!-- series data -->
-              <template ngFor let-serie [ngForOf]="series.series">
-                <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable || series.hasSeasonallyAdjusted === false && serie.categoryTable">
+              <ng-template ngFor let-serie [ngForOf]="series.displaySeries">
+                <tr>
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                     <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title">
                       {{serie.seriesInfo.title}}
                     </a>
                     <span class="badge badge-pill badge-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.level}}</td>
-                  </template>
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+                    <td>{{item.level}}</td>
+                  </ng-template>
                 </tr>
-                <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable && yoyIsActive || series.hasSeasonallyAdjusted === false && serie.categoryTable && yoyIsActive">
+                <tr *ngIf="yoyIsActive">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                   {{(serie.seriesInfo.percent === true) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.yoy}}</td>
-                  </template>
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+                    <td>{{item.yoy}}</td>
+                  </ng-template>
                 </tr>
-                <tr *ngIf="serie.seriesInfo.seasonallyAdjusted !== false && serie.categoryTable && ytdIsActive || series.hasSeasonallyAdjusted === false && serie.categoryTable && ytdIsActive">
+                <tr *ngIf="ytdIsActive">
                   <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
                   {{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
                   </th>
-                  <template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td *ngIf="item.date >= series.dateWrapper.firstDate && item.date <= series.dateWrapper.endDate">{{item.ytd}}</td>
-                  </template>
+                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+                    <td>{{item.ytd}}</td>
+                  </ng-template>
                 </tr>
-              </template>
+              </ng-template>
             </table>
           </div>
         </div>
-      </template>
-    </template>
+      </ng-template>
+    </ng-template>
   </div>
 </div>
