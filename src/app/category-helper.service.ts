@@ -150,7 +150,7 @@ export class CategoryHelperService {
               // Set date wrapper based on starting and ending dates of displaySeries;
               // Format data for category-table display
               this._helper.setDateWrapper(displaySeries, dateWrapper);
-              let catTable = this.formatTableData(displaySeries, dateArray, dateWrapper);
+              let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
               sublistIndex.dateRange = catTable.tableDates;
               sublistIndex.datatables = catTable.datatables;
               this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, displaySeries: displaySeries, allSeries: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
@@ -267,7 +267,7 @@ export class CategoryHelperService {
           // Get array of dates for entire subcategory, used for table view
           // Format data for category table display
           this._helper.categoryDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
-          let catTable = this.formatTableData(displaySeries, dateArray, dateWrapper);
+          let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
           let sublist = { name: search, dateRange: catTable.tableDates, datatables: catTable.datatables };
           this.categoryData[search + routeGeo + routeFreq].sublist = [sublist];
           this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublist, displaySeries: displaySeries, allSeries: searchSeries, seasonallyAdjusted: hasSeasonallyAdjusted });
@@ -298,7 +298,7 @@ export class CategoryHelperService {
     return display;
   }
 
-  formatTableData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
+  formatCatTableData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
     displaySeries.forEach((series) => {
       series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper);
     });

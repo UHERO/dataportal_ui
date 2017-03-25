@@ -198,8 +198,8 @@ export class HelperService {
       seriesTableData.forEach((seriesData) => {
         if (item.date === seriesData.date) {
           item.level = seriesData.value === ' ' ? ' ' : this.formatNum(+seriesData.value, 2);
-          item.yoy = seriesData.yoy === ' ' ? ' ' : this.formatNum(+seriesData.yoy, 2);
-          item.ytd = seriesData.ytd === ' ' ? ' ' : this.formatNum(+seriesData.ytd, 2);
+          item.yoy = seriesData.yoy === null ? ' ' : this.formatNum(+seriesData.yoy, 2);
+          item.ytd = seriesData.ytd === null ? ' ' : this.formatNum(+seriesData.ytd, 2);
         }
       });
     });
@@ -261,24 +261,6 @@ export class HelperService {
       }
     }
     return dateHeader;
-  }
-
-  catTableDateWrapper(categoryTable, seriesTable, dateWrapper) {
-    for (let j = 0; j < seriesTable.length; j++) {
-      if (dateWrapper.firstDate === '' || seriesTable[j].date < dateWrapper.firstDate) {
-        dateWrapper.firstDate = seriesTable[j].date;
-      }
-      if (dateWrapper.endDate === '' || seriesTable[j].date > dateWrapper.endDate) {
-        dateWrapper.endDate = seriesTable[j].date;
-      }
-      // Format values for category table
-      if (categoryTable.date === seriesTable[j].date) {
-        categoryTable.level = seriesTable[j].value === ' ' ? ' ' : this.formatNum(+seriesTable[j].value, 2);
-        categoryTable.yoy = seriesTable[j].yoy === ' ' ? ' ' : this.formatNum(+seriesTable[j].yoy, 2);
-        categoryTable.ytd = seriesTable[j].ytd === ' ' ? ' ' : this.formatNum(+seriesTable[j].ytd, 2);
-        break;
-      }
-    }
   }
 
   sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
