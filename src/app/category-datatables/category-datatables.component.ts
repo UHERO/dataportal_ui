@@ -21,7 +21,6 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
   constructor() { }
 
   ngOnInit() {
-    console.log('datatables', this.data);
   }
 
   ngAfterViewInit() {
