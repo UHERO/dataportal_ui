@@ -30,15 +30,15 @@ export class HighchartComponent implements OnInit {
     let dataFreq = this.currentFreq.freq;
     this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true ? true : false;
     this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
+    let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq);
+      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq) {
+  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -86,10 +86,16 @@ export class HighchartComponent implements OnInit {
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point, index) => {
             let label = '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            if (point.series.name === 'Level') {
+              label += ' (' + unitsShort + ')';
+            }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone, index) => {
                 if (point.x < pseudoZones[index].value) {
                   s += '<br>' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                  if (point.series.name === 'Level') {
+                    s += ' (' + unitsShort + ')';
+                  }
                 } else {
                   s += label;
                 }
