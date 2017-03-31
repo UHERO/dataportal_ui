@@ -6,7 +6,8 @@ import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
-
+import 'jquery';
+declare var $: any;
 //import { error } from 'util';
 
 
@@ -32,7 +33,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private userEvent: boolean = false;
   private errorMessage: string;
   private categoryData;
-
+  private tooltipInfo;
   // Variables for geo and freq selectors
   public currentGeo: Geography;
   public currentFreq: Frequency;
@@ -127,6 +128,12 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   ytdActive(e) {
     this.ytdIsActive = e.target.checked;
+  }
+
+  showTooltip() {
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
   }
 
   scrollTo(): void {

@@ -39,11 +39,15 @@
               </tr>
               <ng-template ngFor let-serie [ngForOf]="series.displaySeries">
                 <tr>
-                  <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title">
+                  <th class= "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}"
+                  title="{{serie.seriesInfo.title}} <br> {{serie.seriesInfo.source_description}} <br> {{serie.seriesInfo.source_link}}"
+                  data-animation='false' data-html='true' data-placement='bottom' data-toggle='tooltip' on-mouseover="showTooltip()">
+                    <!-- <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title"> -->
+                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}">
                       {{serie.seriesInfo.title}}
                     </a>
                     <span class="badge badge-pill badge-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
+                    <!-- <span title="{{serie.seriesInfo.title}}" data-animation='false' data-toggle='tooltip' on-mouseover="showTooltip()"><i class="material-icons">&#xE88F;</i></span> -->
                   </th>
                   <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td>{{item.level}}</td>
