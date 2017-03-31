@@ -37,11 +37,12 @@
                   <td><b>{{date}}</b></td>
                 </ng-template>
               </tr>
-              <ng-template ngFor let-serie [ngForOf]="series.displaySeries">
+              <ng-template ngFor let-serie [ngForOf]="series.displaySeries" let-i="index">
                 <tr>
                   <th class= "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}"
-                  title="{{serie.seriesInfo.title}} <br> {{serie.seriesInfo.source_description}} <br> {{serie.seriesInfo.source_link}}"
-                  data-animation='false' data-html='true' data-placement='bottom' data-toggle='tooltip' on-mouseover="showTooltip()">
+                  title="{{serie.seriesInfo.tooltipInfo}}"
+                  data-animation='false' data-html='true' data-placement='top'
+                  data-toggle='tooltip' on-mouseover="showTooltip()">
                     <!-- <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title"> -->
                     <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}">
                       {{serie.seriesInfo.title}}

@@ -132,7 +132,18 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   showTooltip() {
     $(function () {
-      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="tooltip"]').tooltip(/* {
+        placement: function(tip, el) {
+          let tooltipPosition = $(el).position();
+          let lastThPosition = $('table tr:last').position();
+          // If the tooltip's position >= the position of the last table's last row, set placement to top
+          if (tooltipPosition.top >= lastThPosition.top) {
+            return 'top';
+          }
+          // Else set placement to bottom
+          return 'bottom';
+        }
+      } */);
     });
   }
 
