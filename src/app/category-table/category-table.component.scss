@@ -262,3 +262,35 @@
     }
   }
 }
+
+.tooltip {
+  &.tooltip-bottom,
+  &.bs-tether-element-attached-top {
+
+    .tooltip-inner::before {
+      border-bottom-color: #F9F9F9;
+    }
+  }
+
+  &.tooltip-top,
+  &.bs-tether-element-attached-bottom {
+
+    .tooltip-inner::before {
+      border-top-color: #F9F9F9;
+    }
+  }
+}
+
+.tooltip-inner {
+  max-width: 225px;
+  text-align: left;
+  background-color: #F9F9F9;
+  color: #000000;
+  box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -moz-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
+  b {
+    font-weight: 600;
+  }
+}
