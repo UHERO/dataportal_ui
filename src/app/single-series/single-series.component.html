@@ -13,7 +13,7 @@
     <p *ngIf="data.noData">{{data.noData}}</p>
     <app-highstock *ngIf="!noSelection && !data.noData" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesTableData, data.currentFreq)"></app-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
-      {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}" target="_blank">{{data.seriesDetail.source_link}}</a>
+      {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}" target="_blank">{{data.seriesDetail.source_link}}</a><br>{{data.seriesDetail.sourceDetails}}
     </div>
     <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">

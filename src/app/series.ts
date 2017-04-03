@@ -8,11 +8,16 @@ export interface Series {
   observationEnd?: string;
   frequency: string;
   frequencyShort: string;
+  freqGeos: Array<any>;
   unitsLabel: string;
   unitsLabelShort: string;
   geography: Geography;
-  SeasonalAdjustment?: string;
-  sesonalAdjustmentShort?: string;
+  geoFreqs: Array<any>;
+  seasonallyAdjusted: boolean;
   source?: string;
+  sourceDescription?: string;
+  sourceDetails?: string;
   sourceLink?: string;
+  percent: boolean;
+  real: boolean;
 }

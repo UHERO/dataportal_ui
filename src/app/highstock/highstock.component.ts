@@ -1,5 +1,10 @@
 // Highstock chart component used for single-series view
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Geography } from '../geography';
+import { Frequency } from '../frequency';
+import { HighchartChartData } from '../highchart-chart-data';
+import { Series } from '../series';
+
 // import * as highcharts from 'highcharts';
 declare var require: any;
 const Highcharts = require('highcharts');
@@ -30,22 +35,23 @@ export class HighstockComponent implements OnChanges {
   constructor() { }
 
   ngOnChanges() {
-    let level = this.chartData.level;
-    // let pseudoLevel = this.chartData.pseudoLevel;
-    let pseudoZones = this.chartData.pseudoZones;
-    let yoy = this.chartData.yoy;
-    let name = this.seriesDetail.title;
-    let units = this.seriesDetail.unitsLabel ? this.seriesDetail.unitsLabel : this.seriesDetail.unitsLabelShort;
-    let change = this.seriesDetail.percent === true ? 'Change' : '% Change';
-    let yoyLabel = this.seriesDetail.percent === true ? 'YOY Change' : 'YOY % Change';
-    let dataFreq = this.currentFreq;
-    let dataGeo = this.currentGeo;
-    let sourceDescription = this.seriesDetail.source_description;
-    let sourceLink = this.seriesDetail.source_link;
-    this.drawChart(level, yoy, name, units, change, dataGeo, dataFreq, yoyLabel, pseudoZones, sourceDescription, sourceLink);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq);
   }
 
-  drawChart(level, yoy, name, units, change, geo, freq, yoyLabel, pseudoZones?, sourceDescription?, sourceLink?) {
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency) {
+    let level = chartData.level;
+    let pseudoZones = chartData.pseudoZones;
+    let yoy = chartData.yoy;
+    let name = seriesDetail.title;
+    let units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
+    let change = seriesDetail.percent ? 'Change' : '% Change';
+    let yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    let dataFreq = freq;
+    let dataGeo = geo;
+    let sourceDescription = seriesDetail.sourceDescription;
+    let sourceLink = seriesDetail.sourceLink;
+    let sourceDetails = seriesDetail. sourceDetails;
+
     this.options = {
       chart: {
         alignTicks: false,
@@ -54,13 +60,15 @@ export class HighstockComponent implements OnChanges {
       },
       labels: {
         items: [{
-          html: sourceDescription,
+          html: sourceDescription
         }, {
-          html: sourceLink,
+          html: sourceLink
         }, {
-          html: 'The Economic Research Organization at the University of Hawaii (UHERO)',
+          html: sourceDetails
         }, {
-          html: 'Data Portal: http://data.uhero.hawaii.edu/' 
+          html: 'The University of Hawaii Economic Research Organization (UHERO)',
+        }, {
+          html: 'Data Portal: http://data.uhero.hawaii.edu/'
         }],
         style: {
           display: 'none'
@@ -229,7 +237,7 @@ export class HighstockComponent implements OnChanges {
             color: '#727272'
           }
         },
-       opposite: false,
+        opposite: false,
       }, {
         title: {
           text: units,
@@ -284,7 +292,7 @@ export class HighstockComponent implements OnChanges {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax;
-    
+
     // Selected level data
     let selectedRange = null;
     if (e.context.series[0].points) {
@@ -293,7 +301,7 @@ export class HighstockComponent implements OnChanges {
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-      this.chartExtremes.emit({minDate: xMin, maxDate: xMax});
+      this.chartExtremes.emit({ minDate: xMin, maxDate: xMax });
     }
   }
 }
