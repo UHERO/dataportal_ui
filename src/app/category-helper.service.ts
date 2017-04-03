@@ -282,11 +282,14 @@ export class CategoryHelperService {
 
   setTooltipInfo(seriesDetails) {
     let tooltip = '<b>' + seriesDetails.title + '</b>';
-    if (seriesDetails.source_description) {
-      tooltip += '<br>' + seriesDetails.source_description;
+    if (seriesDetails.sourceDescription) {
+      tooltip += '<br>' + seriesDetails.sourceDescription;
     }
-    if (seriesDetails.source_link) {
-      tooltip += '<br>' + seriesDetails.source_link;
+    if (seriesDetails.sourceLink) {
+      tooltip += '<br>' + seriesDetails.sourceLink;
+    }
+    if (seriesDetails.sourceDetails) {
+      tooltip += '<br>' + seriesDetails.sourceDetails;
     }
     return tooltip;
   }
