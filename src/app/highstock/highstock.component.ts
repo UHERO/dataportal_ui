@@ -66,6 +66,8 @@ export class HighstockComponent implements OnChanges {
         }, {
           html: sourceDetails
         }, {
+          html: name + ': http://data.uhero.hawaii.edu/#/series?id=' + seriesDetail.id
+        }, {
           html: 'The University of Hawaii Economic Research Organization (UHERO)',
         }, {
           html: 'Data Portal: http://data.uhero.hawaii.edu/'

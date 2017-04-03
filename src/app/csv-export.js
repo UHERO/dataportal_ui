@@ -62,8 +62,9 @@
         if (chartLabels[2].html) {
             sourceDetails = ['Source Details: ' + chartLabels[2].html]; 
         }
-        var uhero = [chartLabels[3].html];
-        var dpLink = [chartLabels[4].html];
+        var seriesLink = [chartLabels[3].html];
+        var uhero = [chartLabels[4].html];
+        var dpLink = [chartLabels[5].html];
         var seriesInfo = ['Series: ' + series];
 
         // Loop the series and index values
@@ -131,6 +132,7 @@
         if (sourceDetails) {
             dataRows.push(sourceDetails);
         }
+        dataRows.push(seriesLink);
         dataRows.push(uhero);
         dataRows.push(dpLink);
 

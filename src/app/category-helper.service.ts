@@ -49,7 +49,7 @@ export class CategoryHelperService {
           this.categoryData[catId + routeGeo + routeFreq].selectedCategory = selectedCategory;
           this.categoryData[catId + routeGeo + routeFreq].sublist = sublist;
           this.categoryData[catId + routeGeo + routeFreq].seriesData = this.seriesData;
-          this.getSubcategoryData(catId, sublist, routeGeo, routeFreq);
+          this.getSubcategoryData(selectedCategory, catId, sublist, routeGeo, routeFreq);
         } else {
           this.categoryData[catId + routeGeo + routeFreq].invalid = 'Category does not exist.';
         }
@@ -58,7 +58,7 @@ export class CategoryHelperService {
     }
   }
 
-  getSubcategoryData(catId: number, sublist: Array<any>, routeGeo?: string, routeFreq?: string) {
+  getSubcategoryData(catName: string, catId: number, sublist: Array<any>, routeGeo?: string, routeFreq?: string) {
     let geoArray = [];
     let freqArray = [];
     let i = 0;
@@ -96,7 +96,7 @@ export class CategoryHelperService {
               this.categoryData[catId + routeGeo + routeFreq].frequencies = freqs;
               this.categoryData[catId + routeGeo + routeFreq].currentGeo = currentGeo;
               this.categoryData[catId + routeGeo + routeFreq].currentFreq = currentFreq;
-              this.getSeriesData(subcat, geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
+              this.getSeriesData(catName, subcat, geoArray, currentGeo, freqArray, currentFreq, dateWrapper, routeGeo, routeFreq);
             });
           }
         });
@@ -104,7 +104,7 @@ export class CategoryHelperService {
   }
 
   // Get regions and frequencies available for a selected category
-  getSeriesData(sublistIndex, regions: Array<any>, currentGeo: Geography, freqs: Array<any>, currentFreq: Frequency, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
+  getSeriesData(catName: string, sublistIndex, regions: Array<any>, currentGeo: Geography, freqs: Array<any>, currentFreq: Frequency, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
     this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
       dateArray = this._helper.categoryDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
@@ -156,6 +156,7 @@ export class CategoryHelperService {
               let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
               sublistIndex.dateRange = catTable.tableDates;
               sublistIndex.datatables = catTable.datatables;
+              sublistIndex.parentName = catName;
               this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, displaySeries: displaySeries, allSeries: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
             } else {
               // No series exist for a subcateogry
