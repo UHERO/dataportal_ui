@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, QueryList, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -166,10 +166,10 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     try {
       this.tableEl._results.forEach((el, index) => {
         this.tableEl._results[index].nativeElement.scrollLeft = this.tableEl._results[index].nativeElement.scrollWidth;
-      })
+      });
     } catch(err) {
       console.log(err) 
-    } 
+    }
   }
 
   userMouse(): void {

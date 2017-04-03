@@ -31,6 +31,10 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
     let tableElement: any = $('#indicator-table-' + this.tableId);
     let tableColumns = this.data.tableColumns;
     let tableData = this.data.tableData;
+    let sublistName = this.sublist.name;
+    let parentName = this.sublist.parentName;
+    let parentId = this.sublist.parentId;
+
     this.tableWidget = tableElement.DataTable({
       data: tableData,
       dom: 'B',
@@ -38,9 +42,11 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
       buttons: [{
         extend: 'csv',
         text: '<i class="material-icons">&#xE2C4;</i> Download CSV',
-        filename: this.sublist.name,
+        filename: sublistName,
         customize: function(csv) {
-          return csv + '\n\n The Economic Research Organization at the University of Hawaii (UHERO) \n Data Portal: http://data.uhero.hawaii.edu/';
+          return csv + 
+          '\n\n The University of Hawaii Economic Research Organization (UHERO) \n Data Portal: http://data.uhero.hawaii.edu/ \n ' +
+          parentName + '-' + sublistName + ': http://data.uhero.hawaii.edu/#/category/table?id=' + parentId;
         }
       }],
       bSort: false,
