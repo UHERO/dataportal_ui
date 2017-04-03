@@ -42,10 +42,12 @@ export class HighstockComponent implements OnChanges {
     let level = chartData.level;
     let pseudoZones = chartData.pseudoZones;
     let yoy = chartData.yoy;
+    let ytd = chartData.ytd;
     let name = seriesDetail.title;
     let units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     let change = seriesDetail.percent ? 'Change' : '% Change';
     let yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    let ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
     let dataFreq = freq;
     let dataGeo = geo;
     let sourceDescription = seriesDetail.sourceDescription;
@@ -240,6 +242,8 @@ export class HighstockComponent implements OnChanges {
           }
         },
         opposite: false,
+        minPadding: 0,
+        maxPadding: 0
       }, {
         title: {
           text: units,
@@ -253,7 +257,9 @@ export class HighstockComponent implements OnChanges {
             color: '#1D667F'
           },
         },
-        gridLineWidth: 0
+        gridLineWidth: 0,
+        minPadding: 0,
+        maxPadding: 0
       }],
       plotOptions: {
         series: {
@@ -266,6 +272,13 @@ export class HighstockComponent implements OnChanges {
         color: '#727272',
         data: yoy,
         showInNavigator: false,
+        dataGrouping: {
+          enabled: false
+        }
+      }, {
+        name: ytdLabel,
+        data: ytd,
+        visible: false,
         dataGrouping: {
           enabled: false
         }

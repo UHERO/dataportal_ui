@@ -157,7 +157,7 @@ export class HelperService {
             results[i].yoy = tableData[j].yoyValue;
             results[i].formattedYoy = tableData[j].yoyValue === null ? ' ' : this.formatNum(+tableData[j].yoyValue, 2);
             results[i].ytd = tableData[j].ytdValue;
-            results[i].formattedytd = tableData[j].ytdValue === null ? ' ' : this.formatNum(+tableData[j].ytdValue, 2);
+            results[i].formattedYtd = tableData[j].ytdValue === null ? ' ' : this.formatNum(+tableData[j].ytdValue, 2);
             break;
           }
         }
