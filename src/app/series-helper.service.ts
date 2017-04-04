@@ -82,4 +82,48 @@ export class SeriesHelperService {
     });
     this.seriesData.sibPairs = checkSiblings;
   }
+
+    // Get summary statistics for single series displays
+  // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
+  summaryStats(seriesData, freq) {
+    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };
+    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', percChange: '', levelChange: '', selectedStart: '', selectedEnd: '' };
+    // Find first non-empty value as the table end value
+    for (let i = 0; i < seriesData.length; i++) {
+      if (stats.tableEndValue === Infinity && seriesData[i].value !== ' ') {
+        stats.tableEndValue = seriesData[i].value;
+      }
+    }
+    // Find last non-empty value as the table start value
+    for (let i = seriesData.length - 1; i >= 0; i--) {
+      if (stats.tableStartValue === Infinity && seriesData[i].value !== ' ') {
+        stats.tableStartValue = seriesData[i].value;
+      }
+    }
+    seriesData.forEach((item) => {
+      if (item.value !== ' ') {
+        if (stats.minValue === Infinity || item.value < stats.minValue) {
+          stats.minValue = item.value;
+          stats.minValueDate = item.date;
+        }
+        if (stats.maxValue === Infinity || item.value > stats.maxValue) {
+          stats.maxValue = item.value;
+          stats.maxValueDate = item.date;
+        }
+      }
+    });
+    stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
+    stats.levelChange = stats.tableEndValue - stats.tableStartValue;
+
+    // Format numbers
+    formatStats.minValue = this._helper.formatNum(stats.minValue, 2);
+    formatStats.minValueDate = this._helper.formatDate(stats.minValueDate, freq.freq);
+    formatStats.maxValue = this._helper.formatNum(stats.maxValue, 2);
+    formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
+    formatStats.percChange = this._helper.formatNum(stats.percChange, 2);
+    formatStats.levelChange = this._helper.formatNum(stats.levelChange, 2)
+    formatStats.selectedStart = this._helper.formatDate(seriesData[0].date, freq.freq);
+    formatStats.selectedEnd = this._helper.formatDate(seriesData[seriesData.length - 1].date, freq);
+    return formatStats;
+  }
 }

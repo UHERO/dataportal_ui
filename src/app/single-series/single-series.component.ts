@@ -18,6 +18,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
   private newTableData;
   private summaryStats;
+  private saChecked: boolean = false;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -40,37 +41,34 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   // Redraw chart when selecting a new region or frequency
   redrawGeo(event, currentFreq, siblings, sa) {
-    let newGeo = event.handle;
+    let geo = event.handle;
     let freq = currentFreq.freq;
-    let id;
-    this.noSelection = null
-    siblings.forEach((sib, index) => {
-      if (siblings[index].geography.handle === newGeo && siblings[index].frequencyShort === freq) {
-        if (sa === siblings[index].seasonallyAdjusted) {
-          id = siblings[index].id;
-        } else {
-          id = siblings[index].id;
-        }
-      }
-    });
-    if (id) {
-      this._router.navigate(['/series/'], {queryParams: {'id': id}});
-    } else {
-      this.noSelection = 'Selection Not Available';
-    }
+    this.noSelection = null;
+    this.goToSeries(siblings, freq, geo, sa);
   }
 
   redrawFreq(event, currentGeo, siblings, sa) {
-    let newFreq = event.freq;
+    let freq = event.freq;
     let geo = currentGeo.handle;
+    this.noSelection = null;
+    this.goToSeries(siblings, freq, geo, sa);
+  }
+
+  goToSeries(siblings, freq, geo, sa) {
     let id;
-    this.noSelection = null
-    siblings.forEach((sib, index) => {
-      if (siblings[index].frequencyShort === newFreq && siblings[index].geography.handle === geo) {
-        if (sa === siblings[index].seasonallyAdjusted) {
-          id = siblings[index].id;
-        } else {
-          id = siblings[index].id;
+    // When switching from annual series, seasonal adjustment(sa) is undefined
+    // If seasonally adjusted checkbox had previously been checked, look for SA sibling, else display non-SA sibling
+    if (sa === undefined) {
+      sa = this.saChecked;
+    }
+    siblings.forEach((sib) => {
+      if (freq === 'A') {
+        if (sib.frequencyShort === freq && sib.geography.handle === geo) {
+          id = sib.id;
+        }
+      } else {
+        if (sib.frequencyShort === freq && sib.geography.handle === geo && sa === sib.seasonallyAdjusted) {
+          id = sib.id;
         }
       }
     });
@@ -96,16 +94,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._helper.summaryStats(this.newTableData, minDate, maxDate, freq);
+    this.summaryStats = this._series.summaryStats(this.newTableData, freq);
   }
 
   saActive(event, geo, freq, siblingPairs) {
-    let id;
-    siblingPairs.forEach((sib, index) => {
-      if (siblingPairs[index].seasonallyAdjusted === event.target.checked && siblingPairs[index].geography.handle === geo.handle && siblingPairs[index].frequencyShort === freq.freq) {
-        id = siblingPairs[index].id;
-      }
-    });
-    this._router.navigate(['/series/'], {queryParams: {'id': id}});
+    this.saChecked = event.target.checked;
+    let sa = event.target.checked;
+    this.noSelection = null;
+    this.goToSeries(siblingPairs, freq.freq, geo.handle, sa);
   }
 }
