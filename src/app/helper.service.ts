@@ -75,43 +75,6 @@ export class HelperService {
     return dateArray;
   }
 
-  // Get summary statistics for single series displays
-  // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
-  summaryStats(seriesData, tableStart, tableEnd, freq) {
-    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };
-    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', percChange: '', levelChange: '', selectedStart: '', selectedEnd: '' };
-
-    seriesData.forEach((item, index) => {
-      if (stats.minValue === Infinity || item.value < stats.minValue) {
-        stats.minValue = item.value;
-        stats.minValueDate = item.date;
-      }
-      if (stats.maxValue === Infinity || item.value > stats.maxValue) {
-        stats.maxValue = item.value;
-        stats.maxValueDate = item.date;
-      }
-      if (tableStart === item.date) {
-        stats.tableStartValue = item.value;
-      }
-      if (tableEnd === item.date) {
-        stats.tableEndValue = item.value;
-      }
-    });
-    stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
-    stats.levelChange = stats.tableEndValue - stats.tableStartValue;
-
-    // Format numbers
-    formatStats.minValue = this.formatNum(stats.minValue, 2);
-    formatStats.minValueDate = this.formatDate(stats.minValueDate, freq.freq);
-    formatStats.maxValue = this.formatNum(stats.maxValue, 2);
-    formatStats.maxValueDate = this.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.percChange = this.formatNum(stats.percChange, 2);
-    formatStats.levelChange = this.formatNum(stats.levelChange, 2)
-    formatStats.selectedStart = this.formatDate(seriesData[0].date, freq.freq);
-    formatStats.selectedEnd = this.formatDate(seriesData[seriesData.length - 1].date, freq);
-    return formatStats;
-  }
-
   dataTransform(seriesObs, dates) {
     let results = null;
     let observations = seriesObs;
