@@ -43,12 +43,10 @@
                   title="{{serie.seriesInfo.tooltipInfo}}"
                   data-animation='false' data-html='true' data-placement='top'
                   data-toggle='tooltip' on-mouseover="showTooltip()">
-                    <!-- <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" [title]="serie.seriesInfo.title"> -->
-                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}">
+                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" (click)="hideTooltip()">
                       {{serie.seriesInfo.title}}
                     </a>
                     <span class="badge badge-pill badge-primary" *ngIf="serie.seriesInfo.seasonallyAdjusted === true">SA</span>
-                    <!-- <span title="{{serie.seriesInfo.title}}" data-animation='false' data-toggle='tooltip' on-mouseover="showTooltip()"><i class="material-icons">&#xE88F;</i></span> -->
                   </th>
                   <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
                     <td>{{item.level}}</td>
