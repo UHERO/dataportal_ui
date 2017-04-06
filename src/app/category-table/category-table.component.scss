@@ -198,6 +198,7 @@
           text-align: right;
           font-size: 0.9em;
           padding: 0.4em;
+          border: 1px solid #E5E5E5
         }
 
         th {
@@ -206,12 +207,19 @@
           left: 0;
           width: 32%;
           white-space: nowrap;
-          border-right: 1px solid #CCCCCC;
+          border-right: 1px solid #E5E5E5;
           text-align: left;
           text-overflow: ellipsis;
           overflow: hidden;
           font-size: 0.9em;
           font-weight: normal;
+          border-bottom: 0;
+        }
+
+        tr:last-child {
+          th {
+            border: 1px solid #E5E5E5;
+          }
         }
 
         .indent1 {
@@ -238,11 +246,11 @@
           }
         }
 
-        tr:nth-child(odd) {
-          background-color: #ECECEC;
+        tr:nth-child(even) {
+          background-color: rgba(0, 0, 0, 0.05);
 
           td:first-child, th:first-child {
-            background: #ECECEC;
+            background: rgba(0, 0, 0, 0.05);
           }
         }
 
