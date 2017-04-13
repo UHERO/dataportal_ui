@@ -261,6 +261,6 @@ export class HighchartComponent implements OnInit {
     }
 
     // Display pill tag to indicate if series is seasonally adjusted
-    this.saLabel(this.chart, this.SA);
+    //this.saLabel(this.chart, this.SA);
   }
 }

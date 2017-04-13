@@ -127,9 +127,8 @@ export class CategoryHelperService {
               seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, currentFreq.freq, seriesDates);
               series = this._helper.dataTransform(result.seriesObservations, seriesDates);
               series['seriesInfo'] = result;
-              series.seriesInfo.tooltipInfo = series.seriesInfo.title;
+              series.seriesInfo.title += series.seriesInfo.seasonallyAdjusted ? ' (SA)' : ''
               // Format information for category table tooltips: Display series title and source description/link if available 
-              series.seriesInfo.tooltipInfo = this.setTooltipInfo(series.seriesInfo);
               categorySeries.push(series);
             }
           });
@@ -246,7 +245,6 @@ export class CategoryHelperService {
               let freq = searchResults[index].frequencyShort;
               series['seriesInfo'] = searchResults[index];
               // Format information for category table tooltips: Display series title and source description/link if available
-              series.seriesInfo.tooltipInfo = this.setTooltipInfo(series.seriesInfo);
               searchSeries.push(series);
             }
           });
@@ -273,20 +271,6 @@ export class CategoryHelperService {
           this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublist, displaySeries: displaySeries, allSeries: searchSeries, seasonallyAdjusted: hasSeasonallyAdjusted });
         };
       });
-  }
-
-  setTooltipInfo(seriesDetails) {
-    let tooltip = '<b>' + seriesDetails.title + '</b>';
-    if (seriesDetails.sourceDescription) {
-      tooltip += '<br>' + seriesDetails.sourceDescription;
-    }
-    if (seriesDetails.sourceLink) {
-      tooltip += '<br>' + seriesDetails.sourceLink;
-    }
-    if (seriesDetails.sourceDetails) {
-      tooltip += '<br>' + seriesDetails.sourceDetails;
-    }
-    return tooltip;
   }
 
   checkSA(seriesArray) {
