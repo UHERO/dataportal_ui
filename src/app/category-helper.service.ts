@@ -106,64 +106,58 @@ export class CategoryHelperService {
   // Get regions and frequencies available for a selected category
   getSeriesData(catName: string, sublistIndex, regions: Array<any>, currentGeo: Geography, freqs: Array<any>, currentFreq: Frequency, dateWrapper: dateWrapper, routeGeo?: string, routeFreq?: string) {
     let dateArray = [];
-    this._uheroAPIService.fetchSelectedCategory(sublistIndex['id']).subscribe((cat) => {
-      dateArray = this._helper.categoryDateArray(cat['observationStart'], cat['observationEnd'], currentFreq.freq, dateArray);
+    let expandedResults;
+    this._uheroAPIService.fetchExpanded(sublistIndex['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
+      expandedResults = expanded;
     },
       (error) => {
+        console.log('error', error);
         error = this.errorMessage = error;
       },
       () => {
-        // Fetch data for current region/frequency settings
-        let expandedResults;
-        this._uheroAPIService.fetchExpanded(sublistIndex['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
-          expandedResults = expanded;
-        },
-          (error) => {
-            error = this.errorMessage = error;
-          },
-          () => {
-            if (expandedResults) {
-              // Array of all series belonging to each category
-              let categorySeries = []
-              expandedResults.forEach((result, index) => {
-                let seriesDates = [], series;
-                let seriesObsStart = result.seriesObservations.observationStart;
-                let seriesObsEnd = result.seriesObservations.observationEnd;
-                let levelData = result.seriesObservations.transformationResults[0].observations;
-                if (levelData) {
-                  seriesDates = this._helper.seriesDateArray(seriesObsStart, seriesObsEnd, currentFreq.freq, seriesDates);
-                  series = this._helper.dataTransform(result.seriesObservations, seriesDates);
-                  series['seriesInfo'] = result;
-                  series.seriesInfo.tooltipInfo = series.seriesInfo.title;
-                  // Format information for category table tooltips: Display series title and source description/link if available 
-                  series.seriesInfo.tooltipInfo = this.setTooltipInfo(series.seriesInfo);
-                  categorySeries.push(series);
-                }
-              });
-
-              // Check if (non-annual) category has seasonally adjusted data
-              // Returns true for annual data
-              let hasSeasonallyAdjusted = this.checkSA(categorySeries);
-
-              // Category chart and table displays (landing-page and category-table components) should only show seasonally adjusted series
-              // If a category does not have any SA data (i.e. hasSeasonallyAdjusted === false), display the series in the category
-              let displaySeries = [];
-              this.seriesToDisplay(categorySeries, hasSeasonallyAdjusted, displaySeries);
-
-              // Set date wrapper based on starting and ending dates of displaySeries;
-              // Format data for category-table display
-              this._helper.setDateWrapper(displaySeries, dateWrapper);
-              let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
-              sublistIndex.dateRange = catTable.tableDates;
-              sublistIndex.datatables = catTable.datatables;
-              sublistIndex.parentName = catName;
-              this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, displaySeries: displaySeries, allSeries: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
-            } else {
-              // No series exist for a subcateogry
-              let series = [{ seriesInfo: 'No data available' }];
-              this.seriesData.push({ sublist: sublistIndex, series: series });
+        if (expandedResults) {
+          // Array of all series belonging to each category
+          let categorySeries = []
+          expandedResults.forEach((result, index) => {
+            let seriesDates = [], series;
+            let seriesObsStart = result.seriesObservations.observationStart;
+            let seriesObsEnd = result.seriesObservations.observationEnd;
+            let levelData = result.seriesObservations.transformationResults[0].observations;
+            if (levelData) {
+              seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, currentFreq.freq, seriesDates);
+              series = this._helper.dataTransform(result.seriesObservations, seriesDates);
+              series['seriesInfo'] = result;
+              series.seriesInfo.tooltipInfo = series.seriesInfo.title;
+              // Format information for category table tooltips: Display series title and source description/link if available 
+              series.seriesInfo.tooltipInfo = this.setTooltipInfo(series.seriesInfo);
+              categorySeries.push(series);
             }
           });
+
+          // Check if (non-annual) category has seasonally adjusted data
+          // Returns true for annual data
+          let hasSeasonallyAdjusted = this.checkSA(categorySeries);
+
+          // Category chart and table displays (landing-page and category-table components) should only show seasonally adjusted series
+          // If a category does not have any SA data (i.e. hasSeasonallyAdjusted === false), display the series in the category
+          let displaySeries = [];
+          this.seriesToDisplay(categorySeries, hasSeasonallyAdjusted, displaySeries);
+
+          // Set date wrapper based on starting and ending dates of displaySeries;
+          this._helper.setDateWrapper(displaySeries, dateWrapper);
+          // Get array of dates for tables
+          this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, currentFreq.freq, dateArray);
+          // Format data for category-table display
+          let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
+          sublistIndex.dateRange = catTable.tableDates;
+          sublistIndex.datatables = catTable.datatables;
+          sublistIndex.parentName = catName;
+          this.seriesData.push({ dateWrapper: dateWrapper, sublist: sublistIndex, displaySeries: displaySeries, allSeries: categorySeries, hasSeasonallyAdjusted: hasSeasonallyAdjusted });
+        } else {
+          // No series exist for a subcateogry
+          let series = [{ seriesInfo: 'No data available' }];
+          this.seriesData.push({ sublist: sublistIndex, series: series });
+        }
       });
   }
 
@@ -245,7 +239,7 @@ export class CategoryHelperService {
             let seriesObsEnd = res.seriesObservations.observationEnd;
             let levelData = res.seriesObservations.transformationResults[0].observations;
             // Get array of dates for each series
-            seriesDates = this._helper.seriesDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
+            seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
             if (seriesDates) {
               series = this._helper.dataTransform(res.seriesObservations, seriesDates);
               let sa = searchResults[index].seasonallyAdjusted;
@@ -272,7 +266,7 @@ export class CategoryHelperService {
 
           // Get array of dates for entire subcategory, used for table view
           // Format data for category table display
-          this._helper.categoryDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
+          this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
           let catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
           let sublist = { name: search, dateRange: catTable.tableDates, datatables: catTable.datatables };
           this.categoryData[search + routeGeo + routeFreq].sublist = [sublist];
@@ -326,9 +320,7 @@ export class CategoryHelperService {
     let dateStart = dateWrapper.firstDate;
     let dateEnd = dateWrapper.endDate;
     dateArray.forEach((date) => {
-      if (date.date >= dateStart && date.date <= dateEnd) {
-        tableHeaderDates.push(date.tableDate);
-      }
+      tableHeaderDates.push(date.tableDate);
     });
     // Using datatables library for exporting functionality
     let datatables = this._helper.sublistTable(displaySeries, dateWrapper, tableHeaderDates);

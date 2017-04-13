@@ -8,65 +8,29 @@ export class HelperService {
 
   constructor() { }
 
-
-  categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let start = +dateStart.substr(0, 4);
-    let end = +dateEnd.substr(0, 4);
-
-    while (start <= end) {
-      if (currentFreq === 'A') {
-        dateArray.push({ date: start.toString() + '-01-01', tableDate: start.toString() });
-        start += 1;
-      } else if (currentFreq === 'S') {
-        let month = ['01', '07'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else if (currentFreq === 'M') {
-        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else {
-        let quarterMonth = ['01', '04', '07', '10'];
-        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-        quarterMonth.forEach((quart, index) => {
-          dateArray.push({ date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index] });
-        });
-        start += 1;
-      }
-    }
-    return dateArray;
-  }
-
-  seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);
     let endYear = +dateEnd.substr(0, 4);
     let startMonth = +dateStart.substr(5, 2);
     let endMonth = +dateEnd.substr(5, 2);
     let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
     let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-    if (currentFreq === 'A') {
-      while (startYear + '-01-01' <= endYear + '-01-01') {
+    while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'A') {
         dateArray.push({ date: startYear.toString() + '-01-01', tableDate: startYear.toString() });
         startYear += 1;
       }
-    } else if (currentFreq === 'S') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'S') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 7 ? startYear += 1 : startYear;
         startMonth = startMonth === 1 ? 7 : 1;
       }
-    } else if (currentFreq === 'M') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'M') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 12 ? startYear += 1 : startYear;
         startMonth = startMonth === 12 ? 1 : startMonth += 1;
       }
-    } else if (currentFreq == 'Q') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'Q') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + ' ' + q[startMonth] })
         startYear = startMonth === 10 ? startYear += 1 : startYear;
         startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;

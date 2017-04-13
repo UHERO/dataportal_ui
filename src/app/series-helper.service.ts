@@ -61,7 +61,7 @@ export class SeriesHelperService {
       let obsEnd = obs.observationEnd;
       if (obs) {
         // Use to format dates for table
-        this._helper.seriesDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
         let data = this._helper.dataTransform(obs, dateArray);
         this.seriesData.chartData = data.chartData;
         this.seriesData.seriesTableData = data.tableData; 
