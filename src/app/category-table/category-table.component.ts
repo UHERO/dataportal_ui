@@ -30,6 +30,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   // Check if seasonally adjusted data is displayed, default to true
   private yoyIsActive: boolean = false;
   private ytdIsActive: boolean = false;
+  private nsaIsActive: boolean = false;
   private userEvent: boolean = false;
   private errorMessage: string;
   private categoryData;
@@ -128,6 +129,10 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   ytdActive(e) {
     this.ytdIsActive = e.target.checked;
+  }
+
+  nsaActive(e) {
+    this.nsaIsActive = e.target.checked;
   }
 
   showTooltip() {

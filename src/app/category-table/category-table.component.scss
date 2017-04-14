@@ -280,11 +280,11 @@
     }
   }
 
-  &.tooltip-top,
-  &.bs-tether-element-attached-bottom {
+  &.tooltip-left,
+  &.bs-tether-element-attached-right {
 
     .tooltip-inner::before {
-      border-top-color: #F9F9F9;
+      border-left-color: #F9F9F9;
     }
   }
 }
@@ -294,9 +294,9 @@
   text-align: left;
   background-color: #F9F9F9;
   color: #000000;
-  box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  -moz-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  -webkit-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
+  -moz-box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
 
   b {
     font-weight: 600;

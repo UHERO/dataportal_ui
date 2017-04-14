@@ -6,6 +6,16 @@
 
   .chart-filters {
     display: block;
+
+    .sa-toggle {
+      font-size: 0.9em;
+      vertical-align: middle;
+      margin-bottom: 0;
+
+      input {
+        margin-right: 5px;
+      }
+    }
   }
 
   .content-links:before {
@@ -133,6 +143,7 @@
     text-decoration: none;
     font-size: 0.9em;
     color: #1D667F;
+    vertical-align: middle;
 
     @media(max-width: 767px) {
       display: none;

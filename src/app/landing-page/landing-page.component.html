@@ -15,11 +15,14 @@
           <div class="chart-filters">
             <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)" class="selector"></app-geo-selector>
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
+            <label class="sa-toggle form-check-inline" *ngIf="data.currentFreq.freq !== 'A'">
+              <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
+            </label>
             <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
           </div>
-          <ng-template ngFor let-serie [ngForOf]="series.displaySeries">
+          <ng-template ngFor let-serie [ngForOf]="nsaIsActive ? series.displaySeries.nsaSeries : series.displaySeries.saSeries">
             <p *ngIf="!serie.seriesInfo.id"> No Data Available </p>
-            <div *ngIf="serie.seriesInfo.seasonallyAdjusted !== false || series.hasSeasonallyAdjusted === false" class="multi-charts">
+            <div class="multi-charts">
               <a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id}" *ngIf="serie.seriesInfo.id">
                 <app-highchart [seriesData]="serie" [currentFreq]="data.currentFreq"></app-highchart>
               </a>

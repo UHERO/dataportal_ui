@@ -164,20 +164,20 @@ export class HelperService {
       tableColumns.push({ title: date, data: 'observations.' + date });
     });
     displaySeries.forEach((series) => {
-      if (series.seriesInfo.seasonallyAdjusted !== false) {
-        let observations = {};
-        let yoy = {};
-        let ytd = {};
-        let percent = series.seriesInfo.percent;
-        let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
-        let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
-        series.categoryTable.forEach((obs) => {
-          observations[obs.tableDate] = obs.level;
-          yoy[obs.tableDate] = obs.yoy;
-          ytd[obs.tableDate] = obs.ytd;
-        });
-        tableData.push({
-          series: series.seriesInfo.title,
+      let observations = {};
+      let yoy = {};
+      let ytd = {};
+      let percent = series.seriesInfo.percent;
+      let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
+      let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
+      series.categoryTable.forEach((obs) => {
+        observations[obs.tableDate] = obs.level;
+        yoy[obs.tableDate] = obs.yoy;
+        ytd[obs.tableDate] = obs.ytd;
+      });
+      tableData.push(
+        {
+          series: series.seriesInfo.seasonallyAdjusted ? series.seriesInfo.title + ' (SA)' : series.seriesInfo.title,
           observations: observations
         },
         {
@@ -187,8 +187,8 @@ export class HelperService {
         {
           series: ytdLabel,
           observations: ytd
-        });
-      }
+        }
+      );
     });
     return { tableColumns: tableColumns, tableData: tableData };
   }
@@ -227,14 +227,14 @@ export class HelperService {
     let formattedDate;
     let year = date.substring(0, 4);
     let month = date.substring(5, 7);
+    let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
+    let qMonth = ['01', '04', '07', '10'];
     if (freq === 'A') {
       formattedDate = year;
     }
     if (freq === 'Q') {
-      let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-      let qMonth = ['01', '04', '07', '10'];
       qMonth.forEach((q, index) => {
-        if (month === qMonth[index]) {
+        if (month === q) {
           formattedDate = quarter[index] + ' ' + year;
         }
       });
