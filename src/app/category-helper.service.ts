@@ -174,7 +174,7 @@ export class CategoryHelperService {
         } else {
           // No series exist for a subcateogry
           let series = [{ seriesInfo: 'No data available' }];
-          this.seriesData.push({ sublist: sublistIndex, series: series });
+          this.seriesData.push({ sublist: sublistIndex, series: series, displaySeries: {nsaSeries: [], saSeries: []}, dateWrapper: {saDateWrapper: '', nsaDateWrapper: ''} });
         }
       });
   }
@@ -307,12 +307,14 @@ export class CategoryHelperService {
   }
 
   seriesToDisplay(seriesList: Array<any>, hasSa: boolean, displaySeries: DisplaySeries) {
+    console.log(hasSa)
     seriesList.forEach((series) => {
       displaySeries.nsaSeries.push(Object.assign({}, series));
       if (series.seriesInfo.seasonallyAdjusted !== false || hasSa === false) {
         displaySeries.saSeries.push(Object.assign({}, series));
       }
     });
+    console.log(displaySeries)
   }
 
   formatCatTableData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: dateWrapper) {
