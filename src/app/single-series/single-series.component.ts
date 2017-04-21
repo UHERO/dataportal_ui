@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { SeriesHelperService } from '../series-helper.service';
-import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
@@ -25,7 +24,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   public currentGeo: Geography;
   private seriesData;
 
-  constructor(private _uheroAPIService: UheroApiService, private _series: SeriesHelperService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) {}
+  constructor(private _uheroAPIService: UheroApiService, private _series: SeriesHelperService, private route: ActivatedRoute, private _router: Router) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, handle: null, name: null};
@@ -38,43 +37,27 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] == 'true');
       }
-      console.log(this.seasonallyAdjusted)
       this.seriesData = this._series.getSeriesData(seriesId);
     });
   }
 
   // Redraw chart when selecting a new region or frequency
-  redrawGeo(event, currentFreq, siblings, sa) {
-    let geo = event.handle;
-    let freq = currentFreq.freq;
-    this.noSelection = null;
-    this.goToSeries(siblings, freq, geo, sa);
-  }
-
-  redrawFreq(event, currentGeo, siblings, sa) {
-    let freq = event.freq;
-    let geo = currentGeo.handle;
-    this.noSelection = null;
-    this.goToSeries(siblings, freq, geo, sa);
-  }
-
   goToSeries(siblings, freq, geo, sa) {
+    this.seasonallyAdjusted = sa;
+    this.noSelection = null;
     let id;
-    console.log('sa', sa)
-    siblings.forEach((sib) => {
-      if (sib.frequencyShort === freq && sib.geography.handle === geo) {
-        if (freq === 'A') {
-          id = sib.id;
-        }
-        if (sa === sib.seasonallyAdjusted) {
-          id = sib.id;
-        }
-        if (freq !== 'A' && sa !== sib.seasonallyAdjusted) {
-          this.seasonallyAdjusted = sib.seasonallyAdjusted;
-          id = sib.id;
-        }
+    // Get array of siblings for selected geo and freq
+    let geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
+    // If more than one sibling exists (i.e. seasonal & non-seasonal)
+    // Select series where seasonallyAdjusted matches sa
+    if (geoFreqSib.length > 1) {
+      id = geoFreqSib.find(sibling => sibling.seasonallyAdjusted === sa).id;
+    } else {
+      id = geoFreqSib[0].id;
+      if (sa !== geoFreqSib[0].seasonallyAdjusted && freq !== 'A') {
+        this.seasonallyAdjusted = geoFreqSib[0].seasonallyAdjusted;
       }
-    });
+    }
     if (id) {
       this._router.navigate(['/series/'], {queryParams: {'id': id, 'sa': this.seasonallyAdjusted}});
     } else {
@@ -98,11 +81,5 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.summaryStats = this._series.summaryStats(this.newTableData, freq);
-  }
-
-  saActive(event, geo, freq, siblingPairs) {
-    this.seasonallyAdjusted = event;
-    this.noSelection = null;
-    this.goToSeries(siblingPairs, freq.freq, geo.handle, this.seasonallyAdjusted);
   }
 }
