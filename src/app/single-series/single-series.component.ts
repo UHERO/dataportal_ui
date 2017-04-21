@@ -18,7 +18,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
   private newTableData;
   private summaryStats;
-  private saChecked: boolean = false;
+  private seasonallyAdjusted = null;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -33,8 +33,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    console.log(this.seasonallyAdjusted)
     this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
+      if (params['sa'] !== undefined) {
+        this.seasonallyAdjusted = (params['sa'] == 'true');
+      }
+      console.log(this.seasonallyAdjusted)
       this.seriesData = this._series.getSeriesData(seriesId);
     });
   }
@@ -56,11 +61,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   goToSeries(siblings, freq, geo, sa) {
     let id;
-    // When switching from annual series, seasonal adjustment(sa) is undefined
-    // If seasonally adjusted checkbox had previously been checked, look for SA sibling, else display non-SA sibling
-    if (sa === undefined) {
-      sa = this.saChecked;
-    }
     siblings.forEach((sib) => {
       if (freq === 'A') {
         if (sib.frequencyShort === freq && sib.geography.handle === geo) {
@@ -69,11 +69,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       } else {
         if (sib.frequencyShort === freq && sib.geography.handle === geo && sa === sib.seasonallyAdjusted) {
           id = sib.id;
+          console.log(sib.id)
         }
       }
     });
     if (id) {
-      this._router.navigate(['/series/'], {queryParams: {'id': id}});
+      this._router.navigate(['/series/'], {queryParams: {'id': id, 'sa': this.seasonallyAdjusted}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -98,9 +99,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   saActive(event, geo, freq, siblingPairs) {
-    this.saChecked = event.target.checked;
-    let sa = event.target.checked;
+    this.seasonallyAdjusted = event;
     this.noSelection = null;
-    this.goToSeries(siblingPairs, freq.freq, geo.handle, sa);
+    this.goToSeries(siblingPairs, freq.freq, geo.handle, this.seasonallyAdjusted);
   }
 }
