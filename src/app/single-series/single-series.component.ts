@@ -33,7 +33,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log(this.seasonallyAdjusted)
     this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
@@ -61,15 +60,18 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   goToSeries(siblings, freq, geo, sa) {
     let id;
+    console.log('sa', sa)
     siblings.forEach((sib) => {
-      if (freq === 'A') {
-        if (sib.frequencyShort === freq && sib.geography.handle === geo) {
+      if (sib.frequencyShort === freq && sib.geography.handle === geo) {
+        if (freq === 'A') {
           id = sib.id;
         }
-      } else {
-        if (sib.frequencyShort === freq && sib.geography.handle === geo && sa === sib.seasonallyAdjusted) {
+        if (sa === sib.seasonallyAdjusted) {
           id = sib.id;
-          console.log(sib.id)
+        }
+        if (freq !== 'A' && sa !== sib.seasonallyAdjusted) {
+          this.seasonallyAdjusted = sib.seasonallyAdjusted;
+          id = sib.id;
         }
       }
     });
