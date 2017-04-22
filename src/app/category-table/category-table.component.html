@@ -27,10 +27,10 @@
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)"
               class="selector"></app-freq-selector>
             <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
-            <app-category-datatables *ngIf="nsaIsActive ? series.sublist.nsaDatatables : series.sublist.saDatatables" [sublist]="sub" [data]="nsaIsActive ? series.sublist.nsaDatatables : series.sublist.saDatatables" [tableId]="i"></app-category-datatables>
+            <app-category-datatables *ngIf="!series.noData" [sublist]="sub" [data]="nsaIsActive ? series.sublist.nsaDatatables : series.sublist.saDatatables" [tableId]="i"></app-category-datatables>
             <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
           </div>
-          <p *ngIf="!series.dateWrapper && !series.hasSeasonallyAdjusted">No Data Available</p>
+          <p *ngIf="series.noData">No Data Available</p>
           <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="nsaIsActive ? series.dateWrapper.nsaDateWrapper : series.dateWrapper.saDateWrapper">
             <table class="category-table">
               <tr>

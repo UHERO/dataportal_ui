@@ -130,12 +130,14 @@ export class CategoryHelperService {
           });
         } else {
           // No series exist for a subcateogry
+          console.log(this.seriesData)
           let series = [{ seriesInfo: 'No data available' }];
           this.seriesData.push({
             sublist: sublistIndex,
             series: series,
-            displaySeries: {nsaSeries: [], saSeries: []},
-            dateWrapper: {saDateWrapper: '', nsaDateWrapper: ''}
+            displaySeries: {nsaSeries: series, saSeries: series},
+            dateWrapper: {saDateWrapper: '', nsaDateWrapper: ''},
+            noData: true
           });
         }
       });
