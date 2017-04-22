@@ -1,72 +1,36 @@
 // Common function used for category multi-chart and table displays
 
 import { Injectable } from '@angular/core';
-import { dateWrapper } from './date-wrapper';
+import { DateWrapper } from './date-wrapper';
 
 @Injectable()
 export class HelperService {
 
   constructor() { }
 
-
-  categoryDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let start = +dateStart.substr(0, 4);
-    let end = +dateEnd.substr(0, 4);
-
-    while (start <= end) {
-      if (currentFreq === 'A') {
-        dateArray.push({ date: start.toString() + '-01-01', tableDate: start.toString() });
-        start += 1;
-      } else if (currentFreq === 'S') {
-        let month = ['01', '07'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else if (currentFreq === 'M') {
-        let month = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-        month.forEach((mon, index) => {
-          dateArray.push({ date: start.toString() + '-' + month[index] + '-01', tableDate: start.toString() + '-' + month[index] });
-        });
-        start += 1;
-      } else {
-        let quarterMonth = ['01', '04', '07', '10'];
-        let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-        quarterMonth.forEach((quart, index) => {
-          dateArray.push({ date: start.toString() + '-' + quarterMonth[index] + '-01', tableDate: start.toString() + ' ' + quarter[index] });
-        });
-        start += 1;
-      }
-    }
-    return dateArray;
-  }
-
-  seriesDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);
     let endYear = +dateEnd.substr(0, 4);
     let startMonth = +dateStart.substr(5, 2);
     let endMonth = +dateEnd.substr(5, 2);
     let m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
     let q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-    if (currentFreq === 'A') {
-      while (startYear + '-01-01' <= endYear + '-01-01') {
+    while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'A') {
         dateArray.push({ date: startYear.toString() + '-01-01', tableDate: startYear.toString() });
         startYear += 1;
       }
-    } else if (currentFreq === 'S') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'S') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 7 ? startYear += 1 : startYear;
         startMonth = startMonth === 1 ? 7 : 1;
       }
-    } else if (currentFreq === 'M') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'M') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
         startYear = startMonth === 12 ? startYear += 1 : startYear;
         startMonth = startMonth === 12 ? 1 : startMonth += 1;
       }
-    } else if (currentFreq == 'Q') {
-      while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+      if (currentFreq === 'Q') {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + ' ' + q[startMonth] })
         startYear = startMonth === 10 ? startYear += 1 : startYear;
         startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
@@ -151,7 +115,7 @@ export class HelperService {
     }
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
     for (let i = 0; i < dateRange.length; i++) {
@@ -179,7 +143,9 @@ export class HelperService {
     return categoryTable;
   }
 
-  setDateWrapper(displaySeries: Array<any>, dateWrapper: dateWrapper) {
+  setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
+    dateWrapper.firstDate = '';
+    dateWrapper.endDate = '';
     displaySeries.forEach((series) => {
       if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
         dateWrapper.firstDate = series.start;
@@ -190,7 +156,7 @@ export class HelperService {
     });
   }
 
-  sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
+  sublistTable(displaySeries: Array<any>, dateWrapper: DateWrapper, tableDates: Array<any>) {
     let tableData = [];
     let tableColumns = [];
     let dateStart = dateWrapper.firstDate;
@@ -200,20 +166,20 @@ export class HelperService {
       tableColumns.push({ title: date, data: 'observations.' + date });
     });
     displaySeries.forEach((series) => {
-      if (series.seriesInfo.seasonallyAdjusted !== false) {
-        let observations = {};
-        let yoy = {};
-        let ytd = {};
-        let percent = series.seriesInfo.percent;
-        let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
-        let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
-        series.categoryTable.forEach((obs) => {
-          observations[obs.tableDate] = obs.level;
-          yoy[obs.tableDate] = obs.yoy;
-          ytd[obs.tableDate] = obs.ytd;
-        });
-        tableData.push({
-          series: series.seriesInfo.title,
+      let observations = {};
+      let yoy = {};
+      let ytd = {};
+      let percent = series.seriesInfo.percent;
+      let yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
+      let ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
+      series.categoryTable.forEach((obs) => {
+        observations[obs.tableDate] = obs.level;
+        yoy[obs.tableDate] = obs.yoy;
+        ytd[obs.tableDate] = obs.ytd;
+      });
+      tableData.push(
+        {
+          series: series.seriesInfo.seasonallyAdjusted ? series.seriesInfo.title + ' (SA)' : series.seriesInfo.title,
           observations: observations
         },
         {
@@ -223,8 +189,8 @@ export class HelperService {
         {
           series: ytdLabel,
           observations: ytd
-        });
-      }
+        }
+      );
     });
     return { tableColumns: tableColumns, tableData: tableData };
   }
@@ -263,14 +229,14 @@ export class HelperService {
     let formattedDate;
     let year = date.substring(0, 4);
     let month = date.substring(5, 7);
+    let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
+    let qMonth = ['01', '04', '07', '10'];
     if (freq === 'A') {
       formattedDate = year;
     }
     if (freq === 'Q') {
-      let quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-      let qMonth = ['01', '04', '07', '10'];
       qMonth.forEach((q, index) => {
-        if (month === qMonth[index]) {
+        if (month === q) {
           formattedDate = quarter[index] + ' ' + year;
         }
       });

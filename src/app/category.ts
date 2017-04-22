@@ -1,11 +1,11 @@
 export interface Category {
-  id: number,
-  name: string,
-  freq_geos: Object,
-  geo_freqs: Object,
-  parentId?: number,
-  children?: Array<any>,
-  defaults?: Object,
-  observationStart?: string,
-  observationEnd?: string
+  id: number;
+  name: string;
+  freqGeos: Object;
+  geoFreqs: Object;
+  parentId?: number;
+  children?: Array<any>;
+  defaults?: {geo: string, freq: string};
+  observationStart?: string;
+  observationEnd?: string;
 }

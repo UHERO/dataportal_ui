@@ -7,6 +7,26 @@
 
   .filters {
     display: inline-block;
+    color: #505050;
+    margin-bottom: 15px;
+    margin-right: 10px;
+
+    .form-check-inline {
+      padding-left: 0;
+      vertical-align: middle;
+      font-size: 0.9em;
+      margin-bottom: 0;
+
+      input {
+        margin-right: 0.25rem;
+        margin-left: 0rem;
+        vertical-align: middle;
+      }
+    }
+
+    .fa-spinner {
+      color: #1D667F;
+    }
   }
 
   .content-links:before {
@@ -78,22 +98,6 @@
     font-size: 0.9em;
     color: #1D667F;
     // margin-left: 10px;
-  }
-
-  .table-checkboxes {
-    display: inline-block;
-    color: #505050;
-    margin-bottom: 15px;
-    margin-right: 10px;
-
-    .form-check-inline {
-      padding-left: 0;
-
-      .form-check-input {
-        margin-right: 0.25rem;
-        margin-left: 0rem;
-      }
-    }
   }
 
   .top-anchor {
@@ -280,11 +284,11 @@
     }
   }
 
-  &.tooltip-top,
-  &.bs-tether-element-attached-bottom {
+  &.tooltip-left,
+  &.bs-tether-element-attached-right {
 
     .tooltip-inner::before {
-      border-top-color: #F9F9F9;
+      border-left-color: #F9F9F9;
     }
   }
 }
@@ -294,9 +298,9 @@
   text-align: left;
   background-color: #F9F9F9;
   color: #000000;
-  box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  -moz-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-  -webkit-box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
+  -moz-box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: -3px -3px 6px rgba(0,0,0,0.16), 3px 3px 6px rgba(0,0,0,0.23);
 
   b {
     font-weight: 600;

@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { SeriesHelperService } from '../series-helper.service';
-import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
@@ -18,14 +17,14 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
   private newTableData;
   private summaryStats;
-  private saChecked: boolean = false;
+  private seasonallyAdjusted = null;
 
   // Vars used in selectors
   public currentFreq: Frequency;
   public currentGeo: Geography;
   private seriesData;
 
-  constructor(private _uheroAPIService: UheroApiService, private _series: SeriesHelperService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) {}
+  constructor(private _uheroAPIService: UheroApiService, private _series: SeriesHelperService, private route: ActivatedRoute, private _router: Router) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, handle: null, name: null};
@@ -35,45 +34,32 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
       let seriesId = Number.parseInt(params['id']);
+      if (params['sa'] !== undefined) {
+        this.seasonallyAdjusted = (params['sa'] == 'true');
+      }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
   }
 
   // Redraw chart when selecting a new region or frequency
-  redrawGeo(event, currentFreq, siblings, sa) {
-    let geo = event.handle;
-    let freq = currentFreq.freq;
-    this.noSelection = null;
-    this.goToSeries(siblings, freq, geo, sa);
-  }
-
-  redrawFreq(event, currentGeo, siblings, sa) {
-    let freq = event.freq;
-    let geo = currentGeo.handle;
-    this.noSelection = null;
-    this.goToSeries(siblings, freq, geo, sa);
-  }
-
   goToSeries(siblings, freq, geo, sa) {
+    this.seasonallyAdjusted = sa;
+    this.noSelection = null;
     let id;
-    // When switching from annual series, seasonal adjustment(sa) is undefined
-    // If seasonally adjusted checkbox had previously been checked, look for SA sibling, else display non-SA sibling
-    if (sa === undefined) {
-      sa = this.saChecked;
-    }
-    siblings.forEach((sib) => {
-      if (freq === 'A') {
-        if (sib.frequencyShort === freq && sib.geography.handle === geo) {
-          id = sib.id;
-        }
-      } else {
-        if (sib.frequencyShort === freq && sib.geography.handle === geo && sa === sib.seasonallyAdjusted) {
-          id = sib.id;
-        }
+    // Get array of siblings for selected geo and freq
+    let geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
+    // If more than one sibling exists (i.e. seasonal & non-seasonal)
+    // Select series where seasonallyAdjusted matches sa
+    if (geoFreqSib.length > 1) {
+      id = geoFreqSib.find(sibling => sibling.seasonallyAdjusted === sa).id;
+    } else {
+      id = geoFreqSib[0].id;
+      if (sa !== geoFreqSib[0].seasonallyAdjusted && freq !== 'A') {
+        this.seasonallyAdjusted = geoFreqSib[0].seasonallyAdjusted;
       }
-    });
+    }
     if (id) {
-      this._router.navigate(['/series/'], {queryParams: {'id': id}});
+      this._router.navigate(['/series/'], {queryParams: {'id': id, 'sa': this.seasonallyAdjusted}});
     } else {
       this.noSelection = 'Selection Not Available';
     }
@@ -95,12 +81,5 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.summaryStats = this._series.summaryStats(this.newTableData, freq);
-  }
-
-  saActive(event, geo, freq, siblingPairs) {
-    this.saChecked = event.target.checked;
-    let sa = event.target.checked;
-    this.noSelection = null;
-    this.goToSeries(siblingPairs, freq.freq, geo.handle, sa);
   }
 }

@@ -2,11 +2,11 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-    <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawGeo($event, data.currentFreq, data.siblings, data.saIsActive)" class="geo-selector"></app-geo-selector>
-    <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawFreq($event, data.currentGeo, data.siblings, data.saIsActive)" class="freq-selector"></app-freq-selector>
-    <div class="form-check" *ngIf="data.currentFreq.freq !== 'A' && data.currentFreq.freq !== 'S' && data.sibPairs.length > 1">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" [checked]="data.saIsActive" (change)="saActive($event, data.currentGeo, data.currentFreq, data.sibPairs)">Seasonally Adjusted
+    <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)" class="geo-selector"></app-geo-selector>
+    <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
+    <div class="form-check" *ngIf="data.saPairAvail">
+      <label class="form-check-inline">
+        <input type="checkbox" [(ngModel)]="seasonallyAdjusted"  (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally Adjusted
       </label>
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>

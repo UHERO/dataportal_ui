@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit, ViewEncapsulation, OnChanges } from '@angular/core';
 import * as $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-fixedcolumns';
@@ -12,7 +12,7 @@ import 'datatables.net-buttons/js/buttons.flash.js';
   styleUrls: ['./category-datatables.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
+export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() data;
   @Input() tableId;
   @Input() sublist;
@@ -24,6 +24,14 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.initDatatable();
+  }
+
+  ngOnChanges() {
+    if (this.tableWidget) {
+      this.tableWidget.destroy();
+      $('#indicator-table-' + this.tableId).empty();
+    }
     this.initDatatable();
   }
 

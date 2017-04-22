@@ -24,6 +24,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentGeo: Geography;
   public currentFreq: Frequency;
   private categoryData;
+  private nsaIsActive: boolean = false;
+  private loading: boolean = false;
 
   constructor(private _uheroAPIService: UheroApiService, private _catHelper: CategoryHelperService, private route: ActivatedRoute, private _router: Router) {
   }
@@ -70,6 +72,14 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getSearchData(search: string, routeGeo?: string, routeFreq?: string) {
     this.categoryData = this._catHelper.initSearch(search, routeGeo, routeFreq);
+  }
+
+  nsaActive(e) {
+    this.loading = true;
+    setTimeout(() => {
+      this.nsaIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
   }
 
   // Redraw series when a new region is selected

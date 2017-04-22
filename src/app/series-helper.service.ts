@@ -5,7 +5,6 @@ import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
-import { dateWrapper } from './date-wrapper';
 
 
 @Injectable()
@@ -18,25 +17,32 @@ export class SeriesHelperService {
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   getSeriesData(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
-    let freqArray = [];
-    let geoArray = [];
-    let dateArray = [];
-    let seriesDetail = null;
-    this.seriesData = {seriesDetail: {}, change: '', saIsActive: null, regions: [], currentGeo: {}, frequencies: [], currentFreq: {}, chartData: [], seriesTableData: [], siblings: [], sibPairs: [], error: null, noData: ''};
-
+    let currentFreq, currentGeo;
+    this.seriesData = {
+      seriesDetail: {},
+      change: '',
+      saPairAvail: null,
+      regions: [],
+      currentGeo: <Geography>{},
+      frequencies: [],
+      currentFreq: <Frequency>{},
+      chartData: [],
+      seriesTableData: [],
+      siblings: [],
+      error: null,
+      noData: ''
+    };
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
-      seriesDetail = series;
-      let freqGeos = seriesDetail.freq_geos;
-      let geoFreqs = seriesDetail.geo_freqs;
-      let currentGeo = seriesDetail.geography;
-      let currentFreq = {freq: seriesDetail.frequencyShort, label: seriesDetail.frequency};
-      this.seriesData.seriesDetail = seriesDetail;
-      this.seriesData.saIsActive = seriesDetail['seasonallyAdjusted'];
+      this.seriesData.seriesDetail = series;
+      let freqGeos = series.freqGeos;
+      let geoFreqs = series.geoFreqs;
+      currentGeo = series.geography;
+      currentFreq = {freq: series.frequencyShort, label: series.frequency};
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = freqGeos.find(freq => freq.freq === currentFreq.freq).geos;
       this.seriesData.frequencies = geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs;
-      this.seriesData.yoyChange = seriesDetail['percent'] === true ? 'YOY Change' : 'YOY % Change';
-      this.seriesData.ytdChange = seriesDetail['percent'] === true ? 'YTD Change' : 'YTD % Change';
+      this.seriesData.yoyChange = series['percent'] === true ? 'YOY Change' : 'YOY % Change';
+      this.seriesData.ytdChange = series['percent'] === true ? 'YTD Change' : 'YTD % Change';
       this.seriesData.currentFreq = currentFreq;
     },
     (error) => {
@@ -46,14 +52,19 @@ export class SeriesHelperService {
     () => {
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesData.siblings = siblings;
-        this.checkSaPairs(siblings);
+        let geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
+        // If saPairAvail === true, display SA toggle in single series view
+        if (geoFreqPair.length > 1) {
+          this.seriesData.saPairAvail = true;
+        }
       });
-      this.getSeriesObservations(id, dateArray);
+      this.getSeriesObservations(id);
     });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
-  getSeriesObservations(id: number, dateArray: Array<any>) {
+  getSeriesObservations(id: number) {
+    let dateArray = [];
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
       // let obs = this._helper.dataTransform(observations);
       let obs = observations;
@@ -61,7 +72,7 @@ export class SeriesHelperService {
       let obsEnd = obs.observationEnd;
       if (obs) {
         // Use to format dates for table
-        this._helper.seriesDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
         let data = this._helper.dataTransform(obs, dateArray);
         this.seriesData.chartData = data.chartData;
         this.seriesData.seriesTableData = data.tableData; 
@@ -71,19 +82,18 @@ export class SeriesHelperService {
     });
   }
 
-  // Check if both seasonally and non-seasonally adjusted series exists for a given region & frequency combination
-  // If only one is available, disable checkbox & do not display checkbox in annual/semi-annual frequencies
-  checkSaPairs(seriesSiblings) {
-    let checkSiblings = [];
-    seriesSiblings.forEach((sibling, index) => {
-      if (this.seriesData.currentGeo.handle === seriesSiblings[index].geography.handle && this.seriesData.currentFreq.freq === seriesSiblings[index].frequencyShort) {
-        checkSiblings.push(seriesSiblings[index]);
+  // Find series siblings for a particular geo-frequency combination
+  findGeoFreqSibling(seriesSiblings, geo, freq) {
+    let saSiblings = [];
+    seriesSiblings.forEach((sibling) => {
+      if (geo === sibling.geography.handle && freq === sibling.frequencyShort) {
+        saSiblings.push(sibling);
       }
     });
-    this.seriesData.sibPairs = checkSiblings;
+    return saSiblings;
   }
 
-    // Get summary statistics for single series displays
+  // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
   summaryStats(seriesData, freq) {
     let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };

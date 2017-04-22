@@ -6,6 +6,21 @@
 
   .chart-filters {
     display: block;
+
+    .sa-toggle {
+      font-size: 0.9em;
+      vertical-align: middle;
+      margin-bottom: 0;
+
+      input {
+        margin-right: 5px;
+        vertical-align: middle;
+      }
+    }
+
+    .fa-spinner {
+      color: #1D667F;
+    }
   }
 
   .content-links:before {
@@ -133,6 +148,7 @@
     text-decoration: none;
     font-size: 0.9em;
     color: #1D667F;
+    vertical-align: middle;
 
     @media(max-width: 767px) {
       display: none;
@@ -142,6 +158,10 @@
   .multi-charts-row {
     display: block;
     margin-bottom: 40px;
+  }
+
+  .no-data {
+    margin-top: 10px;
   }
 
   .multi-charts {
@@ -165,11 +185,4 @@
   @media (max-width: 767px) {
     margin-top: 50px;
   }
-
-  /* @media (max-width: 991px) {
-    .multi-charts {
-      display: block;
-      margin-bottom: 20px;
-    }
-  } */
 }
