@@ -27,9 +27,9 @@ export class HighchartComponent implements OnInit {
     let pseudoZones = this.seriesData.chartData.pseudoZones;
     let ytd = this.seriesData.chartData.ytd;
     let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
-    title += this.seriesData.seriesInfo.seasonallyAdjusted ? ' (SA)' : '';
+    title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
     let dataFreq = this.currentFreq.freq;
-    this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true ? true : false;
+    //this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true ? true : false;
     this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
     let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {

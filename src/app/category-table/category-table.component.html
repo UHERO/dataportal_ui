@@ -42,11 +42,11 @@
               <ng-template ngFor let-serie [ngForOf]="nsaIsActive ? series.displaySeries.nsaSeries : series.displaySeries.saSeries" let-i="index">
                 <tr>
                   <th class= "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}"
-                  title="{{serie.seriesInfo.seasonallyAdjusted ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
+                  title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
                   data-animation='false' data-html='true' data-placement='left'
                   data-toggle='tooltip' on-mouseover="showTooltip()">
                     <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" (click)="hideTooltip()">
-                      {{serie.seriesInfo.seasonallyAdjusted ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
+                      {{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
                     </a>
                   </th>
                   <ng-template ngFor let-item [ngForOf]="serie.categoryTable">

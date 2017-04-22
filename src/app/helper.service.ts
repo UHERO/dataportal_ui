@@ -179,7 +179,7 @@ export class HelperService {
       });
       tableData.push(
         {
-          series: series.seriesInfo.seasonallyAdjusted ? series.seriesInfo.title + ' (SA)' : series.seriesInfo.title,
+          series: series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? series.seriesInfo.title + ' (SA)' : series.seriesInfo.title,
           observations: observations
         },
         {

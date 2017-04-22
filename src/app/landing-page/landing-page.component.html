@@ -15,7 +15,7 @@
           <div class="chart-filters">
             <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)" class="selector"></app-geo-selector>
             <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
-            <label class="sa-toggle form-check-inline" *ngIf="data.currentFreq.freq !== 'A'">
+            <label class="sa-toggle form-check-inline" *ngIf="series.hasSeasonallyAdjusted">
               <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
             </label>
             <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
