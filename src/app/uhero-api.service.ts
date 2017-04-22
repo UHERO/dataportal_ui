@@ -25,7 +25,7 @@ export class UheroApiService {
   private cachedSeriesDetail = [];
   private cachedSiblings = [];
   private cachedSearchExpand = [];
-  private cachedSearchFilters = [];
+  private cachedSearch = [];
 
   constructor(private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
@@ -139,14 +139,14 @@ export class UheroApiService {
     }
   }
 
-  fetchSearchFilters(search: string) {
-    if (this.cachedSearchFilters[search]) {
-      return Observable.of(this.cachedSearchFilters[search]);
+  fetchSearch(search: string) {
+    if (this.cachedSearch[search]) {
+      return Observable.of(this.cachedSearch[search]);
     } else {
       let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
-          this.cachedSearchFilters[search] = val;
+          this.cachedSearch[search] = val;
           filters$ = null;
         });
       return filters$;

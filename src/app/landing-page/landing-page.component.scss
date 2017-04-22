@@ -14,7 +14,12 @@
 
       input {
         margin-right: 5px;
+        vertical-align: middle;
       }
+    }
+
+    .fa-spinner {
+      color: #1D667F;
     }
   }
 
@@ -176,11 +181,4 @@
   @media (max-width: 767px) {
     margin-top: 50px;
   }
-
-  /* @media (max-width: 991px) {
-    .multi-charts {
-      display: block;
-      margin-bottom: 20px;
-    }
-  } */
 }

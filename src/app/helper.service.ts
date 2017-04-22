@@ -1,7 +1,7 @@
 // Common function used for category multi-chart and table displays
 
 import { Injectable } from '@angular/core';
-import { dateWrapper } from './date-wrapper';
+import { DateWrapper } from './date-wrapper';
 
 @Injectable()
 export class HelperService {
@@ -115,7 +115,7 @@ export class HelperService {
     }
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: dateWrapper) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper) {
     let categoryTable = [];
     // Set datewrapper first and end date based on seasonally adjusted series only for non-annual/non-semiannual frequencies
     for (let i = 0; i < dateRange.length; i++) {
@@ -143,7 +143,9 @@ export class HelperService {
     return categoryTable;
   }
 
-  setDateWrapper(displaySeries: Array<any>, dateWrapper: dateWrapper) {
+  setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
+    dateWrapper.firstDate = '';
+    dateWrapper.endDate = '';
     displaySeries.forEach((series) => {
       if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
         dateWrapper.firstDate = series.start;
@@ -154,7 +156,7 @@ export class HelperService {
     });
   }
 
-  sublistTable(displaySeries: Array<any>, dateWrapper: dateWrapper, tableDates: Array<any>) {
+  sublistTable(displaySeries: Array<any>, dateWrapper: DateWrapper, tableDates: Array<any>) {
     let tableData = [];
     let tableColumns = [];
     let dateStart = dateWrapper.firstDate;

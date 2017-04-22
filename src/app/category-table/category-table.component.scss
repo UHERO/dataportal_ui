@@ -7,6 +7,26 @@
 
   .filters {
     display: inline-block;
+    color: #505050;
+    margin-bottom: 15px;
+    margin-right: 10px;
+
+    .form-check-inline {
+      padding-left: 0;
+      vertical-align: middle;
+      font-size: 0.9em;
+      margin-bottom: 0;
+
+      input {
+        margin-right: 0.25rem;
+        margin-left: 0rem;
+        vertical-align: middle;
+      }
+    }
+
+    .fa-spinner {
+      color: #1D667F;
+    }
   }
 
   .content-links:before {
@@ -78,22 +98,6 @@
     font-size: 0.9em;
     color: #1D667F;
     // margin-left: 10px;
-  }
-
-  .table-checkboxes {
-    display: inline-block;
-    color: #505050;
-    margin-bottom: 15px;
-    margin-right: 10px;
-
-    .form-check-inline {
-      padding-left: 0;
-
-      .form-check-input {
-        margin-right: 0.25rem;
-        margin-left: 0rem;
-      }
-    }
   }
 
   .top-anchor {

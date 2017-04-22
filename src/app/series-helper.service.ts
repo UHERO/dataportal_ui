@@ -5,7 +5,6 @@ import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
-import { dateWrapper } from './date-wrapper';
 
 
 @Injectable()

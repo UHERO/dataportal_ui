@@ -38,6 +38,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   // Variables for geo and freq selectors
   public currentGeo: Geography;
   public currentFreq: Frequency;
+  private loading: boolean = false;
 
   constructor(private _uheroAPIService: UheroApiService, private _catHelper: CategoryHelperService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) { }
 
@@ -124,15 +125,27 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   yoyActive(e) {
-    this.yoyIsActive = e.target.checked;
+    this.loading = true;
+    setTimeout(() => {
+      this.yoyIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
   }
 
   ytdActive(e) {
-    this.ytdIsActive = e.target.checked;
+    this.loading = true;
+    setTimeout(() => {
+      this.ytdIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
   }
 
   nsaActive(e) {
-    this.nsaIsActive = e.target.checked;
+    this.loading = true;
+    setTimeout(() => {
+      this.nsaIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
   }
 
   showTooltip() {

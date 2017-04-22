@@ -14,6 +14,7 @@ export interface Series {
   geography: Geography;
   geoFreqs: Array<any>;
   seasonallyAdjusted: boolean;
+  seasonalAdjustment: string;
   source?: string;
   sourceDescription?: string;
   sourceDetails?: string;
