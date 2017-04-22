@@ -1,5 +1,5 @@
 export interface Frequency {
-    freq: string,
-    label: string
+    freq: string;
+    label: string;
 }
 

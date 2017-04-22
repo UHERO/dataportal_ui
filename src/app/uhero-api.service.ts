@@ -36,7 +36,7 @@ export class UheroApiService {
   }
 
   //  Get data from API
-  // Gets all available categories. Used for navigation & displaying sublists 
+  // Gets all available categories. Used for navigation & displaying sublists
   fetchCategories(): Observable<CategoryTree> {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
@@ -56,7 +56,8 @@ export class UheroApiService {
     if (this.cachedExpanded[id + geo + freq]) {
       return Observable.of(this.cachedExpanded[id + geo + freq]);
     } else {
-      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=` +
+        id + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedExpanded[id + geo + freq] = val;
@@ -171,7 +172,8 @@ export class UheroApiService {
     if (this.cachedSearchExpand[search + geo + freq]) {
       return Observable.of(this.cachedSearchExpand[search + geo + freq]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` +
+        search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
@@ -201,11 +203,11 @@ export class UheroApiService {
 // Used for landing-page.component
 // And side bar navigation on single-series & table views
 function mapCategories(response: Response): CategoryTree {
-  let categories = response.json().data;
-  let dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
-  let categoryTree = [];
+  const categories = response.json().data;
+  const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
+  const categoryTree = [];
   categories.forEach((value) => {
-    let parent = dataMap[value.parentId];
+    const parent = dataMap[value.parentId];
     if (parent) {
       (parent.children || (parent.children = [])).push(value);
     } else {
@@ -222,6 +224,6 @@ function mapCategories(response: Response): CategoryTree {
 }
 
 function mapData(response: Response): any {
-  let data = response.json().data;
+  const data = response.json().data;
   return data;
 }
