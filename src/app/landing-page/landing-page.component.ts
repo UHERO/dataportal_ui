@@ -18,6 +18,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private routeGeo: string;
   private routeFreq: string;
   private routeSearch: string;
+  private routeView: string;
   private queryParams: any = {};
 
   // Variables for geo and freq selectors
@@ -41,10 +42,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
-      if (this.id) {this.queryParams.id = this.id};
-      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
-      if (this.routeGeo) {this.queryParams.geo = this.routeGeo};
-      if (this.routeFreq) {this.queryParams.freq = this.routeFreq};
+      this.routeView = params['view'];
+      if (this.id) { this.queryParams.id = this.id };
+      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id };
+      if (this.routeGeo) { this.queryParams.geo = this.routeGeo };
+      if (this.routeFreq) { this.queryParams.freq = this.routeFreq };
+      if(this.routeView) { this.queryParams.view = this.routeView };
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
@@ -101,6 +104,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this._router.navigate(['/category'], {queryParams: {id: this.id, geo: geoHandle, freq: freq} });
     }
+  }
+
+  viewTable() {
+    this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'table', geo: this.routeGeo, freq: this.routeFreq} });
   }
 
   scrollTo(): void {

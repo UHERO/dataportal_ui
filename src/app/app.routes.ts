@@ -24,7 +24,7 @@ const routes: Routes = [
     component: LandingPageComponent
   },
 
-  {
+  /* {
     path: 'category/table',
     component: CategoryTableComponent
   },
@@ -32,7 +32,7 @@ const routes: Routes = [
   {
     path: 'category/table/search',
     component: CategoryTableComponent
-  },
+  }, */
 
   {
     path: 'series',

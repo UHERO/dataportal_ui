@@ -1,5 +1,5 @@
 <div class="category-tables">
-  <div *ngFor="let data of categoryData | async">
+  <div>
     <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="data.invalid">{{data.invalid}}</p>

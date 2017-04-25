@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -19,12 +19,14 @@ declare var $: any;
 })
 export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
+  @Input() data;
 
   private arSub;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
   private routeSearch: string;
+  private routeView: string;
   private queryParams: any = {};
 
   // Check if seasonally adjusted data is displayed, default to true
@@ -48,30 +50,18 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Get (optional) query parameters from URL
+    console.log('data', this.data);
     this.arSub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
-      if (this.id) this.queryParams.id = this.id;
-      if (this.routeSearch) {this.queryParams.search = this.routeSearch; delete this.queryParams.id};
-      if (this.routeGeo) this.queryParams.geo = this.routeGeo;
-      if (this.routeFreq) this.queryParams.freq = this.routeFreq;
-
-      if (this.routeSearch) {
-        if (this.routeGeo && this.routeFreq) {
-          this.getSearchData(this.routeSearch, this.routeGeo, this.routeFreq);
-        } else {
-          this.getSearchData(this.routeSearch);
-        }
-      } else {
-        if (this.routeGeo && this.routeFreq) {
-          this.getCategoryData(this.id, this.routeGeo, this.routeFreq);
-        } else {
-          this.getCategoryData(this.id);
-        }
-      }
+      this.routeView = params['view'];
+      if (this.id) { this.queryParams.id = this.id };
+      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id };
+      if (this.routeGeo) { this.queryParams.geo = this.routeGeo };
+      if (this.routeFreq) { this.queryParams.freq = this.routeFreq };
+      if (this.routeView) { this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table' };
     });
   }
 
@@ -88,7 +78,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.arSub.unsubscribe();
+    //this.arSub.unsubscribe();
   }
 
   getCategoryData(id: number, routeGeo?: string, routeFreq?: string) {
@@ -106,9 +96,9 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     let freq = currentFreq.freq;
     let geoHandle = event.handle;  
     if (this.routeSearch) {
-      this._router.navigate(['/category/table'], {queryParams: {search: this.routeSearch, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
-      this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
     }
   }
 
@@ -118,10 +108,14 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
     let geoHandle = currentGeo.handle;
     let freq = event.freq;
     if (this.routeSearch) {
-      this._router.navigate(['/category/table'], {queryParams: {search: this.routeSearch, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
-      this._router.navigate(['/category/table'], {queryParams: {id: this.id, geo: geoHandle, freq} });
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq} });
     }
+  }
+
+  viewChart() {
+    this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'chart', geo: this.routeGeo, freq: this.routeFreq} });
   }
 
   yoyActive(e) {

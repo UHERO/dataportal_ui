@@ -121,6 +121,8 @@ export class CategoryHelperService {
           sublistIndex.saDatatables = splitSeries.saCatTable.datatables;
           sublistIndex.nsaDateRange = splitSeries.nsaCatTable.tableDates;
           sublistIndex.nsaDatatables = splitSeries.nsaCatTable.datatables;
+          sublistIndex.displaySeries = splitSeries.displaySeries;
+          sublistIndex.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
           this.seriesData.push({
             dateWrapper: splitSeries.dateWrapper,
             sublist: sublistIndex,

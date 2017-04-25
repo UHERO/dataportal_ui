@@ -1,4 +1,7 @@
-<div class="multi-series-container" (searchItem)="search(searchItem)">
+<ng-template ngFor let-data [ngForOf]="categoryData | async">
+  <app-category-table *ngIf="routeView === 'table'" [data]="data"></app-category-table>
+</ng-template>
+<!-- <div class="multi-series-container">
   <div *ngFor="let data of categoryData | async">
     <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
@@ -18,7 +21,7 @@
             <label class="sa-toggle form-check-inline" *ngIf="series.hasSeasonallyAdjusted">
               <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
             </label>
-            <a [routerLink]="['/category/table']" [queryParams]="queryParams" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
+            <a (click)="viewTable()" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
             <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
           </div>
           <p *ngIf="series.noData" class="no-data">No Data Available</p>
@@ -33,4 +36,4 @@
       </ng-template>
     </ng-template>
   </div>
-</div>
+</div> -->
