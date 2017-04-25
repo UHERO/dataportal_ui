@@ -1,7 +1,39 @@
-<ng-template ngFor let-data [ngForOf]="categoryData | async">
-  <app-category-table *ngIf="routeView === 'table'" [data]="data"></app-category-table>
-</ng-template>
-<!-- <div class="multi-series-container">
+<div class="multi-series-container">
+	<ng-template ngFor let-data [ngForOf]="categoryData | async">
+    <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
+    <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
+    <p *ngIf="!routeSearch && data.invalid">{{data.invalid}}</p>
+		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
+			<ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
+				<li *ngFor="let sub of data.sublist; let subInd='index'">
+					<a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub.id" (click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
+				</li>
+			</ul>
+			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
+			<div class="filters">
+				<label *ngIf="routeView === 'table'" class="form-check-inline">
+          <input type="checkbox" [checked]="yoyIsActive" (change)="yoyActive($event)">YOY
+        </label>
+				<label *ngIf="routeView === 'table'" class="form-check-inline">
+          <input type="checkbox" [checked]="ytdIsActive" (change)="ytdActive($event)">YTD
+        </label>
+				<label class="form-check-inline" *ngIf="data.currentFreq?.freq !== 'A'">
+          <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
+        </label>
+				<app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)"
+					class="selector"></app-geo-selector>
+				<app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)"
+					class="selector"></app-freq-selector>
+				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
+        <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="nsaIsActive ? sub.nsaDatatables : sub.saDatatables" [tableId]="sub.id"></app-category-datatables>
+        <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
+			</div>
+			<app-category-table *ngIf="routeView === 'table'" [data]="sub" [nsaActive]="nsaIsActive" [yoyActive]="yoyIsActive" [ytdActive]="ytdIsActive"></app-category-table>
+		</ng-template>
+	</ng-template>
+</div>
+	<!-- <div class="multi-series-container">
   <div *ngFor="let data of categoryData | async">
     <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>

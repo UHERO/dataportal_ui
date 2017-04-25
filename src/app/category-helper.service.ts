@@ -123,24 +123,19 @@ export class CategoryHelperService {
           sublistIndex.nsaDatatables = splitSeries.nsaCatTable.datatables;
           sublistIndex.displaySeries = splitSeries.displaySeries;
           sublistIndex.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
-          this.seriesData.push({
-            dateWrapper: splitSeries.dateWrapper,
-            sublist: sublistIndex,
-            displaySeries: splitSeries.displaySeries,
-            allSeries: categorySeries,
-            hasSeasonallyAdjusted: splitSeries.hasSeasonallyAdjusted
-          });
+          console.log(splitSeries.displaySeries);
+          sublistIndex.dateWrapper = splitSeries.dateWrapper;
+          sublistIndex.noData = false;
         } else {
           // No series exist for a subcateogry
-          console.log(this.seriesData)
           let series = [{ seriesInfo: 'No data available' }];
-          this.seriesData.push({
-            sublist: sublistIndex,
-            series: series,
-            displaySeries: {nsaSeries: series, saSeries: series},
-            dateWrapper: {saDateWrapper: '', nsaDateWrapper: ''},
-            noData: true
-          });
+          sublistIndex.dateWrapper = {saDateWrapper: '', nsaDateWrapper: ''};
+          sublistIndex.saDateRange = [];
+          sublistIndex.saDatatables = {};
+          sublistIndex.nsaDateRange = [];
+          sublistIndex.nsaDatatables = {};
+          sublistIndex.displaySeries = {nsaSeries: series, saSeries: series};
+          sublistIndex.noData = true;
         }
       });
   }

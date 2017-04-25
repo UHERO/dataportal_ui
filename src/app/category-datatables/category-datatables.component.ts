@@ -24,7 +24,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
   }
 
   ngAfterViewInit() {
-    this.initDatatable();
+    if(this.data) {
+      this.initDatatable();
+    }
   }
 
   ngOnChanges() {
@@ -32,7 +34,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       this.tableWidget.destroy();
       $('#indicator-table-' + this.tableId).empty();
     }
-    this.initDatatable();
+    if(this.data) {
+      this.initDatatable();
+    }
   }
 
   initDatatable(): void {

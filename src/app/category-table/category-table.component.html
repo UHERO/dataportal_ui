@@ -1,79 +1,46 @@
 <div class="category-tables">
-  <div>
-    <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
-    <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
-    <p *ngIf="data.invalid">{{data.invalid}}</p>
-    <ng-template ngFor let-sub [ngForOf]="data.sublist">
-      <ng-template ngFor let-series [ngForOf]="data.seriesData" let-i="index">
-        <div class="table-row" *ngIf="sub.id === series.sublist.id || routeSearch">
-          <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
-            <li *ngFor="let sub of data.sublist">
-              <a [routerLink]="['/category/table']" [queryParams]="queryParams" [fragment]="sub.id" (click)="scrollTo()" [class.current-sub]="sub.id === series.sublist.id">{{sub.name}}</a>
-            </li>
-          </ul>
-          <hr class="sublist-separator" *ngIf="data.sublist.length > 1">
-          <div class="filters">
-            <label class="form-check-inline">
-              <input type="checkbox" [checked]="yoyIsActive" (change)="yoyActive($event)">YOY
-            </label>
-            <label class="form-check-inline">
-              <input type="checkbox" [checked]="ytdIsActive" (change)="ytdActive($event)">YTD
-            </label>
-            <label class="form-check-inline" *ngIf="data.currentFreq.freq !== 'A'">
-              <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
-            </label>
-            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawTableGeo($event, data.currentFreq)"
-              class="selector"></app-geo-selector>
-            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawTableFreq($event, data.currentGeo)"
-              class="selector"></app-freq-selector>
-            <a [routerLink]="['/category']" [queryParams]="queryParams" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
-            <app-category-datatables *ngIf="!series.noData" [sublist]="sub" [data]="nsaIsActive ? series.sublist.nsaDatatables : series.sublist.saDatatables" [tableId]="i"></app-category-datatables>
-            <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
-          </div>
-          <p *ngIf="series.noData">No Data Available</p>
-          <div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="nsaIsActive ? series.dateWrapper.nsaDateWrapper : series.dateWrapper.saDateWrapper">
-            <table class="category-table">
-              <tr>
-                <th><b>Series</b></th>
-                <ng-template ngFor let-date [ngForOf]="nsaIsActive ? series.sublist.nsaDateRange : series.sublist.saDateRange" let-i="index">
-                  <td><b>{{date}}</b></td>
-                </ng-template>
-              </tr>
-              <ng-template ngFor let-serie [ngForOf]="nsaIsActive ? series.displaySeries.nsaSeries : series.displaySeries.saSeries" let-i="index">
-                <tr>
-                  <th class= "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}"
-                  title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
-                  data-animation='false' data-html='true' data-placement='left'
-                  data-toggle='tooltip' on-mouseover="showTooltip()">
-                    <a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" (click)="hideTooltip()">
-                      {{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
-                    </a>
-                  </th>
-                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td>{{item.level}}</td>
-                  </ng-template>
-                </tr>
-                <tr *ngIf="yoyIsActive">
-                  <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-                  {{(serie.seriesInfo.percent === true) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
-                  </th>
-                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td>{{item.yoy}}</td>
-                  </ng-template>
-                </tr>
-                <tr *ngIf="ytdIsActive">
-                  <th class = "{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-                  {{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
-                  </th>
-                  <ng-template ngFor let-item [ngForOf]="serie.categoryTable">
-                    <td>{{item.ytd}}</td>
-                  </ng-template>
-                </tr>
-              </ng-template>
-            </table>
-          </div>
-        </div>
-      </ng-template>
-    </ng-template>
-  </div>
+	<div>
+		<div class="table-row" *ngIf="data || routeSearch">
+			<p *ngIf="data.noData">No Data Available</p>
+			<div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="!data.noData">
+				<table class="category-table">
+					<tr>
+						<th><b>Series</b></th>
+						<ng-template ngFor let-date [ngForOf]="nsaActive ? data.nsaDateRange : data.saDateRange" let-i="index">
+							<td><b>{{date}}</b></td>
+						</ng-template>
+					</tr>
+					<ng-template ngFor let-serie [ngForOf]="nsaActive ? data.displaySeries.nsaSeries : data.displaySeries?.saSeries" let-i="index">
+						<tr>
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
+								data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
+								<a [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" (click)="hideTooltip()">
+                  {{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
+                </a>
+							</th>
+							<ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+								<td>{{item.level}}</td>
+							</ng-template>
+						</tr>
+						<tr *ngIf="yoyActive">
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
+								{{(serie.seriesInfo.percent === true) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
+							</th>
+							<ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+								<td>{{item.yoy}}</td>
+							</ng-template>
+						</tr>
+						<tr *ngIf="ytdActive">
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
+								{{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
+							</th>
+							<ng-template ngFor let-item [ngForOf]="serie.categoryTable">
+								<td>{{item.ytd}}</td>
+							</ng-template>
+						</tr>
+					</ng-template>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>

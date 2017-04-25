@@ -25,6 +25,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentGeo: Geography;
   public currentFreq: Frequency;
   private categoryData;
+  private yoyIsActive: boolean = false;
+  private ytdIsActive: boolean = false;
   private nsaIsActive: boolean = false;
   private loading: boolean = false;
 
@@ -47,7 +49,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq };
-      if(this.routeView) { this.queryParams.view = this.routeView };
+      if (this.routeView) { this.queryParams.view = this.routeView };
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
@@ -90,9 +92,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     let freq = currentFreq.freq;
     let geoHandle = event.handle;
     if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
     }
   }
 
@@ -100,15 +102,36 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     let geoHandle = currentGeo.handle;
     let freq = event.freq;
     if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
     }
   }
 
-  viewTable() {
-    this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'table', geo: this.routeGeo, freq: this.routeFreq} });
+  switchView() {
+    if (this.routeView === 'table') {
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'chart', geo: this.routeGeo, freq: this.routeFreq} });
+    } else {
+      this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'table', geo: this.routeGeo, freq: this.routeFreq} });
+    }
   }
+
+  yoyActive(e) {
+    this.loading = true;
+    setTimeout(() => {
+      this.yoyIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
+  }
+
+  ytdActive(e) {
+    this.loading = true;
+    setTimeout(() => {
+      this.ytdIsActive = e.target.checked;
+      this.loading = false;
+    }, 10);
+  }
+
 
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {

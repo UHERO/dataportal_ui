@@ -20,6 +20,9 @@ declare var $: any;
 export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
+  @Input() nsaActive;
+  @Input() yoyActive;
+  @Input() ytdActive;
 
   private arSub;
   private id: number;
@@ -30,9 +33,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   private queryParams: any = {};
 
   // Check if seasonally adjusted data is displayed, default to true
-  private yoyIsActive: boolean = false;
-  private ytdIsActive: boolean = false;
-  private nsaIsActive: boolean = false;
   private userEvent: boolean = false;
   private errorMessage: string;
   private categoryData;
@@ -50,7 +50,7 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('data', this.data);
+    console.log('data', this.data)
     this.arSub = this.route.queryParams.subscribe((params) => {
       this.id = +params['id'] || 42;
       this.routeGeo = params['geo'];
@@ -116,30 +116,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   viewChart() {
     this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'chart', geo: this.routeGeo, freq: this.routeFreq} });
-  }
-
-  yoyActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.yoyIsActive = e.target.checked;
-      this.loading = false;
-    }, 10);
-  }
-
-  ytdActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.ytdIsActive = e.target.checked;
-      this.loading = false;
-    }, 10);
-  }
-
-  nsaActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.nsaIsActive = e.target.checked;
-      this.loading = false;
-    }, 10);
   }
 
   showTooltip() {
