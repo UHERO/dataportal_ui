@@ -20,49 +20,25 @@ declare var $: any;
 export class CategoryTableComponent implements OnInit, AfterViewInit {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
+  @Input() dates;
+  @Input() noSeries;
   @Input() nsaActive;
   @Input() yoyActive;
   @Input() ytdActive;
-
-  private arSub;
-  private id: number;
-  private routeGeo: string;
-  private routeFreq: string;
-  private routeSearch: string;
-  private routeView: string;
-  private queryParams: any = {};
 
   // Check if seasonally adjusted data is displayed, default to true
   private userEvent: boolean = false;
   private errorMessage: string;
   private categoryData;
   private tooltipInfo;
-  // Variables for geo and freq selectors
-  public currentGeo: Geography;
-  public currentFreq: Frequency;
   private loading: boolean = false;
 
   constructor(private _uheroAPIService: UheroApiService, private _catHelper: CategoryHelperService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) { }
 
   ngOnInit() {
-    this.currentGeo = {fips: null, name: null, handle: null};
-    this.currentFreq = {freq: null, label: null};
   }
 
   ngAfterViewInit() {
-    console.log('data', this.data)
-    this.arSub = this.route.queryParams.subscribe((params) => {
-      this.id = +params['id'] || 42;
-      this.routeGeo = params['geo'];
-      this.routeFreq = params['freq'];
-      this.routeSearch = params['search'];
-      this.routeView = params['view'];
-      if (this.id) { this.queryParams.id = this.id };
-      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id };
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo };
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq };
-      if (this.routeView) { this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table' };
-    });
   }
 
   ngAfterViewChecked() {
@@ -79,43 +55,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
 
   ngOnDestroy() {
     //this.arSub.unsubscribe();
-  }
-
-  getCategoryData(id: number, routeGeo?: string, routeFreq?: string) {
-    this.categoryData = this._catHelper.initContent(id, routeGeo, routeFreq);
-  }
-
-  getSearchData(search: string, routeGeo?: string, routeFreq?: string) {
-    this.categoryData = this._catHelper.initSearch(search, routeGeo, routeFreq);
-  }
-
-  // Update table data when a new region/frequency is selected
-  redrawTableGeo(event, currentFreq) {
-    // Reset table scrollbar position to the right when new region is selected
-    this.userEvent = false;
-    let freq = currentFreq.freq;
-    let geoHandle = event.handle;  
-    if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
-    } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
-    }
-  }
-
-  redrawTableFreq(event, currentGeo) {
-    // Reset table scrollbar position to the right when new frequency is selected
-    this.userEvent = false;
-    let geoHandle = currentGeo.handle;
-    let freq = event.freq;
-    if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
-    } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq} });
-    }
-  }
-
-  viewChart() {
-    this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'chart', geo: this.routeGeo, freq: this.routeFreq} });
   }
 
   showTooltip() {

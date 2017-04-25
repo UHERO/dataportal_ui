@@ -46,6 +46,7 @@ import { CategoryTableComponent } from './category-table/category-table.componen
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { CategoryDatatablesComponent } from './category-datatables/category-datatables.component';
+import { CategoryChartsComponent } from './category-charts/category-charts.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { CategoryDatatablesComponent } from './category-datatables/category-data
     SearchBarComponent,
     FeedbackComponent,
     CategoryDatatablesComponent,
+    CategoryChartsComponent,
   ],
   imports: [
     BrowserModule,

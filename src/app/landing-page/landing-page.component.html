@@ -29,43 +29,8 @@
         <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="nsaIsActive ? sub.nsaDatatables : sub.saDatatables" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [data]="sub" [nsaActive]="nsaIsActive" [yoyActive]="yoyIsActive" [ytdActive]="ytdIsActive"></app-category-table>
+			<app-category-table *ngIf="routeView === 'table'" [data]="nsaIsActive ? sub.displaySeries?.nsaSeries : sub.displaySeries?.saSeries" [dates]="nsaIsActive ? sub.nsaDateRange : sub.saDateRange" [yoyActive]="yoyIsActive" [ytdActive]="ytdIsActive" [noSeries]="sub.noData"></app-category-table>
+      <app-category-charts *ngIf="routeView !== 'table'" [data]="nsaIsActive ? sub.displaySeries?.nsaSeries : sub.displaySeries?.saSeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>
-	<!-- <div class="multi-series-container">
-  <div *ngFor="let data of categoryData | async">
-    <h2 class="selected-category" [class.search-term]="routeSearch" id="id_top">{{data.selectedCategory}}</h2>
-    <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>
-    <p *ngIf="!routeSearch && data.invalid">{{data.invalid}}</p>
-    <ng-template ngFor let-sub [ngForOf]="data.sublist">
-      <ng-template ngFor let-series [ngForOf]="data.seriesData">
-        <div class="multi-charts-row" *ngIf="sub.id === series.sublist.id || routeSearch">
-          <ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + series.sublist.id">
-            <li *ngFor="let sub of data.sublist">
-              <a [routerLink]="['/category']" [queryParams]="queryParams" [fragment]="sub.id" (click)="scrollTo()" [class.current-sub]="sub.id === series.sublist.id">{{sub.name}}</a>
-            </li>
-          </ul>
-          <hr class="sublist-separator" *ngIf="data.sublist.length > 1">
-          <div class="chart-filters">
-            <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)" class="selector"></app-geo-selector>
-            <app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector"></app-freq-selector>
-            <label class="sa-toggle form-check-inline" *ngIf="series.hasSeasonallyAdjusted">
-              <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
-            </label>
-            <a (click)="viewTable()" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
-            <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
-          </div>
-          <p *ngIf="series.noData" class="no-data">No Data Available</p>
-          <ng-template ngFor let-serie [ngForOf]="nsaIsActive ? series.displaySeries.nsaSeries : series.displaySeries.saSeries">
-            <div class="multi-charts">
-              <a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" *ngIf="serie.seriesInfo.id">
-                <app-highchart [seriesData]="serie" [currentFreq]="data.currentFreq"></app-highchart>
-              </a>
-            </div>
-          </ng-template>
-        </div>
-      </ng-template>
-    </ng-template>
-  </div>
-</div> -->

@@ -1,16 +1,16 @@
 <div class="category-tables">
 	<div>
 		<div class="table-row" *ngIf="data || routeSearch">
-			<p *ngIf="data.noData">No Data Available</p>
-			<div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="!data.noData">
+			<p *ngIf="noSeries">No Data Available</p>
+			<div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="!noSeries">
 				<table class="category-table">
 					<tr>
 						<th><b>Series</b></th>
-						<ng-template ngFor let-date [ngForOf]="nsaActive ? data.nsaDateRange : data.saDateRange" let-i="index">
+						<ng-template ngFor let-date [ngForOf]="dates" let-i="index">
 							<td><b>{{date}}</b></td>
 						</ng-template>
 					</tr>
-					<ng-template ngFor let-serie [ngForOf]="nsaActive ? data.displaySeries.nsaSeries : data.displaySeries?.saSeries" let-i="index">
+					<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
 						<tr>
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
 								data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
