@@ -39,20 +39,20 @@ export class HighstockComponent implements OnChanges {
   }
 
   drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency) {
-    let level = chartData.level;
-    let pseudoZones = chartData.pseudoZones;
-    let yoy = chartData.yoy;
-    let ytd = chartData.ytd;
-    let name = seriesDetail.title;
-    let units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
-    let change = seriesDetail.percent ? 'Change' : '% Change';
-    let yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-    let ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    let dataFreq = freq;
-    let dataGeo = geo;
-    let sourceDescription = seriesDetail.sourceDescription;
-    let sourceLink = seriesDetail.sourceLink;
-    let sourceDetails = seriesDetail. sourceDetails;
+    const level = chartData.level;
+    const pseudoZones = chartData.pseudoZones;
+    const yoy = chartData.yoy;
+    const ytd = chartData.ytd;
+    const name = seriesDetail.title;
+    const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
+    const change = seriesDetail.percent ? 'Change' : '% Change';
+    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const dataFreq = freq;
+    const dataGeo = geo;
+    const sourceDescription = seriesDetail.sourceDescription;
+    const sourceLink = seriesDetail.sourceLink;
+    const sourceDetails = seriesDetail. sourceDetails;
 
     this.options = {
       chart: {
@@ -86,7 +86,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       rangeSelector: {
-        //allButtonsEnabled: true,
+        // allButtonsEnabled: true,
         selected: 2,
         buttons: [{
           type: 'year',
@@ -175,7 +175,7 @@ export class HighstockComponent implements OnChanges {
         shadow: false,
         valueDecimals: 2,
         formatter: function () {
-          let pseudo = 'Pseudo History ';
+          const pseudo = 'Pseudo History ';
           let s = '<b>';
           if (freq.freq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1';
@@ -193,12 +193,22 @@ export class HighstockComponent implements OnChanges {
             s = s + Highcharts.dateFormat('%b', this.x);
           }
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
-          this.points.forEach((point, index) => {
-            let label = '<br><span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+          this.points.forEach((point) => {
+            const label = '<br><span style="color:' +
+              point.color + '">\u25CF</span> ' +
+              point.series.name + ': ' +
+              Highcharts.numberFormat(point.y);
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone, index) => {
                 if (point.x < pseudoZones[index].value) {
-                  s += '<br><span style="color:' + point.color + '">\u25CF</span> ' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                  s += '<br><span style="color:' +
+                    point.color +
+                    '">\u25CF</span> ' +
+                    pseudo +
+                    point.series.name +
+                    ': ' +
+                    Highcharts.numberFormat(point.y) +
+                    '<br>';
                 } else {
                   s += label;
                 }

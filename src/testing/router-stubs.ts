@@ -5,7 +5,7 @@ import { ActivatedRoute, Route, Params, ActivatedRouteSnapshot, UrlSegment, Data
 
 // RouterLinkStub
 @Directive({
-    selector: '[routerLink]',
+    selector: '[appRouterLink]',
     host: {
         '(click)': 'onclick()'
     }
@@ -20,7 +20,7 @@ class RouterLinkStubDirective {
 }
 
 @Directive({
-    selector: '[queryParams]',
+    selector: '[appQueryParams]',
     host: {
         '(click)': 'onclick()'
     }
@@ -35,7 +35,7 @@ class QueryParamsStubDirective {
 }
 
 // RouterOutletStub
-@Component({ selector: 'router-outlet', template: '' })
+@Component({ selector: 'app-router-outlet', template: '' })
 class RouterOutletStubComponent { }
 
 // RouterStub
@@ -61,7 +61,7 @@ export class ActivatedRouteStub implements ActivatedRoute {
     children: ActivatedRoute[];
     pathFromRoot: ActivatedRoute[];
     toString(): string {
-        return "";
+        return '';
     };
 }
 // Only implements params and part of snapshot.params

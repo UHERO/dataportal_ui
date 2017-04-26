@@ -1,8 +1,8 @@
 import { Routes, RouterModule } from '@angular/router';
 
-import {LandingPageComponent} from "./landing-page/landing-page.component";
-import {SingleSeriesComponent} from "./single-series/single-series.component";
-import {CategoryTableComponent} from "./category-table/category-table.component";
+import {LandingPageComponent} from './landing-page/landing-page.component';
+import {SingleSeriesComponent} from './single-series/single-series.component';
+import {CategoryTableComponent} from './category-table/category-table.component';
 
 
 const routes: Routes = [

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -8,7 +8,6 @@ import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 import 'jquery';
 declare var $: any;
-//import { error } from 'util';
 
 
 @Component({
@@ -17,7 +16,7 @@ declare var $: any;
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements OnInit, AfterViewInit {
+export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
   @Input() dates;
@@ -27,18 +26,21 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
   @Input() ytdActive;
 
   // Check if seasonally adjusted data is displayed, default to true
-  private userEvent: boolean = false;
+  private userEvent = false;
   private errorMessage: string;
   private categoryData;
   private tooltipInfo;
-  private loading: boolean = false;
+  private loading = false;
 
-  constructor(private _uheroAPIService: UheroApiService, private _catHelper: CategoryHelperService, private _helper: HelperService, private route: ActivatedRoute, private _router: Router) { }
+  constructor(
+    private _uheroAPIService: UheroApiService,
+    private _catHelper: CategoryHelperService,
+    private _helper: HelperService,
+    private route: ActivatedRoute,
+    private _router: Router
+  ) {}
 
   ngOnInit() {
-  }
-
-  ngAfterViewInit() {
   }
 
   ngAfterViewChecked() {
@@ -51,10 +53,6 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
         if (el) el.scrollIntoView(el);
       });*/
     }
-  }
-
-  ngOnDestroy() {
-    //this.arSub.unsubscribe();
   }
 
   showTooltip() {
@@ -70,12 +68,12 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) {
         el.scrollIntoView(el);
-        let scrolledY = window.scrollY;
-        if(scrolledY){
+        const scrolledY = window.scrollY;
+        if (scrolledY) {
           window.scroll(0, scrolledY - 75);
         }
       }
-      if (frag === 'top') {el.scrollTop};
+      if (frag === 'top') { el.scrollTop; }
     });
   }
 
@@ -85,8 +83,8 @@ export class CategoryTableComponent implements OnInit, AfterViewInit {
       this.tableEl._results.forEach((el, index) => {
         this.tableEl._results[index].nativeElement.scrollLeft = this.tableEl._results[index].nativeElement.scrollWidth;
       });
-    } catch(err) {
-      console.log(err) 
+    } catch (err) {
+      console.log(err);
     }
   }
 

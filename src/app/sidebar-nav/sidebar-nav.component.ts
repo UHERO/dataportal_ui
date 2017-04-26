@@ -1,9 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { UheroApiService } from '../uhero-api.service';
-import { CategoryTree } from '../category-tree';
-import { SelectedSeries } from '../selected-series';
 
 @Component({
   selector: 'app-sidebar-nav',
@@ -11,11 +8,11 @@ import { SelectedSeries } from '../selected-series';
   styleUrls: ['./sidebar-nav.component.scss']
 })
 export class SidebarNavComponent implements OnInit, Input {
-  private categories: CategoryTree;
+  private categories;
   private errorMessage: string;
   public expand: string = null;
-  private reveal: boolean = false;
-  private overlay: boolean = false;
+  private reveal = false;
+  private overlay = false;
   private selectedCategory: number;
   private id: number;
 
@@ -28,7 +25,7 @@ export class SidebarNavComponent implements OnInit, Input {
 
     this.route.queryParams.subscribe((params) => {
       this.id = +params['id'];
-      let search = params['search'];
+      const search = params['search'];
       if (this.id) {
         this.selectedCategory = this.id;
       } else if (search) {
@@ -45,7 +42,7 @@ export class SidebarNavComponent implements OnInit, Input {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], {queryParams: {search: event}})
+    this._router.navigate(['/category/search'], { queryParams: {search: event}} );
   }
 
 }

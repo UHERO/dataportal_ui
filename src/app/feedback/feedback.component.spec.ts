@@ -5,7 +5,7 @@ import { FeedbackComponent } from './feedback.component';
 
 describe('Component: Feedback', () => {
   it('should create an instance', () => {
-    let component = new FeedbackComponent();
+    const component = new FeedbackComponent();
     expect(component).toBeTruthy();
   });
 });

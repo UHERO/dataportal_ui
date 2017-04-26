@@ -24,7 +24,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   public currentGeo: Geography;
   private seriesData;
 
-  constructor(private _uheroAPIService: UheroApiService, private _series: SeriesHelperService, private route: ActivatedRoute, private _router: Router) {}
+  constructor(
+    private _uheroAPIService: UheroApiService,
+    private _series: SeriesHelperService,
+    private route: ActivatedRoute,
+    private _router: Router
+  ) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, handle: null, name: null};
@@ -33,9 +38,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
-      let seriesId = Number.parseInt(params['id']);
+      const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
-        this.seasonallyAdjusted = (params['sa'] == 'true');
+        this.seasonallyAdjusted = (params['sa'] === 'true');
       }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
@@ -47,7 +52,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.noSelection = null;
     let id;
     // Get array of siblings for selected geo and freq
-    let geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
+    const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonallyAdjusted matches sa
     if (geoFreqSib.length > 1) {

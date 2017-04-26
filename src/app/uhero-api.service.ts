@@ -5,7 +5,6 @@ import 'rxjs/Rx';
 import 'rxjs/add/operator/mergeMap';
 
 import { Category } from './category';
-import { CategoryTree } from './category-tree';
 import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
@@ -37,7 +36,7 @@ export class UheroApiService {
 
   //  Get data from API
   // Gets all available categories. Used for navigation & displaying sublists
-  fetchCategories(): Observable<CategoryTree> {
+  fetchCategories(): Observable<Category[]> {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
@@ -202,7 +201,7 @@ export class UheroApiService {
 // Create a nested JSON of parent and child categories
 // Used for landing-page.component
 // And side bar navigation on single-series & table views
-function mapCategories(response: Response): CategoryTree {
+function mapCategories(response: Response): Array<Category> {
   const categories = response.json().data;
   const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   const categoryTree = [];

@@ -15,6 +15,6 @@ export class SearchBarComponent implements OnInit {
 
   search(searchTerm: HTMLInputElement): void {
     this.onSearch.emit(searchTerm.value);
-    searchTerm.value = ''
+    searchTerm.value = '';
   }
 }

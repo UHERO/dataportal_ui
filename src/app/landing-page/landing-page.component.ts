@@ -25,13 +25,17 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentGeo: Geography;
   public currentFreq: Frequency;
   private categoryData;
-  private yoyIsActive: boolean = false;
-  private ytdIsActive: boolean = false;
-  private nsaIsActive: boolean = false;
-  private loading: boolean = false;
+  private yoyIsActive = false;
+  private ytdIsActive = false;
+  private nsaIsActive = false;
+  private loading = false;
 
-  constructor(private _uheroAPIService: UheroApiService, private _catHelper: CategoryHelperService, private route: ActivatedRoute, private _router: Router) {
-  }
+  constructor(
+    private _uheroAPIService: UheroApiService,
+    private _catHelper: CategoryHelperService,
+    private route: ActivatedRoute,
+    private _router: Router
+  ) {}
 
   ngOnInit() {
     this.currentGeo = {fips: null, name: null, handle: null};
@@ -45,23 +49,23 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
       this.routeView = params['view'];
-      if (this.id) { this.queryParams.id = this.id };
-      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id };
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo };
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq };
-      if (this.routeView) { this.queryParams.view = this.routeView };
+      if (this.id) { this.queryParams.id = this.id; };
+      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id; };
+      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
+      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
+      if (this.routeView) { this.queryParams.view = this.routeView; };
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
-          this.getSearchData(this.routeSearch, this.routeGeo, this.routeFreq);
+          this.categoryData = this._catHelper.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
         } else {
-          this.getSearchData(this.routeSearch);
+          this.categoryData = this._catHelper.initSearch(this.routeSearch);
         }
       } else {
         if (this.routeGeo && this.routeFreq) {
-          this.getCategoryData(this.id, this.routeGeo, this.routeFreq);
+          this.categoryData = this._catHelper.initContent(this.id, this.routeGeo, this.routeFreq);
         } else {
-          this.getCategoryData(this.id);
+          this.categoryData = this._catHelper.initContent(this.id);
         }
       }
     });
@@ -69,14 +73,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
-
-  getCategoryData(id: number, routeGeo?: string, routeFreq?: string) {
-    this.categoryData = this._catHelper.initContent(id, routeGeo, routeFreq);
-  }
-
-  getSearchData(search: string, routeGeo?: string, routeFreq?: string) {
-    this.categoryData = this._catHelper.initSearch(search, routeGeo, routeFreq);
   }
 
   nsaActive(e) {
@@ -89,8 +85,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq) {
-    let freq = currentFreq.freq;
-    let geoHandle = event.handle;
+    const freq = currentFreq.freq;
+    const geoHandle = event.handle;
     if (this.routeSearch) {
       this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
@@ -99,8 +95,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   redrawSeriesFreq(event, currentGeo) {
-    let geoHandle = currentGeo.handle;
-    let freq = event.freq;
+    const geoHandle = currentGeo.handle;
+    const freq = event.freq;
     if (this.routeSearch) {
       this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
     } else {
@@ -138,12 +134,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) {
         el.scrollIntoView(el);
-        let scrolledY = window.scrollY;
-        if(scrolledY){
+        const scrolledY = window.scrollY;
+        if (scrolledY) {
           window.scroll(0, scrolledY - 75);
         }
       }
-      if (frag === 'top') {el.scrollTop};
+      if (frag === 'top') { el.scrollTop; };
     });
   }
 }

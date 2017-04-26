@@ -5,7 +5,7 @@ import { GeoSelectorComponent } from './geo-selector.component';
 
 describe('Component: GeoSelector', () => {
   it('should create an instance', () => {
-    let component = new GeoSelectorComponent();
+    const component = new GeoSelectorComponent();
     expect(component).toBeTruthy();
   });
 });

@@ -8,10 +8,10 @@ import { ChartModule } from 'angular2-highcharts';
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 declare var require: any;
 export function highchartsFactory() {
-  let highcharts = require('highcharts/highstock');
-  let exp = require('highcharts/modules/exporting');
-  let offlineExport = require('highcharts/modules/offline-exporting');
-  let csv = require('./csv-export');
+  const highcharts = require('highcharts/highstock');
+  const exp = require('highcharts/modules/exporting');
+  const offlineExport = require('highcharts/modules/offline-exporting');
+  const csv = require('./csv-export');
 
   exp(highcharts);
   offlineExport(highcharts);
@@ -20,7 +20,7 @@ export function highchartsFactory() {
     lang: {
       thousandsSep: ','
     }
-  })
+  });
   return (highcharts);
 }
 
