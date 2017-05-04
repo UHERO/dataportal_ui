@@ -39,7 +39,7 @@ export class HelperService {
     return dateArray;
   }
 
-  dataTransform(seriesObs, dates) {
+  dataTransform(seriesObs, dates, decimals) {
     let results = null;
     const observations = seriesObs;
     const start = observations.observationStart;
@@ -57,7 +57,7 @@ export class HelperService {
         }
       });
       const combineData = this.combineObsData(level, yoy, ytd);
-      const tableData = this.seriesTable(combineData, dates);
+      const tableData = this.seriesTable(combineData, dates, decimals);
       const chart = this.seriesChart(combineData, dates);
       const chartData = { level: chart[0], pseudoZones: pseudoZones, yoy: chart[1], ytd: chart[2] };
       results = { chartData: chartData, tableData: tableData, start: start, end: end };
@@ -65,7 +65,7 @@ export class HelperService {
     return results;
   }
 
-  seriesTable(seriesData, dateRange) {
+  seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
       table.push({date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
@@ -74,11 +74,11 @@ export class HelperService {
       const seriesDate = data.date;
       const tableEntry = table.find(date => date.date === seriesDate);
       tableEntry.value = data.value;
-      tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, 1);
+      tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
       tableEntry.yoy = data.yoyValue;
-      tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, 1);
+      tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, decimals);
       tableEntry.ytd = data.ytdValue;
-      tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, 1);
+      tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, decimals);
     });
     return table;
   }
@@ -102,7 +102,7 @@ export class HelperService {
     return [levelValue, yoyValue, ytdValue];
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper, decimals: number) {
     // Format series data for the category table
     let categoryTableData = [];
     dateRange.forEach((date) => {
@@ -111,9 +111,9 @@ export class HelperService {
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
       if (tableObs) {
-        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, 1);
-        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, 1);
-        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, 1);
+        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
+        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
+        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
       }
     });
     let tableStart, tableEnd;

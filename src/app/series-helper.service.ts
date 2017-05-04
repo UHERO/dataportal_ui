@@ -17,7 +17,7 @@ export class SeriesHelperService {
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   getSeriesData(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
-    let currentFreq, currentGeo;
+    let currentFreq, currentGeo, decimals;
     this.seriesData = {
       seriesDetail: {},
       change: '',
@@ -36,6 +36,7 @@ export class SeriesHelperService {
       this.seriesData.seriesDetail = series;
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
+      decimals = series.decimals ? series.decimals : 1;
       currentGeo = series.geography;
       currentFreq = {freq: series.frequencyShort, label: series.frequency};
       this.seriesData.currentGeo = currentGeo;
@@ -58,12 +59,12 @@ export class SeriesHelperService {
           this.seriesData.saPairAvail = true;
         }
       });
-      this.getSeriesObservations(id);
+      this.getSeriesObservations(id, decimals);
     });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
-  getSeriesObservations(id: number) {
+  getSeriesObservations(id: number, decimals: number) {
     const dateArray = [];
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
       // let obs = this._helper.dataTransform(observations);
@@ -73,7 +74,7 @@ export class SeriesHelperService {
       if (obs) {
         // Use to format dates for table
         this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
-        const data = this._helper.dataTransform(obs, dateArray);
+        const data = this._helper.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = data.chartData;
         this.seriesData.seriesTableData = data.tableData;
       } else {

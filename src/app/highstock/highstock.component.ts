@@ -40,6 +40,7 @@ export class HighstockComponent implements OnChanges {
 
   drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency) {
     const level = chartData.level;
+    const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
     const yoy = chartData.yoy;
     const ytd = chartData.ytd;
@@ -173,7 +174,7 @@ export class HighstockComponent implements OnChanges {
       tooltip: {
         borderWidth: 0,
         shadow: false,
-        valueDecimals: 2,
+        valueDecimals: decimals,
         formatter: function () {
           const pseudo = 'Pseudo History ';
           let s = '<b>';

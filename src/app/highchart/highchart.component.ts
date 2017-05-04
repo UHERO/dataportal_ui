@@ -26,6 +26,7 @@ export class HighchartComponent implements OnInit {
     const level = this.seriesData.chartData.level;
     const pseudoZones = this.seriesData.chartData.pseudoZones;
     const ytd = this.seriesData.chartData.ytd;
+    const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
     let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
     const dataFreq = this.currentFreq;
@@ -34,11 +35,11 @@ export class HighchartComponent implements OnInit {
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort);
+      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort) {
+  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort, decimals) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -62,7 +63,7 @@ export class HighchartComponent implements OnInit {
         },
         shadow: false,
         borderWidth: 0,
-        valueDecimals: 2,
+        valueDecimals: decimals,
         shared: true,
         backgroundColor: 'transparent',
         formatter: function () {

@@ -221,10 +221,11 @@ export class CategoryHelperService {
       const seriesObsStart = res.seriesObservations.observationStart;
       const seriesObsEnd = res.seriesObservations.observationEnd;
       const levelData = res.seriesObservations.transformationResults[0].observations;
+      const decimals = res.decimals ? res.decimals : 1;
       // Add series if level data is available
       if (levelData) {
         seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations, seriesDates);
+        series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         series.seriesInfo = res;
         series.seriesInfo.saParam = res.seasonalAdjustment === 'seasonally_adjusted' ? true : false;
         filtered.push(series);
@@ -264,7 +265,8 @@ export class CategoryHelperService {
 
   formatCatTableData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
     displaySeries.forEach((series) => {
-      series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper);
+      const decimals = series.seriesInfo.decimals ? series.seriesInfo.decimals : 1;
+      series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, decimals);
     });
     const tableHeaderDates = [];
     const dateStart = dateWrapper.firstDate;
