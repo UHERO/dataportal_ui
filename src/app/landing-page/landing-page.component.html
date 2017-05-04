@@ -12,10 +12,10 @@
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
 			<div class="filters">
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="yoyIsActive" (change)="yoyActive($event)">YOY
+          <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">YOY
         </label>
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="ytdIsActive" (change)="ytdActive($event)">YTD
+          <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">YTD
         </label>
 				<label class="form-check-inline" *ngIf="data.currentFreq?.freq !== 'A'">
           <input type="checkbox" [checked]="nsaIsActive" (change)="nsaActive($event)">Include Not Seasonally Adjusted
@@ -29,7 +29,7 @@
         <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="nsaIsActive ? sub.nsaDatatables : sub.saDatatables" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [data]="nsaIsActive ? sub.displaySeries?.nsaSeries : sub.displaySeries?.saSeries" [dates]="nsaIsActive ? sub.nsaDateRange : sub.saDateRange" [yoyActive]="yoyIsActive" [ytdActive]="ytdIsActive" [noSeries]="sub.noData"></app-category-table>
+			<app-category-table *ngIf="routeView === 'table'" [data]="nsaIsActive ? sub.displaySeries?.nsaSeries : sub.displaySeries?.saSeries" [dates]="nsaIsActive ? sub.nsaDateRange : sub.saDateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData"></app-category-table>
       <app-category-charts *ngIf="routeView !== 'table'" [data]="nsaIsActive ? sub.displaySeries?.nsaSeries : sub.displaySeries?.saSeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData"></app-category-charts>
 		</ng-template>
 	</ng-template>

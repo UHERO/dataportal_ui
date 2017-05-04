@@ -19,14 +19,14 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private routeFreq: string;
   private routeSearch: string;
   private routeView: string;
+  private routeYoy;
+  private routeYtd;
   private queryParams: any = {};
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
   public currentFreq: Frequency;
   private categoryData;
-  private yoyIsActive = false;
-  private ytdIsActive = false;
   private nsaIsActive = false;
   private loading = false;
 
@@ -49,11 +49,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeFreq = params['freq'];
       this.routeSearch = params['search'];
       this.routeView = params['view'];
+      this.routeYoy = params['yoy'];
+      this.routeYtd = params['ytd'];
       if (this.id) { this.queryParams.id = this.id; };
       if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
+      if (this.routeYoy) {this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
+      if (this.routeYtd) {this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
 
       if (this.routeSearch) {
         if (this.routeGeo && this.routeFreq) {
@@ -85,37 +89,41 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq) {
-    const freq = currentFreq.freq;
-    const geoHandle = event.handle;
+    this.queryParams.freq = currentFreq.freq;
+    this.queryParams.geo = event.handle;
     if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     }
   }
 
   redrawSeriesFreq(event, currentGeo) {
-    const geoHandle = currentGeo.handle;
-    const freq = event.freq;
+    this.queryParams.geo = currentGeo.handle;
+    this.queryParams.freq = event.freq;
     if (this.routeSearch) {
-      this._router.navigate(['/category'], {queryParams: {search: this.routeSearch, view: this.routeView, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: this.routeView, geo: geoHandle, freq: freq} });
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     }
   }
 
   switchView() {
     if (this.routeView === 'table') {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'chart', geo: this.routeGeo, freq: this.routeFreq} });
+      this.queryParams.view = 'chart';
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     } else {
-      this._router.navigate(['/category'], {queryParams: {id: this.id, view: 'table', geo: this.routeGeo, freq: this.routeFreq} });
+      this.queryParams.view = 'table';
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
     }
   }
 
   yoyActive(e) {
     this.loading = true;
     setTimeout(() => {
-      this.yoyIsActive = e.target.checked;
+      this.routeYoy = e.target.checked;
+      this.queryParams.yoy = e.target.checked;
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
       this.loading = false;
     }, 10);
   }
@@ -123,11 +131,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ytdActive(e) {
     this.loading = true;
     setTimeout(() => {
-      this.ytdIsActive = e.target.checked;
+      this.routeYtd = e.target.checked;
+      this.queryParams.ytd = e.target.checked;
+      this._router.navigate(['/category'], { queryParams: this.queryParams });
       this.loading = false;
     }, 10);
   }
-
 
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {

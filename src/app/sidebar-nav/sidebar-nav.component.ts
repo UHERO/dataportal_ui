@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 
@@ -15,6 +15,9 @@ export class SidebarNavComponent implements OnInit, Input {
   private overlay = false;
   private selectedCategory: number;
   private id: number;
+  private view: string;
+  private yoy: string;
+  private ytd: string;
 
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute, private _router: Router) { }
 
@@ -24,6 +27,10 @@ export class SidebarNavComponent implements OnInit, Input {
       error => this.errorMessage = error);
 
     this.route.queryParams.subscribe((params) => {
+      console.log(params);
+      this.view = params['view'] ? params['view'] : 'chart';
+      this.yoy = params['yoy'] ? params['yoy'] : 'false';
+      this.ytd = params['ytd'] ? params['ytd'] : 'false';
       this.id = +params['id'];
       const search = params['search'];
       if (this.id) {
