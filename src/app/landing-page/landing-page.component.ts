@@ -27,7 +27,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentGeo: Geography;
   public currentFreq: Frequency;
   private categoryData;
-  private nsaIsActive = false;
   private loading = false;
 
   constructor(
@@ -77,14 +76,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
-
-  nsaActive(e) {
-    this.loading = true;
-    setTimeout(() => {
-      this.nsaIsActive = e.target.checked;
-      this.loading = false;
-    }, 10);
   }
 
   // Redraw series when a new region is selected

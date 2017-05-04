@@ -8,7 +8,6 @@ import { CategoryData } from './category-data';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { DateWrapper } from './date-wrapper';
-import { CategoryDateWrapper } from './category-date-wrapper';
 import { DisplaySeries } from './display-series';
 
 @Injectable()
@@ -76,7 +75,7 @@ export class CategoryHelperService {
         () => {
           if (index === sublist.length - 1) {
             sublist.forEach((subcat) => {
-              const dateWrapper: CategoryDateWrapper = { saDateWrapper: <DateWrapper>{}, nsaDateWrapper: <DateWrapper>{} };
+              const dateWrapper = <DateWrapper>{};
               const selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
               const selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
               let freqs, regions, currentGeo, currentFreq;
@@ -112,24 +111,21 @@ export class CategoryHelperService {
         if (expandedResults) {
           // Get array of all series that have level data available
           const categorySeries = this.filterSeriesResults(expandedResults, currentFreq.freq);
-          const splitSeries = this.splitSaSeries(categorySeries, dateWrapper, currentFreq.freq);
-          sublist.saDateRange = splitSeries.saCatTable.tableDates;
-          sublist.saDatatables = splitSeries.saCatTable.datatables;
-          sublist.nsaDateRange = splitSeries.nsaCatTable.tableDates;
-          sublist.nsaDatatables = splitSeries.nsaCatTable.datatables;
+          const splitSeries = this.getDisplaySeries(categorySeries, dateWrapper, currentFreq.freq);
+          sublist.dateRange = splitSeries.catTable.tableDates;
+          sublist.datatables = splitSeries.catTable.datatables;
           sublist.displaySeries = splitSeries.displaySeries;
+          sublist.allSeries = categorySeries;
           sublist.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
           sublist.dateWrapper = splitSeries.dateWrapper;
           sublist.noData = false;
         } else {
           // No series exist for a subcateogry
           const series = [{ seriesInfo: 'No data available' }];
-          sublist.dateWrapper = {saDateWrapper: '', nsaDateWrapper: ''};
-          sublist.saDateRange = [];
-          sublist.saDatatables = {};
-          sublist.nsaDateRange = [];
-          sublist.nsaDatatables = {};
-          sublist.displaySeries = {nsaSeries: series, saSeries: series};
+          sublist.dateWrapper = <DateWrapper>{};
+          sublist.dateRange = [];
+          sublist.datatables = {};
+          sublist.displaySeries = series;
           sublist.noData = true;
         }
       });
@@ -154,7 +150,7 @@ export class CategoryHelperService {
         },
         () => {
           if (obsEnd && obsStart) {
-            const dateWrapper: CategoryDateWrapper = { saDateWrapper: <DateWrapper>{}, nsaDateWrapper: <DateWrapper>{} };
+            const dateWrapper = <DateWrapper>{};
             this.searchSettings(search, dateWrapper, geoFreqs, freqGeos, routeGeo, routeFreq);
             this.categoryData[search + routeGeo + routeFreq].selectedCategory = 'Search: ' + search;
           } else {
@@ -165,7 +161,7 @@ export class CategoryHelperService {
     }
   }
 
-  searchSettings(search: string, dateWrapper: CategoryDateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
+  searchSettings(search: string, dateWrapper: DateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
     const dateArray = [];
     const selectedFreq = routeFreq ? routeFreq : this.defaults.freq.freq;
     const selectedGeo = routeGeo ? routeGeo : this.defaults.geo.handle;
@@ -191,8 +187,7 @@ export class CategoryHelperService {
     this.getSearchData(search, currentGeo.handle, currentFreq.freq, dateWrapper, routeGeo, routeFreq);
   }
 
-  getSearchData(search: string, geo: string, freq: string, dateWrapper: CategoryDateWrapper, routeGeo?: string, routeFreq?: string) {
-    const saDateArray = [], nsaDateArray = [];
+  getSearchData(search: string, geo: string, freq: string, dateWrapper: DateWrapper, routeGeo?: string, routeFreq?: string) {
     let searchResults;
     // Get expanded search results for a selected region & frequency
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
@@ -205,14 +200,12 @@ export class CategoryHelperService {
         if (searchResults) {
           // Get array of all series that have level data available
           const searchSeries = this.filterSeriesResults(searchResults, freq);
-          const splitSeries = this.splitSaSeries(searchSeries, dateWrapper, freq);
+          const splitSeries = this.getDisplaySeries(searchSeries, dateWrapper, freq);
           const sublist = {
             name: search,
             dateWrapper: splitSeries.dateWrapper,
-            saDateRange: splitSeries.saCatTable.tableDates,
-            saDatatables: splitSeries.saCatTable.datatables,
-            nsaDateRange: splitSeries.nsaCatTable.tableDates,
-            nsaDatatables: splitSeries.nsaCatTable.datatables,
+            dateRange: splitSeries.catTable.tableDates,
+            datatables: splitSeries.catTable.datatables,
             hasSeaonsallyAdjusted: splitSeries.hasSeasonallyAdjusted,
             displaySeries: splitSeries.displaySeries
           };
@@ -245,49 +238,28 @@ export class CategoryHelperService {
     return saSeries ? true : false;
   }
 
-  splitSaSeries(allSeries, dateWrapper: CategoryDateWrapper, freq) {
-    const saDateArray = [];
-    const nsaDateArray = [];
+  getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq) {
+    const dateArray = [];
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data
     const hasSeasonallyAdjusted = this.checkSA(allSeries);
+    const displaySeries = [];
+    allSeries.forEach((series) => {
+      if (series.seriesInfo.seasonalAdjustment !== 'not_seasonally_adjusted' || hasSeasonallyAdjusted === false) {
+        // only include series with seasonal adjustment or where seasonality is not applicable
+        displaySeries.push(series);
+      }
+    });
+    this._helper.setDateWrapper(displaySeries, dateWrapper);
+    this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
+    const catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
 
-    // Group series by seasonality for category chart and table displays (landing-page and category-table components):
-    //   (1) Seasonally Adjusted (SA) and Not Applicable (NA) (2) Not SA (NSA), SA, NA
-    // If a category does not have any SA data (i.e. hasSeasonallyAdjusted === false), display all the series in the category
-    const displaySeries = <DisplaySeries>{};
-    displaySeries.saSeries = [];
-    displaySeries.nsaSeries = [];
-    this.seriesToDisplay(allSeries, hasSeasonallyAdjusted, displaySeries);
-
-    // Group (1)
-    this._helper.setDateWrapper(displaySeries.saSeries, dateWrapper.saDateWrapper);
-    this._helper.calculateDateArray(dateWrapper.saDateWrapper.firstDate, dateWrapper.saDateWrapper.endDate, freq, saDateArray);
-    const saCatTable = this.formatCatTableData(displaySeries.saSeries, saDateArray, dateWrapper.saDateWrapper);
-
-    // Group (2)
-    this._helper.setDateWrapper(displaySeries.nsaSeries, dateWrapper.nsaDateWrapper);
-    this._helper.calculateDateArray(dateWrapper.nsaDateWrapper.firstDate, dateWrapper.nsaDateWrapper.endDate, freq, nsaDateArray);
-    const nsaCatTable = this.formatCatTableData(displaySeries.nsaSeries, nsaDateArray, dateWrapper.nsaDateWrapper);
     return {
       displaySeries: displaySeries,
       dateWrapper: dateWrapper,
-      saCatTable: saCatTable,
-      nsaCatTable: nsaCatTable,
+      catTable: catTable,
       hasSeasonallyAdjusted: hasSeasonallyAdjusted
     };
-  }
-
-  seriesToDisplay(seriesList: Array<any>, hasSa: boolean, displaySeries: DisplaySeries) {
-    seriesList.forEach((series) => {
-      // All series included in nsaSeries
-      displaySeries.nsaSeries.push(Object.assign({}, series));
-      if (series.seriesInfo.seasonalAdjustment !== 'not_seasonally_adjusted' || hasSa === false) {
-        // SA series only include series with seasonal adjustment or where seasonality is not applicable
-        // Equals the nsaSeries if a category does not have any seasonal series
-        displaySeries.saSeries.push(Object.assign({}, series));
-      }
-    });
   }
 
   formatCatTableData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
