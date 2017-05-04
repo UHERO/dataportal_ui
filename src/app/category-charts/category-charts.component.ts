@@ -12,6 +12,7 @@ export class CategoryChartsComponent implements OnInit {
   @Input() nsaActive;
   @Input() yoyActive;
   @Input() ytdActive;
+  @Input() params;
 
   constructor() { }
 

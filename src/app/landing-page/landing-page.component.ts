@@ -80,26 +80,45 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq) {
-    this.queryParams.freq = currentFreq.freq;
-    this.queryParams.geo = event.handle;
-    if (this.routeSearch) {
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
-    } else {
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
-    }
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.freq = currentFreq.freq;
+      this.queryParams.geo = event.handle;
+      if (this.routeSearch) {
+        delete this.queryParams.id;
+      } else {
+        delete this.queryParams.search;
+      }
+      if (this.routeSearch) {
+        this._router.navigate(['/category'], { queryParams: this.queryParams });
+      } else {
+        this._router.navigate(['/category'], { queryParams: this.queryParams });
+      }
+      this.loading = false;
+    }, 10);
   }
 
   redrawSeriesFreq(event, currentGeo) {
-    this.queryParams.geo = currentGeo.handle;
-    this.queryParams.freq = event.freq;
-    if (this.routeSearch) {
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.geo = currentGeo.handle;
+      this.queryParams.freq = event.freq;
+      if (this.routeSearch) {
+        delete this.queryParams.id;
+      } else {
+        delete this.queryParams.search;
+      }
       this._router.navigate(['/category'], { queryParams: this.queryParams });
-    } else {
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
-    }
+      this.loading = false;
+    }, 10);
   }
 
   switchView() {
+    if (this.routeSearch) {
+      delete this.queryParams.id;
+    } else {
+      delete this.queryParams.search;
+    }
     if (this.routeView === 'table') {
       this.queryParams.view = 'chart';
       this._router.navigate(['/category'], { queryParams: this.queryParams });

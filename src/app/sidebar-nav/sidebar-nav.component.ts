@@ -27,7 +27,6 @@ export class SidebarNavComponent implements OnInit, Input {
       error => this.errorMessage = error);
 
     this.route.queryParams.subscribe((params) => {
-      console.log(params);
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
       this.ytd = params['ytd'] ? params['ytd'] : 'false';

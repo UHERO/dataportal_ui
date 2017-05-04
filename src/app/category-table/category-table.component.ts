@@ -21,9 +21,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @Input() data;
   @Input() dates;
   @Input() noSeries;
-  @Input() nsaActive;
   @Input() yoyActive;
   @Input() ytdActive;
+  @Input() params;
 
   // Check if seasonally adjusted data is displayed, default to true
   private userEvent = false;

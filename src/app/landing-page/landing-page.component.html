@@ -12,10 +12,10 @@
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
 			<div class="filters">
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">YOY
+          <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year Over Year
         </label>
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">YTD
+          <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year To Date
         </label>
 				<app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)"
 					class="selector"></app-geo-selector>
@@ -26,8 +26,8 @@
         <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="sub.datatables" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData"></app-category-table>
-      <app-category-charts *ngIf="routeView !== 'table'" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData"></app-category-charts>
+			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+      <app-category-charts *ngIf="routeView !== 'table'" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>

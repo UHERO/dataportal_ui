@@ -74,11 +74,11 @@ export class HelperService {
       const seriesDate = data.date;
       const tableEntry = table.find(date => date.date === seriesDate);
       tableEntry.value = data.value;
-      tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, 2);
+      tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, 1);
       tableEntry.yoy = data.yoyValue;
-      tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, 2);
+      tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, 1);
       tableEntry.ytd = data.ytdValue;
-      tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, 2);
+      tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, 1);
     });
     return table;
   }
@@ -111,9 +111,9 @@ export class HelperService {
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
       if (tableObs) {
-        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, 2);
-        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, 2);
-        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, 2);
+        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, 1);
+        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, 1);
+        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, 1);
       }
     });
     let tableStart, tableEnd;
