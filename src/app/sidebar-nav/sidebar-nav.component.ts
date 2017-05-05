@@ -49,7 +49,7 @@ export class SidebarNavComponent implements OnInit, Input {
     setTimeout(() => {
       this._router.navigate(['/category'], { queryParams: { id: catId }, queryParamsHandling: 'merge' });
       this.loading = false;
-    }, 20);
+    }, 15);
   }
 
   mobileMenuToggle(): void {
