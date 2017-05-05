@@ -6,7 +6,8 @@
 		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
 			<ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
 				<li *ngFor="let sub of data.sublist; let subInd='index'">
-					<a [routerLink]="['/category']" [fragment]="sub.id" [queryParams]="queryParams"(click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
+					{{sub}}
+					<a [routerLink]="['/category']" [fragment]="sub.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
 				</li>
 			</ul>
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">

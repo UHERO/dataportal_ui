@@ -50,7 +50,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeView = params['view'];
       this.routeYoy = params['yoy'];
       this.routeYtd = params['ytd'];
-      if (this.id) { this.queryParams.id = this.id; };
+      if (this.id) {
+        this.queryParams.id = this.id;
+      };
       if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
@@ -69,6 +71,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
           this.categoryData = this._catHelper.initContent(this.id, this.routeGeo, this.routeFreq);
         } else {
           this.categoryData = this._catHelper.initContent(this.id);
+          console.log(this.categoryData)
         }
       }
     });
@@ -150,6 +153,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {
+      console.log(frag)
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) {
         el.scrollIntoView(el);

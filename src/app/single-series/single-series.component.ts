@@ -38,6 +38,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
+      console.log(params)
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
@@ -64,7 +65,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     if (id) {
-      this._router.navigate(['/series/'], {queryParams: {'id': id, 'sa': this.seasonallyAdjusted}});
+      this._router.navigate(['/series/'], {queryParams: {'id': id, 'sa': this.seasonallyAdjusted }, queryParamsHandling: 'merge'});
     } else {
       this.noSelection = 'Selection Not Available';
     }

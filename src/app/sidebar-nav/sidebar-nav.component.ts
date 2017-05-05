@@ -27,10 +27,10 @@ export class SidebarNavComponent implements OnInit, Input {
       error => this.errorMessage = error);
 
     this.route.queryParams.subscribe((params) => {
+      this.id = +params['id'];
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
-      this.id = +params['id'];
       const search = params['search'];
       if (this.id) {
         this.selectedCategory = this.id;
@@ -48,7 +48,7 @@ export class SidebarNavComponent implements OnInit, Input {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], { queryParams: {search: event}} );
+    this._router.navigate(['/category/search'], { queryParams: { search: event } } );
   }
 
 }

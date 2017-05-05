@@ -14,6 +14,6 @@ export class HeaderComponent implements OnInit {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], { queryParams: {search: event} });
+    this._router.navigate(['/category/search'], { queryParams: { search: event } });
   }
 }

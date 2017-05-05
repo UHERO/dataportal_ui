@@ -45,7 +45,7 @@ export class RouterStub {
 }
 
 @Injectable()
-export class ActivatedRouteStub implements ActivatedRoute {
+export class ActivatedRouteStub {
     snapshot: ActivatedRouteSnapshot;
     url: Observable<UrlSegment[]>;
     params: Observable<Params>;
