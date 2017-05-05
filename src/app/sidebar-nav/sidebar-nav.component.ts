@@ -18,6 +18,7 @@ export class SidebarNavComponent implements OnInit, Input {
   private view: string;
   private yoy: string;
   private ytd: string;
+  private loading;
 
   constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute, private _router: Router) { }
 
@@ -40,6 +41,15 @@ export class SidebarNavComponent implements OnInit, Input {
         this.selectedCategory = 42;
       }
     });
+  }
+
+  navigate(catId) {
+    this.loading = true;
+    this.selectedCategory = catId;
+    setTimeout(() => {
+      this._router.navigate(['/category'], { queryParams: { id: catId }, queryParamsHandling: 'merge' });
+      this.loading = false;
+    }, 20);
   }
 
   mobileMenuToggle(): void {

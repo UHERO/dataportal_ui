@@ -76,8 +76,14 @@ export class CategoryHelperService {
           if (index === sublist.length - 1) {
             sublist.forEach((subcat) => {
               const dateWrapper = <DateWrapper>{};
-              const selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-              const selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+              let selectedFreq, selectedGeo;
+              selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+              selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+              if (routeFreq || routeGeo) {
+                const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
+                selectedFreq = selected.freq;
+                selectedGeo = selected.geo;
+              }
               let freqs, regions, currentGeo, currentFreq;
               // Get frequencies available for a selected region
               freqs = geoArray.find(geo => geo.handle === selectedGeo).freqs;
@@ -163,8 +169,14 @@ export class CategoryHelperService {
 
   searchSettings(search: string, dateWrapper: DateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
     const dateArray = [];
-    const selectedFreq = routeFreq ? routeFreq : this.defaults.freq.freq;
-    const selectedGeo = routeGeo ? routeGeo : this.defaults.geo.handle;
+    let selectedFreq, selectedGeo;
+    selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
+    selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoFreqs[0].handle;
+    if (routeFreq || routeGeo) {
+      const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
+      selectedFreq = selected.freq;
+      selectedGeo = selected.geo;
+    }
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
     regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
@@ -212,6 +224,19 @@ export class CategoryHelperService {
           this.categoryData[search + routeGeo + routeFreq].sublist = [sublist];
         };
       });
+  }
+
+  checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray) {
+    // Check if freq/geo specified in route exists in a category's list of freqs/geos
+    const freqExist = freqArray.find(freq => freq.freq === routeFreq);
+    const geoExist = geoArray.find(geo => geo.handle === routeGeo);
+    // If either does not exist, set selected freq & geo to the category's default
+    // or first element of freq/geo arrays if default is not specified
+    if (!freqExist || !geoExist) {
+      return { freq: this.defaultFreq ? this.defaultFreq : freqArray[0].freq, geo: this.defaultGeo ? this.defaultGeo : geoArray[0].handle };
+    } else {
+      return { freq: routeFreq, geo: routeGeo };
+    }
   }
 
   filterSeriesResults(results: Array<any>, freq: string) {

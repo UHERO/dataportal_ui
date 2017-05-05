@@ -111,9 +111,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   switchView() {
-    this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
+      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
+      this.loading = false;
+    });
   }
 
   yoyActive(e) {
@@ -138,7 +142,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   scrollTo(): void {
     this.route.fragment.subscribe(frag => {
-      console.log(frag)
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) {
         el.scrollIntoView(el);
