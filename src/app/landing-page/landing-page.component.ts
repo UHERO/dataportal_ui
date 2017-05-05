@@ -17,10 +17,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private id: number;
   private routeGeo: string;
   private routeFreq: string;
-  private routeSearch: string;
   private routeView: string;
   private routeYoy;
   private routeYtd;
+  private search = false;
   private queryParams: any = {};
 
   // Variables for geo and freq selectors
@@ -34,44 +34,50 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     private _catHelper: CategoryHelperService,
     private route: ActivatedRoute,
     private _router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.currentGeo = {fips: null, name: null, handle: null};
-    this.currentFreq = {freq: null, label: null};
+    this.currentGeo = { fips: null, name: null, handle: null };
+    this.currentFreq = { freq: null, label: null };
   }
 
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
-      this.id = +params['id'] || 42;
+      if (!params['id'] || params['id'] === undefined) {
+        this.id = 42;
+      } else {
+        if (isNaN(+params['id'])) {
+          this.id = params['id'];
+          this.search = true;
+        }
+        if (+params['id']) {
+          this.id = +params['id'];
+          this.search = false;
+        }
+      }
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
-      this.routeSearch = params['search'];
       this.routeView = params['view'];
       this.routeYoy = params['yoy'];
       this.routeYtd = params['ytd'];
-      if (this.id) {
-        this.queryParams.id = this.id;
-      };
-      if (this.routeSearch) { this.queryParams.search = this.routeSearch; delete this.queryParams.id; };
+      if (this.id) { this.queryParams.id = this.id; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
-      if (this.routeYoy) {this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
-      if (this.routeYtd) {this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
+      if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
+      if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
 
-      if (this.routeSearch) {
+      if (typeof this.id === 'string') {
         if (this.routeGeo && this.routeFreq) {
-          this.categoryData = this._catHelper.initSearch(this.routeSearch, this.routeGeo, this.routeFreq);
+          this.categoryData = this._catHelper.initSearch(this.id, this.routeGeo, this.routeFreq);
         } else {
-          this.categoryData = this._catHelper.initSearch(this.routeSearch);
+          this.categoryData = this._catHelper.initSearch(this.id);
         }
       } else {
         if (this.routeGeo && this.routeFreq) {
           this.categoryData = this._catHelper.initContent(this.id, this.routeGeo, this.routeFreq);
         } else {
           this.categoryData = this._catHelper.initContent(this.id);
-          console.log(this.categoryData)
         }
       }
     });
@@ -85,18 +91,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   redrawSeriesGeo(event, currentFreq) {
     this.loading = true;
     setTimeout(() => {
-      this.queryParams.freq = currentFreq.freq;
+      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
       this.queryParams.geo = event.handle;
-      if (this.routeSearch) {
-        delete this.queryParams.id;
-      } else {
-        delete this.queryParams.search;
-      }
-      if (this.routeSearch) {
-        this._router.navigate(['/category'], { queryParams: this.queryParams });
-      } else {
-        this._router.navigate(['/category'], { queryParams: this.queryParams });
-      }
+      this.queryParams.freq = currentFreq.freq;
+      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 10);
   }
@@ -104,39 +102,26 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   redrawSeriesFreq(event, currentGeo) {
     this.loading = true;
     setTimeout(() => {
+      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
-      if (this.routeSearch) {
-        delete this.queryParams.id;
-      } else {
-        delete this.queryParams.search;
-      }
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
+      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 10);
   }
 
   switchView() {
-    if (this.routeSearch) {
-      delete this.queryParams.id;
-    } else {
-      delete this.queryParams.search;
-    }
-    if (this.routeView === 'table') {
-      this.queryParams.view = 'chart';
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
-    } else {
-      this.queryParams.view = 'table';
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
-    }
+    this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
+    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
   }
 
   yoyActive(e) {
     this.loading = true;
     setTimeout(() => {
-      this.routeYoy = e.target.checked;
       this.queryParams.yoy = e.target.checked;
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
+      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 10);
   }
@@ -144,9 +129,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ytdActive(e) {
     this.loading = true;
     setTimeout(() => {
-      this.routeYtd = e.target.checked;
       this.queryParams.ytd = e.target.checked;
-      this._router.navigate(['/category'], { queryParams: this.queryParams });
+      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 10);
   }
