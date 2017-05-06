@@ -23,23 +23,23 @@ export class HighchartComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    let level = this.seriesData.chartData.level;
-    let pseudoZones = this.seriesData.chartData.pseudoZones;
-    let ytd = this.seriesData.chartData.ytd;
+    const level = this.seriesData.chartData.level;
+    const pseudoZones = this.seriesData.chartData.pseudoZones;
+    const ytd = this.seriesData.chartData.ytd;
+    const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
     let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
-    let dataFreq = this.currentFreq.freq;
-    //this.SA = this.seriesData.seriesInfo.seasonallyAdjusted === true ? true : false;
+    const dataFreq = this.currentFreq;
     this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
-    let unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
+    const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort);
+      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort) {
+  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort, decimals) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -63,11 +63,11 @@ export class HighchartComponent implements OnInit {
         },
         shadow: false,
         borderWidth: 0,
-        valueDecimals: 2,
+        valueDecimals: decimals,
         shared: true,
         backgroundColor: 'transparent',
         formatter: function () {
-          let pseudo = 'Pseudo History ';
+          const pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
             s = s + 'Q1 ';
@@ -85,7 +85,7 @@ export class HighchartComponent implements OnInit {
             s = s + Highcharts.dateFormat('%b', this.x) + ' ';
           };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
-          this.points.forEach((point, index) => {
+          this.points.forEach((point) => {
             let label = '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
@@ -182,16 +182,6 @@ export class HighchartComponent implements OnInit {
       }],
     };
   }
-  
-  saLabel(chart, SA) {
-    if (SA) {
-      chart.renderer.label('<span class="badge badge-pill" style="font-size: 100%; background-color: #1D667F">SA</span>', 160, 170, null, null, null, true)
-        .css({
-          size: '16px'
-        })
-        .add();
-    }
-  }
 
   noDataChart(title) {
     this.options = {
@@ -242,10 +232,10 @@ export class HighchartComponent implements OnInit {
 
   render(event) {
     this.chart = event;
-    let level = this.chart.series[0];
-    let ytd = this.chart.series[1];
-    let latestLevel = (level !== undefined) ? level.points.length - 1 : null;
-    let latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+    const level = this.chart.series[0];
+    const ytd = this.chart.series[1];
+    const latestLevel = (level !== undefined) ? level.points.length - 1 : null;
+    const latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
@@ -260,8 +250,5 @@ export class HighchartComponent implements OnInit {
     if (latestLevel > 0 && latestYtd > 0) {
       this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
     }
-
-    // Display pill tag to indicate if series is seasonally adjusted
-    //this.saLabel(this.chart, this.SA);
   }
 }

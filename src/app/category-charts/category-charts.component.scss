@@ -1,0 +1,22 @@
+  .multi-charts-row {
+    display: block;
+    margin-bottom: 40px;
+  }
+
+  .no-data {
+    margin-top: 10px;
+  }
+
+  .multi-charts {
+    display: inline-block;
+    padding: 0 3px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    margin: 10px 10px 10px 3px;
+    background: #F7F7F7;
+
+    a:hover {
+      text-decoration: none;
+    }
+  }

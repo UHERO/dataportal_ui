@@ -8,7 +8,14 @@ import { DebugElement, Component } from '@angular/core';
 import { SidebarNavComponent } from './sidebar-nav.component';
 import { UheroApiService } from '../uhero-api.service';
 import { MockApiService } from '../../testing/mockapi-service';
-import { ActivatedRoute, ActivatedRouteStub, Router, RouterStub, QueryParamsStubDirective, RouterLinkStubDirective } from '../../testing/router-stubs';
+import {
+  ActivatedRoute,
+  ActivatedRouteStub,
+  Router,
+  RouterStub,
+  QueryParamsStubDirective,
+  RouterLinkStubDirective
+} from '../../testing/router-stubs';
 import { addMatchers, newEvent } from '../../testing/helpers';
 import { Observable } from 'rxjs/Observable';
 
@@ -41,7 +48,7 @@ describe('SidebarNavComponent', () => {
   it('1st category should match 1st test category', () => {
     const expectedCategory = page.categoryRows[0].textContent;
     expect(expectedCategory).toContain('Test Category', 'category name');
-  });  
+  });
 });
 
 function createComponent() {

@@ -34,21 +34,22 @@ export class FeedbackComponent implements OnInit {
 
   onSubmit() {
     this.hideAlert = false;
-    let headers = new Headers();
+    const headers = new Headers();
     headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
-    let requestOptionsArgs = { headers: headers };
-    let feedback = { data: { name: '', email: '', feedback: '' }, 'g-recaptcha-response': '' };
+    const requestOptionsArgs = { headers: headers };
+    const feedback = { data: { name: '', email: '', feedback: '' }, 'g-recaptcha-response': '' };
     feedback.data.name = this.feedbackForm.value.name;
     feedback.data.email = this.feedbackForm.value.email;
     feedback.data.feedback = this.feedbackForm.value.feedback;
     feedback['g-recaptcha-response'] = this.feedbackForm.value.captcha;
-    return this.http.post('http://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs).map((res: Response) => res.json())
+    return this.http.post('http://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs)
+      .map((res: Response) => res.json())
       .subscribe(
       data => this.successMsg = 'Submission successful.',
       error => this.errorMsg = 'Something went wrong. Try again.',
       () => {
         setTimeout(() => {
-          this.hideAlert = true
+          this.hideAlert = true;
         }, 3000);
       });
   }

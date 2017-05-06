@@ -5,7 +5,7 @@ import { HighstockComponent } from './highstock.component';
 
 describe('Component: Highstock', () => {
   it('should create an instance', () => {
-    let component = new HighstockComponent();
+    const component = new HighstockComponent();
     expect(component).toBeTruthy();
   });
 });

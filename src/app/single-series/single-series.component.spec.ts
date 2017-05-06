@@ -28,7 +28,14 @@ describe('SingleSeriesComponent', () => {
   }));
 
   describe('when navigating to a series, it should display single series component', () => {
-    let selectedSeries = [{ 'id': 140000, 'name': 'T@ES.T', 'title': 'Test Series Title', 'frequency': 'year', 'unitsLabel': '', 'unitsLabelShort': '%' }];
+    const selectedSeries = [{
+      'id': 140000,
+      'name': 'T@ES.T',
+      'title': 'Test Series Title',
+      'frequency': 'year',
+      'unitsLabel': '',
+      'unitsLabelShort': '%'
+    }];
 
     beforeEach(async(() => {
       activatedRoute.testParams = { id: selectedSeries['id'] };

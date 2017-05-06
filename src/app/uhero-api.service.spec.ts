@@ -63,8 +63,8 @@ describe('Service: UheroApi', () => {
     beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
       backend = be;
       service = new UheroApiService(http);
-      let mockCategories = mockCategoryData();
-      let options = new ResponseOptions({status: 200, body: { data: mockCategories}});
+      const mockCategories = mockCategoryData();
+      const options = new ResponseOptions({status: 200, body: { data: mockCategories}});
       response = new Response(options);
     }));
 
@@ -78,7 +78,7 @@ describe('Service: UheroApi', () => {
     })));
 
     it('should be OK returning no categories', async(inject([], () => {
-      let resp = new Response(new ResponseOptions({status: 200, body: {data: []}}));
+      const resp = new Response(new ResponseOptions({status: 200, body: {data: []}}));
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(resp));
 
       service.fetchCategories()
@@ -92,8 +92,8 @@ describe('Service: UheroApi', () => {
     beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
       backend = be;
       service = new UheroApiService(http);
-      let mockSeries = mockSeriesData();
-      let options = new ResponseOptions({status: 200, body: { data: mockSeries}});
+      const mockSeries = mockSeriesData();
+      const options = new ResponseOptions({status: 200, body: { data: mockSeries}});
       response = new Response(options);
     }));
 
@@ -111,8 +111,8 @@ describe('Service: UheroApi', () => {
     beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
       backend = be;
       service = new UheroApiService(http);
-      let mockObservations = mockObservationData();
-      let options = new ResponseOptions({status: 200, body: { data: mockObservations}});
+      const mockObservations = mockObservationData();
+      const options = new ResponseOptions({status: 200, body: { data: mockObservations}});
       response = new Response(options);
     }));
 

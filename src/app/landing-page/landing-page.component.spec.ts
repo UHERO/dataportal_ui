@@ -33,7 +33,7 @@ describe('LandingPageComponent', () => {
   }));
 
   describe('when navigating to a category, it should display series charts', () => {
-    let selectedCategory = [{ 'children': { 'id': 8, 'name': 'Test Subcategory', 'parentId': 4 }, 'id': 4, 'name': 'Test Category' }];
+    const selectedCategory = [{ 'children': { 'id': 8, 'name': 'Test Subcategory', 'parentId': 4 }, 'id': 4, 'name': 'Test Category' }];
 
     beforeEach(async(() => {
       activatedRoute.testParams = { id: selectedCategory['children']['id'] };

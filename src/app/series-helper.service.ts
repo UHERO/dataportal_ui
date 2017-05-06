@@ -17,7 +17,7 @@ export class SeriesHelperService {
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   getSeriesData(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
-    let currentFreq, currentGeo;
+    let currentFreq, currentGeo, decimals;
     this.seriesData = {
       seriesDetail: {},
       change: '',
@@ -34,8 +34,9 @@ export class SeriesHelperService {
     };
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesData.seriesDetail = series;
-      let freqGeos = series.freqGeos;
-      let geoFreqs = series.geoFreqs;
+      const freqGeos = series.freqGeos;
+      const geoFreqs = series.geoFreqs;
+      decimals = series.decimals ? series.decimals : 1;
       currentGeo = series.geography;
       currentFreq = {freq: series.frequencyShort, label: series.frequency};
       this.seriesData.currentGeo = currentGeo;
@@ -52,39 +53,39 @@ export class SeriesHelperService {
     () => {
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesData.siblings = siblings;
-        let geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
+        const geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
         // If saPairAvail === true, display SA toggle in single series view
         if (geoFreqPair.length > 1) {
           this.seriesData.saPairAvail = true;
         }
       });
-      this.getSeriesObservations(id);
+      this.getSeriesObservations(id, decimals);
     });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
-  getSeriesObservations(id: number) {
-    let dateArray = [];
+  getSeriesObservations(id: number, decimals: number) {
+    const dateArray = [];
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
       // let obs = this._helper.dataTransform(observations);
-      let obs = observations;
-      let obsStart = obs.observationStart;
-      let obsEnd = obs.observationEnd;
+      const obs = observations;
+      const obsStart = obs.observationStart;
+      const obsEnd = obs.observationEnd;
       if (obs) {
         // Use to format dates for table
         this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
-        let data = this._helper.dataTransform(obs, dateArray);
+        const data = this._helper.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = data.chartData;
-        this.seriesData.seriesTableData = data.tableData; 
+        this.seriesData.seriesTableData = data.tableData;
       } else {
-        this.seriesData.noData = 'Data not available'
+        this.seriesData.noData = 'Data not available';
       }
     });
   }
 
   // Find series siblings for a particular geo-frequency combination
   findGeoFreqSibling(seriesSiblings, geo, freq) {
-    let saSiblings = [];
+    const saSiblings = [];
     seriesSiblings.forEach((sibling) => {
       if (geo === sibling.geography.handle && freq === sibling.frequencyShort) {
         saSiblings.push(sibling);
@@ -96,8 +97,26 @@ export class SeriesHelperService {
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
   summaryStats(seriesData, freq) {
-    let stats = { minValue: Infinity, minValueDate: '', maxValue: Infinity, maxValueDate: '', tableStartValue: Infinity, tableEndValue: Infinity, percChange: Infinity, levelChange: Infinity };
-    let formatStats = { minValue: '', minValueDate: '', maxValue: '', maxValueDate: '', percChange: '', levelChange: '', selectedStart: '', selectedEnd: '' };
+    const stats = {
+      minValue: Infinity,
+      minValueDate: '',
+      maxValue: Infinity,
+      maxValueDate: '',
+      tableStartValue: Infinity,
+      tableEndValue: Infinity,
+      percChange: Infinity,
+      levelChange: Infinity
+    };
+    const formatStats = {
+      minValue: '',
+      minValueDate: '',
+      maxValue: '',
+      maxValueDate: '',
+      percChange: '',
+      levelChange: '',
+      selectedStart: '',
+      selectedEnd: ''
+    };
     // Find first non-empty value as the table end value
     for (let i = 0; i < seriesData.length; i++) {
       if (stats.tableEndValue === Infinity && seriesData[i].value !== ' ') {
@@ -131,7 +150,7 @@ export class SeriesHelperService {
     formatStats.maxValue = this._helper.formatNum(stats.maxValue, 2);
     formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
     formatStats.percChange = this._helper.formatNum(stats.percChange, 2);
-    formatStats.levelChange = this._helper.formatNum(stats.levelChange, 2)
+    formatStats.levelChange = this._helper.formatNum(stats.levelChange, 2);
     formatStats.selectedStart = this._helper.formatDate(seriesData[0].date, freq.freq);
     formatStats.selectedEnd = this._helper.formatDate(seriesData[seriesData.length - 1].date, freq);
     return formatStats;

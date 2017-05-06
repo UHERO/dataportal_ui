@@ -1,19 +1,24 @@
 .multi-series-container {
   vertical-align: top;
-  display: inline-block;
+  // display: inline-block;
   min-height: 100%;
   overflow: auto;
 
-  .chart-filters {
-    display: block;
+  .filters {
+    display: inline-block;
+    color: #505050;
+    margin-bottom: 5px;
+    margin-right: 10px;
 
-    .sa-toggle {
-      font-size: 0.9em;
+    .form-check-inline {
+      padding-left: 0;
       vertical-align: middle;
+      font-size: 0.9em;
       margin-bottom: 0;
 
       input {
-        margin-right: 5px;
+        margin-right: 0.25rem;
+        margin-left: 0rem;
         vertical-align: middle;
       }
     }
@@ -39,7 +44,6 @@
 
     li {
       display: inline-block;
-      margin-right: 5px;
 
        a {
          text-decoration: none;
@@ -149,6 +153,7 @@
     font-size: 0.9em;
     color: #1D667F;
     vertical-align: middle;
+    cursor: pointer;
 
     @media(max-width: 767px) {
       display: none;

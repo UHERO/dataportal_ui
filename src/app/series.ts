@@ -20,5 +20,6 @@ export interface Series {
   sourceDetails?: string;
   sourceLink?: string;
   percent: boolean;
+  decimals?: number;
   real: boolean;
 }
