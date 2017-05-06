@@ -58,7 +58,7 @@ export class SidebarNavComponent implements OnInit, Input {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], { queryParams: { search: event }, queryParamsHandling: 'merge' } );
+    this._router.navigate(['/category/search'], { queryParams: { id: event }, queryParamsHandling: 'merge' } );
   }
 
 }
