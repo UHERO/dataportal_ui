@@ -44,6 +44,11 @@ export class SidebarNavComponent implements OnInit, Input {
   }
 
   navigate(catId) {
+    // If a popover from the category tables is open, remove when navigating to another category
+    const popover = $('.popover');
+    if (popover) {
+      popover.remove();
+    }
     this.loading = true;
     this.selectedCategory = catId;
     setTimeout(() => {

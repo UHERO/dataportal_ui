@@ -58,8 +58,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  hideTooltip() {
+  hideInfo() {
     $('[data-toggle="tooltip"]').tooltip('hide');
+    $('.popover').remove();
   }
 
   showPopover(seriesInfo) {
