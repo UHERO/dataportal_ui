@@ -8,6 +8,7 @@ body {
    padding: 0;
    box-sizing: border-box;
    font-family: 'Lucida Sans', sans-serif;
+   font-size: 16px;
 
    #header {
     top: 0;
@@ -38,6 +39,33 @@ body {
      // max-width: 275px;
      padding: 5px;
    }
+  }
+
+  .custom-select {
+    color: #1D667F;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9em;
+    height: calc(1.75rem - 2px);
+    padding: 0.175rem 1.75rem 0.175rem 0.75rem;
+    background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+    background-size: 8px 10px;
+  }
+
+  .popover {
+    .popover-title {
+      font-size: 0.9em;
+      font-weight: bold;
+
+      .close-info {
+        font-size: 1.1em;
+        float: right;
+        cursor: pointer;
+      }
+    }
+
+    .popover-content {
+      font-size: 0.9em;
+    }
   }
 
   #loading {

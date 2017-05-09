@@ -8,11 +8,11 @@ import { UheroApiService } from '../uhero-api.service';
   styleUrls: ['./sidebar-nav.component.scss']
 })
 export class SidebarNavComponent implements OnInit, Input {
-  private categories;
+  public categories;
   private errorMessage: string;
   public expand: string = null;
-  private reveal = false;
-  private overlay = false;
+  public reveal = false;
+  public overlay = false;
   private selectedCategory: number;
   private id: number;
   private view: string;

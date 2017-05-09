@@ -9,7 +9,6 @@ import { Geography } from '../geography';
 import 'jquery';
 declare var $: any;
 
-
 @Component({
   selector: 'app-category-table',
   templateUrl: './category-table.component.html',
@@ -61,6 +60,19 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
 
   hideTooltip() {
     $('[data-toggle="tooltip"]').tooltip('hide');
+  }
+
+  showPopover(seriesInfo) {
+    const popover = $('#' + seriesInfo.id).popover({
+      trigger: 'manual',
+      placement: 'top',
+      html: true,
+      title: seriesInfo.title + "<i class='material-icons close-info' onclick='$(this.parentElement.parentElement).popover(" + '"hide"' + ")'>&#xE14C;</i>",
+      content: 'Units: ' + seriesInfo.unitsLabelShort + 
+        '<br> Source Description: ' + seriesInfo.sourceDescription +
+        "<br> Source Link:  <a target='_blank' href='"+ seriesInfo.sourceLink + "'>" + seriesInfo.sourceLink
+    });
+    popover.popover('toggle')
   }
 
   scrollTo(): void {

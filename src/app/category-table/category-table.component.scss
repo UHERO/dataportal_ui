@@ -13,17 +13,6 @@
     margin-top: 50px;
   }
 
-  a.series-name {
-    font-size: 0.9em;
-    font-weight: bold;
-    color: #505050;
-    text-decoration: none;
-
-    p {
-      margin-bottom: 0px;
-    }
-  }
-
   .material-icons.md-18 {
     font-size: 18px;
     // color: #1D667F;
@@ -53,7 +42,7 @@
           vertical-align: top;
           width: 125px;
           text-align: right;
-          font-size: 0.9em;
+          font-size: 0.85em;
           padding: 0.4em;
           border: 1px solid #E5E5E5
         }
@@ -68,9 +57,14 @@
           text-align: left;
           text-overflow: ellipsis;
           overflow: hidden;
-          font-size: 0.9em;
+          font-size: 0.85em;
           font-weight: normal;
           border-bottom: 0;
+        }
+
+        .info-icon {
+          font-size: 1.2em;
+          vertical-align: middle;
         }
 
         tr:last-child {
@@ -85,6 +79,10 @@
           a {
             width: 79%;
           }
+          
+          .info {
+            width: initial;
+          }
         }
 
         .indent2 {
@@ -93,6 +91,10 @@
           a {
             width: 77%;
           }
+          
+          .info {
+            width: initial;
+          }
         }
 
         .indent3 {
@@ -100,6 +102,10 @@
 
           a {
             width: 75%;
+          }
+        
+          .info {
+            width: initial;
           }
         }
 
@@ -118,6 +124,12 @@
           text-overflow: ellipsis;
           color: #505050;
           vertical-align: top;
+        }
+        
+        .info {
+          width: initial;
+          right: 5px;
+          position: absolute;
         }
 
         .badge-primary {

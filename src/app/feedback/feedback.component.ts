@@ -8,9 +8,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
   styleUrls: ['./feedback.component.scss']
 })
 export class FeedbackComponent implements OnInit {
-  private feedbackForm: FormGroup;
-  private successMsg: string;
-  private errorMsg: string;
+  public feedbackForm: FormGroup;
+  public successMsg: string;
+  public errorMsg: string;
   private hideAlert: Boolean = true;
   constructor(private fb: FormBuilder, private http: Http) { }
 

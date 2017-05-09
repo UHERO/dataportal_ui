@@ -26,7 +26,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Variables for geo and freq selectors
   public currentGeo: Geography;
   public currentFreq: Frequency;
-  private categoryData;
+  public categoryData;
   private loading = false;
 
   constructor(

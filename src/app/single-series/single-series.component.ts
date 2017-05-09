@@ -22,7 +22,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   // Vars used in selectors
   public currentFreq: Frequency;
   public currentGeo: Geography;
-  private seriesData;
+  public seriesData;
 
   constructor(
     private _uheroAPIService: UheroApiService,

@@ -1,4 +1,4 @@
-<div class="multi-charts-row" *ngIf="data || routeSearch">
+<div class="multi-charts-row" *ngIf="data">
 	<p *ngIf="noSeries" class="no-data">No Data Available</p>
 	<ng-template ngFor let-serie [ngForOf]="data">
 		<div class="multi-charts">
