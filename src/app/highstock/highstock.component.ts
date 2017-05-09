@@ -30,7 +30,7 @@ export class HighstockComponent implements OnChanges {
 
   // Async EventEmitter, emit chart extremes on load and when selecting a new range using the range selector
   @Output() chartExtremes = new EventEmitter(true);
-  private options: Object;
+  public options: Object;
 
   constructor() { }
 

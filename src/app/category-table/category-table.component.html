@@ -1,6 +1,6 @@
 <div class="category-tables">
 	<div>
-		<div class="table-row" *ngIf="data || routeSearch">
+		<div class="table-row" *ngIf="data">
 			<p *ngIf="noSeries">No Data Available</p>
 			<div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="!noSeries">
 				<table class="category-table">
@@ -13,10 +13,17 @@
 					<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
 						<tr>
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
-								data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
-								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge' (click)="hideTooltip()">
+							 data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
+								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge'
+								 (click)="hideTooltip()">
                   {{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
                 </a>
+								<!-- <button type="button" (click)="showPopover()" class="btn btn-secondary" data-container="body" data-toggle="popover" data-placement="top" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
+									<i class="material-icons info-icon">&#xE88F;</i>
+								</button> -->
+								<a tabindex="0" id="{{serie.seriesInfo.id}}" class="info" (click)="showPopover(serie.seriesInfo)" role="button" data-animation='false' data-toggle="popover">
+									<i class="material-icons info-icon">&#xE88F;</i>
+								</a>
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.categoryTable">
 								<td>{{item.level}}</td>

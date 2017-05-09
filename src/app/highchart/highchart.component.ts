@@ -16,7 +16,7 @@ Highcharts.setOptions({
 export class HighchartComponent implements OnInit {
   @Input() seriesData;
   @Input() currentFreq;
-  private options: Object;
+  public options: Object;
   private chart;
   private SA: boolean;
   private dataAvail: boolean;
