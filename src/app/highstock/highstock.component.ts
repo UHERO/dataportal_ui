@@ -60,6 +60,8 @@ export class HighstockComponent implements OnChanges {
         alignTicks: false,
         zoomType: 'x',
         backgroundColor: '#F9F9F9',
+        // Description used in xAxis label formatter
+        description: freq.freq
       },
       labels: {
         items: [{
@@ -236,6 +238,29 @@ export class HighstockComponent implements OnChanges {
         labels: {
           style: {
             color: '#505050'
+          },
+          formatter: function() {
+            let s = '';
+            const month = Highcharts.dateFormat('%b', this.value);
+            const frequency = this.chart.options.chart.description;
+            const first = Highcharts.dateFormat('%Y', this.axis.userMin);
+            const last = Highcharts.dateFormat('%Y', this.axis.userMax);
+            if (last - first <= 5) {
+              if (frequency === 'Q' && month === 'Jan') {
+                s = s + 'Q1 ';
+              }
+              if (frequency === 'Q' && month === 'Apr') {
+                s = s + 'Q2 ';
+              }
+              if (frequency === 'Q' && month === 'Jul') {
+                s = s + 'Q3 ';
+              }
+              if (frequency === 'Q' && month === 'Oct') {
+                s = s + 'Q4 ';
+              }
+            }
+            s = s + Highcharts.dateFormat('%Y', this.value);
+            return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
           }
         }
       },
@@ -318,7 +343,6 @@ export class HighstockComponent implements OnChanges {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax;
-
     // Selected level data
     let selectedRange = null;
     if (e.context.series[0].points) {
