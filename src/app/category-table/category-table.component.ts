@@ -69,12 +69,13 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       trigger: 'manual',
       placement: 'top',
       html: true,
-      title: seriesInfo.title + "<i class='material-icons close-info' onclick='$(this.parentElement.parentElement).popover(" + '"hide"' + ")'>&#xE14C;</i>",
-      content: 'Units: ' + seriesInfo.unitsLabelShort + 
+      title: seriesInfo.title +
+        "<i class='material-icons close-info' onclick='$(this.parentElement.parentElement).popover(" + '"hide"' + ")'>&#xE14C;</i>",
+      content: 'Units: ' + seriesInfo.unitsLabelShort +
         '<br> Source Description: ' + seriesInfo.sourceDescription +
-        "<br> Source Link:  <a target='_blank' href='"+ seriesInfo.sourceLink + "'>" + seriesInfo.sourceLink
+        "<br> Source Link:  <a target='_blank' href='" + seriesInfo.sourceLink + "'>" + seriesInfo.sourceLink
     });
-    popover.popover('toggle')
+    popover.popover('toggle');
   }
 
   // On load, table scrollbars should start at the right -- showing most recent data
