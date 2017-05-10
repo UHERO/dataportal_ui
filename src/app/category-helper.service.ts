@@ -118,6 +118,8 @@ export class CategoryHelperService {
           // Get array of all series that have level data available
           const categorySeries = this.filterSeriesResults(expandedResults, currentFreq.freq);
           const splitSeries = this.getDisplaySeries(categorySeries, dateWrapper, currentFreq.freq);
+          // sublist id used as anchor fragments in landing-page component, fragment expects a string
+          sublist.id = sublist.id.toString();
           sublist.dateRange = splitSeries.catTable.tableDates;
           sublist.datatables = splitSeries.catTable.datatables;
           sublist.displaySeries = splitSeries.displaySeries;

@@ -77,20 +77,6 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     popover.popover('toggle')
   }
 
-  scrollTo(): void {
-    this.route.fragment.subscribe(frag => {
-      const el = <HTMLElement>document.querySelector('#id_' + frag);
-      if (el) {
-        el.scrollIntoView(el);
-        const scrolledY = window.scrollY;
-        if (scrolledY) {
-          window.scroll(0, scrolledY - 75);
-        }
-      }
-      if (frag === 'top') { el.scrollTop; }
-    });
-  }
-
   // On load, table scrollbars should start at the right -- showing most recent data
   tableScroll(): void {
     try {
