@@ -30,6 +30,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private loading = false;
   private fragment;
   private userEvent;
+  private previousHeight;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -86,15 +87,22 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewChecked() {
-    // When directly navigating to a link containing a fragment, scroll to element
-    // prevent scrolling user interacts with mouse
-    if (!this.userEvent) {
+    // Check height of content and scroll to anchor if fragment is in URL
+    // If true, height is changing, i.e. content still loading
+    if (this.checkContainerHeight()) {
       this.scrollTo();
     }
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+  }
+
+  checkContainerHeight() {
+    const contianer = $('.multi-series-container');
+    const heightDiff = (this.previousHeight !== contianer.height());
+    this.previousHeight = contianer.height();
+    return heightDiff;
   }
 
   // Redraw series when a new region is selected
@@ -155,11 +163,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.scrollTo();
     }, 10);
-  }
-
-  userMouse() {
-    console.log('true')
-    this.userEvent = true;
   }
 
   updateRoute() {

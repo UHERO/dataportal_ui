@@ -30,6 +30,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   private categoryData;
   private tooltipInfo;
   private loading = false;
+  private previousHeight;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -43,15 +44,18 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    // Do not force scroll to the right if mouseover event occurs
-    // Prevents scrollbar from resetting to the right afer manually scrolling
-    if (!this.userEvent) {
+    // Check height of content and scroll tables to the right
+    // If true, height is changing, i.e. content still loading
+    if (this.checkContainerHeight()) {
       this.tableScroll();
-      /* this.route.fragment.subscribe(frag => {
-        const el = <HTMLElement>document.querySelector('#id_' + frag);
-        if (el) el.scrollIntoView(el);
-      });*/
     }
+  }
+
+  checkContainerHeight() {
+    const contianer = $('.multi-series-container');
+    const heightDiff = (this.previousHeight !== contianer.height());
+    this.previousHeight = contianer.height();
+    return heightDiff;
   }
 
   showTooltip() {

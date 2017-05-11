@@ -2,7 +2,7 @@
 	<div>
 		<div class="table-row" *ngIf="data">
 			<p *ngIf="noSeries">No Data Available</p>
-			<div class="table" #tableScroll on-mouseover="userMouse()" *ngIf="!noSeries">
+			<div class="table" #tableScroll *ngIf="!noSeries">
 				<table class="category-table">
 					<tr>
 						<th><b>Series</b></th>
