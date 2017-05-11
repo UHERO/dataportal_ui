@@ -1,4 +1,4 @@
-<div class="multi-series-container">
+<div class="multi-series-container" on-mousemove="userMouse()">
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
     <h2 class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="routeSearch && data.invalid">No results found for "{{data.invalid}}."</p>

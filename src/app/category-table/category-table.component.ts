@@ -60,20 +60,33 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
 
   hideInfo() {
     $('[data-toggle="tooltip"]').tooltip('hide');
-    $('.popover').remove();
+    $('.popover').popover('dispose');
   }
 
   showPopover(seriesInfo) {
     $('[data-toggle="tooltip"]').tooltip('hide');
+    // Prevent multiple popovers from being open at once
+    const activePopover = $('.popover').not('#' + seriesInfo.id);
+    activePopover.popover('toggle');
     const popover = $('#' + seriesInfo.id).popover({
       trigger: 'manual',
       placement: 'top',
       html: true,
       title: seriesInfo.title +
-        "<i class='material-icons close-info' onclick='$(this.parentElement.parentElement).popover(" + '"hide"' + ")'>&#xE14C;</i>",
-      content: 'Units: ' + seriesInfo.unitsLabelShort +
-        '<br> Source Description: ' + seriesInfo.sourceDescription +
-        "<br> Source Link:  <a target='_blank' href='" + seriesInfo.sourceLink + "'>" + seriesInfo.sourceLink
+        '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>',
+      content: function() {
+        let info = '';
+        if (seriesInfo.unitsLabelShort) {
+          info += 'Units: ' + seriesInfo.unitsLabelShort;
+        }
+        if (seriesInfo.sourceDescription) {
+          info += '<br> Source Description: ' + seriesInfo.sourceDescription;
+        }
+        if (seriesInfo.sourceLink) {
+          info += '<br> Source Link: <a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+        }
+        return info;
+      }
     });
     popover.popover('toggle');
   }
@@ -81,8 +94,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   // On load, table scrollbars should start at the right -- showing most recent data
   tableScroll(): void {
     try {
-      this.tableEl._results.forEach((el, index) => {
-        this.tableEl._results[index].nativeElement.scrollLeft = this.tableEl._results[index].nativeElement.scrollWidth;
+      this.tableEl._results.forEach((el) => {
+        el.nativeElement.scrollLeft = el.nativeElement.scrollWidth;
       });
     } catch (err) {
       console.log(err);

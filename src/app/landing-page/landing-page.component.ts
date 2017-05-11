@@ -29,6 +29,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public categoryData;
   private loading = false;
   private fragment;
+  private userEvent;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -81,8 +82,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
           this.categoryData = this._catHelper.initContent(this.id);
         }
       }
-      this.scrollToPreservedFragment();
     });
+  }
+
+  ngAfterViewChecked() {
+    // When directly navigating to a link containing a fragment, scroll to element
+    // prevent scrolling user interacts with mouse
+    if (!this.userEvent) {
+      this.scrollTo();
+    }
   }
 
   ngOnDestroy() {
@@ -98,7 +106,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fragment = subId;
       this.updateRoute();
     }, 10);
-    this.scrollToPreservedFragment();
+    this.scrollToFragment();
   }
 
   redrawSeriesFreq(event, currentGeo, subId) {
@@ -109,7 +117,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fragment = subId;
       this.updateRoute();
     }, 10);
-    this.scrollToPreservedFragment();
+    this.scrollToFragment();
   }
 
   switchView(subId) {
@@ -119,7 +127,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fragment = subId;
       this.updateRoute();
     });
-    this.scrollToPreservedFragment();
+    this.scrollToFragment();
   }
 
   yoyActive(e, subId) {
@@ -129,7 +137,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fragment = subId;
       this.updateRoute();
     }, 10);
-    this.scrollToPreservedFragment();
+    this.scrollToFragment();
   }
 
   ytdActive(e, subId) {
@@ -139,14 +147,19 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fragment = subId;
       this.updateRoute();
     }, 10);
-    this.scrollToPreservedFragment();
+    this.scrollToFragment();
   }
 
   // Work around for srolling to page anchor
-  scrollToPreservedFragment() {
+  scrollToFragment() {
     setTimeout(() => {
       this.scrollTo();
     }, 10);
+  }
+
+  userMouse() {
+    console.log('true')
+    this.userEvent = true;
   }
 
   updateRoute() {
