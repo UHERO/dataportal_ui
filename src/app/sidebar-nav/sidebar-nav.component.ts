@@ -35,7 +35,7 @@ export class SidebarNavComponent implements OnInit, Input {
       const search = params['search'];
       if (this.id) {
         this.selectedCategory = this.id;
-      } else if (search) {
+      } else if (isNaN(this.id)) {
         this.selectedCategory = null;
       } else {
         this.selectedCategory = 42;
@@ -63,7 +63,7 @@ export class SidebarNavComponent implements OnInit, Input {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], { queryParams: { id: event }, queryParamsHandling: 'merge' } );
+    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' } );
   }
 
 }

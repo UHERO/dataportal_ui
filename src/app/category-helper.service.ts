@@ -36,13 +36,8 @@ export class CategoryHelperService {
         if (cat) {
           const selectedCategory = cat.name;
           const sublist = cat.children;
-          if (cat.defaults) {
-            this.defaultFreq = cat.defaults.freq;
-            this.defaultGeo = cat.defaults.geo;
-          } else {
-            this.defaultFreq = '';
-            this.defaultGeo = '';
-          }
+          this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
+          this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
           this.categoryData[catId + routeGeo + routeFreq].selectedCategory = selectedCategory;
           this.categoryData[catId + routeGeo + routeFreq].sublist = sublist;
           this.getSubcategoryData(selectedCategory, catId, sublist, routeGeo, routeFreq);
@@ -182,18 +177,8 @@ export class CategoryHelperService {
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
     regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
-
-    if (selectedGeo) {
-      currentGeo = regions.find(region => region.handle === selectedGeo);
-    } else {
-      currentGeo = regions[0];
-    }
-
-    if (selectedFreq) {
-      currentFreq = freqs.find(freq => freq.freq === selectedFreq);
-    } else {
-      currentFreq = freqs[0];
-    }
+    currentGeo = selectedGeo ? regions.find(region => region.handle === selectedGeo) : regions[0];
+    currentFreq = selectedFreq ? freqs.find(freq => freq.freq === selectedFreq) : freqs[0];
     this.categoryData[search + routeGeo + routeFreq].regions = regions;
     this.categoryData[search + routeGeo + routeFreq].currentGeo = currentGeo;
     this.categoryData[search + routeGeo + routeFreq].frequencies = freqs;
