@@ -21,7 +21,7 @@ export class SearchBarComponent implements OnInit {
 
   // Google Analytics: Track search event
   submitGAEvent(searchTerm) {
-    this.googleAES.emitEvent("Search", "search", searchTerm);
+    this.googleAES.emitEvent('Search', 'search', searchTerm);
   }
 
 }

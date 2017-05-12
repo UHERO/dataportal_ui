@@ -22,7 +22,7 @@ export class CategoryChartsComponent implements OnInit {
   // Google Analytics: Track clicking on series
   submitGAEvent(seriesId) {
     const id = seriesId.toString();
-    this.googleAES.emitEvent("series", "click", id);
+    this.googleAES.emitEvent('series', 'click', id);
   }
 
 }

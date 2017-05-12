@@ -12,7 +12,7 @@ import { Geography } from '../geography';
   templateUrl: 'landing-page.component.html',
   styleUrls: ['landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   private sub;
   private id: number;
   private routeGeo: string;

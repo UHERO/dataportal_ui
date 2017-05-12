@@ -64,7 +64,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     if (id) {
-      this._router.navigate(['/series/'], {queryParams: { id: id, sa: this.seasonallyAdjusted, geo: geo, freq: freq }, queryParamsHandling: 'merge'});
+      const queryParams = {
+        id: id,
+        sa: this.seasonallyAdjusted,
+        geo: geo,
+        freq: freq
+      };
+      this._router.navigate(['/series/'], {queryParams: queryParams, queryParamsHandling: 'merge'});
     } else {
       this.noSelection = 'Selection Not Available';
     }
