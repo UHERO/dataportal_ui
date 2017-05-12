@@ -6,27 +6,27 @@
 		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
 			<ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
 				<li *ngFor="let sub of data.sublist; let subInd='index'">
-					<a [routerLink]="['/category']" [fragment]="sub.id" [queryParams]="queryParams" (click)="scrollTo(sub.id)" [class.current-sub]="subInd === i">{{sub.name}}</a>
+					<a [routerLink]="['/category']" [fragment]="sub.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
 				</li>
 			</ul>
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
 			<div class="filters">
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year Over Year
+          <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event, sub.id)">Year Over Year
         </label>
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-          <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year To Date
+          <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event, sub.id)">Year To Date
         </label>
-				<app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)"
+				<app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq, sub.id)"
 					class="selector"></app-geo-selector>
-				<app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)"
+				<app-freq-selector [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo, sub.id)"
 					class="selector"></app-freq-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
+				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
         <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="sub.datatables" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [subcatIndex]="sub.id" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
       <app-category-charts *ngIf="routeView !== 'table'" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>

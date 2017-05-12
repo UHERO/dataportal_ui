@@ -23,13 +23,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @Input() yoyActive;
   @Input() ytdActive;
   @Input() params;
+  @Input() subcatIndex;
 
-  // Check if seasonally adjusted data is displayed, default to true
-  private userEvent = false;
-  private errorMessage: string;
-  private categoryData;
-  private tooltipInfo;
-  private loading = false;
+  private previousHeight;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -43,15 +39,22 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    // Do not force scroll to the right if mouseover event occurs
-    // Prevents scrollbar from resetting to the right afer manually scrolling
-    if (!this.userEvent) {
+    // Check height of content and scroll tables to the right
+    // If true, height is changing, i.e. content still loading
+    if (this.checkContainerHeight()) {
       this.tableScroll();
-      /* this.route.fragment.subscribe(frag => {
-        const el = <HTMLElement>document.querySelector('#id_' + frag);
-        if (el) el.scrollIntoView(el);
-      });*/
     }
+  }
+
+  checkContainerHeight() {
+    const contianer = $('.multi-series-container');
+    const heightDiff = (this.previousHeight !== contianer.height());
+    this.previousHeight = contianer.height();
+    return heightDiff;
+  }
+
+  getRowCount(index) {
+    return index;
   }
 
   showTooltip() {
@@ -60,20 +63,39 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
 
   hideInfo() {
     $('[data-toggle="tooltip"]').tooltip('hide');
-    $('.popover').remove();
+    $('.popover').popover('dispose');
   }
 
-  showPopover(seriesInfo) {
+  showPopover(subcatIndex, seriesInfo) {
     $('[data-toggle="tooltip"]').tooltip('hide');
-    const popover = $('#' + seriesInfo.id).popover({
+    const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
       placement: 'top',
       html: true,
-      title: seriesInfo.title +
-        "<i class='material-icons close-info' onclick='$(this.parentElement.parentElement).popover(" + '"hide"' + ")'>&#xE14C;</i>",
-      content: 'Units: ' + seriesInfo.unitsLabelShort +
-        '<br> Source Description: ' + seriesInfo.sourceDescription +
-        "<br> Source Link:  <a target='_blank' href='" + seriesInfo.sourceLink + "'>" + seriesInfo.sourceLink
+      title: function() {
+        let title = '';
+        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
+          title = seriesInfo.title + ' (SA)';
+        } else {
+          title = seriesInfo.title;
+        }
+        return title; /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
+      },
+      content: function() {
+        let info = '';
+        if (seriesInfo.unitsLabelShort) {
+          info += 'Units: ' + seriesInfo.unitsLabelShort;
+        }
+        if (seriesInfo.sourceDescription) {
+          info += '<br> Source Description: ' + seriesInfo.sourceDescription;
+        }
+        if (seriesInfo.sourceLink) {
+          info += '<br> Source Link: <a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+        }
+        return info;
+      }
+    }).on('show.bs.popover', function(e) {
+      $('.popover').not(e.target).popover('dispose');
     });
     popover.popover('toggle');
   }
@@ -81,15 +103,11 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   // On load, table scrollbars should start at the right -- showing most recent data
   tableScroll(): void {
     try {
-      this.tableEl._results.forEach((el, index) => {
-        this.tableEl._results[index].nativeElement.scrollLeft = this.tableEl._results[index].nativeElement.scrollWidth;
+      this.tableEl._results.forEach((el) => {
+        el.nativeElement.scrollLeft = el.nativeElement.scrollWidth;
       });
     } catch (err) {
       console.log(err);
     }
-  }
-
-  userMouse(): void {
-    this.userEvent = true;
   }
 }

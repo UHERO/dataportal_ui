@@ -14,6 +14,6 @@ export class HeaderComponent implements OnInit {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category/search'], { queryParams: { id: event }, queryParamsHandling: 'merge' });
+    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' });
   }
 }

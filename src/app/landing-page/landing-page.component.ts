@@ -1,6 +1,6 @@
 // Component for multi-chart view
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
@@ -28,13 +28,16 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public currentFreq: Frequency;
   public categoryData;
   private loading = false;
+  private fragment;
+  private userEvent;
+  private previousHeight;
 
   constructor(
     private _uheroAPIService: UheroApiService,
     private _catHelper: CategoryHelperService,
     private route: ActivatedRoute,
     private _router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.currentGeo = { fips: null, name: null, handle: null };
@@ -83,64 +86,92 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  ngAfterViewChecked() {
+    // Check height of content and scroll to anchor if fragment is in URL
+    // If true, height is changing, i.e. content still loading
+    if (this.checkContainerHeight()) {
+      this.scrollTo();
+    }
+  }
+
   ngOnDestroy() {
     this.sub.unsubscribe();
   }
 
+  checkContainerHeight() {
+    const contianer = $('.multi-series-container');
+    const heightDiff = (this.previousHeight !== contianer.height());
+    this.previousHeight = contianer.height();
+    return heightDiff;
+  }
+
   // Redraw series when a new region is selected
-  redrawSeriesGeo(event, currentFreq) {
+  redrawSeriesGeo(event, currentFreq, subId) {
     this.loading = true;
     setTimeout(() => {
-      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
-      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-      this.loading = false;
+      this.fragment = subId;
+      this.updateRoute();
     }, 10);
+    this.scrollToFragment();
   }
 
-  redrawSeriesFreq(event, currentGeo) {
+  redrawSeriesFreq(event, currentGeo, subId) {
     this.loading = true;
     setTimeout(() => {
-      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
-      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-      this.loading = false;
+      this.fragment = subId;
+      this.updateRoute();
     }, 10);
+    this.scrollToFragment();
   }
 
-  switchView() {
+  switchView(subId) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-      this.loading = false;
+      this.fragment = subId;
+      this.updateRoute();
     });
+    this.scrollToFragment();
   }
 
-  yoyActive(e) {
+  yoyActive(e, subId) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.yoy = e.target.checked;
-      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-      this.loading = false;
+      this.fragment = subId;
+      this.updateRoute();
     }, 10);
+    this.scrollToFragment();
   }
 
-  ytdActive(e) {
+  ytdActive(e, subId) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.ytd = e.target.checked;
-      this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-      this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
-      this.loading = false;
+      this.fragment = subId;
+      this.updateRoute();
+    }, 10);
+    this.scrollToFragment();
+  }
+
+  // Work around for srolling to page anchor
+  scrollToFragment() {
+    setTimeout(() => {
+      this.scrollTo();
     }, 10);
   }
 
-  scrollTo(subId): void {
+  updateRoute() {
+    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    this.loading = false;
+  }
+
+  scrollTo(): void {
     this.route.fragment.subscribe(frag => {
       const el = <HTMLElement>document.querySelector('#id_' + frag);
       if (el) {
