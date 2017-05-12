@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
+import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
@@ -32,7 +33,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     private _catHelper: CategoryHelperService,
     private _helper: HelperService,
     private route: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private googleAES: GoogleAnalyticsEventsService
   ) {}
 
   ngOnInit() {
@@ -61,9 +63,10 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  hideInfo() {
+  hideInfo(seriesId) {
     $('[data-toggle="tooltip"]').tooltip('hide');
     $('.popover').popover('dispose');
+    this.submitGAEvent(seriesId);
   }
 
   showPopover(subcatIndex, seriesInfo) {
@@ -110,4 +113,11 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       console.log(err);
     }
   }
+
+  // Google Analytics: Track clicking on series
+  submitGAEvent(seriesId) {
+    const id = seriesId.toString();
+    this.googleAES.emitEvent("series", "click", id);
+  }
+
 }

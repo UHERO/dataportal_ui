@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-
+import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 @Component({
   selector: 'app-category-charts',
   templateUrl: './category-charts.component.html',
@@ -14,9 +14,15 @@ export class CategoryChartsComponent implements OnInit {
   @Input() ytdActive;
   @Input() params;
 
-  constructor() { }
+  constructor(private googleAES: GoogleAnalyticsEventsService) { }
 
   ngOnInit() {
+  }
+
+  // Google Analytics: Track clicking on series
+  submitGAEvent(seriesId) {
+    const id = seriesId.toString();
+    this.googleAES.emitEvent("series", "click", id);
   }
 
 }
