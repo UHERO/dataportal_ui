@@ -130,6 +130,10 @@
           width: initial;
           right: 5px;
           position: absolute;
+
+          &:focus {
+            outline: 0;
+          }
         }
 
         .badge-primary {

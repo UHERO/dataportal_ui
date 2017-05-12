@@ -23,13 +23,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @Input() yoyActive;
   @Input() ytdActive;
   @Input() params;
+  @Input() subcatIndex;
 
-  // Check if seasonally adjusted data is displayed, default to true
-  private userEvent = false;
-  private errorMessage: string;
-  private categoryData;
-  private tooltipInfo;
-  private loading = false;
   private previousHeight;
 
   constructor(
@@ -58,6 +53,10 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     return heightDiff;
   }
 
+  getRowCount(index) {
+    return index;
+  }
+
   showTooltip() {
     $('[data-toggle="tooltip"]').tooltip();
   }
@@ -67,17 +66,21 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     $('.popover').popover('dispose');
   }
 
-  showPopover(seriesInfo) {
+  showPopover(subcatIndex, seriesInfo) {
     $('[data-toggle="tooltip"]').tooltip('hide');
-    // Prevent multiple popovers from being open at once
-    const activePopover = $('.popover').not('#' + seriesInfo.id);
-    activePopover.popover('toggle');
-    const popover = $('#' + seriesInfo.id).popover({
+    const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
       placement: 'top',
       html: true,
-      title: seriesInfo.title +
-        '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>',
+      title: function() {
+        let title = '';
+        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
+          title = seriesInfo.title + ' (SA)';
+        } else {
+          title = seriesInfo.title;
+        }
+        return title; /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
+      },
       content: function() {
         let info = '';
         if (seriesInfo.unitsLabelShort) {
@@ -91,6 +94,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
         }
         return info;
       }
+    }).on('show.bs.popover', function(e) {
+      $('.popover').not(e.target).popover('dispose');
     });
     popover.popover('toggle');
   }
@@ -104,9 +109,5 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     } catch (err) {
       console.log(err);
     }
-  }
-
-  userMouse(): void {
-    this.userEvent = true;
   }
 }

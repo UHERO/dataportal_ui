@@ -98,7 +98,7 @@ export class CategoryHelperService {
   }
 
   // Get regions and frequencies available for a selected category
-  getSeriesData(sublist, currentGeo: Geography, currentFreq: Frequency, dateWrapper) {
+  getSeriesData(sublist, currentGeo: Geography, currentFreq: Frequency, dateWrapper: DateWrapper) {
     const saDateArray = [], nsaDateArray = [];
     let expandedResults;
     this._uheroAPIService.fetchExpanded(sublist['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
@@ -251,7 +251,7 @@ export class CategoryHelperService {
     return saSeries ? true : false;
   }
 
-  getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq) {
+  getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq: string) {
     const dateArray = [];
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data

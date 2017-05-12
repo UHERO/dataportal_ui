@@ -26,7 +26,7 @@
         <app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [sublist]="sub" [data]="sub.datatables" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+			<app-category-table *ngIf="routeView === 'table'" [data]="sub.displaySeries" [subcatIndex]="sub.id" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
       <app-category-charts *ngIf="routeView !== 'table'" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
