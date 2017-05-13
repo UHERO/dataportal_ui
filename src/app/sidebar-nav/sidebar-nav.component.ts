@@ -32,18 +32,20 @@ export class SidebarNavComponent implements OnInit, Input {
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
-      const search = params['search'];
-      if (!this.id || this.id === undefined) {
-        this.selectedCategory = 42;
-      } else {
-        if (isNaN(+this.id)) {
-          this.selectedCategory = null;
-        }
-        if (+this.id) {
-          this.selectedCategory = +this.id;
-        }
-      }
+      this.selectedCategory = this.findSelectedCategory(this.id);
     });
+  }
+
+  findSelectedCategory(id) {
+    if (id === undefined) {
+      return 42;
+    }
+    if (id && isNaN(id)) {
+      return null;
+    }
+    if (id && +id) {
+      return +id;
+    }
   }
 
   navigate(catId) {

@@ -46,16 +46,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
-      if (!params['id'] || params['id'] === undefined) {
-        this.id = 42;
-      } else {
-        if (isNaN(+params['id'])) {
-          this.id = params['id'];
-        }
-        if (+params['id']) {
-          this.id = +params['id'];
-        }
-      }
+      this.id = this.getIdParam(params['id']);
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeView = params['view'];
@@ -67,20 +58,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-
-      if (typeof this.id === 'string') {
-        if (this.routeGeo && this.routeFreq) {
-          this.categoryData = this._catHelper.initSearch(this.id, this.routeGeo, this.routeFreq);
-        } else {
-          this.categoryData = this._catHelper.initSearch(this.id);
-        }
-      } else {
-        if (this.routeGeo && this.routeFreq) {
-          this.categoryData = this._catHelper.initContent(this.id, this.routeGeo, this.routeFreq);
-        } else {
-          this.categoryData = this._catHelper.initContent(this.id);
-        }
-      }
+      this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
     });
   }
 
@@ -94,6 +72,35 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+  }
+
+  getIdParam(id) {
+    if (id === undefined) {
+      return 42;
+    }
+    if (id && isNaN(+id)) {
+      // id param is a string, display search results
+      return id;
+    }
+    if (id && +id) {
+      // id of category selected in sidebar
+      return +id;
+    }
+  }
+
+  getData(id, geo, freq) {
+    if (typeof id === 'string' && geo && freq) {
+      return this._catHelper.initSearch(id, geo, freq);
+    }
+    if (typeof id === 'string' && !geo && !freq) {
+      return this._catHelper.initSearch(id);
+    }
+    if (typeof id === 'number' && geo && freq) {
+      return this._catHelper.initContent(id, geo, freq);
+    }
+    if (typeof id === 'number' && !geo && !freq) {
+      return this._catHelper.initContent(id, geo, freq);
+    }
   }
 
   checkContainerHeight() {
