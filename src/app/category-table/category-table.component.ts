@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, OnChanges, AfterViewInit, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
+import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
@@ -26,14 +27,17 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @Input() subcatIndex;
 
   private previousHeight;
+  private tableWidths = [];
+  private tableHeaders = [];
 
   constructor(
     private _uheroAPIService: UheroApiService,
     private _catHelper: CategoryHelperService,
     private _helper: HelperService,
     private route: ActivatedRoute,
-    private _router: Router
-  ) {}
+    private _router: Router,
+    private googleAES: GoogleAnalyticsEventsService
+  ) { }
 
   ngOnInit() {
   }
@@ -44,6 +48,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     if (this.checkContainerHeight()) {
       this.tableScroll();
     }
+
+    // Scroll tables to the right when table widths changes, i.e. changing frequency from A to Q | M
+    this.checkTableWidth();
   }
 
   checkContainerHeight() {
@@ -53,17 +60,28 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     return heightDiff;
   }
 
-  getRowCount(index) {
-    return index;
+  checkTableWidth() {
+    const tables = $('.table');
+    const tableWidths = this.tableWidths;
+    if (tables) {
+      tables.each(function(index) {
+        const widthDiff = (tableWidths[index] !== tables[index].scrollWidth);
+        if (widthDiff) {
+          tables[index].scrollLeft = tables[index].scrollWidth;
+        }
+        tableWidths[index] = tables[index].scrollWidth;
+      });
+    }
   }
 
   showTooltip() {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  hideInfo() {
+  hideInfo(seriesId) {
     $('[data-toggle="tooltip"]').tooltip('hide');
     $('.popover').popover('dispose');
+    this.submitGAEvent(seriesId);
   }
 
   showPopover(subcatIndex, seriesInfo) {
@@ -72,7 +90,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       trigger: 'manual',
       placement: 'top',
       html: true,
-      title: function() {
+      title: function () {
         let title = '';
         if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
           title = seriesInfo.title + ' (SA)';
@@ -81,7 +99,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
         }
         return title; /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
       },
-      content: function() {
+      content: function () {
         let info = '';
         if (seriesInfo.unitsLabelShort) {
           info += 'Units: ' + seriesInfo.unitsLabelShort;
@@ -94,7 +112,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
         }
         return info;
       }
-    }).on('show.bs.popover', function(e) {
+    }).on('show.bs.popover', function (e) {
       $('.popover').not(e.target).popover('dispose');
     });
     popover.popover('toggle');
@@ -109,5 +127,11 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  // Google Analytics: Track clicking on series
+  submitGAEvent(seriesId) {
+    const id = seriesId.toString();
+    this.googleAES.emitEvent('series', 'click', id);
   }
 }

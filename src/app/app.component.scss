@@ -37,6 +37,23 @@
    .content-col {
      // padding-left: 30px;
 
+     .browser {
+       position: fixed;
+       top: 55px;
+       right: 0px;
+       z-index: 2;
+       margin-bottom: 0;
+       padding: 0.25rem 1.25rem;
+       height: 30px;
+       border-radius: 0;
+       font-size: 0.8em;
+
+       button {
+         top: -0.35rem;
+         padding: 0.2rem 1.25rem;
+       }
+     }
+
      @media (min-width: 1200px) {
        padding-left: 50px;
      }

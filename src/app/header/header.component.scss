@@ -1,5 +1,6 @@
 #header {
   position: fixed;
+  height: 55px;
   top: 0;
   width: 100%;
   background-color: #FFFFFF;
@@ -24,10 +25,10 @@
   }
 
   img {
-    // width: 23%;
-    padding: 5px;
+    position: absolute;
+    height: 55px;
+    padding: 10px;
     max-width: 275px;
-    // height: auto;
   }
 }
 

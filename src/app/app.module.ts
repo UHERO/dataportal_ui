@@ -35,6 +35,7 @@ import { UheroApiService } from './uhero-api.service';
 import { CategoryHelperService } from './category-helper.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
+import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
@@ -80,6 +81,7 @@ import { CategoryChartsComponent } from './category-charts/category-charts.compo
     CategoryHelperService,
     SeriesHelperService,
     HelperService,
+    GoogleAnalyticsEventsService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
