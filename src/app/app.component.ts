@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 
 declare var ga: Function;
@@ -17,5 +17,13 @@ export class AppComponent {
         ga('send', 'pageview');
       }
     });
+  }
+
+  ngOnInit() {
+    if (navigator.userAgent.search('Chrome') === -1) {
+      $('.browser').show();
+    } else {
+      $('.browser').hide();
+    }
   }
 }

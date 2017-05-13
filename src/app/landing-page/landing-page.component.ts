@@ -51,11 +51,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       } else {
         if (isNaN(+params['id'])) {
           this.id = params['id'];
-          this.search = true;
         }
         if (+params['id']) {
           this.id = +params['id'];
-          this.search = false;
         }
       }
       this.routeGeo = params['geo'];
