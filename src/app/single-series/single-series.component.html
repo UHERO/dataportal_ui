@@ -34,7 +34,7 @@
       <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
       <p-column field="formattedValue" header="Level"></p-column>
       <p-column field="formattedYoy" [header]=data.yoyChange></p-column>
-      <p-column field="formattedYtd" [header]=data.ytdChange></p-column>
+      <p-column *ngIf="data.currentFreq.freq !== 'A'" field="formattedYtd" [header]=data.ytdChange></p-column>
     </p-dataTable>
     </div>
   </div>

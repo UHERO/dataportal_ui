@@ -18,29 +18,27 @@ export class HighchartComponent implements OnInit {
   @Input() currentFreq;
   public options: Object;
   private chart;
-  private SA: boolean;
-  private dataAvail: boolean;
   constructor() { }
 
   ngOnInit() {
-    const level = this.seriesData.chartData.level;
-    const pseudoZones = this.seriesData.chartData.pseudoZones;
-    const ytd = this.seriesData.chartData.ytd;
-    const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
-    const percent = this.seriesData.seriesInfo.percent;
-    let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
-    title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
-    const dataFreq = this.currentFreq;
-    this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
-    const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-    if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
-      this.noDataChart(title);
+    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
+      this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals, percent);
+      this.drawChart(this.seriesData, this.currentFreq);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq: string, unitsShort: string, decimals: number, percent: boolean) {
+  drawChart(seriesData, currentFreq) {
+    const level = seriesData.chartData.level;
+    const pseudoZones = seriesData.chartData.pseudoZones;
+    const ytd = seriesData.chartData.ytd;
+    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
+    const percent = seriesData.seriesInfo.percent;
+    let title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+    title += seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
+    const dataFreq = currentFreq;
+    const unitsShort = seriesData.seriesInfo.unitsLabelShort;
+
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -87,7 +85,7 @@ export class HighchartComponent implements OnInit {
           };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
-            let name, change;
+            let name;
             if (point.series.name === 'Level') {
               name = 'Level';
             }
@@ -98,7 +96,7 @@ export class HighchartComponent implements OnInit {
               name = 'YTD';
             }
             if (point.series.name === 'YTD' && percent) {
-              name += ' Change'; 
+              name += ' Change';
             }
             if (point.series.name === 'YTD' && !percent) {
               name += ' % Change';
@@ -108,13 +106,16 @@ export class HighchartComponent implements OnInit {
               label += ' (' + unitsShort + ')';
             }
             if (pseudoZones.length > 0) {
-              pseudoZones.forEach((zone, index) => {
-                if (point.x < pseudoZones[index].value) {
+              pseudoZones.forEach((zone) => {
+                if (point.x < zone.value) {
                   s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
                   if (point.series.name === 'Level') {
                     s += ' (' + unitsShort + ')';
                   }
-                } else {
+                } /* else {
+                  s += label;
+                } */
+                if (point.x >= zone.value) {
                   s += label;
                 }
               });
@@ -200,7 +201,10 @@ export class HighchartComponent implements OnInit {
     };
   }
 
-  noDataChart(title) {
+  noDataChart(seriesData) {
+    let title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+    title += seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
+
     this.options = {
       chart: {
         backgroundColor: '#F9F9F9'
