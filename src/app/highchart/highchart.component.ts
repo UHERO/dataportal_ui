@@ -27,6 +27,7 @@ export class HighchartComponent implements OnInit {
     const pseudoZones = this.seriesData.chartData.pseudoZones;
     const ytd = this.seriesData.chartData.ytd;
     const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
+    const percent = this.seriesData.seriesInfo.percent;
     let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
     title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
     const dataFreq = this.currentFreq;
@@ -35,11 +36,11 @@ export class HighchartComponent implements OnInit {
     if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
       this.noDataChart(title);
     } else {
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals);
+      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals, percent);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort, decimals) {
+  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq: string, unitsShort: string, decimals: number, percent: boolean) {
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -86,14 +87,30 @@ export class HighchartComponent implements OnInit {
           };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
-            let label = '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            let name, change;
+            if (point.series.name === 'Level') {
+              name = 'Level';
+            }
+            if (point.series.name === 'YTD' && dataFreq === 'A') {
+              name = 'YOY';
+            }
+            if (point.series.name === 'YTD' && dataFreq !== 'A') {
+              name = 'YTD';
+            }
+            if (point.series.name === 'YTD' && percent) {
+              name += ' Change'; 
+            }
+            if (point.series.name === 'YTD' && !percent) {
+              name += ' % Change';
+            }
+            let label = '<br>' + name + ': ' + Highcharts.numberFormat(point.y);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
             }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone, index) => {
                 if (point.x < pseudoZones[index].value) {
-                  s += '<br>' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                  s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
                   if (point.series.name === 'Level') {
                     s += ' (' + unitsShort + ')';
                   }
