@@ -14,7 +14,7 @@
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
           <input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event, sub.id)">Year Over Year
         </label>
-				<label *ngIf="routeView === 'table'" class="form-check-inline">
+				<label *ngIf="routeView === 'table' && data.currentFreq?.freq !== 'A'" class="form-check-inline">
           <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event, sub.id)">Year To Date
         </label>
 				<app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq, sub.id)"

@@ -34,7 +34,7 @@
 								<td>{{item.yoy}}</td>
 							</ng-template>
 						</tr>
-						<tr *ngIf="ytdActive">
+						<tr *ngIf="ytdActive && serie.seriesInfo.frequencyShort !== 'A'">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
 								{{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
 							</th>
