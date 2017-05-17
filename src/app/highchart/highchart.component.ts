@@ -58,11 +58,10 @@ export class HighchartComponent implements OnInit {
       },
       tooltip: {
         positioner: function() {
-          return {x: 0, y: 0};
+          return {x: 0, y: -5};
         },
         shadow: false,
         borderWidth: 0,
-        valueDecimals: decimals,
         shared: true,
         backgroundColor: 'transparent',
         formatter: function () {
@@ -90,36 +89,35 @@ export class HighchartComponent implements OnInit {
               name = 'Level';
             }
             if (point.series.name === 'YTD' && dataFreq === 'A') {
-              name = 'YOY';
+              name = 'Year-Over-Year';
             }
             if (point.series.name === 'YTD' && dataFreq !== 'A') {
-              name = 'YTD';
+              name = 'Year-To-Date';
             }
             if (point.series.name === 'YTD' && percent) {
-              name += ' Change';
+              name += ' Chg';
             }
             if (point.series.name === 'YTD' && !percent) {
-              name += ' % Change';
+              name += ' % Chg';
             }
-            let label = '<br>' + name + ': ' + Highcharts.numberFormat(point.y);
+            let label = '<br>' + name + ': ' + Highcharts.numberFormat(point.y, decimals);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
             }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+                  s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y, decimals) + '<br>';
                   if (point.series.name === 'Level') {
                     s += ' (' + unitsShort + ')';
                   }
-                } /* else {
-                  s += label;
-                } */
+                }
                 if (point.x >= zone.value) {
                   s += label;
                 }
               });
-            } else {
+            }
+            if (pseudoZones.length === 0) {
               s += label;
             }
           });
