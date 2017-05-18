@@ -72,8 +72,8 @@ export class CategoryHelperService {
             sublist.forEach((subcat) => {
               const dateWrapper = <DateWrapper>{};
               let selectedFreq, selectedGeo;
-              selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-              selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+              selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+              selectedGeo = this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
               if (routeFreq || routeGeo) {
                 const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
                 selectedFreq = selected.freq;
@@ -167,8 +167,8 @@ export class CategoryHelperService {
   searchSettings(search: string, dateWrapper: DateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
     const dateArray = [];
     let selectedFreq, selectedGeo;
-    selectedFreq = routeFreq ? routeFreq : this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
-    selectedGeo = routeGeo ? routeGeo : this.defaultGeo ? this.defaultGeo : geoFreqs[0].handle;
+    selectedFreq = this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
+    selectedGeo = this.defaultGeo ? this.defaultGeo : geoFreqs[0].handle;
     if (routeFreq || routeGeo) {
       const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
       selectedFreq = selected.freq;
@@ -201,6 +201,7 @@ export class CategoryHelperService {
           const searchSeries = this.filterSeriesResults(searchResults, freq);
           const splitSeries = this.getDisplaySeries(searchSeries, dateWrapper, freq);
           const sublist = {
+            parentName: 'Search',
             name: search,
             dateWrapper: splitSeries.dateWrapper,
             dateRange: splitSeries.catTable.tableDates,
