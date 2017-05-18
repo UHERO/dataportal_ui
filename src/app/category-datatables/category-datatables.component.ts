@@ -56,7 +56,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       columns: tableColumns,
       buttons: [{
         extend: 'csv',
-        text: '<i class="material-icons">&#xE2C4;</i> Download CSV',
+        text: 'Download CSV <i class="fa fa-file-excel-o" aria-hidden="true"></i>',
         filename: sublistName,
         customize: function(csv) {
           return csv +
