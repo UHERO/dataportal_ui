@@ -16,6 +16,8 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
   @Input() data;
   @Input() tableId;
   @Input() sublist;
+  @Input() geo;
+  @Input() freq;
   private tableWidget;
 
   constructor() { }
@@ -46,7 +48,8 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     const sublistName = this.sublist.name;
     const parentName = this.sublist.parentName;
     const parentId = this.sublist.parentId;
-
+    const geo = this.geo;
+    const freq = this.freq
     this.tableWidget = tableElement.DataTable({
       data: tableData,
       dom: 'B',
@@ -58,7 +61,8 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         customize: function(csv) {
           return csv +
           '\n\n The University of Hawaii Economic Research Organization (UHERO) \n Data Portal: http://data.uhero.hawaii.edu/ \n ' +
-          parentName + '-' + sublistName + ': http://data.uhero.hawaii.edu/#/category/table?id=' + parentId;
+          parentName + '-' + sublistName + ' (' + geo.name + ' - ' + freq.label + ')' +
+          ': http://data.uhero.hawaii.edu/#/category/table?id=' + parentId;
         }
       }],
       bSort: false,

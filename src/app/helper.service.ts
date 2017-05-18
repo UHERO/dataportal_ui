@@ -2,11 +2,12 @@
 
 import { Injectable } from '@angular/core';
 import { DateWrapper } from './date-wrapper';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 @Injectable()
 export class HelperService {
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) { }
 
   calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);
@@ -143,6 +144,11 @@ export class HelperService {
   }
 
   sublistTable(displaySeries: Array<any>, dateWrapper: DateWrapper, tableDates: Array<any>) {
+    let ytdSelected, yoySelected;
+    this.route.queryParams.subscribe((params) => {
+      ytdSelected = (params['ytd'] === 'true');
+      yoySelected = (params['yoy'] === 'true');
+    });
     // Format table for jquery datatables
     const tableData = [];
     const tableColumns = [];
@@ -165,20 +171,22 @@ export class HelperService {
         yoy[obs.tableDate] = obs.yoy;
         ytd[obs.tableDate] = obs.ytd;
       });
-      tableData.push(
-        {
-          series: series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? title + ' (SA)' : title,
-          observations: observations
-        },
-        {
+      tableData.push({
+        series: series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? title + ' (SA)' : title,
+        observations: observations
+      });
+      if (yoySelected) {
+        tableData.push({
           series: yoyLabel,
           observations: yoy
-        },
-        {
+        });
+      }
+      if (ytdSelected) {
+        tableData.push({
           series: ytdLabel,
           observations: ytd
-        }
-      );
+        });
+      }
     });
     return { tableColumns: tableColumns, tableData: tableData };
   }
