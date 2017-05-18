@@ -34,8 +34,7 @@ export class HighchartComponent implements OnInit {
     const ytd = seriesData.chartData.ytd;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
-    let title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
-    title += seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
+    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
     const dataFreq = currentFreq;
     const unitsShort = seriesData.seriesInfo.unitsLabelShort;
 
@@ -200,8 +199,7 @@ export class HighchartComponent implements OnInit {
   }
 
   noDataChart(seriesData) {
-    let title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
-    title += seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
+    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
 
     this.options = {
       chart: {

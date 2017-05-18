@@ -90,25 +90,23 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       trigger: 'manual',
       placement: 'top',
       html: true,
-      title: function () {
-        let title = '';
-        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
-          title = seriesInfo.title + ' (SA)';
-        } else {
-          title = seriesInfo.title;
-        }
-        return title; /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
-      },
+      title: seriesInfo.title, /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
       content: function () {
         let info = '';
         if (seriesInfo.unitsLabelShort) {
           info += 'Units: ' + seriesInfo.unitsLabelShort;
         }
+        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
+          info += '<br> Seasonally Adjusted';
+        }
         if (seriesInfo.sourceDescription) {
-          info += '<br> Source Description: ' + seriesInfo.sourceDescription;
+          info += '<br> Source: ' + seriesInfo.sourceDescription;
         }
         if (seriesInfo.sourceLink) {
-          info += '<br> Source Link: <a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+          info += '<br><a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+        }
+        if (seriesInfo.sourceDetails) {
+          info += '<br>Source Detail: ' + seriesInfo.sourceDetails;
         }
         return info;
       }

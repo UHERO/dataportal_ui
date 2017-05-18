@@ -5,18 +5,18 @@
 			<div class="table" #tableScroll *ngIf="!noSeries">
 				<table class="category-table">
 					<tr>
-						<th><b>Series</b></th>
+						<th class="empty-header">&nbsp;</th>
 						<ng-template ngFor let-date [ngForOf]="dates" let-i="index">
 							<td><b>{{date}}</b></td>
 						</ng-template>
 					</tr>
 					<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
 						<tr>
-							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}"
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.title}}"
 							 data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
 								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge'
 								 (click)="hideInfo(serie.seriesInfo.id)">
-                  					{{serie.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? serie.seriesInfo.title + ' (SA)' : + serie.seriesInfo.title}}
+                  					{{serie.seriesInfo.title}}
                 				</a>
 								<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(subcatIndex, serie.seriesInfo)" role="button" data-animation='false' data-toggle="popover">
 									<i class="material-icons info-icon">&#xE88F;</i>

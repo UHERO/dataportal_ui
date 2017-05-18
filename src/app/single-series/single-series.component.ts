@@ -77,7 +77,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         this.seasonallyAdjusted = geoFreqSiblings[0].seasonallyAdjusted;
       }
       return geoFreqSiblings[0].id;
-    } 
+    }
   }
 
   // Update table when selecting new ranges in the chart
