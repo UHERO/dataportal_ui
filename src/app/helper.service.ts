@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { DateWrapper } from './date-wrapper';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class HelperService {
@@ -69,7 +69,7 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
@@ -267,61 +267,57 @@ export class HelperService {
 
   // Get a unique array of available regions for a category
   uniqueGeos(geo, geoList) {
-    let exist = false;
-    for (const i in geoList) {
-      if (geo.handle === geoList[i].handle) {
-        exist = true;
-        // If region already exists, check it's list of frequencies
-        // Get a unique list of frequencies available for a region
-        const freqs = geo.freqs;
-        for (const j in freqs) {
-          if (!this.freqExist(geoList[i].freqs, freqs[j].freq)) {
-            geoList[i].freqs.push(freqs[j]);
-          }
-        }
-      }
+    const existGeo = geoList.find(region => region.handle === geo.handle);
+    if (existGeo) {
+      const freqs = geo.freqs;
+      // If region already exists, check it's list of frequencies
+      // Add frequency if it doesn't exist
+      this.addFreq(freqs, existGeo);
     }
-    if (!exist) {
+    if (!existGeo) {
       geoList.push(geo);
     }
   }
 
+  // Check if freq exists in freqArray
   freqExist(freqArray, freq) {
-    for (const n in freqArray) {
-      if (freq === freqArray[n].freq) {
-        return true;
+    const exist = freqArray.find(frequency => frequency.freq === freq);
+    return exist ? true : false;
+  }
+
+  addFreq(freqList, geo) {
+    for (const j in freqList) {
+      if (!this.freqExist(geo.freqs, freqList[j].freq)) {
+        geo.freqs.push(freqList[j]);
       }
     }
-    return false;
   }
 
   // Get a unique array of available frequencies for a category
   uniqueFreqs(freq, freqList) {
-    let exist = false;
-    for (const i in freqList) {
-      if (freq.label === freqList[i].label) {
-        exist = true;
-        // If frequency already exists, check it's list of regions
-        // Get a unique list of regions available for a frequency
-        const geos = freq.geos;
-        for (const j in geos) {
-          if (!this.geoExist(freqList[i].geos, geos[j].handle)) {
-            freqList[i].geos.push(geos[j]);
-          }
-        }
-      }
+    const existFreq = freqList.find(frequency => frequency.label === freq.label);
+    if (existFreq) {
+      const geos = freq.geos;
+      // If frequency already exists, check it's list of regions
+      // Add geo if it doesn't exist
+      this.addGeo(geos, existFreq);
     }
-    if (!exist) {
+    if (!existFreq) {
       freqList.push(freq);
     }
   }
 
+  // Check if geo exists in geoArray
   geoExist(geoArray, geo) {
-    for (const n in geoArray) {
-      if (geo === geoArray[n].handle) {
-        return true;
+    const exist = geoArray.find(region => region.handle === geo);
+    return exist ? true : false;
+  }
+
+  addGeo(geoList, freq) {
+    for (const j in geoList) {
+      if (!this.geoExist(freq.geos, geoList[j].handle)) {
+        freq.geos.push(geoList[j]);
       }
     }
-    return false;
   }
 }
