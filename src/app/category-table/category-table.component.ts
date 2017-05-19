@@ -85,29 +85,38 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   }
 
   showPopover(subcatIndex, seriesInfo) {
-    console.log(subcatIndex)
     $('[data-toggle="tooltip"]').tooltip('hide');
     const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
-      placement: 'top',
+      placement: function(popoverEl, el) {
+        // popoverEl = popover DOM element
+        // el = DOM element that triggers popover
+        let position = 'top'
+        const elOffset = $(el).offset().top;
+        if (elOffset <= 150) {
+          position = 'bottom';
+        }
+        return position;
+      },
       html: true,
-      title: seriesInfo.title, /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
+      title: function() {
+        let title = seriesInfo.title;
+        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')': ' (' + seriesInfo.unitsLabelShort + ')';
+        return title;
+      },
       content: function () {
         let info = '';
-        if (seriesInfo.unitsLabelShort) {
-          info += 'Units: ' + seriesInfo.unitsLabelShort;
-        }
         if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
-          info += '<br> Seasonally Adjusted';
+          info += 'Seasonally Adjusted<br>';
         }
         if (seriesInfo.sourceDescription) {
-          info += '<br> Source: ' + seriesInfo.sourceDescription;
+          info += 'Source: ' + seriesInfo.sourceDescription + '<br>';
         }
         if (seriesInfo.sourceLink) {
-          info += '<br><a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+          info += '<a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a><br>';
         }
         if (seriesInfo.sourceDetails) {
-          info += '<br>Source Detail: ' + seriesInfo.sourceDetails;
+          info += seriesInfo.sourceDetails;
         }
         return info;
       }

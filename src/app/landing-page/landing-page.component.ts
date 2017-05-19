@@ -6,6 +6,9 @@ import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
+import 'jquery';
+declare var $: any;
+
 
 @Component({
   selector: 'app-landing-page',
@@ -113,6 +116,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq, subId) {
     this.loading = true;
+    this.closePopover();
     setTimeout(() => {
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
@@ -124,6 +128,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   redrawSeriesFreq(event, currentGeo, subId) {
     this.loading = true;
+    this.closePopover();
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
@@ -135,6 +140,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   switchView(subId) {
     this.loading = true;
+    this.closePopover();
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
       this.fragment = subId;
@@ -145,6 +151,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   yoyActive(e, subId) {
     this.loading = true;
+    this.closePopover();
     setTimeout(() => {
       this.queryParams.yoy = e.target.checked;
       this.fragment = subId;
@@ -155,6 +162,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   ytdActive(e, subId) {
     this.loading = true;
+    this.closePopover();
     setTimeout(() => {
       this.queryParams.ytd = e.target.checked;
       this.fragment = subId;
@@ -174,6 +182,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
     this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
+  }
+
+  closePopover() {
+    const openPopover = $('.popover');
+    if (openPopover) {
+      openPopover.popover('dispose');
+    }
   }
 
   scrollTo(): void {
