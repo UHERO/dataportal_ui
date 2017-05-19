@@ -115,8 +115,7 @@ export class CategoryHelperService {
           const splitSeries = this.getDisplaySeries(categorySeries, dateWrapper, currentFreq.freq);
           // sublist id used as anchor fragments in landing-page component, fragment expects a string
           sublist.id = sublist.id.toString();
-          sublist.dateRange = splitSeries.catTable.tableDates;
-          sublist.datatables = splitSeries.catTable.datatables;
+          sublist.dateRange = splitSeries.tableDates;
           sublist.displaySeries = splitSeries.displaySeries;
           sublist.allSeries = categorySeries;
           sublist.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
@@ -201,11 +200,11 @@ export class CategoryHelperService {
           const searchSeries = this.filterSeriesResults(searchResults, freq);
           const splitSeries = this.getDisplaySeries(searchSeries, dateWrapper, freq);
           const sublist = {
+            id: 'search',
             parentName: 'Search',
             name: search,
             dateWrapper: splitSeries.dateWrapper,
-            dateRange: splitSeries.catTable.tableDates,
-            datatables: splitSeries.catTable.datatables,
+            dateRange: splitSeries.tableDates,
             hasSeaonsallyAdjusted: splitSeries.hasSeasonallyAdjusted,
             displaySeries: splitSeries.displaySeries
           };
@@ -247,6 +246,7 @@ export class CategoryHelperService {
     return filtered;
   }
 
+  // Check if series in a given category has seasonally adjusted data
   checkSA(seriesArray) {
     const saSeries = seriesArray.find(series => series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted');
     return saSeries ? true : false;
@@ -254,8 +254,7 @@ export class CategoryHelperService {
 
   getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq: string) {
     const dateArray = [];
-    // Check if (non-annual) category has seasonally adjusted data
-    // Returns true for annual data
+    // Check if category series has seasonally adjusted data
     const hasSeasonallyAdjusted = this.checkSA(allSeries);
     const displaySeries = [];
     allSeries.forEach((series) => {
@@ -266,12 +265,12 @@ export class CategoryHelperService {
     });
     this._helper.setDateWrapper(displaySeries, dateWrapper);
     this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
-    const catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
+    const tableDates = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
 
     return {
       displaySeries: displaySeries,
       dateWrapper: dateWrapper,
-      catTable: catTable,
+      tableDates: tableDates,
       hasSeasonallyAdjusted: hasSeasonallyAdjusted
     };
   }
@@ -287,8 +286,6 @@ export class CategoryHelperService {
     dateArray.forEach((date) => {
       tableHeaderDates.push(date.tableDate);
     });
-    // Using datatables library for exporting functionality
-    const datatables = this._helper.sublistTable(displaySeries, dateWrapper, tableHeaderDates);
-    return { tableDates: tableHeaderDates, datatables: datatables };
+    return tableHeaderDates;
   }
 }

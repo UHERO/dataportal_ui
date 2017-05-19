@@ -85,6 +85,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   }
 
   showPopover(subcatIndex, seriesInfo) {
+    console.log(subcatIndex)
     $('[data-toggle="tooltip"]').tooltip('hide');
     const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
