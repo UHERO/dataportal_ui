@@ -2,12 +2,11 @@
 
 import { Injectable } from '@angular/core';
 import { DateWrapper } from './date-wrapper';
-import { ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class HelperService {
 
-  constructor(private route: ActivatedRoute) { }
+  constructor() { }
 
   calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);

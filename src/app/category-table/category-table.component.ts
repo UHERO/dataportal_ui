@@ -121,7 +121,14 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
         return info;
       }
     }).on('show.bs.popover', function (e) {
+      // Display only one popover at a time
       $('.popover').not(e.target).popover('dispose');
+      setTimeout(() => {
+        // Close popover on next click (source link in popover is still clickable)
+        $('body').one('click', function() {
+          popover.popover('dispose');
+        });
+      }, 1);
     });
     popover.popover('toggle');
   }
