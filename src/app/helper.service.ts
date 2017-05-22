@@ -2,12 +2,11 @@
 
 import { Injectable } from '@angular/core';
 import { DateWrapper } from './date-wrapper';
-import { ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class HelperService {
 
-  constructor(private route: ActivatedRoute) { }
+  constructor() { }
 
   calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);
@@ -141,54 +140,6 @@ export class HelperService {
         dateWrapper.endDate = series.end;
       }
     });
-  }
-
-  sublistTable(displaySeries: Array<any>, dateWrapper: DateWrapper, tableDates: Array<any>) {
-    let ytdSelected, yoySelected;
-    this.route.queryParams.subscribe((params) => {
-      ytdSelected = (params['ytd'] === 'true');
-      yoySelected = (params['yoy'] === 'true');
-    });
-    // Format table for jquery datatables
-    const tableData = [];
-    const tableColumns = [];
-    const dateStart = dateWrapper.firstDate;
-    const dateEnd = dateWrapper.endDate;
-    tableColumns.push({ title: 'Series', data: 'series' });
-    tableDates.forEach((date) => {
-      tableColumns.push({ title: date, data: 'observations.' + date });
-    });
-    displaySeries.forEach((series) => {
-      const observations = {};
-      const yoy = {};
-      const ytd = {};
-      const percent = series.seriesInfo.percent;
-      const yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
-      const ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
-      const title = series.seriesInfo.title;
-      series.categoryTable.forEach((obs) => {
-        observations[obs.tableDate] = obs.level;
-        yoy[obs.tableDate] = obs.yoy;
-        ytd[obs.tableDate] = obs.ytd;
-      });
-      tableData.push({
-        series: series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? title + ' (SA)' : title,
-        observations: observations
-      });
-      if (yoySelected) {
-        tableData.push({
-          series: yoyLabel,
-          observations: yoy
-        });
-      }
-      if (ytdSelected) {
-        tableData.push({
-          series: ytdLabel,
-          observations: ytd
-        });
-      }
-    });
-    return { tableColumns: tableColumns, tableData: tableData };
   }
 
   // Combine level and percent arrays from Observation data

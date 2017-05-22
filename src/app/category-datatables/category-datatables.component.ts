@@ -13,11 +13,12 @@ import 'datatables.net-buttons/js/buttons.flash.js';
   encapsulation: ViewEncapsulation.None
 })
 export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnChanges {
-  @Input() data;
   @Input() tableId;
   @Input() sublist;
   @Input() geo;
   @Input() freq;
+  @Input() yoy;
+  @Input() ytd;
   private tableWidget;
 
   constructor() { }
@@ -26,7 +27,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
   }
 
   ngAfterViewInit() {
-    if (this.data) {
+    if (this.sublist.dateRange && this.sublist.displaySeries) {
       this.initDatatable();
     }
   }
@@ -36,15 +37,16 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       this.tableWidget.destroy();
       $('#indicator-table-' + this.tableId).empty();
     }
-    if (this.data) {
+    if (this.sublist.dateRange && this.sublist.displaySeries) {
       this.initDatatable();
     }
   }
 
   initDatatable(): void {
+    const datatables = this.formatTable(this.sublist.displaySeries, this.sublist.dateRange);
     const tableElement: any = $('#indicator-table-' + this.tableId);
-    const tableColumns = this.data.tableColumns;
-    const tableData = this.data.tableData;
+    const tableColumns = datatables.tableColumns;
+    const tableData = datatables.tableData;
     const sublistName = this.sublist.name;
     const parentName = this.sublist.parentName;
     const parentId = this.sublist.parentId;
@@ -72,5 +74,48 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       info: false,
     });
     tableElement.hide();
+  }
+
+  formatTable(displaySeries: Array<any>, tableDates: Array<any>) {
+    const yoySelected = this.yoy;
+    const ytdSelected = this.ytd;
+    // Format table for jquery datatables
+    const tableData = [];
+    const tableColumns = [];
+    tableColumns.push({ title: 'Series', data: 'series' });
+    tableDates.forEach((date) => {
+      tableColumns.push({ title: date, data: 'observations.' + date });
+    });
+    displaySeries.forEach((series) => {
+      const observations = {};
+      const yoy = {};
+      const ytd = {};
+      const percent = series.seriesInfo.percent;
+      const yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
+      const ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
+      const title = series.seriesInfo.title;
+      series.categoryTable.forEach((obs) => {
+        observations[obs.tableDate] = obs.level;
+        yoy[obs.tableDate] = obs.yoy;
+        ytd[obs.tableDate] = obs.ytd;
+      });
+      tableData.push({
+        series: title,
+        observations: observations
+      });
+      if (yoySelected) {
+        tableData.push({
+          series: yoyLabel,
+          observations: yoy
+        });
+      }
+      if (ytdSelected) {
+        tableData.push({
+          series: ytdLabel,
+          observations: ytd
+        });
+      }
+    });
+    return { tableColumns: tableColumns, tableData: tableData };
   }
 }

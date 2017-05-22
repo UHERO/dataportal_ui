@@ -6,6 +6,9 @@ import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
+import 'jquery';
+declare var $: any;
+
 
 @Component({
   selector: 'app-landing-page',
