@@ -85,7 +85,7 @@ export class HighchartComponent implements OnInit {
           this.points.forEach((point) => {
             let name;
             if (point.series.name === 'Level') {
-              name = 'Level';
+              name = '';
             }
             if (point.series.name === 'YTD' && dataFreq === 'A') {
               name = 'Year-Over-Year';
@@ -94,12 +94,12 @@ export class HighchartComponent implements OnInit {
               name = 'Year-To-Date';
             }
             if (point.series.name === 'YTD' && percent) {
-              name += ' Chg';
+              name += ' Chg: ';
             }
             if (point.series.name === 'YTD' && !percent) {
-              name += ' % Chg';
+              name += ' % Chg: ';
             }
-            let label = '<br>' + name + ': ' + Highcharts.numberFormat(point.y, decimals);
+            let label = '<br>' + name + Highcharts.numberFormat(point.y, decimals);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
             }

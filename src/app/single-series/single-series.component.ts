@@ -81,7 +81,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Update table when selecting new ranges in the chart
-  redrawTable(e, tableData, freq) {
+  redrawTable(e, seriesDetail, tableData, freq) {
+    const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e.minDate;
     maxDate = e.maxDate;
@@ -95,6 +96,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._series.summaryStats(this.newTableData, freq);
+    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls);
   }
 }
