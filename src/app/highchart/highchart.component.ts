@@ -29,9 +29,9 @@ export class HighchartComponent implements OnInit {
   }
 
   drawChart(seriesData, currentFreq) {
-    const level = seriesData.chartData.level;
-    const pseudoZones = seriesData.chartData.pseudoZones;
-    const ytd = seriesData.chartData.ytd;
+    const level = seriesData.categoryChart.chartData.level;
+    const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
+    const ytd = seriesData.categoryChart.chartData.ytd;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
     const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
@@ -249,10 +249,12 @@ export class HighchartComponent implements OnInit {
 
   render(event) {
     this.chart = event;
+    let latestLevel, latestYtd;
     const level = this.chart.series[0];
     const ytd = this.chart.series[1];
-    const latestLevel = (level !== undefined) ? level.points.length - 1 : null;
-    const latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+    // Get position of last non-null value
+    latestLevel = (level !== undefined) ? this.findLastValue(level.points) : null;
+    latestYtd = (ytd !== undefined) ? this.findLastValue(ytd.points) : null;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
@@ -267,5 +269,11 @@ export class HighchartComponent implements OnInit {
     if (latestLevel > 0 && latestYtd > 0) {
       this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
     }
+  }
+
+  findLastValue(valueArray) {
+    let counter = valueArray.length;
+    while (counter-- && !valueArray[counter].y);
+    return counter;
   }
 }

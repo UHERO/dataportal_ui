@@ -133,11 +133,11 @@ export class HelperService {
     dateWrapper.firstDate = '';
     dateWrapper.endDate = '';
     displaySeries.forEach((series) => {
-      if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
-        dateWrapper.firstDate = series.start;
+      if (dateWrapper.firstDate === '' || series.seriesObservations.observationStart < dateWrapper.firstDate) {
+        dateWrapper.firstDate = series.seriesObservations.observationStart;
       }
-      if (dateWrapper.endDate === '' || series.end > dateWrapper.endDate) {
-        dateWrapper.endDate = series.end;
+      if (dateWrapper.endDate === '' || series.seriesObservations.observationEnd > dateWrapper.endDate) {
+        dateWrapper.endDate = series.seriesObservations.observationEnd;
       }
     });
   }
