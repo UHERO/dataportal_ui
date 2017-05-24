@@ -25,6 +25,7 @@ export function highchartsFactory() {
 }
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { NouisliderModule } from 'ng2-nouislider';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
 
@@ -48,6 +49,7 @@ import { SearchBarComponent } from './search-bar/search-bar.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { CategoryDatatablesComponent } from './category-datatables/category-datatables.component';
 import { CategoryChartsComponent } from './category-charts/category-charts.component';
+import { DateSliderComponent } from './date-slider/date-slider.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +67,7 @@ import { CategoryChartsComponent } from './category-charts/category-charts.compo
     FeedbackComponent,
     CategoryDatatablesComponent,
     CategoryChartsComponent,
+    DateSliderComponent,
   ],
   imports: [
     BrowserModule,
@@ -74,6 +77,7 @@ import { CategoryChartsComponent } from './category-charts/category-charts.compo
     HttpModule,
     routing,
     DataTableModule, SharedModule,
+    NouisliderModule,
     RecaptchaModule.forRoot()
   ],
   providers: [
