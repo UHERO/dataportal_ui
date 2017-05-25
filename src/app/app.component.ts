@@ -8,7 +8,7 @@ declare var ga: Function;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(public _router: Router) {
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

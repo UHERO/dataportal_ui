@@ -91,7 +91,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       placement: function(popoverEl, el) {
         // popoverEl = popover DOM element
         // el = DOM element that triggers popover
-        let position = 'top'
+        let position = 'top';
         const elOffset = $(el).offset().top;
         if (elOffset <= 150) {
           position = 'bottom';
@@ -101,7 +101,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
       html: true,
       title: function() {
         let title = seriesInfo.title;
-        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')': ' (' + seriesInfo.unitsLabelShort + ')';
+        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
         return title;
       },
       content: function () {

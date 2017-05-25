@@ -1,34 +1,47 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, ViewChild, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-date-slider',
   templateUrl: './date-slider.component.html',
   styleUrls: ['./date-slider.component.scss']
 })
-export class DateSliderComponent implements OnInit {
+export class DateSliderComponent implements OnInit, OnChanges {
   private someRange;
   private sliderConfig;
   private start;
   private end;
   @Input() dateWrapper;
   @Input() freq;
+  @Input() routeStart;
+  @Input() routeEnd;
+  @Output() updateRange = new EventEmitter(true);
+  @ViewChild('nouislider') nouislider;
+
   constructor() { }
 
   ngOnInit() {
-
   }
 
   ngOnChanges() {
-    console.log('dates', this.dateWrapper);
-    console.log('freq', this.freq);
     if (this.dateWrapper && this.freq) {
       const step = this.calculateStep(this.freq);
       const range = this.dateRangeValues(this.dateWrapper);
-      this.createSliderConfig(range, step);
+      const sliderStart = (this.routeStart && this.routeEnd) ? this.configSliderStart(this.routeStart, this.routeEnd) : this.dateRangeValues(this.dateWrapper);
+      const startDate = new Date(this.timestamp(range.startYear, range.startMonth));
+      const endDate = new Date(this.timestamp(range.endYear, range.endMonth));
+      const formattedRange = this.formatDisplayDates(startDate, endDate, this.freq);
+      this.start = formattedRange.startDate;
+      this.end = formattedRange.endDate;
+      this.createSliderConfig(range, sliderStart, step);
+      console.log(this.sliderConfig)
+    }
+    if (this.nouislider) {
+      // Call updateOptions to update the slider's range limits
+      this.nouislider.slider.updateOptions(this.sliderConfig)
     }
   }
 
-  createSliderConfig(range, step) {
+  createSliderConfig(range, sliderStart, step) {
     this.sliderConfig = {
       behavior: 'drag',
       keyboard: true,
@@ -37,9 +50,8 @@ export class DateSliderComponent implements OnInit {
         min: this.timestamp(range.startYear, range.startMonth),
         max: this.timestamp(range.endYear, range.endMonth)
       },
-      // tooltips: [true, true],
       step: step,
-      start: [this.timestamp(range.startYear, range.startMonth), this.timestamp(range.endYear, range.endMonth)],
+      start: [this.timestamp(sliderStart.startYear, sliderStart.startMonth), this.timestamp(sliderStart.endYear, sliderStart.endMonth)],
       format: {
         to: function(value) {
           return value;
@@ -71,20 +83,40 @@ export class DateSliderComponent implements OnInit {
     return { startYear: startYear, startMonth: startMonth, endYear: endYear, endMonth: endMonth };
   }
 
+  configSliderStart(routeStart, routeEnd) {
+    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+    let startMonth, endMonth;
+    const startYear = +this.routeStart.substr(0, 4);
+    const endYear = +this.routeEnd.substr(0, 4);
+    if (this.freq === 'A') {
+      startMonth = 0;
+      endMonth = 0;
+    }
+    if (this.freq === 'Q') {
+      startMonth = quarters.indexOf(this.routeStart.substr(4, 2));
+      endMonth = quarters.indexOf(this.routeEnd.subtr(4, 2));
+    }
+    if (this.freq === 'M') {
+      startMonth = +this.routeStart.subtr(4, 2);
+      endMonth = +this.routeEnd.substr(4, 2);
+    }
+    return { startYear: startYear, startMonth: startMonth, endYear: endYear, endMonth: endMonth };
+  }
+
   // Create a new date from a string, return as a timestamp.
   timestamp(year: number, month: number) {
-    return new Date(year, month).getTime();
+    return new Date(year, month, 1).getTime();
   }
 
   onChange(event, freq) {
-    console.log(new Date(event[0]).toISOString())
     const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
     const first = new Date(event[0]);
     const last = new Date(event[1]);
     const formattedDates = this.formatDisplayDates(first, last, freq);
     this.start = formattedDates.startDate;
-    this.end = formattedDates.endDate
+    this.end = formattedDates.endDate;
+    this.updateRange.emit({ start: this.start.toString(), end: this.end.toString() });
   }
 
   formatDisplayDates(start, end, freq) {

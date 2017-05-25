@@ -23,7 +23,7 @@
 					class="selector"></app-freq-selector>
 				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
 				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
-        <app-date-slider [dateWrapper]="sub.dateWrapper" [freq]="data.currentFreq?.freq"></app-date-slider>
+        <app-date-slider [routeStart]="routeStart" [routeEnd]="routeEnd" [dateWrapper]="sub.dateWrapper" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
 				<app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>

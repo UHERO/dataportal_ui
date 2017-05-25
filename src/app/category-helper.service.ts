@@ -121,7 +121,7 @@ export class CategoryHelperService {
           sublist.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
           sublist.dateWrapper = splitSeries.dateWrapper;
           sublist.noData = false;
-          console.log(sublist)
+          console.log(sublist);
         } else {
           // No series exist for a subcateogry
           const series = [{ seriesInfo: 'No data available' }];
