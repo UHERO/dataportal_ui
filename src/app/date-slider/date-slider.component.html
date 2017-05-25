@@ -1,1 +1,3 @@
-<nouislider [config]="sliderConfig" [(ngModel)]="dateRange" (ngModelChange)="onChange($event)"></nouislider>
+{{start}}
+<nouislider *ngIf="sliderConfig" [config]="sliderConfig" [(ngModel)]="dateRange" (ngModelChange)="onChange($event, freq)"></nouislider>
+{{end}}
