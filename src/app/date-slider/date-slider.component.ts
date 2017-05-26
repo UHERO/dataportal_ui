@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-date-slider',
@@ -6,19 +6,9 @@ import { Component, OnInit, Input, OnChanges, ViewChild, EventEmitter, Output } 
   styleUrls: ['./date-slider.component.scss']
 })
 export class DateSliderComponent implements OnInit, OnChanges {
-  private selectedRange;
-  private slideMin;
-  private slideMax;
-  private step;
-  private sliderConfig;
-  private start;
-  private end;
-  @Input() dateWrapper;
+  @Input() dates;
   @Input() freq;
-  @Input() routeStart;
-  @Input() routeEnd;
   @Output() updateRange = new EventEmitter(true);
-  // @ViewChild('nouislider') nouislider;
 
   constructor() { }
 
@@ -26,30 +16,6 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    if (this.dateWrapper && this.freq) {
-      const slideLimits = this.dateRangeValues(this.dateWrapper);
-      this.slideMin = slideLimits.start;
-      this.slideMax = slideLimits.end;
-      this.selectedRange = [this.slideMin, this.slideMax];
-      this.step = this.calculateStep(this.freq);
-    }
-    /* if (this.dateWrapper && this.freq) {
-      const step = this.calculateStep(this.freq);
-      const range = this.dateRangeValues(this.dateWrapper);
-      const sliderStart = (this.routeStart && this.routeEnd) ? this.configSliderStart(this.routeStart, this.routeEnd) : this.dateRangeValues(this.dateWrapper);
-      console.log('slider start', sliderStart)
-      const startDate = new Date(this.timestamp(range.startYear, range.startMonth));
-      const endDate = new Date(this.timestamp(range.endYear, range.endMonth));
-      const formattedRange = this.formatDisplayDates(startDate, endDate, this.freq);
-      this.start = formattedRange.startDate;
-      this.end = formattedRange.endDate;
-      this.createSliderConfig(range, sliderStart, step);
-    }
-    if (this.nouislider) {
-      // Call updateOptions to update the slider's range limits
-      console.log(this.nouislider)
-      this.nouislider.slider.updateOptions(this.sliderConfig)
-    } */
   }
 
   dateRangeValues(dateWrapper) {
@@ -76,14 +42,31 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   slideChange(event, freq) {
-    console.log('change event', new Date(event.values[0]).toISOString());
-    const first = new Date(event.values[0]).toISOString().substr(0, 10);
-    const last = new Date(event.values[1]).toISOString().substr(0, 10);
-    // const formattedDates = this.formatDisplayDates(first, last, freq);
-    // console.log('formatted dates', formattedDates);
-    this.start = first;
-    this.end = last;
-    this.updateRange.emit({ start: first, end: last });
+    console.log('change event', event);
+    const chartStart = this.formatChartDate(event.from_value, freq);
+    const chartEnd = this.formatChartDate(event.to_value, freq);
+    const tableStart = event.from_value;
+    const tableEnd = event.to_value;
+    this.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
+  }
+
+  formatChartDate(value, freq) {
+    const quarters = {Q1: '01', Q2: '04', Q3: '07', Q4: '10'};
+    let date;
+    if (freq === 'A') {
+      date = value.toString() + '-01-01';
+      return Date.parse(date);
+    }
+    if (freq === 'Q') {
+      const year = value.substr(0, 4);
+      const q = value.substr(5, 2);
+      date = value.substr(0, 4) + '-' + quarters[q] + '-01';
+      return Date.parse(date);
+    }
+    if (freq === 'M') {
+      date = value + '-01';
+      return Date.parse(date);
+    }
   }
 
   formatDisplayDates(start, end, freq) {
@@ -121,82 +104,9 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
 
-  /* createSliderConfig(range, sliderStart, step) {
-    this.sliderConfig = {
-      behavior: 'drag',
-      keyboard: true,
-      connect: true,
-      range: {
-        min: this.timestamp(range.startYear, range.startMonth),
-        max: this.timestamp(range.endYear, range.endMonth)
-      },
-      step: step,
-      start: [this.timestamp(sliderStart.startYear, sliderStart.startMonth), this.timestamp(sliderStart.endYear, sliderStart.endMonth)],
-      format: {
-        to: function(value) {
-          return value;
-        },
-        from: function(value) {
-          return value;
-        }
-      }
-    }
-  }
-
-  calculateStep(freq) {
-    if (freq === 'A') {
-      return 52 * 7 * 24 * 60 * 60 * 1000; // One Year
-    }
-    if (freq === 'Q') {
-      return 12 * 7 * 24 * 60 * 60 * 1000; // One Quarter
-    }
-    if (freq === 'M') {
-      return 4 * 7 * 24 * 60 * 60 * 1000; // One Month
-    }
-  }
-
-  dateRangeValues(dateWrapper) {
-    const startYear = +dateWrapper.firstDate.substr(0, 4);
-    const startMonth = +dateWrapper.firstDate.substr(5, 2) - 1;
-    const endYear = +dateWrapper.endDate.substr(0, 4);
-    const endMonth = +dateWrapper.endDate.substr(5, 2) - 1;
-    return { startYear: startYear, startMonth: startMonth, endYear: endYear, endMonth: endMonth };
-  }
-
-  configSliderStart(routeStart, routeEnd) {
-    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
-    let startMonth, endMonth;
-    const startYear = +this.routeStart.substr(0, 4);
-    const endYear = +this.routeEnd.substr(0, 4);
-    if (this.freq === 'A') {
-      startMonth = 0;
-      endMonth = 0;
-    }
-    if (this.freq === 'Q') {
-      startMonth = quarters.indexOf(this.routeStart.substr(4, 2));
-      endMonth = quarters.indexOf(this.routeEnd.substr(4, 2));
-    }
-    if (this.freq === 'M') {
-      startMonth = +this.routeStart.substr(4, 2);
-      endMonth = +this.routeEnd.substr(4, 2);
-    }
-    return { startYear: startYear, startMonth: startMonth, endYear: endYear, endMonth: endMonth };
-  }
-
-  // Create a new date from a string, return as a timestamp.
+  /* // Create a new date from a string, return as a timestamp.
   timestamp(year: number, month: number) {
     return new Date(year, month, 1).getTime();
-  }
-
-  onChange(event, freq) {
-    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
-    const first = new Date(event[0]);
-    const last = new Date(event[1]);
-    const formattedDates = this.formatDisplayDates(first, last, freq);
-    this.start = formattedDates.startDate;
-    this.end = formattedDates.endDate;
-    this.updateRange.emit({ start: this.start.toString(), end: this.end.toString() });
   }
 
   formatDisplayDates(start, end, freq) {

@@ -1,6 +1,11 @@
 <!-- {{start}}
 <nouislider #nouislider *ngIf="sliderConfig" [config]="sliderConfig" [(ngModel)]="dateRange" (ngModelChange)="onChange($event, freq)"></nouislider>
 {{end}} -->
-{{start}}
-<p-slider [(ngModel)]="selectedRange" [min]="slideMin" [max]="slideMax" [step]="step" [range]="true" (onChange)="slideChange($event, freq)"></p-slider>
-{{end}}
+<ion-range-slider
+    type="double"
+    [values]="dates"
+    prettify_enabled="false"
+    hide_min_max="true"
+    keyboard="true"
+    (onFinish)="slideChange($event, freq)">
+</ion-range-slider>

@@ -26,13 +26,16 @@
         "../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
         "../node_modules/primeng/resources/primeng.min.css",
         "../node_modules/nouislider/distribute/nouislider.min.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
         "styles.scss"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.js",
         "../node_modules/tether/dist/js/tether.js",
         "../node_modules/bootstrap/dist/js/bootstrap.js",
-        "../node_modules/datatables.net/js/jquery.dataTables.js"
+        "../node_modules/datatables.net/js/jquery.dataTables.js",
+        "../node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

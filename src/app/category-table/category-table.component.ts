@@ -16,7 +16,7 @@ declare var $: any;
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements OnInit, AfterViewChecked {
+export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
   @Input() dates;
@@ -25,10 +25,14 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   @Input() ytdActive;
   @Input() params;
   @Input() subcatIndex;
-
+  @Input() tableStart;
+  @Input() tableEnd;
+  
   private previousHeight;
   private tableWidths = [];
   private tableHeaders = [];
+  private start;
+  private end;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -40,6 +44,11 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   ) { }
 
   ngOnInit() {
+  }
+
+  ngOnChanges() {
+    this.start = this.tableStart ? this.tableStart : this.dates[0];
+    this.end = this.tableEnd ? this.tableEnd : this.dates[this.dates.length - 1];
   }
 
   ngAfterViewChecked() {

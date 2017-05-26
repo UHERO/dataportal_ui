@@ -289,6 +289,7 @@ export class CategoryHelperService {
     dateArray.forEach((date) => {
       tableHeaderDates.push(date.tableDate);
     });
+    console.log(tableHeaderDates)
     return tableHeaderDates;
   }
 }

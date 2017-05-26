@@ -31,6 +31,7 @@
     "datatables.net-fixedcolumns": "^3.2.2",
     "datatables.net-fixedcolumns-dt": "^3.2.2",
     "highcharts-export-csv": "^1.4.3",
+    "ng2-ion-range-slider": "^1.0.2",
     "ng2-nouislider": "^1.6.1",
     "ng2-recaptcha": "^1.5.4",
     "nouislider": "^9.2.0",

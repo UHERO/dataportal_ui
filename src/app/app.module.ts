@@ -25,6 +25,7 @@ export function highchartsFactory() {
 }
 
 import { DataTableModule, SharedModule, SliderModule } from 'primeng/primeng';
+import { IonRangeSliderModule } from "ng2-ion-range-slider";
 import { NouisliderModule } from 'ng2-nouislider';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
@@ -78,6 +79,7 @@ import { DateSliderComponent } from './date-slider/date-slider.component';
     routing,
     DataTableModule, SharedModule, SliderModule,
     NouisliderModule,
+    IonRangeSliderModule,
     RecaptchaModule.forRoot()
   ],
   providers: [
