@@ -24,7 +24,7 @@ export function highchartsFactory() {
   return (highcharts);
 }
 
-import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { DataTableModule, SharedModule, SliderModule } from 'primeng/primeng';
 import { NouisliderModule } from 'ng2-nouislider';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
@@ -76,7 +76,7 @@ import { DateSliderComponent } from './date-slider/date-slider.component';
     ReactiveFormsModule,
     HttpModule,
     routing,
-    DataTableModule, SharedModule,
+    DataTableModule, SharedModule, SliderModule,
     NouisliderModule,
     RecaptchaModule.forRoot()
   ],

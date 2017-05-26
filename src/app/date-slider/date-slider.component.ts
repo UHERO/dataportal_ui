@@ -6,7 +6,10 @@ import { Component, OnInit, Input, OnChanges, ViewChild, EventEmitter, Output } 
   styleUrls: ['./date-slider.component.scss']
 })
 export class DateSliderComponent implements OnInit, OnChanges {
-  private someRange;
+  private selectedRange;
+  private slideMin;
+  private slideMax;
+  private step;
   private sliderConfig;
   private start;
   private end;
@@ -15,7 +18,7 @@ export class DateSliderComponent implements OnInit, OnChanges {
   @Input() routeStart;
   @Input() routeEnd;
   @Output() updateRange = new EventEmitter(true);
-  @ViewChild('nouislider') nouislider;
+  // @ViewChild('nouislider') nouislider;
 
   constructor() { }
 
@@ -24,24 +27,101 @@ export class DateSliderComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     if (this.dateWrapper && this.freq) {
+      const slideLimits = this.dateRangeValues(this.dateWrapper);
+      this.slideMin = slideLimits.start;
+      this.slideMax = slideLimits.end;
+      this.selectedRange = [this.slideMin, this.slideMax];
+      this.step = this.calculateStep(this.freq);
+    }
+    /* if (this.dateWrapper && this.freq) {
       const step = this.calculateStep(this.freq);
       const range = this.dateRangeValues(this.dateWrapper);
       const sliderStart = (this.routeStart && this.routeEnd) ? this.configSliderStart(this.routeStart, this.routeEnd) : this.dateRangeValues(this.dateWrapper);
+      console.log('slider start', sliderStart)
       const startDate = new Date(this.timestamp(range.startYear, range.startMonth));
       const endDate = new Date(this.timestamp(range.endYear, range.endMonth));
       const formattedRange = this.formatDisplayDates(startDate, endDate, this.freq);
       this.start = formattedRange.startDate;
       this.end = formattedRange.endDate;
       this.createSliderConfig(range, sliderStart, step);
-      console.log(this.sliderConfig)
     }
     if (this.nouislider) {
       // Call updateOptions to update the slider's range limits
+      console.log(this.nouislider)
       this.nouislider.slider.updateOptions(this.sliderConfig)
+    } */
+  }
+
+  dateRangeValues(dateWrapper) {
+    const start = Date.parse(dateWrapper.firstDate);
+    const end = Date.parse(dateWrapper.endDate);
+    return { start: start, end: end };
+  }
+
+  // Create a new date from a string, return as a timestamp.
+  timestamp(year: number, month: number) {
+    return new Date(year, month, 1).getTime();
+  }
+
+  calculateStep(freq) {
+    if (freq === 'A') {
+      return 365 * 24 * 60 * 60 * 1000; // One Year
+    }
+    if (freq === 'Q') {
+      return 12 * 7 * 24 * 60 * 60 * 1000; // One Quarter
+    }
+    if (freq === 'M') {
+      return 4 * 7 * 24 * 60 * 60 * 1000; // One Month
     }
   }
 
-  createSliderConfig(range, sliderStart, step) {
+  slideChange(event, freq) {
+    console.log('change event', new Date(event.values[0]).toISOString());
+    const first = new Date(event.values[0]).toISOString().substr(0, 10);
+    const last = new Date(event.values[1]).toISOString().substr(0, 10);
+    // const formattedDates = this.formatDisplayDates(first, last, freq);
+    // console.log('formatted dates', formattedDates);
+    this.start = first;
+    this.end = last;
+    this.updateRange.emit({ start: first, end: last });
+  }
+
+  formatDisplayDates(start, end, freq) {
+    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    if (freq === 'A') {
+      return { startDate: start.getFullYear(), endDate: end.getFullYear() }
+    }
+    if (freq === 'Q') {
+      return {
+        startDate: start.getFullYear() + ' ' + this.getQuarter(start.getMonth()),
+        endDate: end.getFullYear() + ' ' + this.getQuarter(end.getMonth())
+      }
+    }
+    if (freq === 'M') {
+      return {
+        startDate: start.getFullYear() + '-' + months[start.getMonth()],
+        endDate: end.getFullYear() + '-' + months[end.getMonth()]
+      }
+    }
+  }
+
+  getQuarter(month) {
+    if (0 <= month && month <= 2) {
+      return 'Q1';
+    }
+    if (3 <= month && month <= 5) {
+      return 'Q2';
+    }
+    if (6 <= month && month <= 8) {
+      return 'Q3';
+    }
+    if (9 <= month && month <= 11) {
+      return 'Q4';
+    }
+  }
+
+
+  /* createSliderConfig(range, sliderStart, step) {
     this.sliderConfig = {
       behavior: 'drag',
       keyboard: true,
@@ -94,10 +174,10 @@ export class DateSliderComponent implements OnInit, OnChanges {
     }
     if (this.freq === 'Q') {
       startMonth = quarters.indexOf(this.routeStart.substr(4, 2));
-      endMonth = quarters.indexOf(this.routeEnd.subtr(4, 2));
+      endMonth = quarters.indexOf(this.routeEnd.substr(4, 2));
     }
     if (this.freq === 'M') {
-      startMonth = +this.routeStart.subtr(4, 2);
+      startMonth = +this.routeStart.substr(4, 2);
       endMonth = +this.routeEnd.substr(4, 2);
     }
     return { startYear: startYear, startMonth: startMonth, endYear: endYear, endMonth: endMonth };
@@ -151,6 +231,6 @@ export class DateSliderComponent implements OnInit, OnChanges {
     if (9 <= month && month <= 11) {
       return 'Q4';
     }
-  }
+  } */
 
 }

@@ -170,12 +170,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.scrollToFragment();
   }
 
-  changeRange(e) {
+  changeRange(e, freq) {
     console.log('range start', e.start);
     console.log('range end', e.end);
-    this.queryParams.start = e.start.replace(/\s|-/g, '');
-    this.queryParams.end = e.end.replace(/\s|-/g, '');
-    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    console.log(freq)
+    // this.queryParams.start = e.start.replace(/\s|-/g, '');
+    // this.queryParams.end = e.end.replace(/\s|-/g, '');
+    // this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
   }
 
   // Work around for srolling to page anchor

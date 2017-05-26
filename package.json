@@ -34,7 +34,7 @@
     "ng2-nouislider": "^1.6.1",
     "ng2-recaptcha": "^1.5.4",
     "nouislider": "^9.2.0",
-    "primeng": "^4.0.0-rc.1",
+    "primeng": "^4.0.1",
     "rxjs": "^5.1.0",
     "tether": "^1.4.0",
     "tlite": "^0.1.6",
