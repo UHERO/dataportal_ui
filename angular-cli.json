@@ -25,7 +25,6 @@
         "../node_modules/datatables.net-dt/css/jquery.dataTables.css",
         "../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
         "../node_modules/primeng/resources/primeng.min.css",
-        "../node_modules/nouislider/distribute/nouislider.min.css",
         "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
         "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
         "styles.scss"

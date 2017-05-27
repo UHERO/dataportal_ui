@@ -7,7 +7,6 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/do';
 import { UheroApiService } from './uhero-api.service';
-import { CategoryTree } from './category-tree';
 
 let backend: MockBackend;
 let service: UheroApiService;

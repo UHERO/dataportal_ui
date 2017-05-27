@@ -28,7 +28,7 @@
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
 			<app-category-table *ngIf="routeView === 'table'" [tableStart]="tableStart" [tableEnd]="tableEnd" [data]="sub.displaySeries" [subcatIndex]="sub.id" [dates]="sub.dateRange" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
-      <app-category-charts *ngIf="routeView !== 'table'" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
+      <app-category-charts *ngIf="routeView !== 'table'" [chartStart]="chartStart" [chartEnd]="chartEnd" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>

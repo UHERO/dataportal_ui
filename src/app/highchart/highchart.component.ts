@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 
 import * as Highcharts from 'highcharts';
 
@@ -13,9 +13,11 @@ Highcharts.setOptions({
   templateUrl: './highchart.component.html',
   styleUrls: ['./highchart.component.scss']
 })
-export class HighchartComponent implements OnInit {
+export class HighchartComponent implements OnInit, OnChanges {
   @Input() seriesData;
   @Input() currentFreq;
+  @Input() chartStart;
+  @Input() chartEnd;
   public options: Object;
   private chart;
   constructor() { }
@@ -28,10 +30,21 @@ export class HighchartComponent implements OnInit {
     }
   }
 
-  drawChart(seriesData, currentFreq) {
-    const level = seriesData.categoryChart.chartData.level;
+  ngOnChanges() {
+    this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
+  }
+
+  drawChart(seriesData, currentFreq, start?, end?) {
+    let level, ytd;
+    if (start && end) {
+      level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
+      ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
+    }
+    if (!start && !end) {
+      level = seriesData.categoryChart.chartData.level;
+      ytd = seriesData.categoryChart.chartData.ytd;
+    }
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
-    const ytd = seriesData.categoryChart.chartData.ytd;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
     const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
@@ -275,5 +288,18 @@ export class HighchartComponent implements OnInit {
     let counter = valueArray.length;
     while (counter-- && !valueArray[counter].y);
     return counter;
+  }
+
+  trimData(dataArray, start, end) {
+    let startIndex = 0, endIndex = dataArray.length - 1;
+    dataArray.forEach((item, index) => {
+      if (item[0] === start) {
+        startIndex = index;
+      }
+      if (item[0] === end) {
+        endIndex = index;
+      }
+    });
+    return dataArray.slice(startIndex, endIndex + 1);
   }
 }

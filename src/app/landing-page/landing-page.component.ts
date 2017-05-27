@@ -29,6 +29,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private queryParams: any = {};
   private tableStart;
   private tableEnd;
+  private chartStart;
+  private chartEnd;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -176,6 +178,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     console.log('change range', e);
     this.tableStart = e.tableStart;
     this.tableEnd = e.tableEnd;
+    this.chartStart = e.chartStart;
+    this.chartEnd = e.chartEnd;
     // this.queryParams.start = e.start.replace(/\s|-/g, '');
     // this.queryParams.end = e.end.replace(/\s|-/g, '');
     // this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
