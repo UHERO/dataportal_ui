@@ -1,4 +1,6 @@
 import { Component, OnInit, Input, OnChanges, EventEmitter, Output } from '@angular/core';
+import 'jquery';
+declare var $: any;
 
 @Component({
   selector: 'app-date-slider',
@@ -8,7 +10,11 @@ import { Component, OnInit, Input, OnChanges, EventEmitter, Output } from '@angu
 export class DateSliderComponent implements OnInit, OnChanges {
   @Input() dates;
   @Input() freq;
+  @Input() dateFrom;
+  @Input() dateTo;
   @Output() updateRange = new EventEmitter(true);
+  private start;
+  private end;
 
   constructor() { }
 
@@ -16,37 +22,33 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-  }
-
-  dateRangeValues(dateWrapper) {
-    const start = Date.parse(dateWrapper.firstDate);
-    const end = Date.parse(dateWrapper.endDate);
-    return { start: start, end: end };
-  }
-
-  // Create a new date from a string, return as a timestamp.
-  timestamp(year: number, month: number) {
-    return new Date(year, month, 1).getTime();
-  }
-
-  calculateStep(freq) {
-    if (freq === 'A') {
-      return 365 * 24 * 60 * 60 * 1000; // One Year
-    }
-    if (freq === 'Q') {
-      return 12 * 7 * 24 * 60 * 60 * 1000; // One Quarter
-    }
-    if (freq === 'M') {
-      return 4 * 7 * 24 * 60 * 60 * 1000; // One Month
+    if (this.dates) {
+      // this.dates.map(String);
+      this.dates.forEach((date) => {
+        date = date.toString();
+      })
+      console.log('dates', this.dates);
+      console.log('dateFrom', this.dateFrom);
+      const startIndex = this.dates.indexOf(this.dateFrom);
+      const endIndex = this.dates.indexOf(this.dateTo);
+      this.start = startIndex === -1 ? 0 : startIndex;
+      this.end = endIndex === -1 ? this.dates.length - 1 : endIndex;
+      if (this.dateFrom === null) {
+        this.start = 0;
+      }
+      if (this.dateTo === null) {
+        this.end = this.dates.length - 1;
+      }
     }
   }
 
   slideChange(event, freq) {
-    console.log('change event', event);
     const chartStart = this.formatChartDate(event.from_value, freq);
     const chartEnd = this.formatChartDate(event.to_value, freq);
-    const tableStart = event.from_value;
-    const tableEnd = event.to_value;
+    const tableStart = event.from_value.toString();
+    const tableEnd = event.to_value.toString();
+    console.log(event);
+    this.dates.map(String);
     this.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
   }
 
@@ -68,79 +70,4 @@ export class DateSliderComponent implements OnInit, OnChanges {
       return Date.parse(date);
     }
   }
-
-  formatDisplayDates(start, end, freq) {
-    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    if (freq === 'A') {
-      return { startDate: start.getFullYear(), endDate: end.getFullYear() }
-    }
-    if (freq === 'Q') {
-      return {
-        startDate: start.getFullYear() + ' ' + this.getQuarter(start.getMonth()),
-        endDate: end.getFullYear() + ' ' + this.getQuarter(end.getMonth())
-      }
-    }
-    if (freq === 'M') {
-      return {
-        startDate: start.getFullYear() + '-' + months[start.getMonth()],
-        endDate: end.getFullYear() + '-' + months[end.getMonth()]
-      }
-    }
-  }
-
-  getQuarter(month) {
-    if (0 <= month && month <= 2) {
-      return 'Q1';
-    }
-    if (3 <= month && month <= 5) {
-      return 'Q2';
-    }
-    if (6 <= month && month <= 8) {
-      return 'Q3';
-    }
-    if (9 <= month && month <= 11) {
-      return 'Q4';
-    }
-  }
-
-
-  /* // Create a new date from a string, return as a timestamp.
-  timestamp(year: number, month: number) {
-    return new Date(year, month, 1).getTime();
-  }
-
-  formatDisplayDates(start, end, freq) {
-    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    if (freq === 'A') {
-      return { startDate: start.getFullYear(), endDate: end.getFullYear() }
-    }
-    if (freq === 'Q') {
-      return {
-        startDate: start.getFullYear() + ' ' + this.getQuarter(start.getMonth()),
-        endDate: end.getFullYear() + ' ' + this.getQuarter(end.getMonth())
-      }
-    }
-    if (freq === 'M') {
-      return {
-        startDate: start.getFullYear() + '-' + months[start.getMonth()],
-        endDate: end.getFullYear() + '-' + months[end.getMonth()]
-      }
-    }
-  }
-
-  getQuarter(month) {
-    if (0 <= month && month <= 2) {
-      return 'Q1';
-    }
-    if (3 <= month && month <= 5) {
-      return 'Q2';
-    }
-    if (6 <= month && month <= 8) {
-      return 'Q3';
-    }
-    if (9 <= month && month <= 11) {
-      return 'Q4';
-    }
-  } */
-
 }

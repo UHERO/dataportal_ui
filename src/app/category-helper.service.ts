@@ -51,6 +51,7 @@ export class CategoryHelperService {
 
   getSubcategoryData(catName: string, catId: number, sublist: Array<any>, routeGeo?: string, routeFreq?: string) {
     const geoArray = [], freqArray = [];
+    const categoryDateWrapper = {firstDate: '', endDate: ''};
     sublist.forEach((sub, index) => {
       // Get all regions available in a given category
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
@@ -90,7 +91,7 @@ export class CategoryHelperService {
               this.categoryData[catId + routeGeo + routeFreq].currentGeo = currentGeo;
               this.categoryData[catId + routeGeo + routeFreq].currentFreq = currentFreq;
               subcat.parentName = catName;
-              this.getSeriesData(subcat, currentGeo, currentFreq, dateWrapper);
+              this.getSeriesData(subcat, currentGeo, currentFreq, dateWrapper, categoryDateWrapper);
             });
           }
         });
@@ -98,8 +99,7 @@ export class CategoryHelperService {
   }
 
   // Get regions and frequencies available for a selected category
-  getSeriesData(sublist, currentGeo: Geography, currentFreq: Frequency, dateWrapper: DateWrapper) {
-    const saDateArray = [], nsaDateArray = [];
+  getSeriesData(sublist, currentGeo: Geography, currentFreq: Frequency, dateWrapper: DateWrapper, categoryDateWrapper: DateWrapper) {
     let expandedResults;
     this._uheroAPIService.fetchExpanded(sublist['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
       expandedResults = expanded;
@@ -112,7 +112,7 @@ export class CategoryHelperService {
         if (expandedResults) {
           // Get array of all series that have level data available
           // Filter out series from expandedResults with non-seasonally-adjusted data
-          const splitSeries = this.getDisplaySeries(expandedResults, dateWrapper, currentFreq.freq);
+          const splitSeries = this.getDisplaySeries(expandedResults, dateWrapper, currentFreq.freq, categoryDateWrapper);
           // sublist id used as anchor fragments in landing-page component, fragment expects a string
           sublist.id = sublist.id.toString();
           sublist.dateRange = splitSeries.tableDates;
@@ -120,6 +120,8 @@ export class CategoryHelperService {
           // sublist.allSeries = expandedResults;
           sublist.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
           sublist.dateWrapper = splitSeries.dateWrapper;
+          sublist.categoryDateWrapper = splitSeries.categoryDateWrapper;
+          sublist.categoryDates = splitSeries.categoryDates;
           sublist.noData = false;
           console.log(sublist);
         } else {
@@ -188,6 +190,7 @@ export class CategoryHelperService {
 
   getSearchData(search: string, geo: string, freq: string, dateWrapper: DateWrapper, routeGeo?: string, routeFreq?: string) {
     let searchResults;
+    let categoryDateWrapper = <DateWrapper>{}
     // Get expanded search results for a selected region & frequency
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
       searchResults = searchRes;
@@ -199,7 +202,7 @@ export class CategoryHelperService {
         if (searchResults) {
           // Get array of all series that have level data available
           const searchSeries = this.filterSeriesResults(searchResults, freq);
-          const splitSeries = this.getDisplaySeries(searchSeries, dateWrapper, freq);
+          const splitSeries = this.getDisplaySeries(searchSeries, dateWrapper, freq, categoryDateWrapper);
           const sublist = {
             id: 'search',
             parentName: 'Search',
@@ -253,8 +256,9 @@ export class CategoryHelperService {
     return saSeries ? true : false;
   }
 
-  getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq: string) {
+  getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq: string, categoryDateWrapper: DateWrapper) {
     const dateArray = [];
+    const categoryDateArray = [];
     // Check if category series has seasonally adjusted data
     const hasSeasonallyAdjusted = this.checkSA(allSeries);
     const displaySeries = [];
@@ -267,11 +271,21 @@ export class CategoryHelperService {
     this._helper.setDateWrapper(displaySeries, dateWrapper);
     this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
     const filtered = this.filterSeriesResults(displaySeries, freq);
-    const tableDates = this.formatCatTableData(filtered, dateArray, dateWrapper);
-
+    // const tableDates = this.formatCatTableData(filtered, dateArray, dateWrapper);
+    if (categoryDateWrapper.firstDate === '' || dateWrapper.firstDate < categoryDateWrapper.firstDate) {
+      categoryDateWrapper.firstDate = dateWrapper.firstDate;
+    }
+    if (categoryDateWrapper.endDate === '' || dateWrapper.endDate > categoryDateWrapper.endDate) {
+      categoryDateWrapper.endDate = dateWrapper.endDate;
+    }
+    this._helper.calculateDateArray(categoryDateWrapper.firstDate, categoryDateWrapper.endDate, freq, categoryDateArray);
+    const categoryDates = this.getTableDates(categoryDateArray);
+    const tableDates = this.formatCatTableData(filtered, categoryDateArray, categoryDateWrapper);
     return {
       displaySeries: filtered,
       dateWrapper: dateWrapper,
+      categoryDateWrapper: categoryDateWrapper,
+      categoryDates: categoryDates,
       tableDates: tableDates,
       hasSeasonallyAdjusted: hasSeasonallyAdjusted
     };
@@ -283,13 +297,16 @@ export class CategoryHelperService {
       series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, decimals);
       series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
     });
-    const tableHeaderDates = [];
     const dateStart = dateWrapper.firstDate;
     const dateEnd = dateWrapper.endDate;
+    return this.getTableDates(dateArray);
+  }
+
+  getTableDates(dateArray: Array<any>) {
+    const tableDates = [];
     dateArray.forEach((date) => {
-      tableHeaderDates.push(date.tableDate);
+      tableDates.push(date.tableDate);
     });
-    console.log(tableHeaderDates)
-    return tableHeaderDates;
+    return tableDates;
   }
 }

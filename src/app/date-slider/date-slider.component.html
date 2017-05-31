@@ -1,8 +1,12 @@
 <ion-range-slider
+    class="sliders"
     type="double"
+    [from]="dateFrom ? start : null"
+    [to]="dateTo ? end : null"
     [values]="dates"
     prettify_enabled="false"
     hide_min_max="true"
     keyboard="true"
+    keyboard_step = "1"
     (onFinish)="slideChange($event, freq)">
 </ion-range-slider>

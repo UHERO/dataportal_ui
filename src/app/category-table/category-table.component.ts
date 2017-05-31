@@ -47,8 +47,10 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   }
 
   ngOnChanges() {
-    this.start = this.tableStart ? this.tableStart : this.dates[0];
-    this.end = this.tableEnd ? this.tableEnd : this.dates[this.dates.length - 1];
+    if (this.dates) {
+      this.start = this.tableStart ? this.tableStart : this.dates[0];
+      this.end = this.tableEnd ? this.tableEnd : this.dates[this.dates.length - 1];
+    }
   }
 
   ngAfterViewChecked() {
