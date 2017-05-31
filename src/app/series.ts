@@ -4,6 +4,7 @@ export interface Series {
   id: string;
   title?: string;
   name: string;
+  measurementId: number;
   observationStart?: string;
   observationEnd?: string;
   frequency: string;
