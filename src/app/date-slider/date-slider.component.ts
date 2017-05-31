@@ -23,10 +23,6 @@ export class DateSliderComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     if (this.dates) {
-      // this.dates.map(String);
-      this.dates.forEach((date) => {
-        date = date.toString();
-      })
       console.log('dates', this.dates);
       console.log('dateFrom', this.dateFrom);
       const startIndex = this.dates.indexOf(this.dateFrom);
