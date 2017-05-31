@@ -22,6 +22,11 @@ export class CategoryHelperService {
   private seriesDates = [];
   private series = [];
 
+  static checkSA(seriesArray) {
+    const saSeries = seriesArray.find(series => series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted');
+    return !!saSeries;
+  }
+
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   // Called on page load
@@ -65,7 +70,7 @@ export class CategoryHelperService {
         });
       },
         (error) => {
-          error = this.errorMessage = error;
+          this.errorMessage = error;
         },
         () => {
           if (index === sublist.length - 1) {
@@ -149,7 +154,7 @@ export class CategoryHelperService {
         obsStart = results.observationStart;
       },
         (error) => {
-          error = this.errorMessage = error;
+          this.errorMessage = error;
         },
         () => {
           if (obsEnd && obsStart) {
@@ -193,7 +198,7 @@ export class CategoryHelperService {
       searchResults = searchRes;
     },
       (error) => {
-        error = this.errorMessage = error;
+        this.errorMessage = error;
       },
       () => {
         if (searchResults) {
@@ -209,7 +214,7 @@ export class CategoryHelperService {
             displaySeries: splitSeries.displaySeries
           };
           this.categoryData[search + routeGeo + routeFreq].sublist = [sublist];
-        };
+        }
       });
   }
 
@@ -238,31 +243,38 @@ export class CategoryHelperService {
       if (levelData) {
         seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
+        res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
-        series.seriesInfo.saParam = res.seasonalAdjustment === 'seasonally_adjusted' ? true : false;
         filtered.push(series);
       }
     });
     return filtered;
   }
 
-  checkSA(seriesArray) {
-    const saSeries = seriesArray.find(series => series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted');
-    return saSeries ? true : false;
-  }
-
   getDisplaySeries(allSeries, dateWrapper: DateWrapper, freq: string) {
     const dateArray = [];
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data
-    const hasSeasonallyAdjusted = this.checkSA(allSeries);
+    const hasSeasonallyAdjusted = CategoryHelperService.checkSA(allSeries);
     const displaySeries = [];
+    const measurements = new Map();
+
     allSeries.forEach((series) => {
-      if (series.seriesInfo.seasonalAdjustment !== 'not_seasonally_adjusted' || hasSeasonallyAdjusted === false) {
-        // only include series with seasonal adjustment or where seasonality is not applicable
+      if (!series.seriesInfo.hasOwnProperty('measurementId')) {
         displaySeries.push(series);
+        return;
+      }
+      const measurementKey = `m${series.seriesInfo.measurementId}`;
+      if (!measurements.has(measurementKey)) {
+        measurements.set(measurementKey, series);
+        return;
+      }
+      if (series.seriesInfo.seasonalAdjustment !== 'not_seasonally_adjusted') {
+        measurements.set(measurementKey, series);
       }
     });
+    measurements.forEach((measurement) => displaySeries.push(measurement));
+
     this._helper.setDateWrapper(displaySeries, dateWrapper);
     this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
     const catTable = this.formatCatTableData(displaySeries, dateArray, dateWrapper);
