@@ -271,4 +271,17 @@ export class HelperService {
       }
     }
   }
+
+  setDefaultRange(freq, dataArray) {
+    // Default to full range for annual data; otherwise, show most recent year
+    if (freq === 'A') {
+      return { start: 0, end: dataArray.length - 1 }
+    }
+    if (freq === 'Q') {
+      return { start: dataArray.length - 5, end: dataArray.length - 1 }
+    }
+    if (freq === 'M') {
+      return { start: dataArray.length - 13, end: dataArray.length - 1 }
+    }
+  }
 }

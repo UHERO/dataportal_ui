@@ -96,7 +96,7 @@ export class CategoryHelperService {
               this.categoryData[catId + routeGeo + routeFreq].currentGeo = currentGeo;
               this.categoryData[catId + routeGeo + routeFreq].currentFreq = currentFreq;
               subcat.parentName = catName;
-              this.getSeriesData(subcat, currentGeo, currentFreq, dateWrapper, categoryDateWrapper);
+              this.getSeriesData(subcat, catId, routeGeo, routeFreq, currentGeo, currentFreq, dateWrapper, categoryDateWrapper);
             });
           }
         });
@@ -104,7 +104,7 @@ export class CategoryHelperService {
   }
 
   // Get regions and frequencies available for a selected category
-  getSeriesData(sublist, currentGeo: Geography, currentFreq: Frequency, dateWrapper: DateWrapper, categoryDateWrapper: DateWrapper) {
+  getSeriesData(sublist, catId, routeGeo, routeFreq, currentGeo: Geography, currentFreq: Frequency, dateWrapper: DateWrapper, categoryDateWrapper: DateWrapper) {
     let expandedResults;
     this._uheroAPIService.fetchExpanded(sublist['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
       expandedResults = expanded;
@@ -123,10 +123,11 @@ export class CategoryHelperService {
           sublist.dateRange = splitSeries.tableDates;
           sublist.displaySeries = splitSeries.displaySeries;
           // sublist.allSeries = expandedResults;
-          sublist.hasSeaonsallyAdjusted = splitSeries.hasSeasonallyAdjusted;
           sublist.dateWrapper = splitSeries.dateWrapper;
           sublist.categoryDateWrapper = splitSeries.categoryDateWrapper;
           sublist.categoryDates = splitSeries.categoryDates;
+          this.categoryData[catId + routeGeo + routeFreq].categoryDateWrapper = splitSeries.categoryDateWrapper;
+          this.categoryData[catId + routeGeo + routeFreq].categoryDates = splitSeries.categoryDates;
           sublist.noData = false;
           console.log(sublist);
         } else {
@@ -195,7 +196,7 @@ export class CategoryHelperService {
 
   getSearchData(search: string, geo: string, freq: string, dateWrapper: DateWrapper, routeGeo?: string, routeFreq?: string) {
     let searchResults;
-    let categoryDateWrapper = <DateWrapper>{}
+    const categoryDateWrapper = <DateWrapper>{};
     // Get expanded search results for a selected region & frequency
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
       searchResults = searchRes;
@@ -214,7 +215,6 @@ export class CategoryHelperService {
             name: search,
             dateWrapper: splitSeries.dateWrapper,
             dateRange: splitSeries.tableDates,
-            hasSeaonsallyAdjusted: splitSeries.hasSeasonallyAdjusted,
             displaySeries: splitSeries.displaySeries
           };
           this.categoryData[search + routeGeo + routeFreq].sublist = [sublist];
@@ -260,7 +260,6 @@ export class CategoryHelperService {
     const categoryDateArray = [];
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data
-    const hasSeasonallyAdjusted = CategoryHelperService.checkSA(allSeries);
     const displaySeries = [];
     const measurements = new Map();
     allSeries.forEach((series) => {
@@ -298,7 +297,6 @@ export class CategoryHelperService {
       categoryDateWrapper: categoryDateWrapper,
       categoryDates: categoryDates,
       tableDates: tableDates,
-      hasSeasonallyAdjusted: hasSeasonallyAdjusted
     };
   }
 

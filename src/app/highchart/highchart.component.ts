@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
-
+import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
 Highcharts.setOptions({
@@ -20,13 +20,14 @@ export class HighchartComponent implements OnInit, OnChanges {
   @Input() chartEnd;
   public options: Object;
   private chart;
-  constructor() { }
+
+  constructor(private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq);
+      this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
     }
   }
 
@@ -36,14 +37,8 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   drawChart(seriesData, currentFreq, start?, end?) {
     let level, ytd;
-    if (start && end) {
-      level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
-      ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
-    }
-    if (!start && !end) {
-      level = seriesData.categoryChart.chartData.level;
-      ytd = seriesData.categoryChart.chartData.ytd;
-    }
+    level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
+    ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
@@ -291,7 +286,8 @@ export class HighchartComponent implements OnInit, OnChanges {
   }
 
   trimData(dataArray, start, end) {
-    let startIndex = 0, endIndex = dataArray.length - 1;
+    const defaultRange = this._helper.setDefaultRange(this.currentFreq, dataArray);
+    let startIndex = defaultRange.start, endIndex = defaultRange.end;
     dataArray.forEach((item, index) => {
       if (item[0] === start) {
         startIndex = index;

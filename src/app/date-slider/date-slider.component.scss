@@ -1,0 +1,10 @@
+.sliders {
+    display: inline-block;
+    width: 200px;
+    vertical-align: middle;
+    margin-left: 10px;
+    
+    .irs-slider, .irs-slider.type_last {
+        z-index: 0;
+    }
+}

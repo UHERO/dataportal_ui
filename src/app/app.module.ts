@@ -25,7 +25,7 @@ export function highchartsFactory() {
 }
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { IonRangeSliderModule } from "ng2-ion-range-slider";
+import { IonRangeSliderModule } from 'ng2-ion-range-slider';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { routing } from './app.routes';
 

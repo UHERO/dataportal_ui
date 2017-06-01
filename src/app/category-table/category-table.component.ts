@@ -19,6 +19,7 @@ declare var $: any;
 export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
+  @Input() freq;
   @Input() dates;
   @Input() noSeries;
   @Input() yoyActive;
@@ -27,12 +28,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   @Input() subcatIndex;
   @Input() tableStart;
   @Input() tableEnd;
-  
+  private tableHeader;
   private previousHeight;
   private tableWidths = [];
-  private tableHeaders = [];
-  private start;
-  private end;
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -48,8 +46,23 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
 
   ngOnChanges() {
     if (this.dates) {
-      this.start = this.tableStart ? this.tableStart : this.dates[0];
-      this.end = this.tableEnd ? this.tableEnd : this.dates[this.dates.length - 1];
+      let startIndex = null, endIndex = null;
+      this.dates.forEach((date, index) => {
+        // Range slider is converting annual year strings to numbers
+        if (date == this.tableStart) {
+          startIndex = index;
+        }
+        if (date == this.tableEnd) {
+          endIndex = index;
+        }
+      });
+      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      const start = startIndex ? startIndex : defaultRanges.start;
+      const end = endIndex ? endIndex : defaultRanges.end;
+      this.tableHeader = this.dates.slice(start, end + 1);
+      this.data.forEach((series) => {
+        series.trimCatTable = series.categoryTable.slice(start, end + 1);
+      });
     }
   }
 

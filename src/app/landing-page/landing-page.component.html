@@ -24,10 +24,11 @@
 				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
 				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table View <i class="material-icons md-18">view_list</i></a>
 				<app-category-datatables *ngIf="!sub.noData && routeView === 'table'" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
-        <app-date-slider [dates]="sub.categoryDates" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
+        <app-date-slider *ngIf="data.categoryDates" [dates]="data.categoryDates" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
+				<!-- <app-date-slider [dates]="sub.categoryDates" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider> -->
         <i *ngIf="loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table'" [tableStart]="tableStart" [tableEnd]="tableEnd" [data]="sub.displaySeries" [subcatIndex]="sub.id" [dates]="sub.categoryDates" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+			<app-category-table *ngIf="routeView === 'table'" [tableStart]="tableStart" [tableEnd]="tableEnd" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [dates]="sub.categoryDates" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
       <app-category-charts *ngIf="routeView !== 'table'" [chartStart]="chartStart" [chartEnd]="chartEnd" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>

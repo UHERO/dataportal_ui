@@ -15,7 +15,7 @@ export class CategoryChartsComponent implements OnInit {
   @Input() params;
   @Input() chartStart;
   @Input() chartEnd;
-  
+
   constructor(private googleAES: GoogleAnalyticsEventsService) { }
 
   ngOnInit() {

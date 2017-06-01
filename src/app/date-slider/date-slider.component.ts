@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, OnChanges, EventEmitter, Output } from '@angular/core';
-import 'jquery';
-declare var $: any;
+import { Component, OnInit, Input, OnChanges, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'app-date-slider',
   templateUrl: './date-slider.component.html',
-  styleUrls: ['./date-slider.component.scss']
+  styleUrls: ['./date-slider.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class DateSliderComponent implements OnInit, OnChanges {
   @Input() dates;
@@ -16,35 +16,35 @@ export class DateSliderComponent implements OnInit, OnChanges {
   private start;
   private end;
 
-  constructor() { }
+  constructor(private _helper: HelperService) { }
 
   ngOnInit() {
   }
 
   ngOnChanges() {
     if (this.dates) {
-      console.log('dates', this.dates);
-      console.log('dateFrom', this.dateFrom);
-      const startIndex = this.dates.indexOf(this.dateFrom);
-      const endIndex = this.dates.indexOf(this.dateTo);
-      this.start = startIndex === -1 ? 0 : startIndex;
-      this.end = endIndex === -1 ? this.dates.length - 1 : endIndex;
-      if (this.dateFrom === null) {
-        this.start = 0;
-      }
-      if (this.dateTo === null) {
-        this.end = this.dates.length - 1;
-      }
+      let startIndex = null, endIndex = null;
+      this.dates.forEach((date, index) => {
+        // Range slider is converting annual year strings to numbers
+        if (date == this.dateFrom) {
+          startIndex = index;
+        }
+        if (date == this.dateTo) {
+          endIndex = index;
+        }
+      });
+      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      this.start = startIndex ? startIndex : defaultRanges.start;
+      this.end = endIndex ? endIndex : defaultRanges.end;
+      console.log(this.end)
     }
   }
 
-  slideChange(event, freq) {
+  sliderFinish(event, freq) {
     const chartStart = this.formatChartDate(event.from_value, freq);
     const chartEnd = this.formatChartDate(event.to_value, freq);
     const tableStart = event.from_value.toString();
     const tableEnd = event.to_value.toString();
-    console.log(event);
-    this.dates.map(String);
     this.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
   }
 
