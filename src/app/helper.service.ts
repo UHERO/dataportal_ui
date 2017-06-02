@@ -67,12 +67,15 @@ export class HelperService {
 
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
+    console.log('dateRnage', dateRange)
     dateRange.forEach((date) => {
       table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
+      console.log('series date', seriesDate)
       const tableEntry = table.find(date => date.date === seriesDate);
+      console.log('table entry', tableEntry)
       tableEntry.value = data.value;
       tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
       tableEntry.yoy = data.yoyValue;
@@ -273,15 +276,15 @@ export class HelperService {
   }
 
   setDefaultRange(freq, dataArray) {
-    // Default to full range for annual data; otherwise, show most recent year
+    // Default to last 10 years
     if (freq === 'A') {
-      return { start: 0, end: dataArray.length - 1 }
+      return { start: dataArray.length - 11, end: dataArray.length - 1 }
     }
     if (freq === 'Q') {
-      return { start: dataArray.length - 5, end: dataArray.length - 1 }
+      return { start: dataArray.length - 41, end: dataArray.length - 1 }
     }
     if (freq === 'M') {
-      return { start: dataArray.length - 13, end: dataArray.length - 1 }
+      return { start: dataArray.length - 121, end: dataArray.length - 1 }
     }
   }
 }

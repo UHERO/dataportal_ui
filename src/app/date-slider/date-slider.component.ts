@@ -8,13 +8,16 @@ import { HelperService } from '../helper.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DateSliderComponent implements OnInit, OnChanges {
-  @Input() dates;
+  @Input() subCats;
+  // @Input() dates;
+  @Input() dateWrapper;
   @Input() freq;
   @Input() dateFrom;
   @Input() dateTo;
   @Output() updateRange = new EventEmitter(true);
   private start;
   private end;
+  private dates = [];
 
   constructor(private _helper: HelperService) { }
 
@@ -22,8 +25,18 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    if (this.dates) {
-      let startIndex = null, endIndex = null;
+    // Get date range for an entire category
+    this.dates = [];
+    if (this.dateWrapper) {
+      const dateArray = [];
+      this._helper.calculateDateArray(this.dateWrapper.firstDate, this.dateWrapper.endDate, this.freq, dateArray);
+      dateArray.forEach((date) => {
+        this.dates.push(date.tableDate);
+      });
+    }
+    if (this.dates && this.dates.length) {
+      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers
         if (date == this.dateFrom) {
@@ -33,10 +46,10 @@ export class DateSliderComponent implements OnInit, OnChanges {
           endIndex = index;
         }
       });
-      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
-      this.start = startIndex ? startIndex : defaultRanges.start;
-      this.end = endIndex ? endIndex : defaultRanges.end;
-      console.log(this.end)
+      // Start and end used for 'from' and 'to' inputs in slider
+      // If start/end exist in values array, position handles at start/end; otherwise, use default range
+      this.start = startIndex;
+      this.end = endIndex;
     }
   }
 
@@ -49,7 +62,7 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   formatChartDate(value, freq) {
-    const quarters = {Q1: '01', Q2: '04', Q3: '07', Q4: '10'};
+    const quarters = { Q1: '01', Q2: '04', Q3: '07', Q4: '10' };
     let date;
     if (freq === 'A') {
       date = value.toString() + '-01-01';

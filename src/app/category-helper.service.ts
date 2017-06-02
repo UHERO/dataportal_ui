@@ -21,6 +21,7 @@ export class CategoryHelperService {
   private categoryDates = [];
   private seriesDates = [];
   private series = [];
+  private requestsRemain;
 
   static checkSA(seriesArray) {
     const saSeries = seriesArray.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
@@ -41,6 +42,7 @@ export class CategoryHelperService {
         if (cat) {
           const selectedCategory = cat.name;
           const sublist = cat.children;
+          this.requestsRemain = sublist.length;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
           this.categoryData[catId + routeGeo + routeFreq].selectedCategory = selectedCategory;
@@ -75,7 +77,7 @@ export class CategoryHelperService {
         },
         () => {
           if (index === sublist.length - 1) {
-            sublist.forEach((subcat) => {
+            sublist.forEach((subcat, i) => {
               const dateWrapper = <DateWrapper>{};
               let selectedFreq, selectedGeo;
               selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
@@ -108,6 +110,7 @@ export class CategoryHelperService {
     let expandedResults;
     this._uheroAPIService.fetchExpanded(sublist['id'], currentGeo.handle, currentFreq.freq).subscribe((expanded) => {
       expandedResults = expanded;
+      this.requestsRemain -= 1;
     },
       (error) => {
         console.log('error', error);
@@ -124,12 +127,12 @@ export class CategoryHelperService {
           sublist.displaySeries = splitSeries.displaySeries;
           // sublist.allSeries = expandedResults;
           sublist.dateWrapper = splitSeries.dateWrapper;
-          sublist.categoryDateWrapper = splitSeries.categoryDateWrapper;
+          // sublist.categoryDateWrapper = splitSeries.categoryDateWrapper;
           sublist.categoryDates = splitSeries.categoryDates;
           this.categoryData[catId + routeGeo + routeFreq].categoryDateWrapper = splitSeries.categoryDateWrapper;
           this.categoryData[catId + routeGeo + routeFreq].categoryDates = splitSeries.categoryDates;
+          this.categoryData[catId + routeGeo + routeFreq].requestsRemain = this.requestsRemain;
           sublist.noData = false;
-          console.log(sublist);
         } else {
           // No series exist for a subcateogry
           const series = [{ seriesInfo: 'No data available' }];
@@ -304,6 +307,7 @@ export class CategoryHelperService {
     displaySeries.forEach((series) => {
       const decimals = series.decimals ? series.decimals : 1;
       series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, dateWrapper, decimals);
+      console.log(series)
       series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
     });
     const dateStart = dateWrapper.firstDate;

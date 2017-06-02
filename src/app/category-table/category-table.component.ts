@@ -19,6 +19,7 @@ declare var $: any;
 export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
+  @Input() subCats;
   @Input() freq;
   @Input() dates;
   @Input() noSeries;
@@ -46,7 +47,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
 
   ngOnChanges() {
     if (this.dates) {
-      let startIndex = null, endIndex = null;
+      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers
         if (date == this.tableStart) {
@@ -56,13 +58,14 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
           endIndex = index;
         }
       });
-      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
-      const start = startIndex ? startIndex : defaultRanges.start;
-      const end = endIndex ? endIndex : defaultRanges.end;
+      const start = startIndex;
+      const end = endIndex;
       this.tableHeader = this.dates.slice(start, end + 1);
-      this.data.forEach((series) => {
-        series.trimCatTable = series.categoryTable.slice(start, end + 1);
-      });
+      if (this.data) {
+        this.data.forEach((series) => {
+          series.trimCatTable = series.categoryTable.slice(start, end + 1);
+        });
+      }
     }
   }
 

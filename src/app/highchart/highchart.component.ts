@@ -96,10 +96,10 @@ export class HighchartComponent implements OnInit, OnChanges {
               name = '';
             }
             if (point.series.name === 'YTD' && dataFreq === 'A') {
-              name = 'Year-Over-Year';
+              name = 'Year-over-Year';
             }
             if (point.series.name === 'YTD' && dataFreq !== 'A') {
-              name = 'Year-To-Date';
+              name = 'Year-to-Date';
             }
             if (point.series.name === 'YTD' && percent) {
               name += ' Chg: ';

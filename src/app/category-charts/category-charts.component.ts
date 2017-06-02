@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+
 @Component({
   selector: 'app-category-charts',
   templateUrl: './category-charts.component.html',
