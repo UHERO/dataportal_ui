@@ -175,7 +175,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   changeRange(e) {
-    console.log('change range', e);
     this.tableStart = e.tableStart;
     this.tableEnd = e.tableEnd;
     this.chartStart = e.chartStart;

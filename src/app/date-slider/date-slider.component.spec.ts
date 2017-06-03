@@ -6,7 +6,7 @@ describe('DateSliderComponent', () => {
   let component: DateSliderComponent;
   let fixture: ComponentFixture<DateSliderComponent>;
 
-  beforeEach(async(() => {
+  /* beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ DateSliderComponent ]
     })
@@ -19,7 +19,7 @@ describe('DateSliderComponent', () => {
     fixture.detectChanges();
   });
 
-  /* it('should create', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   }); */
 });

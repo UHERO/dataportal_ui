@@ -7,7 +7,7 @@
 					<tr>
 						<th class="empty-header">&nbsp;</th>
 						<ng-template ngFor let-date [ngForOf]="tableHeader" let-i="index">
-							<td><b>{{date}}</b></td>
+							<td><b>{{date.tableDate}}</b></td>
 						</ng-template>
 					</tr>
 					<ng-template ngFor let-serie [ngForOf]="data" let-i="index">

@@ -67,15 +67,12 @@ export class HelperService {
 
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
-    console.log('dateRnage', dateRange)
     dateRange.forEach((date) => {
       table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
-      console.log('series date', seriesDate)
       const tableEntry = table.find(date => date.date === seriesDate);
-      console.log('table entry', tableEntry)
       tableEntry.value = data.value;
       tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
       tableEntry.yoy = data.yoyValue;
@@ -105,11 +102,11 @@ export class HelperService {
     return [levelValue, yoyValue, ytdValue];
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper, decimals: number) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, decimals: number) {
     // Format series data for the category table
-    let categoryTableData = [];
+    const categoryTableData = [];
     dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, level: '', yoy: '', ytd: '' });
+      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
@@ -119,16 +116,6 @@ export class HelperService {
         tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
       }
     });
-    let tableStart, tableEnd;
-    categoryTableData.forEach((item, index) => {
-      if (item.date === dateWrapper.firstDate) {
-        tableStart = index;
-      }
-      if (item.date === dateWrapper.endDate) {
-        tableEnd = index;
-      }
-    });
-    categoryTableData = categoryTableData.slice(tableStart, tableEnd + 1);
     return categoryTableData;
   }
 
@@ -136,11 +123,11 @@ export class HelperService {
     dateWrapper.firstDate = '';
     dateWrapper.endDate = '';
     displaySeries.forEach((series) => {
-      if (dateWrapper.firstDate === '' || series.seriesObservations.observationStart < dateWrapper.firstDate) {
-        dateWrapper.firstDate = series.seriesObservations.observationStart;
+      if (dateWrapper.firstDate === '' || series.seriesInfo.seriesObservations.observationStart < dateWrapper.firstDate) {
+        dateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
       }
-      if (dateWrapper.endDate === '' || series.seriesObservations.observationEnd > dateWrapper.endDate) {
-        dateWrapper.endDate = series.seriesObservations.observationEnd;
+      if (dateWrapper.endDate === '' || series.seriesInfo.seriesObservations.observationEnd > dateWrapper.endDate) {
+        dateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
       }
     });
   }
@@ -186,9 +173,9 @@ export class HelperService {
       formattedDate = year;
     }
     if (freq === 'Q') {
-      qMonth.forEach((q, index) => {
+      qMonth.forEach((q) => {
         if (month === q) {
-          formattedDate = quarter[index] + ' ' + year;
+          formattedDate = q + ' ' + year;
         }
       });
     }
@@ -278,13 +265,13 @@ export class HelperService {
   setDefaultRange(freq, dataArray) {
     // Default to last 10 years
     if (freq === 'A') {
-      return { start: dataArray.length - 11, end: dataArray.length - 1 }
+      return { start: dataArray.length - 11, end: dataArray.length - 1 };
     }
     if (freq === 'Q') {
-      return { start: dataArray.length - 41, end: dataArray.length - 1 }
+      return { start: dataArray.length - 41, end: dataArray.length - 1 };
     }
     if (freq === 'M') {
-      return { start: dataArray.length - 121, end: dataArray.length - 1 }
+      return { start: dataArray.length - 121, end: dataArray.length - 1 };
     }
   }
 }

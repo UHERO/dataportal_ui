@@ -29,6 +29,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   @Input() subcatIndex;
   @Input() tableStart;
   @Input() tableEnd;
+
   private tableHeader;
   private previousHeight;
   private tableWidths = [];
@@ -51,10 +52,10 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
       let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers
-        if (date == this.tableStart) {
+        if (date.tableDate == this.tableStart) {
           startIndex = index;
         }
-        if (date == this.tableEnd) {
+        if (date.tableDate == this.tableEnd) {
           endIndex = index;
         }
       });
@@ -63,7 +64,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
       this.tableHeader = this.dates.slice(start, end + 1);
       if (this.data) {
         this.data.forEach((series) => {
-          series.trimCatTable = series.categoryTable.slice(start, end + 1);
+          if (series.seriesInfo !== 'No data available') {
+            series.trimCatTable = series.categoryTable.slice(start, end + 1);
+          }
         });
       }
     }

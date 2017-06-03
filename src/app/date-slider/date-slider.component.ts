@@ -9,15 +9,13 @@ import { HelperService } from '../helper.service';
 })
 export class DateSliderComponent implements OnInit, OnChanges {
   @Input() subCats;
-  // @Input() dates;
-  @Input() dateWrapper;
+  @Input() dates;
   @Input() freq;
   @Input() dateFrom;
   @Input() dateTo;
   @Output() updateRange = new EventEmitter(true);
   private start;
   private end;
-  private dates = [];
 
   constructor(private _helper: HelperService) { }
 
@@ -25,15 +23,6 @@ export class DateSliderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    // Get date range for an entire category
-    this.dates = [];
-    if (this.dateWrapper) {
-      const dateArray = [];
-      this._helper.calculateDateArray(this.dateWrapper.firstDate, this.dateWrapper.endDate, this.freq, dateArray);
-      dateArray.forEach((date) => {
-        this.dates.push(date.tableDate);
-      });
-    }
     if (this.dates && this.dates.length) {
       const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
       let startIndex = defaultRanges.start, endIndex = defaultRanges.end;

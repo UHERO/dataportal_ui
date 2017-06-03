@@ -4,7 +4,7 @@
     vertical-align: bottom;
     margin-left: 10px;
 
-    /* .irs-line-mid,
+    .irs-line-mid,
     .irs-line-left,
     .irs-line-right,
     .irs-bar,
@@ -14,41 +14,35 @@
         position: absolute;
     }
 
-    .irs-line {
-        height: 8px; top: 25px;
-        
-        .irs-line-left {
-            height: 8px;
-            background-position: 0 -30px;
-        }
-    
-        .irs-line-mid {
-            height: 8px;
-            background-position: 0 0;
-        }
-    
-        .irs-line-right {
-            height: 8px;
-            background-position: 100% -30px;
-        }
+    .irs-slider.from, .irs-slider.to {
+        background-position: 0 -120px;
     }
-    
+
+    .irs-slider.state_hover, .irs-slider:hover {
+        background-position: 0 -150px;
+    }
+
+    .irs-line-mid {
+        background-position: 0 0;
+    }
+
+    .irs-line-left {
+        background-position: 0 -30px;
+    }
+
+    .irs-line-right {
+        background-position: 100% -30px;
+    }
+
     .irs-bar {
-        height: 8px; top: 25px;
         background-position: 0 -60px;
-        
-        .irs-bar-edge {
-            top: 25px;
-            height: 8px; width: 11px;
-            background-position: 0 -90px;
-        }
-    } */
+    }
 
     .irs-slider, .irs-slider.type_last {
         z-index: 0;
     }
 
-    .irs-from, .irs-to {
+    .irs-from, .irs-to, .irs-single {
         background: none;
         border-radius: 0px;
         font-size: 12px;
