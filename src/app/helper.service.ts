@@ -68,7 +68,7 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
@@ -102,11 +102,11 @@ export class HelperService {
     return [levelValue, yoyValue, ytdValue];
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, dateWrapper: DateWrapper, decimals: number) {
+  catTable(seriesTableData: Array<any>, dateRange: Array<any>, decimals: number) {
     // Format series data for the category table
-    let categoryTableData = [];
+    const categoryTableData = [];
     dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, level: '', yoy: '', ytd: '' });
+      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
     });
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
@@ -116,16 +116,6 @@ export class HelperService {
         tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
       }
     });
-    let tableStart, tableEnd;
-    categoryTableData.forEach((item, index) => {
-      if (item.date === dateWrapper.firstDate) {
-        tableStart = index;
-      }
-      if (item.date === dateWrapper.endDate) {
-        tableEnd = index;
-      }
-    });
-    categoryTableData = categoryTableData.slice(tableStart, tableEnd + 1);
     return categoryTableData;
   }
 
@@ -133,54 +123,13 @@ export class HelperService {
     dateWrapper.firstDate = '';
     dateWrapper.endDate = '';
     displaySeries.forEach((series) => {
-      if (dateWrapper.firstDate === '' || series.start < dateWrapper.firstDate) {
-        dateWrapper.firstDate = series.start;
+      if (dateWrapper.firstDate === '' || series.seriesInfo.seriesObservations.observationStart < dateWrapper.firstDate) {
+        dateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
       }
-      if (dateWrapper.endDate === '' || series.end > dateWrapper.endDate) {
-        dateWrapper.endDate = series.end;
+      if (dateWrapper.endDate === '' || series.seriesInfo.seriesObservations.observationEnd > dateWrapper.endDate) {
+        dateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
       }
     });
-  }
-
-  sublistTable(displaySeries: Array<any>, dateWrapper: DateWrapper, tableDates: Array<any>) {
-    // Format table for jquery datatables
-    const tableData = [];
-    const tableColumns = [];
-    const dateStart = dateWrapper.firstDate;
-    const dateEnd = dateWrapper.endDate;
-    tableColumns.push({ title: 'Series', data: 'series' });
-    tableDates.forEach((date) => {
-      tableColumns.push({ title: date, data: 'observations.' + date });
-    });
-    displaySeries.forEach((series) => {
-      const observations = {};
-      const yoy = {};
-      const ytd = {};
-      const percent = series.seriesInfo.percent;
-      const yoyLabel = percent ? 'YOY (ch)' : 'YOY (%)';
-      const ytdLabel = percent ? 'YTD (ch)' : 'YTD (%)';
-      const title = series.seriesInfo.title;
-      series.categoryTable.forEach((obs) => {
-        observations[obs.tableDate] = obs.level;
-        yoy[obs.tableDate] = obs.yoy;
-        ytd[obs.tableDate] = obs.ytd;
-      });
-      tableData.push(
-        {
-          series: series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? title + ' (SA)' : title,
-          observations: observations
-        },
-        {
-          series: yoyLabel,
-          observations: yoy
-        },
-        {
-          series: ytdLabel,
-          observations: ytd
-        }
-      );
-    });
-    return { tableColumns: tableColumns, tableData: tableData };
   }
 
   // Combine level and percent arrays from Observation data
@@ -224,9 +173,9 @@ export class HelperService {
       formattedDate = year;
     }
     if (freq === 'Q') {
-      qMonth.forEach((q, index) => {
+      qMonth.forEach((q) => {
         if (month === q) {
-          formattedDate = quarter[index] + ' ' + year;
+          formattedDate = q + ' ' + year;
         }
       });
     }
@@ -259,61 +208,70 @@ export class HelperService {
 
   // Get a unique array of available regions for a category
   uniqueGeos(geo, geoList) {
-    let exist = false;
-    for (const i in geoList) {
-      if (geo.handle === geoList[i].handle) {
-        exist = true;
-        // If region already exists, check it's list of frequencies
-        // Get a unique list of frequencies available for a region
-        const freqs = geo.freqs;
-        for (const j in freqs) {
-          if (!this.freqExist(geoList[i].freqs, freqs[j].freq)) {
-            geoList[i].freqs.push(freqs[j]);
-          }
-        }
-      }
+    const existGeo = geoList.find(region => region.handle === geo.handle);
+    if (existGeo) {
+      const freqs = geo.freqs;
+      // If region already exists, check it's list of frequencies
+      // Add frequency if it doesn't exist
+      this.addFreq(freqs, existGeo);
     }
-    if (!exist) {
+    if (!existGeo) {
       geoList.push(geo);
     }
   }
 
+  // Check if freq exists in freqArray
   freqExist(freqArray, freq) {
-    for (const n in freqArray) {
-      if (freq === freqArray[n].freq) {
-        return true;
+    const exist = freqArray.find(frequency => frequency.freq === freq);
+    return exist ? true : false;
+  }
+
+  addFreq(freqList, geo) {
+    for (const j in freqList) {
+      if (!this.freqExist(geo.freqs, freqList[j].freq)) {
+        geo.freqs.push(freqList[j]);
       }
     }
-    return false;
   }
 
   // Get a unique array of available frequencies for a category
   uniqueFreqs(freq, freqList) {
-    let exist = false;
-    for (const i in freqList) {
-      if (freq.label === freqList[i].label) {
-        exist = true;
-        // If frequency already exists, check it's list of regions
-        // Get a unique list of regions available for a frequency
-        const geos = freq.geos;
-        for (const j in geos) {
-          if (!this.geoExist(freqList[i].geos, geos[j].handle)) {
-            freqList[i].geos.push(geos[j]);
-          }
-        }
-      }
+    const existFreq = freqList.find(frequency => frequency.label === freq.label);
+    if (existFreq) {
+      const geos = freq.geos;
+      // If frequency already exists, check it's list of regions
+      // Add geo if it doesn't exist
+      this.addGeo(geos, existFreq);
     }
-    if (!exist) {
+    if (!existFreq) {
       freqList.push(freq);
     }
   }
 
+  // Check if geo exists in geoArray
   geoExist(geoArray, geo) {
-    for (const n in geoArray) {
-      if (geo === geoArray[n].handle) {
-        return true;
+    const exist = geoArray.find(region => region.handle === geo);
+    return exist ? true : false;
+  }
+
+  addGeo(geoList, freq) {
+    for (const j in geoList) {
+      if (!this.geoExist(freq.geos, geoList[j].handle)) {
+        freq.geos.push(geoList[j]);
       }
     }
-    return false;
+  }
+
+  setDefaultRange(freq, dataArray) {
+    // Default to last 10 years
+    if (freq === 'A') {
+      return { start: dataArray.length - 11, end: dataArray.length - 1 };
+    }
+    if (freq === 'Q') {
+      return { start: dataArray.length - 41, end: dataArray.length - 1 };
+    }
+    if (freq === 'M') {
+      return { start: dataArray.length - 121, end: dataArray.length - 1 };
+    }
   }
 }

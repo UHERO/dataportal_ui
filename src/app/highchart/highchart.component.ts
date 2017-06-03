@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
 Highcharts.setOptions({
@@ -13,33 +13,39 @@ Highcharts.setOptions({
   templateUrl: './highchart.component.html',
   styleUrls: ['./highchart.component.scss']
 })
-export class HighchartComponent implements OnInit {
+export class HighchartComponent implements OnInit, OnChanges {
   @Input() seriesData;
   @Input() currentFreq;
+  @Input() chartStart;
+  @Input() chartEnd;
   public options: Object;
   private chart;
-  private SA: boolean;
-  private dataAvail: boolean;
-  constructor() { }
+
+  constructor(private _helper: HelperService) { }
 
   ngOnInit() {
-    const level = this.seriesData.chartData.level;
-    const pseudoZones = this.seriesData.chartData.pseudoZones;
-    const ytd = this.seriesData.chartData.ytd;
-    const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
-    let title = this.seriesData.seriesInfo.title === undefined ? this.seriesData.seriesInfo.name : this.seriesData.seriesInfo.title;
-    title += this.seriesData.seriesInfo.seasonalAdjustment === 'seasonally_adjusted' ? ' (SA)' : '';
-    const dataFreq = this.currentFreq;
-    this.dataAvail = this.seriesData.seriesInfo === 'No data available' ? false : true;
-    const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-    if (this.seriesData.seriesInfo === 'No data available' || level.length === 0) {
-      this.noDataChart(title);
+    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
+      this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(title, level, pseudoZones, ytd, dataFreq, unitsShort, decimals);
+      this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
     }
   }
 
-  drawChart(title: string, level: Array<any>, pseudoZones, ytd: Array<any>, dataFreq, unitsShort, decimals) {
+  ngOnChanges() {
+    this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
+  }
+
+  drawChart(seriesData, currentFreq, start?, end?) {
+    let level, ytd;
+    level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
+    ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
+    const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
+    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
+    const percent = seriesData.seriesInfo.percent;
+    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+    const dataFreq = currentFreq;
+    const unitsShort = seriesData.seriesInfo.unitsLabelShort;
+
     this.options = {
       chart: {
         backgroundColor: '#F7F7F7',
@@ -59,11 +65,10 @@ export class HighchartComponent implements OnInit {
       },
       tooltip: {
         positioner: function() {
-          return {x: 0, y: 0};
+          return {x: 0, y: -5};
         },
         shadow: false,
         borderWidth: 0,
-        valueDecimals: decimals,
         shared: true,
         backgroundColor: 'transparent',
         formatter: function () {
@@ -86,22 +91,40 @@ export class HighchartComponent implements OnInit {
           };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
-            let label = '<br>' + point.series.name + ': ' + Highcharts.numberFormat(point.y);
+            let name;
+            if (point.series.name === 'Level') {
+              name = '';
+            }
+            if (point.series.name === 'YTD' && dataFreq === 'A') {
+              name = 'Year-over-Year';
+            }
+            if (point.series.name === 'YTD' && dataFreq !== 'A') {
+              name = 'Year-to-Date';
+            }
+            if (point.series.name === 'YTD' && percent) {
+              name += ' Chg: ';
+            }
+            if (point.series.name === 'YTD' && !percent) {
+              name += ' % Chg: ';
+            }
+            let label = '<br>' + name + Highcharts.numberFormat(point.y, decimals);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
             }
             if (pseudoZones.length > 0) {
-              pseudoZones.forEach((zone, index) => {
-                if (point.x < pseudoZones[index].value) {
-                  s += '<br>' + pseudo + point.series.name + ': ' + Highcharts.numberFormat(point.y) + '<br>';
+              pseudoZones.forEach((zone) => {
+                if (point.x < zone.value) {
+                  s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y, decimals) + '<br>';
                   if (point.series.name === 'Level') {
                     s += ' (' + unitsShort + ')';
                   }
-                } else {
+                }
+                if (point.x >= zone.value) {
                   s += label;
                 }
               });
-            } else {
+            }
+            if (pseudoZones.length === 0) {
               s += label;
             }
           });
@@ -183,7 +206,9 @@ export class HighchartComponent implements OnInit {
     };
   }
 
-  noDataChart(title) {
+  noDataChart(seriesData) {
+    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+
     this.options = {
       chart: {
         backgroundColor: '#F9F9F9'
@@ -232,10 +257,12 @@ export class HighchartComponent implements OnInit {
 
   render(event) {
     this.chart = event;
+    let latestLevel, latestYtd;
     const level = this.chart.series[0];
     const ytd = this.chart.series[1];
-    const latestLevel = (level !== undefined) ? level.points.length - 1 : null;
-    const latestYtd = (ytd !== undefined) ? ytd.points.length - 1 : null;
+    // Get position of last non-null value
+    latestLevel = (level !== undefined) ? this.findLastValue(level.points) : null;
+    latestYtd = (ytd !== undefined) ? this.findLastValue(ytd.points) : null;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
@@ -250,5 +277,25 @@ export class HighchartComponent implements OnInit {
     if (latestLevel > 0 && latestYtd > 0) {
       this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
     }
+  }
+
+  findLastValue(valueArray) {
+    let counter = valueArray.length;
+    while (counter-- && !valueArray[counter].y);
+    return counter;
+  }
+
+  trimData(dataArray, start, end) {
+    const defaultRange = this._helper.setDefaultRange(this.currentFreq, dataArray);
+    let startIndex = defaultRange.start, endIndex = defaultRange.end;
+    dataArray.forEach((item, index) => {
+      if (item[0] === start) {
+        startIndex = index;
+      }
+      if (item[0] === end) {
+        endIndex = index;
+      }
+    });
+    return dataArray.slice(startIndex, endIndex + 1);
   }
 }

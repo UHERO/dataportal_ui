@@ -20,7 +20,7 @@
 
     Highcharts.setOptions({
         lang: {
-            downloadCSV: 'Download CSV',
+            downloadCSV: 'Download CSV (XLS)',
             downloadXLS: 'Download XLS',
             viewData: 'View data table'
         }
@@ -70,7 +70,7 @@
         // Loop the series and index values
         i = 0;
         each(this.series, function (series) {
-            if (series.options.includeInCSVExport !== false && series.name !== 'Navigator 1') {
+            if (series.options.includeInCSVExport !== false) {
                 names.push(series.name);
                 each(series.options.data, function (point) {
                     if (!rows[point[0]]) {
@@ -309,10 +309,10 @@
         Highcharts.getOptions().exporting.buttons.contextButton.menuItems.push({
             textKey: 'downloadCSV',
             onclick: function () { this.downloadCSV(); }
-        }, {
+        }/* , {
             textKey: 'downloadXLS',
             onclick: function () { this.downloadXLS(); }
-        }/* , {
+        }, {
             textKey: 'viewData',
             onclick: function () { this.viewData(); }
         } */);
