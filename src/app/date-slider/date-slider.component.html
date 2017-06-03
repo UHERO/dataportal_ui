@@ -1,12 +1,1 @@
-<ion-range-slider
-    class="sliders"
-    type="double"
-    [from]="start"
-    [to]="end"
-    [values]="dates"
-    prettify_enabled="false"
-    hide_min_max="true"
-    keyboard="true"
-    keyboard_step="1"
-    (onFinish)="sliderFinish($event, freq)">
-</ion-range-slider>
+<input *ngIf="subCat" class="sliders" type="text" [id]="subCat.id" value="" />

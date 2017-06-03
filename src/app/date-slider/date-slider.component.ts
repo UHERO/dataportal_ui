@@ -1,5 +1,8 @@
-import { Component, OnInit, Input, OnChanges, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, AfterViewInit, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
+import 'jquery';
+declare var $: any;
+import 'ion-rangeslider';
 
 @Component({
   selector: 'app-date-slider',
@@ -7,12 +10,13 @@ import { HelperService } from '../helper.service';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnInit, OnChanges {
-  @Input() subCats;
+export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
+  @Input() subCat;
   @Input() dates;
   @Input() freq;
   @Input() dateFrom;
   @Input() dateTo;
+  @Input() sublist;
   @Output() updateRange = new EventEmitter(true);
   private start;
   private end;
@@ -20,6 +24,28 @@ export class DateSliderComponent implements OnInit, OnChanges {
   constructor(private _helper: HelperService) { }
 
   ngOnInit() {
+  }
+
+  ngAfterViewInit() {
+    const that = this;
+    const freq = this.freq;
+    $('#' + this.subCat.id).ionRangeSlider({   min: 0,
+      from: this.start,
+      to: this.end,
+      values: this.dates,
+      prettify_enabled: false,
+      hide_min_max: true,
+      keyboard: true,
+      keyboard_step: 1,
+      type: 'double',
+      onFinish: function(data) {
+        const chartStart = that.formatChartDate(data.from_value, freq);
+        const chartEnd = that.formatChartDate(data.to_value, freq);
+        const tableStart = data.from_value.toString();
+        const tableEnd = data.to_value.toString();
+        that.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
+      }
+    });
   }
 
   ngOnChanges() {
@@ -39,15 +65,15 @@ export class DateSliderComponent implements OnInit, OnChanges {
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = startIndex;
       this.end = endIndex;
+      this.sublist.forEach((sub) => {
+        if ($('#' + sub.id).data('ionRangeSlider')) {
+          $('#' + sub.id).data('ionRangeSlider').update({
+            from: this.start,
+            to: this.end
+          });
+        }
+      });
     }
-  }
-
-  sliderFinish(event, freq) {
-    const chartStart = this.formatChartDate(event.from_value, freq);
-    const chartEnd = this.formatChartDate(event.to_value, freq);
-    const tableStart = event.from_value.toString();
-    const tableEnd = event.to_value.toString();
-    this.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
   }
 
   formatChartDate(value, freq) {
