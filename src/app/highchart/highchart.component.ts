@@ -21,6 +21,13 @@ export class HighchartComponent implements OnInit, OnChanges {
   public options: Object;
   private chart;
 
+  static findLastValue(valueArray) {
+    console.log('array', valueArray)
+    let counter = valueArray.length;
+    while (counter-- && valueArray[counter].y === null);
+    return counter;
+  }
+
   constructor(private _helper: HelperService) { }
 
   ngOnInit() {
@@ -72,6 +79,17 @@ export class HighchartComponent implements OnInit, OnChanges {
         shared: true,
         backgroundColor: 'transparent',
         formatter: function () {
+          const getLabelName = function (seriesName, freq, precent) {
+            if (seriesName === 'Level') {
+              return '';
+            }
+            if (seriesName === 'YTD' && freq === 'A') {
+              return percent ? 'Year-over-Year Chg: ' : 'Year-over-Year % Chg: ';
+            }
+            if (seriesName === 'YTD' && freq !== 'A') {
+              return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
+            }
+          }
           const pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
           if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
@@ -91,22 +109,7 @@ export class HighchartComponent implements OnInit, OnChanges {
           };
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
-            let name;
-            if (point.series.name === 'Level') {
-              name = '';
-            }
-            if (point.series.name === 'YTD' && dataFreq === 'A') {
-              name = 'Year-over-Year';
-            }
-            if (point.series.name === 'YTD' && dataFreq !== 'A') {
-              name = 'Year-to-Date';
-            }
-            if (point.series.name === 'YTD' && percent) {
-              name += ' Chg: ';
-            }
-            if (point.series.name === 'YTD' && !percent) {
-              name += ' % Chg: ';
-            }
+            const name = getLabelName(point.series.name, dataFreq, percent);
             let label = '<br>' + name + Highcharts.numberFormat(point.y, decimals);
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ')';
@@ -261,8 +264,8 @@ export class HighchartComponent implements OnInit, OnChanges {
     const level = this.chart.series[0];
     const ytd = this.chart.series[1];
     // Get position of last non-null value
-    latestLevel = (level !== undefined) ? this.findLastValue(level.points) : null;
-    latestYtd = (ytd !== undefined) ? this.findLastValue(ytd.points) : null;
+    latestLevel = (level !== undefined) ? HighchartComponent.findLastValue(level.points) : null;
+    latestYtd = (ytd !== undefined) ? HighchartComponent.findLastValue(ytd.points) : null;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
@@ -277,12 +280,6 @@ export class HighchartComponent implements OnInit, OnChanges {
     if (latestLevel > 0 && latestYtd > 0) {
       this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
     }
-  }
-
-  findLastValue(valueArray) {
-    let counter = valueArray.length;
-    while (counter-- && !valueArray[counter].y);
-    return counter;
   }
 
   trimData(dataArray, start, end) {

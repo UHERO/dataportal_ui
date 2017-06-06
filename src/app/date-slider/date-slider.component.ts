@@ -66,8 +66,9 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
       this.start = startIndex;
       this.end = endIndex;
       this.sublist.forEach((sub) => {
-        if ($('#' + sub.id).data('ionRangeSlider')) {
-          $('#' + sub.id).data('ionRangeSlider').update({
+        const slider = $('#' + sub.id).data('ionRangeSlider')
+        if (slider) {
+          slider.update({
             from: this.start,
             to: this.end
           });
