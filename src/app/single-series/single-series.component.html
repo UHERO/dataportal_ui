@@ -11,22 +11,22 @@
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
-    <app-highstock *ngIf="!noSelection && !data.noData" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesTableData, data.currentFreq)"></app-highstock>
+    <app-highstock *ngIf="!noSelection && !data.noData" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.currentFreq)"></app-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
       {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}" target="_blank">{{data.seriesDetail.source_link}}</a><br>{{data.seriesDetail.sourceDetails}}
     </div>
     <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">
-        <p>Min:</p>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}
+        <p>Min:<br>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}</p>
       </div>
       <div class="stat">
-        <p>Max:</p>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}
+        <p>Max:<br>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}</p>
+      </div>
+      <div class="stat" *ngIf="!data.seriesDetail.percent">
+        <p>% Change over Selected Range:<br>{{summaryStats.percChange}}</p>
       </div>
       <div class="stat">
-        <p>{{data.seriesDetail.percent === true ? 'Change ' : '% Change '}}Over Selected Range: </p>{{summaryStats.percChange}}
-      </div>
-      <div class="stat">
-        <p>Level Change Over Selected Range:</p>{{summaryStats.levelChange}}
+        <p>Change over Selected Range:<br>{{summaryStats.levelChange}}</p>
       </div>
     </div>
     <div class="series-table">
@@ -34,7 +34,7 @@
       <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
       <p-column field="formattedValue" header="Level"></p-column>
       <p-column field="formattedYoy" [header]=data.yoyChange></p-column>
-      <p-column field="formattedYtd" [header]=data.ytdChange></p-column>
+      <p-column *ngIf="data.currentFreq.freq !== 'A'" field="formattedYtd" [header]=data.ytdChange></p-column>
     </p-dataTable>
     </div>
   </div>

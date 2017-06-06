@@ -42,8 +42,8 @@ export class SeriesHelperService {
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = freqGeos.find(freq => freq.freq === currentFreq.freq).geos;
       this.seriesData.frequencies = geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs;
-      this.seriesData.yoyChange = series['percent'] === true ? 'YOY Change' : 'YOY % Change';
-      this.seriesData.ytdChange = series['percent'] === true ? 'YTD Change' : 'YTD % Change';
+      this.seriesData.yoyChange = series['percent'] === true ? 'Year-over-Year Change' : 'Year-over-Year % Change';
+      this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
     },
     (error) => {
@@ -96,7 +96,7 @@ export class SeriesHelperService {
 
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
-  summaryStats(seriesData, freq) {
+  summaryStats(seriesData, freq, decimals) {
     const stats = {
       minValue: Infinity,
       minValueDate: '',
@@ -145,12 +145,12 @@ export class SeriesHelperService {
     stats.levelChange = stats.tableEndValue - stats.tableStartValue;
 
     // Format numbers
-    formatStats.minValue = this._helper.formatNum(stats.minValue, 2);
+    formatStats.minValue = this._helper.formatNum(stats.minValue, decimals);
     formatStats.minValueDate = this._helper.formatDate(stats.minValueDate, freq.freq);
-    formatStats.maxValue = this._helper.formatNum(stats.maxValue, 2);
+    formatStats.maxValue = this._helper.formatNum(stats.maxValue, decimals);
     formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.percChange = this._helper.formatNum(stats.percChange, 2);
-    formatStats.levelChange = this._helper.formatNum(stats.levelChange, 2);
+    formatStats.percChange = this._helper.formatNum(stats.percChange, decimals);
+    formatStats.levelChange = this._helper.formatNum(stats.levelChange, decimals);
     formatStats.selectedStart = this._helper.formatDate(seriesData[0].date, freq.freq);
     formatStats.selectedEnd = this._helper.formatDate(seriesData[seriesData.length - 1].date, freq);
     return formatStats;

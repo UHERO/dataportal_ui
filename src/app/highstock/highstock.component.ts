@@ -49,8 +49,6 @@ export class HighstockComponent implements OnChanges {
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const dataFreq = freq;
-    const dataGeo = geo;
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
@@ -126,6 +124,11 @@ export class HighstockComponent implements OnChanges {
         },
         inputEnabled: false
       },
+      navigator: {
+        series: {
+          includeInCSVExport: false
+        }
+      },
       exporting: {
         buttons: {
           contextButton: {
@@ -176,7 +179,6 @@ export class HighstockComponent implements OnChanges {
       tooltip: {
         borderWidth: 0,
         shadow: false,
-        valueDecimals: decimals,
         formatter: function () {
           const pseudo = 'Pseudo History ';
           let s = '<b>';
@@ -200,17 +202,17 @@ export class HighstockComponent implements OnChanges {
             const label = '<br><span style="color:' +
               point.color + '">\u25CF</span> ' +
               point.series.name + ': ' +
-              Highcharts.numberFormat(point.y);
+              Highcharts.numberFormat(point.y, decimals);
             if (pseudoZones.length > 0) {
-              pseudoZones.forEach((zone, index) => {
-                if (point.x < pseudoZones[index].value) {
+              pseudoZones.forEach((zone) => {
+                if (point.x < zone.value) {
                   s += '<br><span style="color:' +
                     point.color +
                     '">\u25CF</span> ' +
                     pseudo +
                     point.series.name +
                     ': ' +
-                    Highcharts.numberFormat(point.y) +
+                    Highcharts.numberFormat(point.y, decimals) +
                     '<br>';
                 } else {
                   s += label;
@@ -314,6 +316,7 @@ export class HighstockComponent implements OnChanges {
       }, {
         name: ytdLabel,
         data: ytd,
+        includeInCSVExport: freq.freq === 'A' ? false : true,
         visible: false,
         dataGrouping: {
           enabled: false
