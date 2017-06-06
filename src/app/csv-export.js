@@ -45,7 +45,7 @@
             columnHeaderFormatter = options.columnHeaderFormatter || function (item, key, keyLength) {
                 if (item instanceof Highcharts.Axis) {
                     return (item.options.title && item.options.title.text) ||
-                        (item.isDatetimeAxis ? 'DateTime' : 'Category');
+                        (item.isDatetimeAxis ? 'Date' : 'Category');
                 }
                 return item.name + (keyLength > 1 ? ' ('+ key + ')' : '');
             };
@@ -96,10 +96,22 @@
 
         // Add header row
         xTitle = columnHeaderFormatter(xAxis);
-        // dataRows = [['Series: ' + series]];
-        // dataRows.push([xTitle].concat(names));
-        dataRows = [[xTitle].concat(names)];
-
+        dataRows = [];
+        dataRows.push(seriesInfo);
+        if (sourceDescription) {
+            dataRows.push(sourceDescription);
+        }
+        if (sourceLink) {
+            dataRows.push(sourceLink);
+        }
+        if (sourceDetails) {
+            dataRows.push(sourceDetails);
+        }
+        dataRows.push(seriesLink);
+        dataRows.push(uhero);
+        dataRows.push(dpLink);
+        dataRows.push([null], [null], [null]);
+        dataRows.push([xTitle].concat(names))
         // Add the category column
         each(rowArr, function (row) {
 
@@ -121,21 +133,6 @@
             row.unshift(category);
             dataRows.push(row);
         });
-        dataRows.push([null], [null], [null], [null]);
-        dataRows.push(seriesInfo);
-        if (sourceDescription) {
-            dataRows.push(sourceDescription);
-        }
-        if (sourceLink) {
-            dataRows.push(sourceLink);
-        }
-        if (sourceDetails) {
-            dataRows.push(sourceDetails);
-        }
-        dataRows.push(seriesLink);
-        dataRows.push(uhero);
-        dataRows.push(dpLink);
-
         return dataRows;
     };
 
