@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+
 @Component({
   selector: 'app-category-charts',
   templateUrl: './category-charts.component.html',
@@ -13,6 +14,8 @@ export class CategoryChartsComponent implements OnInit {
   @Input() yoyActive;
   @Input() ytdActive;
   @Input() params;
+  @Input() chartStart;
+  @Input() chartEnd;
 
   constructor(private googleAES: GoogleAnalyticsEventsService) { }
 

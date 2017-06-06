@@ -13,7 +13,6 @@ import { Geography } from '../geography';
   encapsulation: ViewEncapsulation.None
 })
 export class SingleSeriesComponent implements OnInit, AfterViewInit {
-  private errorMessage: string;
   private noSelection: string;
   private newTableData;
   private summaryStats;
@@ -47,22 +46,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries(siblings, freq, geo, sa) {
+  goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     let id;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
-    // If more than one sibling exists (i.e. seasonal & non-seasonal)
-    // Select series where seasonallyAdjusted matches sa
-    if (geoFreqSib.length > 1) {
-      id = geoFreqSib.find(sibling => sibling.seasonallyAdjusted === sa).id;
-    } else {
-      id = geoFreqSib[0].id;
-      if (sa !== geoFreqSib[0].seasonallyAdjusted && freq !== 'A') {
-        this.seasonallyAdjusted = geoFreqSib[0].seasonallyAdjusted;
-      }
-    }
+    id = this.selectSibling(geoFreqSib, sa, freq);
     if (id) {
       const queryParams = {
         id: id,
@@ -76,8 +66,23 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
   }
 
+  selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
+    // If more than one sibling exists (i.e. seasonal & non-seasonal)
+    // Select series where seasonallyAdjusted matches sa
+    if (geoFreqSiblings.length > 1) {
+      return geoFreqSiblings.find(sibling => sibling.seasonallyAdjusted === sa).id;
+    }
+    if (geoFreqSiblings.length <= 1) {
+      if (sa !== geoFreqSiblings[0].seasonallyAdjusted && freq !== 'A') {
+        this.seasonallyAdjusted = geoFreqSiblings[0].seasonallyAdjusted;
+      }
+      return geoFreqSiblings[0].id;
+    }
+  }
+
   // Update table when selecting new ranges in the chart
-  redrawTable(e, tableData, freq) {
+  redrawTable(e, seriesDetail, tableData, freq) {
+    const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e.minDate;
     maxDate = e.maxDate;
@@ -91,6 +96,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._series.summaryStats(this.newTableData, freq);
+    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls);
   }
 }

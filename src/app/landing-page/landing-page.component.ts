@@ -6,6 +6,9 @@ import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
+import 'jquery';
+declare var $: any;
+
 
 @Component({
   selector: 'app-landing-page',
@@ -20,8 +23,14 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private routeView: string;
   private routeYoy;
   private routeYtd;
+  private routeStart;
+  private routeEnd;
   private search = false;
   private queryParams: any = {};
+  private tableStart;
+  private tableEnd;
+  private chartStart;
+  private chartEnd;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -52,6 +61,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       this.routeView = params['view'];
       this.routeYoy = params['yoy'];
       this.routeYtd = params['ytd'];
+      this.routeStart = params['start'];
+      this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
@@ -161,6 +172,16 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       this.updateRoute();
     }, 10);
     this.scrollToFragment();
+  }
+
+  changeRange(e) {
+    this.tableStart = e.tableStart;
+    this.tableEnd = e.tableEnd;
+    this.chartStart = e.chartStart;
+    this.chartEnd = e.chartEnd;
+    // this.queryParams.start = e.start.replace(/\s|-/g, '');
+    // this.queryParams.end = e.end.replace(/\s|-/g, '');
+    // this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
   }
 
   // Work around for srolling to page anchor

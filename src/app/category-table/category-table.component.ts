@@ -16,19 +16,23 @@ declare var $: any;
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements OnInit, AfterViewChecked {
+export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
+  @Input() subCats;
+  @Input() freq;
   @Input() dates;
   @Input() noSeries;
   @Input() yoyActive;
   @Input() ytdActive;
   @Input() params;
   @Input() subcatIndex;
+  @Input() tableStart;
+  @Input() tableEnd;
 
+  private tableHeader;
   private previousHeight;
   private tableWidths = [];
-  private tableHeaders = [];
 
   constructor(
     private _uheroAPIService: UheroApiService,
@@ -40,6 +44,32 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
   ) { }
 
   ngOnInit() {
+  }
+
+  ngOnChanges() {
+    if (this.dates) {
+      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+      this.dates.forEach((date, index) => {
+        // Range slider is converting annual year strings to numbers
+        if (date.tableDate == this.tableStart) {
+          startIndex = index;
+        }
+        if (date.tableDate == this.tableEnd) {
+          endIndex = index;
+        }
+      });
+      const start = startIndex;
+      const end = endIndex;
+      this.tableHeader = this.dates.slice(start, end + 1);
+      if (this.data) {
+        this.data.forEach((series) => {
+          if (series.seriesInfo !== 'No data available') {
+            series.trimCatTable = series.categoryTable.slice(start, end + 1);
+          }
+        });
+      }
+    }
   }
 
   ngAfterViewChecked() {
@@ -88,32 +118,47 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked {
     $('[data-toggle="tooltip"]').tooltip('hide');
     const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
-      placement: 'top',
-      html: true,
-      title: function () {
-        let title = '';
-        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
-          title = seriesInfo.title + ' (SA)';
-        } else {
-          title = seriesInfo.title;
+      placement: function(popoverEl, el) {
+        // popoverEl = popover DOM element
+        // el = DOM element that triggers popover
+        let position = 'top';
+        const elOffset = $(el).offset().top;
+        if (elOffset <= 150) {
+          position = 'bottom';
         }
-        return title; /* + '<i class="material-icons close-info" onclick="$(this.parentElement.parentElement).popover(' + "'dispose'" + ')">&#xE14C;</i>'; */
+        return position;
+      },
+      html: true,
+      title: function() {
+        let title = seriesInfo.title;
+        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
+        return title;
       },
       content: function () {
         let info = '';
-        if (seriesInfo.unitsLabelShort) {
-          info += 'Units: ' + seriesInfo.unitsLabelShort;
+        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
+          info += 'Seasonally Adjusted<br>';
         }
         if (seriesInfo.sourceDescription) {
-          info += '<br> Source Description: ' + seriesInfo.sourceDescription;
+          info += 'Source: ' + seriesInfo.sourceDescription + '<br>';
         }
         if (seriesInfo.sourceLink) {
-          info += '<br> Source Link: <a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a>';
+          info += '<a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a><br>';
+        }
+        if (seriesInfo.sourceDetails) {
+          info += seriesInfo.sourceDetails;
         }
         return info;
       }
     }).on('show.bs.popover', function (e) {
+      // Display only one popover at a time
       $('.popover').not(e.target).popover('dispose');
+      setTimeout(() => {
+        // Close popover on next click (source link in popover is still clickable)
+        $('body').one('click', function() {
+          popover.popover('dispose');
+        });
+      }, 1);
     });
     popover.popover('toggle');
   }

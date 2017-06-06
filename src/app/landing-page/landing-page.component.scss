@@ -26,6 +26,13 @@
     .fa-spinner {
       color: #1D667F;
     }
+
+    .sliders {
+      display: inline-block;
+      width: 200px;
+      vertical-align: bottom;
+      margin-left: 10px;
+    }
   }
 
   .content-links:before {
@@ -109,6 +116,7 @@
 
   .sublist-separator {
     margin-top: 0rem;
+    margin-bottom: 0.5rem;
     background-color: #1D667F;
     height: 2px;
   }
