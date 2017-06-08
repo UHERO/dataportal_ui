@@ -17,6 +17,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private newTableData;
   private summaryStats;
   private seasonallyAdjusted = null;
+  private startDate;
+  private endDate;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -40,6 +42,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
+      }
+      if (params['seriesStart']) {
+        this.startDate = params['seriesStart'];
+      }
+      if (params['seriesEnd']) {
+        this.endDate = params['seriesEnd'];
       }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
@@ -78,6 +86,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
       return geoFreqSiblings[0].id;
     }
+  }
+
+  updateChartExtremes(e) {
+    const start = e.minDate.replace(/\s|-/g, '');
+    const end = e.maxDate.replace(/\s|-/g, '');
+    this._router.navigate(['/series/'], { queryParams: { seriesStart: start, seriesEnd: end }, queryParamsHandling: 'merge' });
   }
 
   // Update table when selecting new ranges in the chart
