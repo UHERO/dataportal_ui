@@ -22,7 +22,6 @@ export class HighchartComponent implements OnInit, OnChanges {
   private chart;
 
   static findLastValue(valueArray) {
-    console.log('array', valueArray)
     let counter = valueArray.length;
     while (counter-- && valueArray[counter].y === null);
     return counter;
@@ -34,7 +33,6 @@ export class HighchartComponent implements OnInit, OnChanges {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      console.log('series data', this.seriesData)
       this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
     }
   }
@@ -85,7 +83,7 @@ export class HighchartComponent implements OnInit, OnChanges {
               return '';
             }
             if (seriesName === 'YTD' && freq === 'A') {
-              return percent ? 'Year-over-Year Chg: ' : 'Year-over-Year % Chg: ';
+              return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
             }
             if (seriesName === 'YTD' && freq !== 'A') {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';

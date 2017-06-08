@@ -42,7 +42,7 @@ export class SeriesHelperService {
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = freqGeos.find(freq => freq.freq === currentFreq.freq).geos;
       this.seriesData.frequencies = geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs;
-      this.seriesData.yoyChange = series['percent'] === true ? 'Year-over-Year Change' : 'Year-over-Year % Change';
+      this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
     },
@@ -67,7 +67,6 @@ export class SeriesHelperService {
   getSeriesObservations(id: number, decimals: number) {
     const dateArray = [];
     this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
-      // let obs = this._helper.dataTransform(observations);
       const obs = observations;
       const obsStart = obs.observationStart;
       const obsEnd = obs.observationEnd;
