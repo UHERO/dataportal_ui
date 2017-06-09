@@ -80,7 +80,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         formatter: function () {
           const getLabelName = function (seriesName, freq, precent) {
             if (seriesName === 'Level') {
-              return '';
+              return ': ';
             }
             if (seriesName === 'YTD' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
@@ -89,36 +89,46 @@ export class HighchartComponent implements OnInit, OnChanges {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
             }
           }
+          const getFreqLabel = function (freq, date) {
+            if (freq === 'A') {
+              return '';
+            }
+            if (freq === 'Q') {
+              if (Highcharts.dateFormat('%b', date) === 'Jan') {
+                return 'Q1 ';
+              }
+              if (Highcharts.dateFormat('%b', date) === 'Apr') {
+                return 'Q2 ';
+              }
+              if (Highcharts.dateFormat('%b', date) === 'Jul') {
+                return 'Q3 ';
+              }
+              if (Highcharts.dateFormat('%b', date) === 'Oct') {
+                return 'Q4 ';
+              }
+            }
+            if (freq === 'M' || 'S') {
+              return Highcharts.dateFormat('%b', date) + ' ';
+            }
+          }
           const pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
-          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jan') {
-            s = s + 'Q1 ';
-          };
-          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Apr') {
-            s = s + 'Q2 ';
-          };
-          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Jul') {
-            s = s + 'Q3 ';
-          };
-          if (dataFreq === 'Q' && Highcharts.dateFormat('%b', this.x) === 'Oct') {
-            s = s + 'Q4 ';
-          };
-          if (dataFreq === 'M' || dataFreq === 'S') {
-            s = s + Highcharts.dateFormat('%b', this.x) + ' ';
-          };
+          // Get Quarter or Month for Q/M frequencies
+          s = s + getFreqLabel(dataFreq, this.x);
+          // Add year
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
             const name = getLabelName(point.series.name, dataFreq, percent);
-            let label = '<br>' + name + Highcharts.numberFormat(point.y, decimals);
+            let label = name + Highcharts.numberFormat(point.y, decimals);
             if (point.series.name === 'Level') {
-              label += ' (' + unitsShort + ')';
+              label += ' (' + unitsShort + ') <br>';
             }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  s += '<br>' + pseudo + name + ': ' + Highcharts.numberFormat(point.y, decimals) + '<br>';
+                  s += pseudo + name + Highcharts.numberFormat(point.y, decimals);
                   if (point.series.name === 'Level') {
-                    s += ' (' + unitsShort + ')';
+                    s += ' (' + unitsShort + ') <br>';
                   }
                 }
                 if (point.x >= zone.value) {

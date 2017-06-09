@@ -3,7 +3,7 @@
     <h2 class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory}}</h2>
     <p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
     <p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete" class="fa fa-spinner fa-pulse fa-fw"></i>
+		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fa fa-spinner fa-pulse fa-fw"></i>
 		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
 			<ul class="content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
 				<li *ngFor="let sub of data.sublist; let subInd='index'">
