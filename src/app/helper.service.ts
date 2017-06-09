@@ -270,6 +270,9 @@ export class HelperService {
     if (freq === 'Q') {
       return { start: dataArray.length - 41, end: dataArray.length - 1 };
     }
+    if (freq === 'S') {
+      return { start: dataArray.length - 21, end: dataArray.length - 1 };
+    }
     if (freq === 'M') {
       return { start: dataArray.length - 121, end: dataArray.length - 1 };
     }
