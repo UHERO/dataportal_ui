@@ -1,9 +1,11 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
 import { Series } from '../series';
+import 'jquery';
+declare var $: any;
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
@@ -29,6 +31,7 @@ export class HighstockComponent implements OnChanges {
   @Input() seriesDetail;
   @Input() start;
   @Input() end;
+  @ViewChild('chart') private chart;
 
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
@@ -369,7 +372,11 @@ export class HighstockComponent implements OnChanges {
 
   updateExtremes(e) {
     const extremes = this.getChartExtremes(e);
-    this.chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+    const chartExtremes = this.chartExtremes;
+    const chart = $('.stock-chart');
+    $('.stock-chart').mouseup(function() {
+      chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+    });
   }
 
   getChartExtremes(e) {

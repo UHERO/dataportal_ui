@@ -18,7 +18,7 @@ export class CategoryHelperService {
   private requestsRemain;
   private defaultFreq: string;
   private defaultGeo: string;
-  private categoryData = [];
+  private categoryData = {};
   private categoryDates = [];
   private seriesDates = [];
   private series = [];
@@ -52,8 +52,12 @@ export class CategoryHelperService {
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
           this.categoryData[cacheId].selectedCategory = selectedCategory;
-          this.categoryData[cacheId].sublist = sublist;
-          this.getSubcategoryData(selectedCategory, cacheId, catId, sublist, routeGeo, routeFreq);
+          const sublistCopy = [];
+          sublist.forEach((sub) => {
+            sublistCopy.push(Object.assign({}, sub));
+          });
+          this.categoryData[cacheId].sublist = sublistCopy;
+          this.getSubcategoryData(selectedCategory, cacheId, catId, this.categoryData[cacheId].sublist, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
