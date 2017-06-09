@@ -56,7 +56,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
-      console.log('id', typeof this.id);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];

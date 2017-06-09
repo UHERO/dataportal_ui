@@ -222,9 +222,15 @@ export class CategoryHelperService {
     }
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
+    let selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
+    // Check if the selected frequency exists in the list of freqs for a selected geo
+    selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
     regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
-    currentGeo = selectedGeo ? regions.find(region => region.handle === selectedGeo) : regions[0];
-    currentFreq = selectedFreq ? freqs.find(freq => freq.freq === selectedFreq) : freqs[0];
+    let selectedGeoExists = regions.find(region => region.handle === selectedGeo);
+    // Check if the selected geo exists in the list of regions for a selected frequency
+    selectedGeo = selectedGeoExists ? selectedGeo : regions[0].handle;
+    currentGeo = regions.find(region => region.handle === selectedGeo);
+    currentFreq = freqs.find(freq => freq.freq === selectedFreq);
     this.categoryData[cacheId].regions = regions;
     this.categoryData[cacheId].currentGeo = currentGeo;
     this.categoryData[cacheId].frequencies = freqs;
