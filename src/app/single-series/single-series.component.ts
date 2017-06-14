@@ -19,6 +19,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private seasonallyAdjusted = null;
   private startDate;
   private endDate;
+  private chartStart;
+  private chartEnd;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -43,12 +45,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
       }
-      if (params['seriesStart']) {
-        this.startDate = params['seriesStart'];
-      }
-      if (params['seriesEnd']) {
-        this.endDate = params['seriesEnd'];
-      }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
   }
@@ -68,6 +64,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         geo: geo,
         freq: freq
       };
+      this.startDate = this.chartStart;
+      this.endDate = this.chartEnd;
       this._router.navigate(['/series/'], {queryParams: queryParams, queryParamsHandling: 'merge'});
     } else {
       this.noSelection = 'Selection Not Available';
@@ -89,9 +87,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   updateChartExtremes(e) {
-    const start = e.minDate.replace(/\s|-/g, '');
-    const end = e.maxDate.replace(/\s|-/g, '');
-    this._router.navigate(['/series/'], { queryParams: { seriesStart: start, seriesEnd: end }, queryParamsHandling: 'merge' });
+    this.chartStart = e.minDate;
+    this.chartEnd = e.maxDate;
   }
 
   // Update table when selecting new ranges in the chart
@@ -100,7 +97,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e.minDate;
     maxDate = e.maxDate;
-
     for (let i = 0; i < tableData.length; i++) {
       if (tableData[i].date === maxDate) {
         tableStart = i;

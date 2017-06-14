@@ -31,7 +31,6 @@ export class HighstockComponent implements OnChanges {
   @Input() seriesDetail;
   @Input() start;
   @Input() end;
-  @ViewChild('chart') private chart;
 
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
@@ -59,8 +58,8 @@ export class HighstockComponent implements OnChanges {
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
-    const startDate = this.start ? this.start.substr(0, 4) + '-' + this.start.substr(4, 2) + '-01' : null;
-    const endDate = this.end ? this.end.substr(0, 4) + '-' + this.end.substr(4, 2) + '-01' : null;
+    const startDate = this.start ? this.start : null;
+    const endDate = this.end ? this.end : null;
 
     this.options = {
       chart: {
@@ -373,13 +372,16 @@ export class HighstockComponent implements OnChanges {
   updateExtremes(e) {
     const extremes = this.getChartExtremes(e);
     const chartExtremes = this.chartExtremes;
+    const tableExtremes = this.tableExtremes;
     const chart = $('.stock-chart');
     const buttons = $('.highcharts-range-selector-buttons');
     buttons.click(function() {
       chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+      tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     });
     chart.mouseup(function() {
       chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+      tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     });
   }
 
@@ -392,10 +394,22 @@ export class HighstockComponent implements OnChanges {
     if (e.context.series[0].points) {
       selectedRange = e.context.series[0].points;
     }
+    if (!e.context.series[0].points.length) {
+      return { min: null, max: null };
+    }
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
+  }
+
+  checkDates(date, levelArray) {
+    levelArray.forEach((item) => {
+      if (Date.parse(date) === item[0]) {
+        return true;
+      }
+      return false;
+    });
   }
 }

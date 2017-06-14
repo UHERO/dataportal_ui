@@ -113,8 +113,6 @@ export class SeriesHelperService {
       maxValueDate: '',
       percChange: '',
       levelChange: '',
-      selectedStart: '',
-      selectedEnd: ''
     };
     // Find first non-empty value as the table end value
     for (let i = 0; i < seriesData.length; i++) {
@@ -150,8 +148,6 @@ export class SeriesHelperService {
     formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
     formatStats.percChange = this._helper.formatNum(stats.percChange, decimals);
     formatStats.levelChange = this._helper.formatNum(stats.levelChange, decimals);
-    formatStats.selectedStart = this._helper.formatDate(seriesData[0].date, freq.freq);
-    formatStats.selectedEnd = this._helper.formatDate(seriesData[seriesData.length - 1].date, freq);
     return formatStats;
   }
 }

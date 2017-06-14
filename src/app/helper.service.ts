@@ -164,25 +164,20 @@ export class HelperService {
   }
 
   formatDate(date: string, freq: string) {
-    let formattedDate;
-    const year = date.substring(0, 4);
-    const month = date.substring(5, 7);
+    const year = date.substr(0, 4);
+    const month = date.substr(5, 2);
     const quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
     const qMonth = ['01', '04', '07', '10'];
     if (freq === 'A') {
-      formattedDate = year;
+      return year;
     }
     if (freq === 'Q') {
-      qMonth.forEach((q) => {
-        if (month === q) {
-          formattedDate = q + ' ' + year;
-        }
-      });
+      const monthIndex = qMonth.indexOf(month);
+      return quarter[monthIndex] + ' ' + year;
     }
     if (freq === 'M' || freq === 'S') {
-      formattedDate = month + '-' + year;
+      return month + '-' + year;
     }
-    return formattedDate;
   }
 
   formatNum(num: number, decimal: number) {
