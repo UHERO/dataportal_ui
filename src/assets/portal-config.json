@@ -1,0 +1,10 @@
+{
+    "uheroPortal": {
+        "logo": "../assets/UHEROdata-Logo-color.svg",
+        "rootCategory": 59
+    },
+    "ntaPortal": {
+        "logo": "",
+        "rootCategory": ""
+    }
+}
