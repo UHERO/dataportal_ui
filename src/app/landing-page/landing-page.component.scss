@@ -3,6 +3,10 @@
   // display: inline-block;
   min-height: 100%;
   // overflow: auto;
+  
+  .fa-spinner {
+    color: #1D667F;
+  }
 
   .filters {
     display: inline-block;
@@ -23,15 +27,12 @@
       }
     }
 
-    .fa-spinner {
-      color: #1D667F;
-    }
-
     .sliders {
       display: inline-block;
       width: 200px;
       vertical-align: bottom;
       margin-left: 10px;
+      margin-right: 10px;
     }
   }
 
@@ -84,11 +85,10 @@
   .selected-category {
     display: inline-block;
     color: #1D667F;
-    font-size: 1.5em;
+    font-size: 1.4em;
     margin: 0px;
     vertical-align: middle;
     text-transform: capitalize;
-    margin-bottom: 10px;
 
     @media (min-width: 768px) {
       display: none;

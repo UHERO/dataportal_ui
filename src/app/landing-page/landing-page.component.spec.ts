@@ -36,7 +36,7 @@ describe('LandingPageComponent', () => {
     const selectedCategory = [{ 'children': { 'id': 8, 'name': 'Test Subcategory', 'parentId': 4 }, 'id': 4, 'name': 'Test Category' }];
 
     beforeEach(async(() => {
-      activatedRoute.testParams = { id: selectedCategory['children']['id'] };
+      activatedRoute.queryParams = { id: selectedCategory['children']['id'] };
       createComponent();
     }));
   });

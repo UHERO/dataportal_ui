@@ -18,7 +18,7 @@ export class CategoryHelperService {
   private requestsRemain;
   private defaultFreq: string;
   private defaultGeo: string;
-  private categoryData = [];
+  private categoryData = {};
   private categoryDates = [];
   private seriesDates = [];
   private series = [];
@@ -52,8 +52,12 @@ export class CategoryHelperService {
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
           this.categoryData[cacheId].selectedCategory = selectedCategory;
-          this.categoryData[cacheId].sublist = sublist;
-          this.getSubcategoryData(selectedCategory, cacheId, catId, sublist, routeGeo, routeFreq);
+          const sublistCopy = [];
+          sublist.forEach((sub) => {
+            sublistCopy.push(Object.assign({}, sub));
+          });
+          this.categoryData[cacheId].sublist = sublistCopy;
+          this.getSubcategoryData(selectedCategory, cacheId, catId, this.categoryData[cacheId].sublist, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
@@ -218,9 +222,15 @@ export class CategoryHelperService {
     }
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
+    let selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
+    // Check if the selected frequency exists in the list of freqs for a selected geo
+    selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
     regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
-    currentGeo = selectedGeo ? regions.find(region => region.handle === selectedGeo) : regions[0];
-    currentFreq = selectedFreq ? freqs.find(freq => freq.freq === selectedFreq) : freqs[0];
+    let selectedGeoExists = regions.find(region => region.handle === selectedGeo);
+    // Check if the selected geo exists in the list of regions for a selected frequency
+    selectedGeo = selectedGeoExists ? selectedGeo : regions[0].handle;
+    currentGeo = regions.find(region => region.handle === selectedGeo);
+    currentFreq = freqs.find(freq => freq.freq === selectedFreq);
     this.categoryData[cacheId].regions = regions;
     this.categoryData[cacheId].currentGeo = currentGeo;
     this.categoryData[cacheId].frequencies = freqs;

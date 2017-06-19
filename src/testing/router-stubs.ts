@@ -5,12 +5,12 @@ import { ActivatedRoute, Route, Params, ActivatedRouteSnapshot, UrlSegment, Data
 
 // RouterLinkStub
 @Directive({
-    selector: '[appRouterLink]',
+    selector: '[routerLink]',
     host: {
         '(click)': 'onclick()'
     }
 })
-class RouterLinkStubDirective {
+export class RouterLinkStubDirective {
     @Input('routerLink') linkParams: any;
     navigatedTo: any = null;
 
@@ -25,7 +25,7 @@ class RouterLinkStubDirective {
         '(click)': 'onclick()'
     }
 })
-class QueryParamsStubDirective {
+export class QueryParamsStubDirective {
     @Input('queryParams') linkParams: any;
     navigatedTo: any = null;
 
@@ -49,7 +49,7 @@ export class ActivatedRouteStub {
     snapshot: ActivatedRouteSnapshot;
     url: Observable<UrlSegment[]>;
     params: Observable<Params>;
-    queryParams: Observable<Params>;
+    queryParams: {};
     fragment: Observable<string>;
     data: Observable<Data>;
     outlet: string;
