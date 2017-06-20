@@ -38,7 +38,7 @@ describe('SingleSeriesComponent', () => {
     }];
 
     beforeEach(async(() => {
-      activatedRoute.testParams = { id: selectedSeries['id'] };
+      activatedRoute.queryParams = { id: selectedSeries['id'] };
       createComponent();
       expect(comp).toBeTruthy();
     }));

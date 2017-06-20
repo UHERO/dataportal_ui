@@ -27,7 +27,7 @@ describe('HeaderComponent', () => {
       comp = fixture.componentInstance;
     });
   }));
-  // tests();
+  tests();
 });
 
 function tests() {
@@ -37,7 +37,7 @@ function tests() {
   beforeEach(() => {
     fixture.detectChanges();
 
-    linkEls = fixture.debugElement.queryAll(By.css('a'));
+    linkEls = fixture.debugElement.queryAll(By.directive(RouterLinkStubDirective));
 
     links = linkEls.map(el => el.injector.get(RouterLinkStubDirective) as RouterLinkStubDirective);
   });

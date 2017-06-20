@@ -16,7 +16,7 @@ import {
   QueryParamsStubDirective,
   RouterLinkStubDirective
 } from '../../testing/router-stubs';
-import { addMatchers, newEvent } from '../../testing/helpers';
+import { newEvent } from '../../testing/helpers';
 import { Observable } from 'rxjs/Observable';
 
 @Component({selector: 'app-search-bar', template: ''})
@@ -24,11 +24,10 @@ class SearchStubComponent {}
 
 let comp: SidebarNavComponent;
 let fixture: ComponentFixture<SidebarNavComponent>;
-/* let page: Page;
+let page: Page;
 
 describe('SidebarNavComponent', () => {
   beforeEach(async(() => {
-    addMatchers();
     TestBed.configureTestingModule({
       declarations: [ SidebarNavComponent, SearchStubComponent, RouterLinkStubDirective, QueryParamsStubDirective ],
       providers: [
@@ -73,4 +72,4 @@ class Page {
     const router = fixture.debugElement.injector.get(Router);
     this.navSpy = spyOn(router, 'navigate');
   }
-} */
+}

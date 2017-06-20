@@ -117,7 +117,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         series: '',
         observations: ''
       }, {
-        series: 'Year-Over-Year',
+        series: 'Year/Year',
         observations: ''
       });
       displaySeries.forEach((series) => {
