@@ -5,6 +5,7 @@
   },
   "apps": [
     {
+      "name": "uhero",
       "root": "src",
       "outDir": "dist",
       "assets": [
@@ -40,6 +41,34 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
+      }
+    }, {
+      "name": "nta",
+      "root": "src",
+      "outDir": "ntaDist",
+      "assets":[
+        "assets"
+      ],
+      "index": "nta-index.html",
+      "main": "ntaMain.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "nta",
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "ntaStyles.scss"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/tether/dist/js/tether.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"        
       }
     }
   ],

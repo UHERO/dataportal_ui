@@ -26,7 +26,7 @@ export function highchartsFactory() {
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng2-recaptcha';
-import { routing } from './app.routes';
+import { routing } from './nta.routes';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
@@ -37,7 +37,7 @@ import { CategoryHelperService } from './category-helper.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
-import { LandingPageComponent } from './landing-page/landing-page.component';
+import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { GeoSelectorComponent } from './geo-selector/geo-selector.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
 import { SidebarNavComponent } from './sidebar-nav/sidebar-nav.component';
@@ -52,6 +52,7 @@ import { CategoryChartsComponent } from './category-charts/category-charts.compo
 import { DateSliderComponent } from './date-slider/date-slider.component';
 
 import { environment } from '../environments/environment';
+
 export function ConfigLoader(configService: ConfigService) {
   // Note: this factory needs to return a function (that returns a promise)
   return () => configService.load(environment.configFile);
@@ -60,7 +61,6 @@ export function ConfigLoader(configService: ConfigService) {
   declarations: [
     AppComponent,
     HeaderComponent,
-    LandingPageComponent,
     GeoSelectorComponent,
     SingleSeriesComponent,
     SidebarNavComponent,
@@ -73,6 +73,7 @@ export function ConfigLoader(configService: ConfigService) {
     CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
+    NtaLayoutComponent,
   ],
   imports: [
     BrowserModule,
@@ -112,4 +113,4 @@ export function ConfigLoader(configService: ConfigService) {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class NtaModule { }

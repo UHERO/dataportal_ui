@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Inject, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigService } from '../config.service';
 
@@ -10,10 +10,11 @@ import { ConfigService } from '../config.service';
 export class HeaderComponent implements OnInit {
   public headerLogo
 
-  constructor(private _router: Router, private configService: ConfigService) { }
+  constructor(@Inject('logo') private logo, private _router: Router, private configService: ConfigService) { }
 
   ngOnInit() {
-    this.headerLogo = this.configService.getConfigurataion().uheroPortal.logo;
+    //this.headerLogo = this.configService.getConfigurataion().uheroPortal.logo;
+    this.headerLogo = this.logo;
   }
 
   onSearch(event) {

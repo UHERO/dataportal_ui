@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
@@ -27,7 +27,7 @@ export class UheroApiService {
   private cachedSearchExpand = [];
   private cachedSearch = [];
 
-  constructor(private http: Http, private configService: ConfigService) {
+  constructor(@Inject('rootCategory') private rootCategory, private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
      this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
@@ -204,7 +204,7 @@ export class UheroApiService {
 // And side bar navigation on single-series & table views
 function mapCategories(response: Response): Array<Category> {
   // Category Id for data beloning to the UHERO Data Portal
-  const rootCategory = this.configService.getConfigurataion().uheroPortal.rootCategory;
+  // const rootCategory = this.configService.getConfigurataion().uheroPortal.rootCategory;
   const categories = response.json().data;
   const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   const categoryTree = [];
@@ -218,7 +218,7 @@ function mapCategories(response: Response): Array<Category> {
   });
   let result = categoryTree;
   categoryTree.forEach((category) => {
-    if (category.id === rootCategory) {
+    if (category.id === this.rootCategory) {
       result = category.children;
     }
   });
