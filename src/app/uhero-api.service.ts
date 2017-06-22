@@ -9,7 +9,6 @@ import { Series } from './series';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { ObservationResults } from './observation-results';
-import { ConfigService } from './config.service';
 
 @Injectable()
 export class UheroApiService {
@@ -203,8 +202,6 @@ export class UheroApiService {
 // Used for landing-page.component
 // And side bar navigation on single-series & table views
 function mapCategories(response: Response): Array<Category> {
-  // Category Id for data beloning to the UHERO Data Portal
-  // const rootCategory = this.configService.getConfigurataion().uheroPortal.rootCategory;
   const categories = response.json().data;
   const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   const categoryTree = [];

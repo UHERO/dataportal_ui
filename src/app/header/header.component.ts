@@ -1,6 +1,5 @@
 import { Inject, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ConfigService } from '../config.service';
 
 @Component({
   selector: 'app-header',
@@ -10,10 +9,9 @@ import { ConfigService } from '../config.service';
 export class HeaderComponent implements OnInit {
   public headerLogo
 
-  constructor(@Inject('logo') private logo, private _router: Router, private configService: ConfigService) { }
+  constructor(@Inject('logo') private logo, private _router: Router) { }
 
   ngOnInit() {
-    //this.headerLogo = this.configService.getConfigurataion().uheroPortal.logo;
     this.headerLogo = this.logo;
   }
 

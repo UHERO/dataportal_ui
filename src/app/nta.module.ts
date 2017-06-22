@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
@@ -31,7 +31,6 @@ import { routing } from './nta.routes';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 
-import { ConfigService } from './config.service';
 import { UheroApiService } from './uhero-api.service';
 import { CategoryHelperService } from './category-helper.service';
 import { SeriesHelperService } from './series-helper.service';
@@ -51,12 +50,6 @@ import { CategoryDatatablesComponent } from './category-datatables/category-data
 import { CategoryChartsComponent } from './category-charts/category-charts.component';
 import { DateSliderComponent } from './date-slider/date-slider.component';
 
-import { environment } from '../environments/environment';
-
-export function ConfigLoader(configService: ConfigService) {
-  // Note: this factory needs to return a function (that returns a promise)
-  return () => configService.load(environment.configFile);
-}
 @NgModule({
   declarations: [
     AppComponent,
@@ -86,13 +79,6 @@ export function ConfigLoader(configService: ConfigService) {
     RecaptchaModule.forRoot()
   ],
   providers: [
-    ConfigService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: ConfigLoader,
-      deps: [ConfigService],
-      multi: true
-    },
     UheroApiService,
     CategoryHelperService,
     SeriesHelperService,
