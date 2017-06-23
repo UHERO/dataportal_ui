@@ -1,19 +1,21 @@
+@import 'colors';
+
 .btn-feedback {
-    background-color: #F9F9F9;
-    color: #505050;
+    background-color: $offwhite;
+    color: $primary-text;
     position: fixed;
     bottom: 0;
     left: 15px;
     line-height: 1;
     font-size: 0.9em;
-    border: 1px solid #ADADAD;
+    border: 1px solid $border;
     border-bottom: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .modal-title {
-    color: #1D667F;
+    color: $primary;
     font-family: 'Lucida Sans', sans-serif;
     font-size: 1em;
 }
@@ -40,16 +42,16 @@
 
 .col-form-label {
     text-align: right;
-    color: #1D667F;
+    color: $primary;
 }
 
 .custom-input {
-    border: 0 solid #1D667F;
+    border: 0 solid $primary;
     border-bottom-width: 2px;
     border-radius: 0;
     font-family: 'Lucida Sans', sans-serif;
     font-size: 0.9em;
-    color: #505050;
+    color: $primary-text;
     padding: 0.5rem 0.25rem;
 }
 
@@ -66,6 +68,6 @@
 }
 
 .btn-submit {
-    background-color: #1D667F;
-    color: #FFFFFF;
+    background-color: $primary;
+    color: $white;
 }

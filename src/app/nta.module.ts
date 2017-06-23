@@ -94,7 +94,11 @@ import { DateSliderComponent } from './date-slider/date-slider.component';
     },
     {
       provide: 'logo',
-      useValue: '../../assets/UHEROdata-Logo-color.svg'
+      useValue: '../../assets/nta-logo.svg'
+    },
+    {
+      provide: 'seriesType',
+      useValue: 'line'
     }
   ],
   bootstrap: [AppComponent]

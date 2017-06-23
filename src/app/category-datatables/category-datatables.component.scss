@@ -1,8 +1,10 @@
+@import 'colors';
+
 .dataTables_wrapper {
     display: inline-block;
 
     .buttons-csv {
-        color: #1D667F;
+        color: $primary;
         text-decoration: none;
         font-size: 0.85em;
         

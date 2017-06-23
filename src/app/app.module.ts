@@ -95,6 +95,10 @@ import { DateSliderComponent } from './date-slider/date-slider.component';
     {
       provide: 'logo',
       useValue: '../../assets/UHEROdata-Logo-color.svg'
+    },
+    {
+      provide: 'seriesType',
+      useValue: 'column'
     }
   ],
   bootstrap: [AppComponent]

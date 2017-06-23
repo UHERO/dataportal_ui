@@ -1,3 +1,5 @@
+@import 'colors';
+
 .search-bar {
   position: fixed;
   top: 12px;
@@ -9,32 +11,31 @@
   }
 
   ::-webkit-input-placeholder {
-    color: #E2E2E2;
+    color: $gray;
   }
 
   :-moz-placeholder {
-    color: #E2E2E2;
+    color: $gray;
     opacity: 1;
   }
 
   ::-moz-placeholder {
-    color: #E2E2E2;
+    color: $gray;
     opacity: 1;
   }
 
   :-ms-input-placeholder {
-    color: #E2E2E2;
+    color: $gray;
   }
 
   .btn {
     line-height: 1.15;
     padding: 0.25rem 1rem;
-    background-color: #1D667F;
+    background-color: $primary;
     
     .material-icons.md-18 {
       font-size: 18px;
-      color: #FFFFFF;
-      // color: #1D667F;
+      color: $white;
       vertical-align: middle;
     }
   }

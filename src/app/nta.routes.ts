@@ -1,6 +1,8 @@
 import { Routes, RouterModule } from '@angular/router';
 
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
+import { SingleSeriesComponent } from './single-series/single-series.component';
+import { CategoryTableComponent } from './category-table/category-table.component';
 
 
 const routes: Routes = [
@@ -8,6 +10,16 @@ const routes: Routes = [
   {
     path: '',
     component: NtaLayoutComponent
+  },
+
+  {
+    path: 'category',
+    component: NtaLayoutComponent
+  },
+
+  {
+    path: 'series',
+    component: SingleSeriesComponent
   }
 ];
 
