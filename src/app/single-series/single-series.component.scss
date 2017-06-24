@@ -36,7 +36,7 @@
 
   .source {
     width: 100%;
-    background-color: $offwhite;
+    background-color: $chart-background;
     padding: 10px 0px 0px;
     font-size: 0.9em;
     text-align: center;
@@ -50,7 +50,7 @@
     width: 100%;
     display: table;
     table-layout: fixed;
-    background-color: $offwhite;
+    background-color: $chart-background;
     padding: 10px 0;
     
     .stat {

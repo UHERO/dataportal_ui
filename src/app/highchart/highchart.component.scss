@@ -19,13 +19,13 @@
 
     .highcharts-series-0 {
         .highcharts-graph {
-            stroke: $highcharts-series1;
+            stroke: $highcharts-series0;
         }
     }
 
     .highcharts-series-1 {
         .highcharts-graph {
-            stroke: $highcharts-series2;
+            stroke: $highcharts-series1;
         }
 
         // Transparent column charts for UHERO data portal
@@ -37,23 +37,37 @@
 
     .highcharts-markers.highcharts-series-0 {
         path {
-            fill: $highcharts-series1;
+            fill: $highcharts-series0;
         }
     }
     
     .highcharts-markers.highcharts-series-1 {
         path {
-            fill: $highcharts-series2;
+            fill: $highcharts-series1;
         }
     }
 
+    .highcharts-no-data {
+        color: $primary-text !important;
+        font-size: 0.85em !important;
+    }
+
+    .highcharts-title {
+        color: $primary-text !important;
+        font-size: 0.9em !important;
+        letter-spacing: 0.05em;
+    }
 
     .highcharts-tooltip {
+        .highcharts-tooltip-box {
+            fill: none;
+        }
+
         text {
+            font-family: 'Lucida Sans', sans-serif;
             color: $primary-text !important;
             font-size: 0.9em !important;
-            letter-spacing: 0.05em;
-            width: 190px;
+            letter-spacing: 0.015em;
             margin-bottom: 5px;
         }
     }

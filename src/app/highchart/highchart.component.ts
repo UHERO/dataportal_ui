@@ -76,7 +76,6 @@ export class HighchartComponent implements OnInit, OnChanges {
         shadow: false,
         borderWidth: 0,
         shared: true,
-        backgroundColor: 'transparent',
         formatter: function () {
           const getLabelName = function (seriesName, freq, precent) {
             if (seriesName === 'Level') {
@@ -210,18 +209,10 @@ export class HighchartComponent implements OnInit, OnChanges {
     const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
 
     this.options = {
-      chart: {
-        backgroundColor: '#F9F9F9'
-      },
       title: {
         text: '<b>' + title + '</b><br>' + 'No Data Available',
         align: 'left',
         widthAdjust: 0,
-        style: {
-          color: '#505050',
-          fontSize: '0.9em',
-          letterSpacing: '0.05em'
-        }
       },
       exporting: {
         enabled: false
@@ -245,12 +236,6 @@ export class HighchartComponent implements OnInit, OnChanges {
       }],
       lang: {
         noData: 'No Data Available'
-      },
-      noData: {
-        style: {
-          color: '#505050',
-          fontSize: '0.85em'
-        }
       }
     };
   }
