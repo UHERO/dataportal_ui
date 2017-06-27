@@ -1,0 +1,22 @@
+<div id="wrapper">
+    <app-header></app-header>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-1 col-md-4 col-lg-3 col-xl-2 sidebar-container">
+                <div class="sidebar-col">
+                    <app-sidebar-nav></app-sidebar-nav>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-8 col-lg-9 col-xl-10 content-col">
+                <div class="alert alert-info alert-dismissible fade show browser" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    This site works best on <a class="alert-link" href="https://www.google.com/chrome/" target="_blank">Google Chrome</a>.
+                </div>
+                <router-outlet></router-outlet>
+                <app-feedback></app-feedback>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
@@ -11,7 +12,7 @@ export function highchartsFactory() {
   const highcharts = require('highcharts/highstock');
   const exp = require('highcharts/modules/exporting');
   const offlineExport = require('highcharts/modules/offline-exporting');
-  const csv = require('./csv-export');
+  const csv = require('../csv-export');
 
   exp(highcharts);
   offlineExport(highcharts);
@@ -23,18 +24,20 @@ export function highchartsFactory() {
   });
   return (highcharts);
 }
-import { Shared } from './shared/shared.module';
-import { routing } from './app.routes';
+import { Shared } from '../shared/shared.module';
+import { routing } from '../app.routes';
+import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { RecaptchaModule } from 'ng2-recaptcha';
 import { AppComponent } from './app.component';
-import { UheroApiService } from './uhero-api.service';
-import { CategoryHelperService } from './category-helper.service';
-import { SeriesHelperService } from './series-helper.service';
-import { HelperService } from './helper.service';
-import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
+import { UheroApiService } from '../uhero-api.service';
+import { CategoryHelperService } from '../category-helper.service';
+import { SeriesHelperService } from '../series-helper.service';
+import { HelperService } from '../helper.service';
+import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     Shared,
@@ -43,7 +46,9 @@ import { GoogleAnalyticsEventsService } from './google-analytics-events.service'
     ChartModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule
+    HttpModule,
+    DataTableModule, SharedModule,
+    RecaptchaModule.forRoot()
   ],
   providers: [
     UheroApiService,
@@ -61,11 +66,11 @@ import { GoogleAnalyticsEventsService } from './google-analytics-events.service'
     },
     {
       provide: 'logo',
-      useValue: '../../assets/UHEROdata-Logo-color.svg'
+      useValue: '../../assets/nta-logo.svg'
     },
     {
       provide: 'seriesType',
-      useValue: 'column'
+      useValue: 'line'
     }
   ],
   bootstrap: [AppComponent]
