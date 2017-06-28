@@ -25,19 +25,22 @@ export function highchartsFactory() {
   return (highcharts);
 }
 import { Shared } from '../shared/shared.module';
-import { routing } from '../app.routes';
+import { routing } from '../nta.routes';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng2-recaptcha';
 import { AppComponent } from './app.component';
 import { UheroApiService } from '../uhero-api.service';
-import { CategoryHelperService } from '../category-helper.service';
+import { NtaHelperService } from './nta-helper.service';
+// import { CategoryHelperService } from '../category-helper.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    NtaLayoutComponent
   ],
   imports: [
     Shared,
@@ -52,7 +55,8 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
   ],
   providers: [
     UheroApiService,
-    CategoryHelperService,
+    // CategoryHelperService,
+    NtaHelperService,
     SeriesHelperService,
     HelperService,
     GoogleAnalyticsEventsService,

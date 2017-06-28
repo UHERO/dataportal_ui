@@ -31,10 +31,12 @@ import { CategoryHelperService } from './category-helper.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LandingPageComponent
   ],
   imports: [
     Shared,
