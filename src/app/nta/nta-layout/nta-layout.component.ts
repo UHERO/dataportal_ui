@@ -69,7 +69,7 @@ export class NtaLayoutComponent implements OnInit {
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-      this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
+      this.categoryData = this.getData(this.id, this.routeFreq);
     });
   }
 
@@ -99,18 +99,12 @@ export class NtaLayoutComponent implements OnInit {
     }
   }
 
-  getData(id, geo, freq) {
-    if (typeof id === 'string' && geo && freq) {
-      return this._ntaHelper.initSearch(id, geo, freq);
+  getData(id, freq) {
+    if (typeof id === 'number' && freq) {
+      return this._ntaHelper.initContent(id, freq);
     }
-    if (typeof id === 'string' && !geo && !freq) {
-      return this._ntaHelper.initSearch(id);
-    }
-    if (typeof id === 'number' && geo && freq) {
-      return this._ntaHelper.initContent(id, geo, freq);
-    }
-    if (typeof id === 'number' && !geo && !freq) {
-      return this._ntaHelper.initContent(id, geo, freq);
+    if (typeof id === 'number' && !freq) {
+      return this._ntaHelper.initContent(id, freq);
     }
   }
 
@@ -121,22 +115,10 @@ export class NtaLayoutComponent implements OnInit {
     return heightDiff;
   }
 
-  // Redraw series when a new region is selected
-  redrawSeriesGeo(event, currentFreq, subId) {
+  // Redraw series when a new frequemcy is selected
+  redrawSeriesFreq(event, subId) {
     this.loading = true;
     setTimeout(() => {
-      this.queryParams.geo = event.handle;
-      this.queryParams.freq = currentFreq.freq;
-      this.fragment = subId;
-      this.updateRoute();
-    }, 10);
-    this.scrollToFragment();
-  }
-
-  redrawSeriesFreq(event, currentGeo, subId) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
       this.fragment = subId;
       this.updateRoute();

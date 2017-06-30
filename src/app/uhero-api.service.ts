@@ -145,13 +145,13 @@ export class UheroApiService {
     if (this.cachedCatMeasures[id]) {
       return Observable.of(this.cachedCatMeasures[id]);
     } else {
-    let measureSeries$ = this.http.get(`${this.baseUrl}/category/measurements?id=` + id, this.requestOptionsArgs)
+    let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=` + id, this.requestOptionsArgs)
       .map(mapData)
       .do(val => {
         this.cachedCatMeasures[id] = val;
-        measureSeries$ = null;
+        catMeasures$ = null;
       });
-    return measureSeries$;
+    return catMeasures$;
     }
   }
 
@@ -159,13 +159,13 @@ export class UheroApiService {
     if (this.cachedMeasureSeries[id + freq]) {
       return Observable.of(this.cachedMeasureSeries[id + freq]);
     } else {
-    let catMeasures$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&freq=` + freq, this.requestOptionsArgs)
+    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&freq=` + freq, this.requestOptionsArgs)
       .map(mapData)
       .do(val => {
         this.cachedMeasureSeries[id + freq] = val;
-        catMeasures$ = null;
+        measureSeries$ = null;
       });
-    return catMeasures$;
+    return measureSeries$;
     }
   }
 
