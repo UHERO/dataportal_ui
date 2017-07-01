@@ -7,8 +7,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-  public headerLogo
-
+  public headerLogo;
+  
   constructor(@Inject('logo') private logo, private _router: Router) { }
 
   ngOnInit() {

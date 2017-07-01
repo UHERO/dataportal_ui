@@ -87,7 +87,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (seriesName === 'YTD' && freq !== 'A') {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
             }
-          }
+          };
           const getFreqLabel = function (freq, date) {
             if (freq === 'A') {
               return '';
@@ -109,7 +109,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (freq === 'M' || 'S') {
               return Highcharts.dateFormat('%b', date) + ' ';
             }
-          }
+          };
           const pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
           // Get Quarter or Month for Q/M frequencies

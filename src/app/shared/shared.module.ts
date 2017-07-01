@@ -12,7 +12,7 @@ import { SingleSeriesComponent } from '../single-series/single-series.component'
 import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
 import { HighchartComponent } from '../highchart/highchart.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
-import { GeoSelectorComponent } from '../geo-selector/geo-selector.component'
+import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
 import { HighstockComponent } from '../highstock/highstock.component';
 import { CategoryTableComponent } from '../category-table/category-table.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';

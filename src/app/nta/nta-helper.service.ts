@@ -6,7 +6,6 @@ import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
 import { Frequency } from '../frequency';
-import { Geography } from '../geography';
 import { DateWrapper } from '../date-wrapper';
 import { DisplaySeries } from '../display-series';
 
@@ -17,7 +16,6 @@ export class NtaHelperService {
   private defaults;
   private requestsRemain;
   private defaultFreq: string;
-  private defaultGeo: string;
   private categoryData = {};
   private categoryDates = [];
   private seriesDates = [];
@@ -47,14 +45,13 @@ export class NtaHelperService {
           const selectedCategory = cat.name;
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
-          this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
           this.categoryData[cacheId].selectedCategory = selectedCategory;
           const sublistCopy = [];
           sublist.forEach((sub) => {
             sublistCopy.push(Object.assign({}, sub));
           });
           this.categoryData[cacheId].sublist = sublistCopy;
-          this.getSubcategoryData(selectedCategory, cacheId, catId, this.categoryData[cacheId].sublist, routeFreq);
+          this.getSubcategoryData(selectedCategory, cacheId, this.categoryData[cacheId].sublist, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
@@ -63,14 +60,13 @@ export class NtaHelperService {
     }
   }
 
-  getSubcategoryData(catName: string, cacheId, catId: number, sublist: Array<any>, routeFreq?: string) {
+  getSubcategoryData(catName: string, cacheId, sublist: Array<any>, routeFreq?: string) {
     const freqArray = [];
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     sublist.forEach((sub, index) => {
       // Get all regions available in a given category
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
-        let freqGeos, geoFreqs;
-        freqGeos = category.freqGeos;
+        const freqGeos = category.freqGeos;
         freqGeos.forEach((freq) => {
           this._helper.uniqueFreqs(freq, freqArray);
         });
@@ -79,32 +75,23 @@ export class NtaHelperService {
           this.errorMessage = error;
         },
         () => {
-          this.requestsRemain = sublist.length;
           if (index === sublist.length - 1) {
+            this.requestsRemain = sublist.length;
+            const measurementsArray = [];
             sublist.forEach((subcat, i) => {
-              const dateWrapper = <DateWrapper>{};
               let selectedFreq;
               selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
               if (routeFreq) {
                 const selected = this.checkSelectedFreqs(routeFreq, freqArray);
                 selectedFreq = selected.freq;
               }
-              let freqs, currentFreq;
               // Get frequencies available for a selected region
-              freqs = freqArray;
-              currentFreq = freqs.find(freq => freq.freq === selectedFreq);
-              this.categoryData[cacheId].frequencies = freqs;
+              const currentFreq = freqArray.find(freq => freq.freq === selectedFreq);
+              this.categoryData[cacheId].frequencies = freqArray;
               this.categoryData[cacheId].currentFreq = currentFreq;
               subcat.parentName = catName;
-              const subcategory = {
-                subcat: subcat,
-                cacheId: cacheId,
-                currentFreq: currentFreq,
-                dateWrapper: dateWrapper,
-                categoryDateWrapper: categoryDateWrapper
-              };
               this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
-              this.getMeasurementData(subcategory, this.categoryData[cacheId]);
+              this.getMeasurementData(subcat, currentFreq.freq, this.categoryData[cacheId], measurementsArray);
             });
           }
         });
@@ -112,14 +99,8 @@ export class NtaHelperService {
   }
 
   // Get list of measurements belonging to a category
-  getMeasurementData(subcategory, category) {
-    const subcat = subcategory.subcat;
-    const cacheId = subcategory.cacheId;
-    const currentFreq = subcategory.currentFreq;
-    const dateWrapper = subcategory.dateWrapper;
-    const categoryDateWrapper = subcategory.categoryDateWrapper;
-    const measurementsArray = [];
-    this._uheroAPIService.fetchCategoryMeasurements(subcat.id).subscribe((measurements) => {
+  getMeasurementData(subcategory, freq, category, measurementsArray) {
+    this._uheroAPIService.fetchCategoryMeasurements(subcategory.id).subscribe((measurements) => {
       measurements.forEach((measurement) => {
         measurementsArray.push(Object.assign({}, measurement));
       });
@@ -130,14 +111,14 @@ export class NtaHelperService {
       () => {
         this.requestsRemain -= 1;
         if (this.requestsRemain === 0) {
-          this.categoryData[cacheId].measurements = measurementsArray;
-          this.getSeriesData(this.categoryData[cacheId], currentFreq.freq, dateWrapper, categoryDateWrapper);
+          category.measurements = measurementsArray;
+          this.getSeriesData(category, freq);
         }
       });
   }
 
   // Get list of series belonging to each measurement
-  getSeriesData(category, freq, dateWrapper, categoryDateWrapper) {
+  getSeriesData(category, freq) {
     const measurements = category.measurements;
     let seriesCount = 0;
     let measurementCount = measurements.length;
@@ -163,8 +144,6 @@ export class NtaHelperService {
   // Get observations beloning to each series
   getObservationData(category, seriesCount) {
     const measurements = category.measurements;
-    let reqCount = 0;
-    let seriesObservations;
     measurements.forEach((measurement) => {
       if (measurement.series) {
         measurement.series.forEach((serie) => {
@@ -177,7 +156,7 @@ export class NtaHelperService {
             () => {
               seriesCount--;
               if (seriesCount === 0) {
-                this.formatSeriesData(category);
+                this.formatCategoryData(category);
               }
             });
         });
@@ -186,27 +165,34 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatSeriesData(category) {
+  formatCategoryData(category) {
     const categoryDateArray = [];
     const measurements = category.measurements;
-    let displaySeries;
+    const freq = category.currentFreq.freq;
+    const catDateWrapper = category.categoryDateWrapper;
     measurements.forEach((measurement) => {
       if (measurement.series) {
-        measurement.displaySeries = this.filterSeriesResults(measurement.series, category.currentFreq.freq, category.categoryDateWrapper);
+        measurement.displaySeries = this.filterSeries(measurement.series, freq, catDateWrapper);
       }
     });
-    this._helper.calculateDateArray(category.categoryDateWrapper.firstDate, category.categoryDateWrapper.endDate, category.currentFreq.freq, categoryDateArray);
+    this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, freq, categoryDateArray);
     category.categoryDates = categoryDateArray;
     measurements.forEach((measurement, i) => {
       if (measurement.series) {
-        this.formatCategoryData(measurement.displaySeries, categoryDateArray, category.categoryDateWrapper);
+        const displaySeries = measurement.displaySeries;
+        displaySeries.forEach((series) => {
+          series.seriesInfo.title = series.seriesInfo.geography.name;
+          const catData = this.formatSeriesData(series, categoryDateArray);
+          series.categoryTable = catData.catTable;
+          series.categoryChart = catData.catChart;
+        });
       }
       measurement.id = measurement.id.toString();
       if (i === measurements.length - 1) {
         category.requestComplete = true;
       }
     });
-    category.sliderDates = this.getTableDates(categoryDateArray);
+    category.sliderDates = this._helper.getTableDates(categoryDateArray);
   }
 
   checkSelectedFreqs(routeFreq, freqArray) {
@@ -221,9 +207,9 @@ export class NtaHelperService {
     }
   }
 
-  filterSeriesResults(results: Array<any>, freq: string, categoryDateWrapper) {
+  filterSeries(seriesArray: Array<any>, freq: string, categoryDateWrapper) {
     const filtered = [];
-    results.forEach((res) => {
+    seriesArray.forEach((res) => {
       let seriesDates = [], series;
       const levelData = res.seriesObservations.transformationResults[0].observations;
       const decimals = res.decimals ? res.decimals : 1;
@@ -231,13 +217,9 @@ export class NtaHelperService {
       if (levelData) {
         const seriesObsStart = res.seriesObservations.observationStart;
         const seriesObsEnd = res.seriesObservations.observationEnd;
-        if (categoryDateWrapper.firstDate === '' || seriesObsStart < categoryDateWrapper.firstDate) {
-          categoryDateWrapper.firstDate = seriesObsStart;
-        }
-        if (categoryDateWrapper.endDate === '' || seriesObsEnd > categoryDateWrapper.endDate) {
-          categoryDateWrapper.endDate = seriesObsEnd;
-        }
-        seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
+        categoryDateWrapper.firstDate = this.setStartDate(categoryDateWrapper, seriesObsStart);
+        categoryDateWrapper.endDate = this.setEndDate(categoryDateWrapper, seriesObsEnd);
+        seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
@@ -247,22 +229,30 @@ export class NtaHelperService {
     return filtered;
   }
 
-  formatCategoryData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
-    displaySeries.forEach((series) => {
-      if (series.seriesInfo !== 'No data available') {
-        series.seriesInfo.title = series.seriesInfo.geography.name;
-        const decimals = series.decimals ? series.decimals : 1;
-        series.categoryTable = this._helper.catTable(series.tableData, dateArray, decimals);
-        series.categoryChart = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
-      }
-    });
+  setStartDate(categoryDateWrapper, observationStart) {
+    if (categoryDateWrapper.firstDate === '') {
+      return observationStart;
+    }
+    if (observationStart < categoryDateWrapper.firstDate) {
+      return observationStart;
+    }
+    return categoryDateWrapper.firstDate;
   }
 
-  getTableDates(dateArray: Array<any>) {
-    const tableDates = [];
-    dateArray.forEach((date) => {
-      tableDates.push(date.tableDate);
-    });
-    return tableDates;
+  setEndDate(categoryDateWrapper, observationEnd) {
+    if (categoryDateWrapper.endDate === '') {
+      return observationEnd;
+    }
+    if (observationEnd > categoryDateWrapper.endDate) {
+      return observationEnd;
+    }
+    return categoryDateWrapper.endDate;
+  }
+
+  formatSeriesData(series, categoryDateArray) {
+    const decimals = series.decimals ? series.decimals : 1;
+    const catTable = this._helper.catTable(series.tableData, categoryDateArray, decimals);
+    const catChart = this._helper.dataTransform(series.seriesInfo.seriesObservations, categoryDateArray, decimals);
+    return { catTable: catTable, catChart: catChart };
   }
 }

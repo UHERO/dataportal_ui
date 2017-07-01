@@ -164,11 +164,11 @@ export class HighstockComponent implements OnChanges {
         borderWidth: 0,
         shadow: false,
         formatter: function () {
-          const getFreqLabel = function(freq, date) {
-            if (freq === 'A') {
+          const getFreqLabel = function(frequency, date) {
+            if (frequency === 'A') {
               return '';
             }
-            if (freq === 'Q') {
+            if (frequency === 'Q') {
               if (Highcharts.dateFormat('%b', date) === 'Jan') {
                 return 'Q1 ';
               }
@@ -182,10 +182,10 @@ export class HighstockComponent implements OnChanges {
                 return 'Q4 ';
               }
             }
-            if (freq === 'M' || freq === 'S') {
+            if (frequency === 'M' || frequency === 'S') {
               return Highcharts.dateFormat('%b', date);
             }
-          }
+          };
           const pseudo = 'Pseudo History ';
           let s = '<b>';
           s = s + getFreqLabel(freq.freq, this.x);
@@ -242,13 +242,13 @@ export class HighstockComponent implements OnChanges {
               if (month === 'Oct') {
                 return 'Q4 ';
               }
-            }
+            };
             let s = '';
             const month = Highcharts.dateFormat('%b', this.value);
             const frequency = this.chart.options.chart.description;
             const first = Highcharts.dateFormat('%Y', this.axis.userMin);
             const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : ''; 
+            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
             s = s + Highcharts.dateFormat('%Y', this.value);
             return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
           }

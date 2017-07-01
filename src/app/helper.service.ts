@@ -8,7 +8,7 @@ export class HelperService {
 
   constructor() { }
 
-  calculateDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+  createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);
     const endYear = +dateEnd.substr(0, 4);
     let startMonth = +dateStart.substr(5, 2);
@@ -271,5 +271,13 @@ export class HelperService {
     if (freq === 'M') {
       return { start: dataArray.length - 121, end: dataArray.length - 1 };
     }
+  }
+
+  getTableDates(dateArray: Array<any>) {
+    const tableDates = [];
+    dateArray.forEach((date) => {
+      tableDates.push(date.tableDate);
+    });
+    return tableDates;
   }
 }

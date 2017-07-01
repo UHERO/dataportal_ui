@@ -29,7 +29,8 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
   ngAfterViewInit() {
     const that = this;
     const freq = this.freq;
-    $('#' + this.subCat.id).ionRangeSlider({   min: 0,
+    $('#' + this.subCat.id).ionRangeSlider({
+      min: 0,
       from: this.start,
       to: this.end,
       values: this.dates,
@@ -66,7 +67,7 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
       this.start = startIndex;
       this.end = endIndex;
       this.sublist.forEach((sub) => {
-        const slider = $('#' + sub.id).data('ionRangeSlider')
+        const slider = $('#' + sub.id).data('ionRangeSlider');
         if (slider) {
           slider.update({
             from: this.start,

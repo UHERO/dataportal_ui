@@ -156,13 +156,13 @@ export class CategoryHelperService {
           if (this.requestsRemain === 0) {
             const categoryDateArray = [];
             const catWrapper = splitSeries.categoryDateWrapper;
-            this._helper.calculateDateArray(catWrapper.firstDate, catWrapper.endDate, currentFreq.freq, categoryDateArray);
+            this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, currentFreq.freq, categoryDateArray);
             const category = this.categoryData[cacheId];
             category.sublist.forEach((sub, i) => {
               this.formatCategoryData(sub.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
               if (i === category.sublist.length - 1) {
                 category.categoryDates = categoryDateArray;
-                category.sliderDates = this.getTableDates(categoryDateArray);
+                category.sliderDates = this._helper.getTableDates(categoryDateArray);
                 category.requestComplete = true;
               }
             });
@@ -222,11 +222,11 @@ export class CategoryHelperService {
     }
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
-    let selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
+    const selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
     // Check if the selected frequency exists in the list of freqs for a selected geo
     selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
     regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
-    let selectedGeoExists = regions.find(region => region.handle === selectedGeo);
+    const selectedGeoExists = regions.find(region => region.handle === selectedGeo);
     // Check if the selected geo exists in the list of regions for a selected frequency
     selectedGeo = selectedGeoExists ? selectedGeo : regions[0].handle;
     currentGeo = regions.find(region => region.handle === selectedGeo);
@@ -262,12 +262,12 @@ export class CategoryHelperService {
           };
           const categoryDateArray = [];
           const catWrapper = splitSeries.categoryDateWrapper;
-          this._helper.calculateDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
+          this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
           this.formatCategoryData(splitSeries.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
           this.categoryData[cacheId].sublist = [sublist];
           this.categoryData[cacheId].categoryDateWrapper = splitSeries.categoryDateWrapper;
           this.categoryData[cacheId].categoryDates = categoryDateArray;
-          this.categoryData[cacheId].sliderDates = this.getTableDates(categoryDateArray);
+          this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
           this.categoryData[cacheId].requestComplete = true;
         }
       });
@@ -296,7 +296,7 @@ export class CategoryHelperService {
       const decimals = res.decimals ? res.decimals : 1;
       // Add series if level data is available
       if (levelData) {
-        seriesDates = this._helper.calculateDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
+        seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
@@ -330,7 +330,7 @@ export class CategoryHelperService {
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq, dateWrapper);
     this._helper.setDateWrapper(filtered, dateWrapper);
-    this._helper.calculateDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
+    this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
     if (categoryDateWrapper.firstDate === '' || dateWrapper.firstDate < categoryDateWrapper.firstDate) {
       categoryDateWrapper.firstDate = dateWrapper.firstDate;
     }
@@ -352,13 +352,5 @@ export class CategoryHelperService {
         series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
-  }
-
-  getTableDates(dateArray: Array<any>) {
-    const tableDates = [];
-    dateArray.forEach((date) => {
-      tableDates.push(date.tableDate);
-    });
-    return tableDates;
   }
 }
