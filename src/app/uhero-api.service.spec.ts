@@ -11,6 +11,7 @@ import { UheroApiService } from './uhero-api.service';
 let backend: MockBackend;
 let service: UheroApiService;
 let response: Response;
+let rootCategory: number;
 
 const mockCategoryData = () => [{
   id: 4,
@@ -125,5 +126,4 @@ describe('Service: UheroApi', () => {
         });
     })));
   });
-
 });
