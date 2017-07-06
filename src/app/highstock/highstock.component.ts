@@ -9,15 +9,16 @@ declare var $: any;
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
-const Highcharts = require('highcharts');
-const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
-const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
+const Highcharts = require('highcharts/js/highstock');
+const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
+const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 
-// Plug in export module for Highstock chart
-exporting(Highcharts);
-offlineExport(Highcharts);
-exportCSV(Highcharts);
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  }
+});
 
 @Component({
   selector: 'app-highstock',
@@ -114,6 +115,10 @@ export class HighstockComponent implements OnChanges {
         },
         inputEnabled: false
       },
+      lang: {
+        exportKey: 'Download Chart',
+        printKey: 'Print Chart'
+      },
       navigator: {
         series: {
           includeInCSVExport: false
@@ -126,10 +131,12 @@ export class HighstockComponent implements OnChanges {
           },
           exportButton: {
             text: 'Download',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
+            _titleKey: 'exportKey',
+            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
           },
           printButton: {
             text: 'Print',
+            _titleKey: 'printKey',
             onclick: function () {
               this.print();
             }
@@ -152,10 +159,11 @@ export class HighstockComponent implements OnChanges {
             position: {
               align: 'right',
               x: -115,
-              y: -38
+              y: -41
             }
           },
           title: {
+            text: name + ' (' + geo.name + ', ' + freq.label + ')',
             align: 'left'
           }
         }
@@ -215,9 +223,6 @@ export class HighstockComponent implements OnChanges {
           });
           return s;
         }
-      },
-      title: {
-        text: name + ' (' + geo.name + ', ' + freq.label + ')',
       },
       credits: {
         enabled: false

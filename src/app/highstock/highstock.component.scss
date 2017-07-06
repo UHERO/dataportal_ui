@@ -1,117 +1,120 @@
 @import 'colors';
 
-.stock-chart {
-    .highcharts-background {
-        fill: $chart-background;
-    }
+.highcharts-background {
+    fill: $chart-background;
+}
 
-    .highcharts-button.highcharts-button-pressed {
+.highcharts-button, .highcharts-button-hover {
+    stroke: none;
+}
+
+.highcharts-button.highcharts-button-pressed {
+    fill: $highstock-series1;
+
+    text {
+        fill: $white !important;
+    }
+}
+
+.highcharts-color-0, .highcharts-color-1 {
+    fill: none;
+    stroke: none;
+}
+
+.highcharts-markers.highcharts-series-0 {
+    path {
+        fill: $highstock-series0;
+    }
+}
+
+.highcharts-markers.highcharts-series-1 {
+    path {
         fill: $highstock-series1;
-
-        text {
-            fill: $white !important;
-        }
     }
+}
 
-    .highcharts-color-0, .highcharts-color-1 {
-        fill: none;
+.highcharts-navigator-series {
+    .highcharts-area {
+        fill: $highstock-series1;
+    }
+}
+
+.highcharts-navigator-handle {
+    stroke: #999999;
+}
+
+.highcharts-series-0 {
+    .highcharts-graph {
+        stroke: $highstock-series0;
+    }
+        
+    rect.highcharts-point {
         stroke: none;
+        fill: $highstock-series0;
     }
+}
 
-    .highcharts-markers.highcharts-series-0 {
-        path {
-            fill: $highstock-series0;
-        }
-    }
-
-    .highcharts-markers.highcharts-series-1 {
-        path {
-            fill: $highstock-series1;
-        }
-    }
-
-    .highcharts-navigator-series {
-        .highcharts-area {
-            fill: $highstock-series1;
-        }
-    }
-
-    .highcharts-navigator-handle {
-        stroke: #999999;
-    }
-
-    .highcharts-series-0 {
-        .highcharts-graph {
-            stroke: $highstock-series0;
-        }
-        
-        rect.highcharts-point {
-            stroke: none;
-            fill: $highstock-series0;
-        }
-    }
-
-    .highcharts-series-1 {
-        .highcharts-graph {
-            stroke: $highstock-series1;
-            color: $highstock-series1;
-        }
-    }
-
-    .highcharts-title {
-        display: none;
+.highcharts-series-1 {
+    .highcharts-graph {
+        stroke: $highstock-series1;
         color: $highstock-series1;
-        font-family: 'sans-serif';
     }
+}
 
-    .highcharts-tooltip {
-        .series-0 {
-            fill: $highstock-series0;
-        }
+.highcharts-title {
+    fill: $primary-text;
+    font-family: 'sans-serif';
+}
+
+.highcharts-tooltip {
+    filter: none !important;
+
+    .series-0 {
+        fill: $highstock-series0;
+    }
         
-        .series-1 {
-            fill: $highstock-series1;
-        }
+    .series-1 {
+        fill: $highstock-series1;
     }
+}
 
-    .highcharts-xaxis-labels {
-        text {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
-        }
+.highcharts-xaxis-labels {
+    text {
+        color: $highstock-series0 !important;
+        fill: $highstock-series0 !important;
     }
+}
 
-    .highcharts-yaxis-grid.series2 {
-        .highcharts-grid-line {
-            display: none;
-        }
+.highcharts-yaxis-grid.series2 {
+    .highcharts-grid-line {
+        display: none;
     }
+}
 
-    .highcharts-yaxis-labels.series1 {
-        text {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
-        }
+.highcharts-yaxis-labels.series1 {
+    text {
+        color: $highstock-series0 !important;
+        fill: $highstock-series0 !important;
     }
+}
 
-    .highcharts-yaxis-labels.series2 {
-        text {
-            color: $highstock-series1 !important;
-            fill: $highstock-series1 !important;
-        }
+.highcharts-yaxis-labels.series2 {
+    text {
+        color: $highstock-series1 !important;
+        fill: $highstock-series1 !important;
     }
+}
 
-    .highcharts-yaxis.series1 {
-        .highcharts-axis-title {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
-        }
+.highcharts-yaxis.series1 {
+    .highcharts-axis-title {
+        color: $highstock-series0 !important;
+        fill: $highstock-series0 !important;
     }
+}
 
-    .highcharts-yaxis.series2 {
-        .highcharts-axis-title {
-            color: $highstock-series1 !important;
-            fill: $highstock-series1 !important;
-        }
+.highcharts-yaxis.series2 {
+    .highcharts-axis-title {
+        color: $highstock-series1 !important;
+        fill: $highstock-series1 !important;
     }
 }

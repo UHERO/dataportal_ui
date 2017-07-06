@@ -8,9 +8,9 @@ import { ChartModule } from 'angular2-highcharts';
 import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 declare var require: any;
 export function highchartsFactory() {
-  const highcharts = require('highcharts/highstock');
-  const exp = require('highcharts/modules/exporting');
-  const offlineExport = require('highcharts/modules/offline-exporting');
+  const highcharts = require('highcharts/js/highstock');
+  const exp = require('highcharts/js/modules/exporting');
+  const offlineExport = require('highcharts/js/modules/offline-exporting');
   const csv = require('./csv-export');
 
   exp(highcharts);

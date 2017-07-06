@@ -9,6 +9,10 @@
         height: 150px;
     } */
 
+    .highcharts-tooltip {
+        filter: none !important;
+    }
+
     .highcharts-background {
         fill: $chart-background;
     }

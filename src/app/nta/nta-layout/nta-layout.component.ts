@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../../uhero-api.service';
@@ -44,7 +44,8 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     private _uheroAPIService: UheroApiService,
     private _ntaHelper: NtaHelperService,
     private route: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -70,6 +71,8 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       this.categoryData = this.getData(this.id, this.routeFreq);
+      // Run change detection explicitly after the change:
+      this.cdRef.detectChanges();
     });
   }
 
