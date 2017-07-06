@@ -143,16 +143,22 @@ export class CategoryHelperService {
       () => {
         this.requestsRemain -= 1;
         if (expandedResults) {
+          // sublist id used as anchor fragments in landing-page component, fragment expects a string
+          subcat.id = subcat.id.toString();
           // Get array of all series that have level data available
           // Filter out series from expandedResults with non-seasonally-adjusted data
           const splitSeries = this.getDisplaySeries(expandedResults, dateWrapper, currentFreq.freq, categoryDateWrapper);
-          // sublist id used as anchor fragments in landing-page component, fragment expects a string
-          subcat.id = subcat.id.toString();
-          subcat.displaySeries = splitSeries.displaySeries;
-          // sublist.allSeries = expandedResults;
-          subcat.dateWrapper = splitSeries.dateWrapper;
-          this.categoryData[cacheId].categoryDateWrapper = splitSeries.categoryDateWrapper;
-          subcat.noData = false;
+          if (splitSeries) {
+            subcat.displaySeries = splitSeries.displaySeries;
+            // sublist.allSeries = expandedResults;
+            subcat.dateWrapper = splitSeries.dateWrapper;
+            this.categoryData[cacheId].categoryDateWrapper = splitSeries.categoryDateWrapper;
+            subcat.noData = false;
+          }
+          if (!splitSeries) {
+          // No series exist for a subcateogry
+            this.setNoData(subcat);
+          }
           if (this.requestsRemain === 0) {
             const categoryDateArray = [];
             const catWrapper = splitSeries.categoryDateWrapper;
@@ -169,14 +175,18 @@ export class CategoryHelperService {
           }
         } else {
           // No series exist for a subcateogry
-          const series = [{ seriesInfo: 'No data available' }];
-          subcat.dateWrapper = <DateWrapper>{};
-          subcat.dateRange = [];
-          subcat.datatables = {};
-          subcat.displaySeries = series;
-          subcat.noData = true;
+          this.setNoData(subcategory);
         }
       });
+  }
+
+  setNoData(subcategory) {
+    const series = [{ seriesInfo: 'No data available' }];
+    subcategory.dateWrapper = <DateWrapper>{};
+    subcategory.dateRange = [];
+    subcategory.datatables = {};
+    subcategory.displaySeries = series;
+    subcategory.noData = true;
   }
 
   // Set up search results
@@ -329,19 +339,21 @@ export class CategoryHelperService {
     measurements.forEach((measurement) => displaySeries.push(measurement));
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq, dateWrapper);
-    this._helper.setDateWrapper(filtered, dateWrapper);
-    this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
-    if (categoryDateWrapper.firstDate === '' || dateWrapper.firstDate < categoryDateWrapper.firstDate) {
-      categoryDateWrapper.firstDate = dateWrapper.firstDate;
+    if (filtered.length) {
+      this._helper.setDateWrapper(filtered, dateWrapper);
+      this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, freq, dateArray);
+      if (categoryDateWrapper.firstDate === '' || dateWrapper.firstDate < categoryDateWrapper.firstDate) {
+        categoryDateWrapper.firstDate = dateWrapper.firstDate;
+      }
+      if (categoryDateWrapper.endDate === '' || dateWrapper.endDate > categoryDateWrapper.endDate) {
+        categoryDateWrapper.endDate = dateWrapper.endDate;
+      }
+      return {
+        displaySeries: filtered,
+        dateWrapper: dateWrapper,
+        categoryDateWrapper: categoryDateWrapper
+      };
     }
-    if (categoryDateWrapper.endDate === '' || dateWrapper.endDate > categoryDateWrapper.endDate) {
-      categoryDateWrapper.endDate = dateWrapper.endDate;
-    }
-    return {
-      displaySeries: filtered,
-      dateWrapper: dateWrapper,
-      categoryDateWrapper: categoryDateWrapper
-    };
   }
 
   formatCategoryData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {

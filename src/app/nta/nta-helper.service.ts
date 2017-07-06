@@ -127,6 +127,9 @@ export class NtaHelperService {
         if (series) {
           seriesCount += series.length;
         }
+        if (!series) {
+          measurement.noData = true;
+        }
         measurement.series = series;
       },
         (error) => {
