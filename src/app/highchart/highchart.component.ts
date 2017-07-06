@@ -23,7 +23,10 @@ export class HighchartComponent implements OnInit, OnChanges {
   private chart;
 
   static findLastValue(valueArray) {
-    let counter = valueArray.length;
+    let counter = valueArray.length - 1;
+    /* while (valueArray[counter].y === null) {
+      counter--;
+    } */
     while (counter-- && valueArray[counter].y === null);
     return counter;
   }
@@ -87,7 +90,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (seriesName === 'YTD' && freq !== 'A') {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
             }
-          }
+          };
           const getFreqLabel = function (freq, date) {
             if (freq === 'A') {
               return '';
@@ -109,7 +112,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (freq === 'M' || 'S') {
               return Highcharts.dateFormat('%b', date) + ' ';
             }
-          }
+          };
           const pseudo = 'Pseudo History ';
           let s = '<b>' + title + '</b><br>';
           // Get Quarter or Month for Q/M frequencies

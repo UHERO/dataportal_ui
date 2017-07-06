@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, OnChanges, A
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
-import { CategoryHelperService } from '../category-helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
 import { Frequency } from '../frequency';
@@ -36,7 +35,6 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
 
   constructor(
     private _uheroAPIService: UheroApiService,
-    private _catHelper: CategoryHelperService,
     private _helper: HelperService,
     private route: ActivatedRoute,
     private _router: Router,
