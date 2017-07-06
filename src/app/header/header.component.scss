@@ -1,14 +1,16 @@
+@import 'colors';
+
 #header {
   position: fixed;
   height: 55px;
   top: 0;
   width: 100%;
-  background-color: #FFFFFF;
-  color: #ffffff;
+  background-color: $white;
+  color: $white;
   padding: 0;
-  box-shadow: 0 4px 6px -6px black;
-  -moz-box-shadow: 0 4px 6px -6px black;
-  -webkit-box-shadow: 0 4px 6px -6px black;
+  box-shadow: 0 4px 6px -6px $black;
+  -moz-box-shadow: 0 4px 6px -6px $black;
+  -webkit-box-shadow: 0 4px 6px -6px $black;
 
   @media (max-width: 767px) {
     display: none;
@@ -37,7 +39,7 @@
    
   a {
     text-decoration: none;
-    color: #000000;
+    color: $black;
     font-family: sans-serif;
     font-size: 0.8em;
     text-transform: uppercase;

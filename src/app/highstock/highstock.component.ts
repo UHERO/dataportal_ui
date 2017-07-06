@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, Inject, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -22,7 +22,8 @@ exportCSV(Highcharts);
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
-  styleUrls: ['./highstock.component.scss']
+  styleUrls: ['./highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
   @Input() chartData;
@@ -38,13 +39,13 @@ export class HighstockComponent implements OnChanges {
   @Output() chartExtremes = new EventEmitter(true);
   public options: Object;
 
-  constructor() { }
+  constructor(@Inject('seriesType') private seriesType) { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.seriesType);
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency) {
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, type: string) {
     const level = chartData.level;
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
@@ -65,7 +66,6 @@ export class HighstockComponent implements OnChanges {
       chart: {
         alignTicks: false,
         zoomType: 'x',
-        backgroundColor: '#F9F9F9',
         // Description used in xAxis label formatter
         description: freq.freq
       },
@@ -85,13 +85,6 @@ export class HighstockComponent implements OnChanges {
         }],
         style: {
           display: 'none'
-        }
-      },
-      navigation: {
-        buttonOptions: {
-          theme: {
-            fill: '#F9F9F9'
-          }
         }
       },
       rangeSelector: {
@@ -115,16 +108,6 @@ export class HighstockComponent implements OnChanges {
         buttonPosition: {
           x: 10,
           y: 10
-        },
-        buttonTheme: {
-          states: {
-            select: {
-              fill: '#1D667F',
-              style: {
-                color: '#FFFFFF'
-              }
-            }
-          }
         },
         labelStyle: {
           visibility: 'hidden'
@@ -173,13 +156,7 @@ export class HighstockComponent implements OnChanges {
             }
           },
           title: {
-            text: name + ' (' + geo.name + ', ' + freq.label + ')',
-            align: 'left',
-            style: {
-              display: 'block',
-              color: '#1D667F',
-              fontFamily: 'sans-serif'
-            }
+            align: 'left'
           }
         }
       },
@@ -214,16 +191,13 @@ export class HighstockComponent implements OnChanges {
           s = s + getFreqLabel(freq.freq, this.x);
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
           this.points.forEach((point) => {
-            const label = '<br><span style="color:' +
-              point.color + '">\u25CF</span> ' +
+            const label = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
               point.series.name + ': ' +
               Highcharts.numberFormat(point.y, decimals);
             if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  return s += '<br><span style="color:' +
-                    point.color +
-                    '">\u25CF</span> ' +
+                  return s += '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
                     pseudo +
                     point.series.name +
                     ': ' +
@@ -243,10 +217,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       title: {
-        text: name + ' (' + geo.name + ' ' + freq.label + ')',
-        style: {
-          display: 'none'
-        }
+        text: name + ' (' + geo.name + ', ' + freq.label + ')',
       },
       credits: {
         enabled: false
@@ -257,9 +228,6 @@ export class HighstockComponent implements OnChanges {
         max: this.end ? Date.parse(endDate) : null,
         ordinal: false,
         labels: {
-          style: {
-            color: '#505050'
-          },
           formatter: function() {
             const getQLabel = function(month) {
               if (month === 'Jan') {
@@ -287,33 +255,23 @@ export class HighstockComponent implements OnChanges {
         }
       },
       yAxis: [{
+        className: 'series1',
         labels: {
-          format: '{value:,.2f}',
-          style: {
-            color: '#727272'
-          },
+          format: '{value:,.2f}'
         },
         title: {
-          text: change,
-          style: {
-            color: '#727272'
-          }
+          text: change
         },
         opposite: false,
         minPadding: 0,
         maxPadding: 0
       }, {
+        className: 'series2',
         title: {
-          text: units,
-          style: {
-            color: '#1D667F'
-          }
+          text: units
         },
         labels: {
-          format: '{value:,.2f}',
-          style: {
-            color: '#1D667F'
-          },
+          format: '{value:,.2f}'
         },
         gridLineWidth: 0,
         minPadding: 0,
@@ -326,18 +284,9 @@ export class HighstockComponent implements OnChanges {
       },
       series: [{
         name: yoyLabel,
-        type: 'column',
-        color: '#727272',
+        type: type,
         data: yoy,
         showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }, {
-        name: ytdLabel,
-        data: ytd,
-        includeInCSVExport: freq.freq === 'A' ? false : true,
-        visible: false,
         dataGrouping: {
           enabled: false
         }
@@ -345,7 +294,6 @@ export class HighstockComponent implements OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        color: '#1D667F',
         data: level,
         states: {
           hover: {
@@ -358,6 +306,14 @@ export class HighstockComponent implements OnChanges {
         },
         zoneAxis: 'x',
         zones: pseudoZones
+      }, {
+        name: ytdLabel,
+        data: ytd,
+        includeInCSVExport: freq.freq === 'A' ? false : true,
+        visible: false,
+        dataGrouping: {
+          enabled: false
+        }
       }]
     };
   }

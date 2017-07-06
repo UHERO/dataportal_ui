@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
@@ -26,7 +26,7 @@ export class UheroApiService {
   private cachedSearchExpand = [];
   private cachedSearch = [];
 
-  constructor(private http: Http) {
+  constructor(@Inject('rootCategory') private rootCategory, private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
      this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
@@ -34,14 +34,14 @@ export class UheroApiService {
      this.requestOptionsArgs = {headers: this.headers};
   }
 
-  //  Get data from API
+  // Get data from API
   // Gets all available categories. Used for navigation & displaying sublists
   fetchCategories(): Observable<Category[]> {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
       let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
-        .map(mapCategories)
+        .map(mapCategories, this)
         .do(val => {
           this.cachedCategories = val;
           categories$ = null;
@@ -215,7 +215,7 @@ function mapCategories(response: Response): Array<Category> {
   });
   let result = categoryTree;
   categoryTree.forEach((category) => {
-    if (category.id === 59) {
+    if (category.id === this.rootCategory) {
       result = category.children;
     }
   });

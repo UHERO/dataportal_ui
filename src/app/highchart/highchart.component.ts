@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Inject, Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
@@ -11,7 +11,8 @@ Highcharts.setOptions({
 @Component({
   selector: 'app-highchart',
   templateUrl: './highchart.component.html',
-  styleUrls: ['./highchart.component.scss']
+  styleUrls: ['./highchart.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HighchartComponent implements OnInit, OnChanges {
   @Input() seriesData;
@@ -27,21 +28,21 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(private _helper: HelperService) { }
+  constructor(@Inject('seriesType') private seriesType, private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
     }
   }
 
   ngOnChanges() {
-    this.drawChart(this.seriesData, this.currentFreq, this.chartStart, this.chartEnd);
+    this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
   }
 
-  drawChart(seriesData, currentFreq, start?, end?) {
+  drawChart(seriesData, currentFreq, seriesType, start?, end?) {
     let level, ytd;
     level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
     ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
@@ -54,7 +55,6 @@ export class HighchartComponent implements OnInit, OnChanges {
 
     this.options = {
       chart: {
-        backgroundColor: '#F7F7F7',
         spacingTop: 20 /* Add spacing to draw plot below fixed tooltip */
       },
       exporting: {
@@ -76,7 +76,6 @@ export class HighchartComponent implements OnInit, OnChanges {
         shadow: false,
         borderWidth: 0,
         shared: true,
-        backgroundColor: 'transparent',
         formatter: function () {
           const getLabelName = function (seriesName, freq, precent) {
             if (seriesName === 'Level') {
@@ -141,13 +140,6 @@ export class HighchartComponent implements OnInit, OnChanges {
             }
           });
           return s;
-        },
-        style: {
-          color: '#505050',
-          fontSize: '0.9em',
-          letterSpacing: '0.05em',
-          width: '190px',
-          marginBottom: '5px',
         }
       },
       legend: {
@@ -171,7 +163,6 @@ export class HighchartComponent implements OnInit, OnChanges {
         title: {
           text: ''
         },
-        gridLineColor: 'transparent'
       }, {
         title: {
           text: ''
@@ -179,7 +170,6 @@ export class HighchartComponent implements OnInit, OnChanges {
         labels: {
           enabled: false
         },
-        gridLineColor: 'transparent',
         opposite: true
       }],
       plotOptions: {
@@ -193,7 +183,6 @@ export class HighchartComponent implements OnInit, OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        color: '#1D667F',
         data: level,
         states: {
           hover: {
@@ -207,9 +196,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         zones: pseudoZones
       }, {
         name: 'YTD',
-        type: 'column',
-        color: 'transparent',
-        borderColor: 'transparent',
+        type: seriesType,
         data: ytd,
         dataGrouping: {
           enabled: false
@@ -222,18 +209,10 @@ export class HighchartComponent implements OnInit, OnChanges {
     const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
 
     this.options = {
-      chart: {
-        backgroundColor: '#F9F9F9'
-      },
       title: {
         text: '<b>' + title + '</b><br>' + 'No Data Available',
         align: 'left',
         widthAdjust: 0,
-        style: {
-          color: '#505050',
-          fontSize: '0.9em',
-          letterSpacing: '0.05em'
-        }
       },
       exporting: {
         enabled: false
@@ -257,12 +236,6 @@ export class HighchartComponent implements OnInit, OnChanges {
       }],
       lang: {
         noData: 'No Data Available'
-      },
-      noData: {
-        style: {
-          color: '#505050',
-          fontSize: '0.85em'
-        }
       }
     };
   }

@@ -1,3 +1,5 @@
+@import 'colors';
+
 .irs-line-mid, .irs-line-left, .irs-line-right,
 .irs-bar, .irs-bar-edge, .irs-slider {
     background: url(../../sprite-skin-nice2.png) repeat-x;
@@ -36,6 +38,6 @@
     background: none;
     border-radius: 0px;
     font-size: 12px;
-    color: #505050;
+    color: $primary-text;
     padding: 1px 2px;
 }

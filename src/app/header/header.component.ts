@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Inject, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,10 +7,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  public headerLogo
 
-  constructor(private _router: Router) { }
+  constructor(@Inject('logo') private logo, private _router: Router) { }
 
   ngOnInit() {
+    this.headerLogo = this.logo;
   }
 
   onSearch(event) {

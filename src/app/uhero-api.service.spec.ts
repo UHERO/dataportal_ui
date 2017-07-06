@@ -11,6 +11,7 @@ import { UheroApiService } from './uhero-api.service';
 let backend: MockBackend;
 let service: UheroApiService;
 let response: Response;
+let rootCategory: number;
 
 const mockCategoryData = () => [{
   id: 4,
@@ -48,7 +49,8 @@ describe('Service: UheroApi', () => {
       imports: [HttpModule],
       providers: [
         UheroApiService,
-        { provide: XHRBackend, useClass: MockBackend}
+        { provide: XHRBackend, useClass: MockBackend },
+        { provide: 'rootCategory', useValue: 59 }
       ]
     })
     .compileComponents();
@@ -59,9 +61,9 @@ describe('Service: UheroApi', () => {
   }));
 
   describe('fetchCategories', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, rootCategory: number) => {
       backend = be;
-      service = new UheroApiService(http);
+      service = new UheroApiService(rootCategory, http);
       const mockCategories = mockCategoryData();
       const options = new ResponseOptions({status: 200, body: { data: mockCategories}});
       response = new Response(options);
@@ -88,9 +90,9 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchSeries', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, rootCategory: number) => {
       backend = be;
-      service = new UheroApiService(http);
+      service = new UheroApiService(rootCategory, http);
       const mockSeries = mockSeriesData();
       const options = new ResponseOptions({status: 200, body: { data: mockSeries}});
       response = new Response(options);
@@ -107,9 +109,9 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchObservations', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, rootCategory: number) => {
       backend = be;
-      service = new UheroApiService(http);
+      service = new UheroApiService(rootCategory, http);
       const mockObservations = mockObservationData();
       const options = new ResponseOptions({status: 200, body: { data: mockObservations}});
       response = new Response(options);

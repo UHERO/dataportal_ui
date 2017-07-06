@@ -5,6 +5,7 @@
   },
   "apps": [
     {
+      "name": "uhero",
       "root": "src",
       "outDir": "dist",
       "assets": [
@@ -19,6 +20,11 @@
       "tsconfig": "tsconfig.app.json",
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "./assets/uhero"
+        ]
+      },
       "styles": [
         "../node_modules/bootstrap/dist/css/bootstrap.css",
         "../node_modules/primeng/resources/themes/omega/theme.css",
@@ -27,6 +33,7 @@
         "../node_modules/primeng/resources/primeng.min.css",
         "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
         "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+        "../node_modules/highcharts/css/highcharts.css",
         "styles.scss"
       ],
       "scripts": [
@@ -40,6 +47,48 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
+      }
+    }, {
+      "name": "nta",
+      "root": "src",
+      "outDir": "ntaDist",
+      "assets":[
+        "assets"
+      ],
+      "index": "nta-index.html",
+      "main": "ntaMain.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "nta",
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "./assets/nta"
+        ]
+      },
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
+        "../node_modules/datatables.net-dt/css/jquery.dataTables.css",
+        "../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+        "../node_modules/primeng/resources/primeng.min.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+        "../node_modules/highcharts/css/highcharts.css",
+        "styles.scss"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/tether/dist/js/tether.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.js",
+        "../node_modules/datatables.net/js/jquery.dataTables.js",
+        "../node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"        
       }
     }
   ],
