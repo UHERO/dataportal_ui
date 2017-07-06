@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
   public headerLogo;
-  
+
   constructor(@Inject('logo') private logo, private _router: Router) { }
 
   ngOnInit() {

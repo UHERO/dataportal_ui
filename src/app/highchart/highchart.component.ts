@@ -23,8 +23,10 @@ export class HighchartComponent implements OnInit, OnChanges {
   private chart;
 
   static findLastValue(valueArray) {
-    let counter = valueArray.length;
-    while (counter-- && valueArray[counter].y === null);
+    let counter = valueArray.length - 1;
+    while (valueArray[counter].y === null) {
+      counter--;
+    }
     return counter;
   }
 
