@@ -1,16 +1,16 @@
+@import 'colors';
+
 .multi-series-container {
   vertical-align: top;
-  // display: inline-block;
   min-height: 100%;
-  // overflow: auto;
   
   .fa-spinner {
-    color: #1D667F;
+    color: $primary;
   }
 
   .filters {
     display: inline-block;
-    color: #505050;
+    color: $primary;
     margin-bottom: 5px;
     margin-right: 10px;
 
@@ -56,22 +56,21 @@
        a {
          text-decoration: none;
          font-size: 0.85em;
-         color: #505050;
+         color: $primary-text;
          padding: 5px;
          border-radius: 3px;
 
          &:hover {
-           color: #1D667F;
-           // border-bottom: 1px solid #1D667F;
+           color: $primary;
          }
        }
 
        .current-sub {
-         background: #1D667F;
-         color: #FFFFFF;
+         background: $primary;
+         color: $white;
 
          &:hover {
-           color: #FFFFFF;
+           color: $white;
          }
        }
 
@@ -84,7 +83,7 @@
 
   .selected-category {
     display: inline-block;
-    color: #1D667F;
+    color: $primary;
     font-size: 1.4em;
     margin: 0px;
     vertical-align: middle;
@@ -109,7 +108,7 @@
 
 
   .sublist {
-    color: #1D667F;
+    color: $primary;
     font-size: 1.2em;
     margin-bottom: 0px;
   }
@@ -117,20 +116,20 @@
   .sublist-separator {
     margin-top: 0rem;
     margin-bottom: 0.5rem;
-    background-color: #1D667F;
+    background-color: $primary;
     height: 2px;
   }
 
   .material-icons.md-18 {
     font-size: 18px;
-    color: #f6a01b;
+    color: $secondary;
     vertical-align: middle;
   }
 
   .switch-view {
     text-decoration: none;
     font-size: 0.85em;
-    color: #1D667F;
+    color: $primary;
     vertical-align: middle;
     cursor: pointer;
 
@@ -146,20 +145,6 @@
 
   .no-data {
     margin-top: 10px;
-  }
-
-  .multi-charts {
-    display: inline-block;
-    padding: 0 3px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    margin: 10px 10px 10px 3px;
-    background: #F7F7F7;
-
-    a:hover {
-      text-decoration: none;
-    }
   }
 
   @media (min-width: 768px) {

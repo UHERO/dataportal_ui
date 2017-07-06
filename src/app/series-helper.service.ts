@@ -72,7 +72,7 @@ export class SeriesHelperService {
       const obsEnd = obs.observationEnd;
       if (obs) {
         // Use to format dates for table
-        this._helper.calculateDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this._helper.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
         const data = this._helper.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = data.chartData;
         this.seriesData.seriesTableData = data.tableData;

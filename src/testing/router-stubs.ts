@@ -1,5 +1,5 @@
 export { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { Component, Directive, Injectable, Input, Type } from '@angular/core';
 import { ActivatedRoute, Route, Params, ActivatedRouteSnapshot, UrlSegment, Data, NavigationExtras } from '@angular/router';
 
@@ -26,11 +26,11 @@ export class RouterLinkStubDirective {
     }
 })
 export class QueryParamsStubDirective {
-    @Input('queryParams') linkParams: any;
+    @Input('queryParams') queryParams: any;
     navigatedTo: any = null;
 
     onClick() {
-        this.navigatedTo = this.linkParams;
+        this.navigatedTo = this.queryParams;
     }
 }
 

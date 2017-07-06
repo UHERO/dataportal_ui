@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
@@ -25,8 +25,10 @@ export class UheroApiService {
   private cachedSiblings = [];
   private cachedSearchExpand = [];
   private cachedSearch = [];
+  private cachedCatMeasures = [];
+  private cachedMeasureSeries =  [];
 
-  constructor(private http: Http) {
+  constructor(@Inject('rootCategory') private rootCategory, private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
      this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
@@ -34,14 +36,14 @@ export class UheroApiService {
      this.requestOptionsArgs = {headers: this.headers};
   }
 
-  //  Get data from API
+  // Get data from API
   // Gets all available categories. Used for navigation & displaying sublists
   fetchCategories(): Observable<Category[]> {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
       let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
-        .map(mapCategories)
+        .map(mapCategories, this)
         .do(val => {
           this.cachedCategories = val;
           categories$ = null;
@@ -139,6 +141,34 @@ export class UheroApiService {
     }
   }
 
+  fetchCategoryMeasurements(id: number) {
+    if (this.cachedCatMeasures[id]) {
+      return Observable.of(this.cachedCatMeasures[id]);
+    } else {
+    let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=` + id, this.requestOptionsArgs)
+      .map(mapData)
+      .do(val => {
+        this.cachedCatMeasures[id] = val;
+        catMeasures$ = null;
+      });
+    return catMeasures$;
+    }
+  }
+
+  fetchMeasurementSeries(id: number, freq: string) {
+    if (this.cachedMeasureSeries[id + freq]) {
+      return Observable.of(this.cachedMeasureSeries[id + freq]);
+    } else {
+    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&freq=` + freq, this.requestOptionsArgs)
+      .map(mapData)
+      .do(val => {
+        this.cachedMeasureSeries[id + freq] = val;
+        measureSeries$ = null;
+      });
+    return measureSeries$;
+    }
+  }
+
   fetchSearch(search: string) {
     if (this.cachedSearch[search]) {
       return Observable.of(this.cachedSearch[search]);
@@ -215,7 +245,7 @@ function mapCategories(response: Response): Array<Category> {
   });
   let result = categoryTree;
   categoryTree.forEach((category) => {
-    if (category.id === 59) {
+    if (category.id === this.rootCategory) {
       result = category.children;
     }
   });

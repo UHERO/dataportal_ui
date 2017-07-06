@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { TestBed, async, inject, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { Component } from '@angular/core';
@@ -18,7 +18,8 @@ describe('HeaderComponent', () => {
     TestBed.configureTestingModule({
       declarations: [HeaderComponent, SearchStubComponent, RouterLinkStubDirective],
       providers: [
-        { provide: Router, useClass: RouterStub },
+        { provide: 'logo', useValue: {logo: 'logo.svg'} },
+        { provide: Router, useClass: RouterStub }
       ]
     })
     .compileComponents()
@@ -33,16 +34,15 @@ describe('HeaderComponent', () => {
 function tests() {
   let links: RouterLinkStubDirective[];
   let linkEls: DebugElement[];
-
   beforeEach(() => {
     fixture.detectChanges();
-
     linkEls = fixture.debugElement.queryAll(By.directive(RouterLinkStubDirective));
-
     links = linkEls.map(el => el.injector.get(RouterLinkStubDirective) as RouterLinkStubDirective);
   });
 
   it('should create an instance', () => {
+    let router: Router;
+    const component = new HeaderComponent('logo', router);
     expect(comp).toBeTruthy();
   });
 

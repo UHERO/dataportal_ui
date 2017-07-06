@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -31,7 +31,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     private _uheroAPIService: UheroApiService,
     private _series: SeriesHelperService,
     private route: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -47,6 +48,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
+    this.cdRef.detectChanges();
   }
 
   // Redraw chart when selecting a new region or frequency

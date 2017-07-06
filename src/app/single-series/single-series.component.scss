@@ -1,3 +1,5 @@
+@import 'colors';
+
 .single-series-view {
   margin: 18% 0 2% 0;
   vertical-align: top;
@@ -21,12 +23,9 @@
 
   .series-title {
     display: block;
-    // vertical-align: middle;
     font-size: 1.5em;
-    color: #1D667F;
-    // text-transform: uppercase;
+    color: $primary;
     letter-spacing: 0.05em;
-    // margin: auto 15px auto 0;
 
     @media (min-width: 768px) {
       margin: auto 10px auto 0;
@@ -37,13 +36,13 @@
 
   .source {
     width: 100%;
-    background-color: #F9F9F9;
+    background-color: $chart-background;
     padding: 10px 0px 0px;
     font-size: 0.9em;
     text-align: center;
 
     a {
-      color: #1D667F;
+      color: $primary;
     }
   }
 
@@ -51,7 +50,7 @@
     width: 100%;
     display: table;
     table-layout: fixed;
-    background-color: #F9F9F9;
+    background-color: $chart-background;
     padding: 10px 0;
     
     .stat {
@@ -61,7 +60,7 @@
 
       p {
         margin-bottom: 0;
-        color: #1D667F;
+        color: $primary;
       }
     }
   }
@@ -86,7 +85,7 @@
     }
     th.ui-state-active {
       background: #ebedf0;
-      color: #555555;
+      color: $primary-text;
       outline: 0;
     }
   }

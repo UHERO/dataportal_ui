@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, Inject, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -9,20 +9,22 @@ declare var $: any;
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
-const Highcharts = require('highcharts');
-const exporting = require('../../../node_modules/highcharts/modules/exporting.src');
-const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
+const Highcharts = require('highcharts/js/highstock');
+const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
+const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 
-// Plug in export module for Highstock chart
-exporting(Highcharts);
-offlineExport(Highcharts);
-exportCSV(Highcharts);
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  }
+});
 
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
-  styleUrls: ['./highstock.component.scss']
+  styleUrls: ['./highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
   @Input() chartData;
@@ -38,13 +40,13 @@ export class HighstockComponent implements OnChanges {
   @Output() chartExtremes = new EventEmitter(true);
   public options: Object;
 
-  constructor() { }
+  constructor(@Inject('seriesType') private seriesType) { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.seriesType);
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency) {
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, type: string) {
     const level = chartData.level;
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
@@ -65,7 +67,6 @@ export class HighstockComponent implements OnChanges {
       chart: {
         alignTicks: false,
         zoomType: 'x',
-        backgroundColor: '#F9F9F9',
         // Description used in xAxis label formatter
         description: freq.freq
       },
@@ -85,13 +86,6 @@ export class HighstockComponent implements OnChanges {
         }],
         style: {
           display: 'none'
-        }
-      },
-      navigation: {
-        buttonOptions: {
-          theme: {
-            fill: '#F9F9F9'
-          }
         }
       },
       rangeSelector: {
@@ -116,20 +110,14 @@ export class HighstockComponent implements OnChanges {
           x: 10,
           y: 10
         },
-        buttonTheme: {
-          states: {
-            select: {
-              fill: '#1D667F',
-              style: {
-                color: '#FFFFFF'
-              }
-            }
-          }
-        },
         labelStyle: {
           visibility: 'hidden'
         },
         inputEnabled: false
+      },
+      lang: {
+        exportKey: 'Download Chart',
+        printKey: 'Print Chart'
       },
       navigator: {
         series: {
@@ -143,10 +131,12 @@ export class HighstockComponent implements OnChanges {
           },
           exportButton: {
             text: 'Download',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
+            _titleKey: 'exportKey',
+            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
           },
           printButton: {
             text: 'Print',
+            _titleKey: 'printKey',
             onclick: function () {
               this.print();
             }
@@ -169,17 +159,12 @@ export class HighstockComponent implements OnChanges {
             position: {
               align: 'right',
               x: -115,
-              y: -38
+              y: -41
             }
           },
           title: {
             text: name + ' (' + geo.name + ', ' + freq.label + ')',
-            align: 'left',
-            style: {
-              display: 'block',
-              color: '#1D667F',
-              fontFamily: 'sans-serif'
-            }
+            align: 'left'
           }
         }
       },
@@ -187,11 +172,11 @@ export class HighstockComponent implements OnChanges {
         borderWidth: 0,
         shadow: false,
         formatter: function () {
-          const getFreqLabel = function(freq, date) {
-            if (freq === 'A') {
+          const getFreqLabel = function(frequency, date) {
+            if (frequency === 'A') {
               return '';
             }
-            if (freq === 'Q') {
+            if (frequency === 'Q') {
               if (Highcharts.dateFormat('%b', date) === 'Jan') {
                 return 'Q1 ';
               }
@@ -205,25 +190,22 @@ export class HighstockComponent implements OnChanges {
                 return 'Q4 ';
               }
             }
-            if (freq === 'M' || freq === 'S') {
+            if (frequency === 'M' || frequency === 'S') {
               return Highcharts.dateFormat('%b', date);
             }
-          }
+          };
           const pseudo = 'Pseudo History ';
           let s = '<b>';
           s = s + getFreqLabel(freq.freq, this.x);
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
           this.points.forEach((point) => {
-            const label = '<br><span style="color:' +
-              point.color + '">\u25CF</span> ' +
+            const label = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
               point.series.name + ': ' +
               Highcharts.numberFormat(point.y, decimals);
             if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  return s += '<br><span style="color:' +
-                    point.color +
-                    '">\u25CF</span> ' +
+                  return s += '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
                     pseudo +
                     point.series.name +
                     ': ' +
@@ -242,12 +224,6 @@ export class HighstockComponent implements OnChanges {
           return s;
         }
       },
-      title: {
-        text: name + ' (' + geo.name + ' ' + freq.label + ')',
-        style: {
-          display: 'none'
-        }
-      },
       credits: {
         enabled: false
       },
@@ -257,9 +233,6 @@ export class HighstockComponent implements OnChanges {
         max: this.end ? Date.parse(endDate) : null,
         ordinal: false,
         labels: {
-          style: {
-            color: '#505050'
-          },
           formatter: function() {
             const getQLabel = function(month) {
               if (month === 'Jan') {
@@ -274,46 +247,36 @@ export class HighstockComponent implements OnChanges {
               if (month === 'Oct') {
                 return 'Q4 ';
               }
-            }
+            };
             let s = '';
             const month = Highcharts.dateFormat('%b', this.value);
             const frequency = this.chart.options.chart.description;
             const first = Highcharts.dateFormat('%Y', this.axis.userMin);
             const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : ''; 
+            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
             s = s + Highcharts.dateFormat('%Y', this.value);
             return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
           }
         }
       },
       yAxis: [{
+        className: 'series1',
         labels: {
-          format: '{value:,.2f}',
-          style: {
-            color: '#727272'
-          },
+          format: '{value:,.2f}'
         },
         title: {
-          text: change,
-          style: {
-            color: '#727272'
-          }
+          text: change
         },
         opposite: false,
         minPadding: 0,
         maxPadding: 0
       }, {
+        className: 'series2',
         title: {
-          text: units,
-          style: {
-            color: '#1D667F'
-          }
+          text: units
         },
         labels: {
-          format: '{value:,.2f}',
-          style: {
-            color: '#1D667F'
-          },
+          format: '{value:,.2f}'
         },
         gridLineWidth: 0,
         minPadding: 0,
@@ -326,18 +289,9 @@ export class HighstockComponent implements OnChanges {
       },
       series: [{
         name: yoyLabel,
-        type: 'column',
-        color: '#727272',
+        type: type,
         data: yoy,
         showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }, {
-        name: ytdLabel,
-        data: ytd,
-        includeInCSVExport: freq.freq === 'A' ? false : true,
-        visible: false,
         dataGrouping: {
           enabled: false
         }
@@ -345,7 +299,6 @@ export class HighstockComponent implements OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        color: '#1D667F',
         data: level,
         states: {
           hover: {
@@ -358,6 +311,14 @@ export class HighstockComponent implements OnChanges {
         },
         zoneAxis: 'x',
         zones: pseudoZones
+      }, {
+        name: ytdLabel,
+        data: ytd,
+        includeInCSVExport: freq.freq === 'A' ? false : true,
+        visible: false,
+        dataGrouping: {
+          enabled: false
+        }
       }]
     };
   }
