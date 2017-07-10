@@ -114,30 +114,16 @@ export class SeriesHelperService {
       percChange: '',
       levelChange: '',
     };
+
     // Find first non-empty value as the table end value
-    for (let i = 0; i < seriesData.length; i++) {
-      if (stats.tableEndValue === Infinity && seriesData[i].value !== ' ') {
-        stats.tableEndValue = seriesData[i].value;
-      }
-    }
+    stats.tableEndValue = this.getTableEnd(seriesData);
     // Find last non-empty value as the table start value
-    for (let i = seriesData.length - 1; i >= 0; i--) {
-      if (stats.tableStartValue === Infinity && seriesData[i].value !== ' ') {
-        stats.tableStartValue = seriesData[i].value;
-      }
-    }
-    seriesData.forEach((item) => {
-      if (item.value !== ' ') {
-        if (stats.minValue === Infinity || item.value < stats.minValue) {
-          stats.minValue = item.value;
-          stats.minValueDate = item.date;
-        }
-        if (stats.maxValue === Infinity || item.value > stats.maxValue) {
-          stats.maxValue = item.value;
-          stats.maxValueDate = item.date;
-        }
-      }
-    });
+    stats.tableStartValue = this.getTableStart(seriesData);
+
+    stats.minValue = this.getMinMax(seriesData).minValue;
+    stats.minValueDate = this.getMinMax(seriesData).minValueDate;
+    stats.maxValue = this.getMinMax(seriesData).maxValue;
+    stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
     stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
     stats.levelChange = stats.tableEndValue - stats.tableStartValue;
 
@@ -149,5 +135,42 @@ export class SeriesHelperService {
     formatStats.percChange = this._helper.formatNum(stats.percChange, decimals);
     formatStats.levelChange = this._helper.formatNum(stats.levelChange, decimals);
     return formatStats;
+  }
+
+  getTableEnd(seriesData) {
+    let counter;
+    if (seriesData.length) {
+      counter = 0;
+      while (seriesData[counter].value === ' ') {
+        counter++;
+      }
+      return seriesData[counter].value;
+    }
+  }
+
+  getTableStart(seriesData) {
+    let counter;
+    if (seriesData.length) {
+      counter = seriesData.length - 1;
+      while (seriesData[counter].value === ' ') {
+        counter--;
+      }
+      return seriesData[counter].value;
+    }
+  }
+
+  getMinMax(seriesData) {
+    let minValue = Infinity, minValueDate = '', maxValue = Infinity, maxValueDate = '';
+    seriesData.forEach((item, index) => {
+      if (minValue === Infinity || item.value < minValue) {
+        minValue = item.value;
+        minValueDate = item.date;
+      }
+      if (maxValue === Infinity || item.value > maxValue) {
+        maxValue = item.value;
+        maxValueDate = item.date;
+      }
+    });
+    return { minValue: minValue, minValueDate: minValueDate, maxValue: maxValue, maxValueDate: maxValueDate }
   }
 }

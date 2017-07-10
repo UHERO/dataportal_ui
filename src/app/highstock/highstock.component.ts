@@ -334,7 +334,7 @@ export class HighstockComponent implements OnChanges {
     const extremes = this.getChartExtremes(e);
     const chartExtremes = this.chartExtremes;
     const tableExtremes = this.tableExtremes;
-    const chart = $('.stock-chart');
+    const chart = $('#chart');
     const buttons = $('.highcharts-range-selector-buttons');
     buttons.click(function() {
       chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
