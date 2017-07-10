@@ -46,6 +46,7 @@ export class NtaHelperService {
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.categoryData[cacheId].selectedCategory = selectedCategory;
+          this.categoryData[cacheId].categoryId = cat.id;
           const sublistCopy = [];
           sublist.forEach((sub) => {
             sublistCopy.push(Object.assign({}, sub));
@@ -123,6 +124,7 @@ export class NtaHelperService {
     let seriesCount = 0;
     let measurementCount = measurements.length;
     measurements.forEach((measurement, mIndex) => {
+      measurement.parentId = category.categoryId.toString();
       this._uheroAPIService.fetchMeasurementSeries(measurement.id, freq).subscribe((series) => {
         if (series) {
           seriesCount += series.length;
