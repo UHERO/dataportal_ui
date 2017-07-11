@@ -142,9 +142,9 @@ export class CategoryHelperService {
       },
       () => {
         this.requestsRemain -= 1;
+        // sublist id used as anchor fragments in landing-page component, fragment expects a string
+        subcat.id = subcat.id.toString();
         if (expandedResults) {
-          // sublist id used as anchor fragments in landing-page component, fragment expects a string
-          subcat.id = subcat.id.toString();
           // Get array of all series that have level data available
           // Filter out series from expandedResults with non-seasonally-adjusted data
           const splitSeries = this.getDisplaySeries(expandedResults, dateWrapper, currentFreq.freq, categoryDateWrapper);
@@ -175,7 +175,7 @@ export class CategoryHelperService {
           }
         } else {
           // No series exist for a subcateogry
-          this.setNoData(subcategory);
+          this.setNoData(subcat);
         }
       });
   }
