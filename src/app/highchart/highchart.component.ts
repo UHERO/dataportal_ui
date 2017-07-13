@@ -30,24 +30,25 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(@Inject('seriesType') private seriesType, private _helper: HelperService) { }
+  constructor(@Inject('highchartInfo') private chartInfo, private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.currentFreq, this.chartInfo, this.chartStart, this.chartEnd);
     }
   }
 
   ngOnChanges() {
-    this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
+    this.drawChart(this.seriesData, this.currentFreq, this.chartInfo, this.chartStart, this.chartEnd);
   }
 
-  drawChart(seriesData, currentFreq, seriesType, start?, end?) {
-    let level, ytd;
-    level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
-    ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
+  drawChart(seriesData, currentFreq, chartInfo, start?, end?) {
+    let series0 = seriesData.categoryChart.chartData.level;
+    let series1 = seriesData.categoryChart.chartData[chartInfo.series1Name];
+    series0 = this.trimData(series0, start, end);
+    series1 = this.trimData(series1, start, end);
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
@@ -83,10 +84,13 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (seriesName === 'Level') {
               return ': ';
             }
-            if (seriesName === 'YTD' && freq === 'A') {
+            if (seriesName === 'c5ma') {
+              return 'Centered, 5 Year Moving Avg: ';
+            }
+            if (seriesName === 'ytd' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
             }
-            if (seriesName === 'YTD' && freq !== 'A') {
+            if (seriesName === 'ytd' && freq !== 'A') {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
             }
           };
@@ -185,7 +189,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        data: level,
+        data: series0,
         states: {
           hover: {
             lineWidth: 2
@@ -197,9 +201,9 @@ export class HighchartComponent implements OnInit, OnChanges {
         zoneAxis: 'x',
         zones: pseudoZones
       }, {
-        name: 'YTD',
-        type: seriesType,
-        data: ytd,
+        name: chartInfo.series1Name,
+        type: chartInfo.series1Type,
+        data: series1,
         dataGrouping: {
           enabled: false
         },

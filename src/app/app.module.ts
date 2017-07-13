@@ -66,8 +66,12 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
       useValue: '../../assets/UHEROdata-Logo-color.svg'
     },
     {
-      provide: 'seriesType',
-      useValue: 'column'
+      provide: 'highchartInfo',
+      useValue: { series1Name: 'ytd', series1Type: 'column' }
+    },
+    {
+      provide: 'highstockInfo',
+      useValue: { series0Name: 'yoy', series0Type: 'column' }
     }
   ],
   bootstrap: [AppComponent]

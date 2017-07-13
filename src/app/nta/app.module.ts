@@ -73,9 +73,14 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
       useValue: '../../assets/nta-logo.svg'
     },
     {
-      provide: 'seriesType',
-      useValue: 'line'
+      provide: 'highchartInfo',
+      useValue: { series1Name: 'c5ma', series1Type: 'line' }
+    },
+    {
+      provide: 'highstockInfo',
+      useValue: { series0Name: 'c5ma', series0Type: 'line' }
     }
+
   ],
   bootstrap: [AppComponent]
 })

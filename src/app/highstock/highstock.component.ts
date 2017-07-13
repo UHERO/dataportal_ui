@@ -41,10 +41,10 @@ export class HighstockComponent implements OnChanges {
   public options: Object;
   private extremes;
 
-  constructor(@Inject('seriesType') private seriesType) { }
+  constructor(@Inject('highstockInfo') private highstockInfo) { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.seriesType);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.highstockInfo);
     // Emit dates when user selects a new range
     const $chart = $('#chart');
     const chartExtremes = this.chartExtremes;
@@ -60,22 +60,25 @@ export class HighstockComponent implements OnChanges {
     });
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, type: string) {
-    const level = chartData.level;
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, highstockInfo) {
+    const series0 = chartData[highstockInfo.series0Name];
+    const series1 = chartData.level;
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
-    const yoy = chartData.yoy;
     const ytd = chartData.ytd;
+    const c5ma = chartData.c5ma;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = 'Centered, 5 Year Moving Avg';
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel };
 
     this.options = {
       chart: {
@@ -97,6 +100,8 @@ export class HighstockComponent implements OnChanges {
           html: 'The University of Hawaii Economic Research Organization (UHERO)',
         }, {
           html: 'Data Portal: http://data.uhero.hawaii.edu/'
+        }, {
+          html: name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
         style: {
           display: 'none'
@@ -302,9 +307,9 @@ export class HighstockComponent implements OnChanges {
         }
       },
       series: [{
-        name: yoyLabel,
-        type: type,
-        data: yoy,
+        name: seriesLabels[highstockInfo.series0Name],
+        type: highstockInfo.series0Type,
+        data: series0,
         showInNavigator: false,
         dataGrouping: {
           enabled: false
@@ -313,7 +318,7 @@ export class HighstockComponent implements OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        data: level,
+        data: series1,
         states: {
           hover: {
             lineWidth: 2
