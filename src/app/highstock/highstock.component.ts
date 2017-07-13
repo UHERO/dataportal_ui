@@ -39,11 +39,25 @@ export class HighstockComponent implements OnChanges {
   // When user updates range selected, emit chartExtremes to update URL params
   @Output() chartExtremes = new EventEmitter(true);
   public options: Object;
+  private extremes;
 
   constructor(@Inject('seriesType') private seriesType) { }
 
   ngOnChanges() {
     this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.seriesType);
+    // Emit dates when user selects a new range
+    const $chart = $('#chart');
+    const chartExtremes = this.chartExtremes;
+    const tableExtremes = this.tableExtremes;
+    $chart.bind('click', function () {
+      const xAxis = $chart.highcharts().xAxis[0];
+      if (xAxis._hasSetExtremes) {
+        const extremes = { minDate: xAxis._extremes.min, maxDate: xAxis._extremes.max };
+        tableExtremes.emit(extremes);
+        chartExtremes.emit(extremes);
+      }
+      xAxis._hasSetExtremes = false;
+    });
   }
 
   drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, type: string) {
@@ -331,19 +345,8 @@ export class HighstockComponent implements OnChanges {
   }
 
   updateExtremes(e) {
-    const extremes = this.getChartExtremes(e);
-    const chartExtremes = this.chartExtremes;
-    const tableExtremes = this.tableExtremes;
-    const chart = $('#chart');
-    const buttons = $('.highcharts-range-selector-buttons');
-    buttons.click(function() {
-      chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-      tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-    });
-    chart.mouseup(function() {
-      chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-      tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-    });
+    e.context._hasSetExtremes = true;
+    e.context._extremes = this.getChartExtremes(e);
   }
 
   getChartExtremes(e) {
