@@ -6,6 +6,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-uhero": "ng build --app=uhero --prod",
+    "build-nta": "ng build --app=nta --prod --base-href=/nta/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
