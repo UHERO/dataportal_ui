@@ -11,7 +11,7 @@
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
-    <app-highstock *ngIf="!noSelection && !data.noData" [start]="startDate" [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="updateChartExtremes($event)" (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.currentFreq)"></app-highstock>
+    <app-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate" [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail"  [currentFreq]="data.currentFreq" [currentGeo]="data.currentGeo" (chartExtremes)="updateChartExtremes($event)" (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.currentFreq)"></app-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
       {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}" target="_blank">{{data.seriesDetail.source_link}}</a><br>{{data.seriesDetail.sourceDetails}}
     </div>
@@ -32,9 +32,9 @@
     <div class="series-table">
     <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData">
       <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
-      <p-column field="formattedValue" header="Level"></p-column>
-      <p-column field="formattedYoy" [header]=data.yoyChange></p-column>
-      <p-column *ngIf="data.currentFreq.freq !== 'A'" field="formattedYtd" [header]=data.ytdChange></p-column>
+      <p-column [field]=portalSettings.seriesTable.series1 header="Level"></p-column>
+      <p-column [field]=portalSettings.seriesTable.series2 [header]="data.seriesDetail.unitsLabelShort === '%' ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label"></p-column>
+      <p-column *ngIf="data.currentFreq.freq !== 'A' && portalSettings.seriesTable.columns === 4" [field]="portalSettings.seriesTable.series3" [header]="data.seriesDetail.unitsLabelShort === '%' ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label"></p-column>
     </p-dataTable>
     </div>
   </div>

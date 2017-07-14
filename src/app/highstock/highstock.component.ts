@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -27,6 +27,7 @@ Highcharts.setOptions({
   encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
+  @Input() portalSettings;
   @Input() chartData;
   @Input() currentFreq;
   @Input() currentGeo;
@@ -41,10 +42,10 @@ export class HighstockComponent implements OnChanges {
   public options: Object;
   private extremes;
 
-  constructor(@Inject('highstockInfo') private highstockInfo) { }
+  constructor() { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.highstockInfo);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
     // Emit dates when user selects a new range
     const $chart = $('#chart');
     const chartExtremes = this.chartExtremes;
@@ -60,25 +61,24 @@ export class HighstockComponent implements OnChanges {
     });
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, highstockInfo) {
-    const series0 = chartData[highstockInfo.series0Name];
-    const series1 = chartData.level;
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
+    const series0 = chartData[portalSettings.highstock.series0Name];
+    const series1 = chartData[portalSettings.highstock.series1Name];
+    const series2 = chartData[portalSettings.highstock.series2Name];
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
-    const ytd = chartData.ytd;
-    const c5ma = chartData.c5ma;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
-    const change = seriesDetail.percent ? 'Change' : '% Change';
-    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = 'Centered, 5 Year Moving Avg';
+    const change = seriesDetail.unitsLabelShort === '%' ? 'Change' : '% Change';
+    const yoyLabel = seriesDetail.unitsLabelShort === '%' ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.unitsLabelShort === '%' ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = 'Centered 5 Year Moving Avg';
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
-    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel };
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
 
     this.options = {
       chart: {
@@ -307,8 +307,8 @@ export class HighstockComponent implements OnChanges {
         }
       },
       series: [{
-        name: seriesLabels[highstockInfo.series0Name],
-        type: highstockInfo.series0Type,
+        name: seriesLabels[portalSettings.highstock.series0Name],
+        type: portalSettings.highstock.series0Type,
         data: series0,
         showInNavigator: false,
         dataGrouping: {
@@ -331,8 +331,8 @@ export class HighstockComponent implements OnChanges {
         zoneAxis: 'x',
         zones: pseudoZones
       }, {
-        name: ytdLabel,
-        data: ytd,
+        name: seriesLabels[portalSettings.highstock.series2Name],
+        data: series2,
         includeInCSVExport: freq.freq === 'A' ? false : true,
         visible: false,
         dataGrouping: {

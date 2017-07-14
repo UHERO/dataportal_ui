@@ -28,15 +28,23 @@
 						</tr>
 						<tr *ngIf="yoyActive">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-								{{(serie.seriesInfo.percent === true) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
+								{{(serie.seriesInfo.unitsLabelShort === '%') ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
 								<td>{{item.yoy}}</td>
 							</ng-template>
 						</tr>
+						<tr *ngIf="c5maActive">
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
+								C5MA
+							</th>
+							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
+								<td>{{item.c5ma}}</td>
+							</ng-template>
+						</tr>
 						<tr *ngIf="ytdActive && serie.seriesInfo.frequencyShort !== 'A'">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-								{{(serie.seriesInfo.percent === true)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
+								{{(serie.seriesInfo.unitsLabelShort === '%')? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
 								<td>{{item.ytd}}</td>

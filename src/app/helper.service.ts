@@ -81,7 +81,7 @@ export class HelperService {
       tableEntry.ytd = data.ytdValue;
       tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, decimals);
       tableEntry.c5ma = data.c5maValue;
-      tableEntry.formatedC5ma = data.c5maValue === null ? ' ' : this.formatNum(+data.c5maValue, decimals);
+      tableEntry.formattedC5ma = data.c5maValue === null ? ' ' : this.formatNum(+data.c5maValue, decimals);
     });
     return table;
   }
@@ -112,7 +112,7 @@ export class HelperService {
     // Format series data for the category table
     const categoryTableData = [];
     dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
     });
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
@@ -120,6 +120,7 @@ export class HelperService {
         tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
         tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
         tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
+        tableObs.c5ma = data.c5ma === null ? ' ' : this.formatNum(+data.c5ma, decimals);
       }
     });
     return categoryTableData;
