@@ -147,7 +147,8 @@ export class HighchartComponent implements OnInit, OnChanges {
             }
           });
           return s;
-        }
+        },
+        useHTML: true
       },
       legend: {
         enabled: false

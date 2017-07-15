@@ -63,16 +63,11 @@
     }
 
     .highcharts-tooltip {
+        font-size: 0.9em;
+        line-height: 1.25em;
+        
         .highcharts-tooltip-box {
             fill: none;
-        }
-
-        text {
-            font-family: 'Lucida Sans', sans-serif;
-            color: $primary-text !important;
-            font-size: 0.9em !important;
-            letter-spacing: 0.015em;
-            margin-bottom: 5px;
         }
     }
 }
