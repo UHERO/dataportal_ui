@@ -20,7 +20,7 @@
           <input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event, sub.id)">Centered 5 Year Moving Average
         </label>
         <app-date-slider class="sliders" *ngIf="data.requestComplete" [dates]="data.sliderDates" [sublist]="data.measurements" [subCat]="measure" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
-        <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates" [sublist]="measure" [tableId]="measure.id"></app-category-datatables>
+        <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [c5ma]="queryParams.c5ma === 'true'" [categoryDates]="data.categoryDates" [sublist]="measure" [tableId]="measure.id"></app-category-datatables>
 				<i *ngIf="!data.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
 			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="data.measurements" [data]="measure.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="measure.id" [c5maActive]="queryParams.c5ma === 'true'" [noSeries]="measure.noData" [params]="queryParams"></app-category-table>

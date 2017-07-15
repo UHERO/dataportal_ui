@@ -52,7 +52,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     series1 = this.trimData(series1, start, end);
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
-    const percent = seriesData.seriesInfo.unitsLabelShort === '%' ? true : false;
+    const percent = seriesData.seriesInfo.percent;
     const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
     const dataFreq = currentFreq;
     const unitsShort = seriesData.seriesInfo.unitsLabelShort;

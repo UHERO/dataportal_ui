@@ -41,6 +41,7 @@ export class HighstockComponent implements OnChanges {
   @Output() chartExtremes = new EventEmitter(true);
   public options: Object;
   private extremes;
+  private chartObject;
 
   constructor() { }
 
@@ -69,9 +70,9 @@ export class HighstockComponent implements OnChanges {
     const pseudoZones = chartData.pseudoZones;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
-    const change = seriesDetail.unitsLabelShort === '%' ? 'Change' : '% Change';
-    const yoyLabel = seriesDetail.unitsLabelShort === '%' ? 'YOY Change' : 'YOY % Change';
-    const ytdLabel = seriesDetail.unitsLabelShort === '%' ? 'YTD Change' : 'YTD % Change';
+    const change = seriesDetail.percent ? 'Change' : '% Change';
+    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
     const c5maLabel = 'Centered 5 Year Moving Avg';
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
@@ -163,6 +164,7 @@ export class HighstockComponent implements OnChanges {
         },
         filename: name + '_' + geo.name + '_' + freq.label,
         chartOptions: {
+          events: null,
           navigator: {
             enabled: false
           },
@@ -343,7 +345,12 @@ export class HighstockComponent implements OnChanges {
   }
 
   setTableExtremes(e) {
-    const extremes = this.getChartExtremes(e);
+    // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
+    // Exporting calls load event and creates empty e.context object, emitting wrong values to series table
+    if (!this.chartObject || this.chartObject.series.length < 4) {
+      this.chartObject = Object.assign({}, e.context);
+    }
+    const extremes = this.getChartExtremes(this.chartObject);
     if (extremes) {
       this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     }
@@ -351,19 +358,19 @@ export class HighstockComponent implements OnChanges {
 
   updateExtremes(e) {
     e.context._hasSetExtremes = true;
-    e.context._extremes = this.getChartExtremes(e);
+    e.context._extremes = this.getChartExtremes(e.context);
   }
 
-  getChartExtremes(e) {
+  getChartExtremes(chartObject) {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (e.context.series[0].points) {
-      selectedRange = e.context.series[0].points;
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
     }
-    if (!e.context.series[0].points.length) {
+    if (!chartObject.series[0].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {
