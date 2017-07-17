@@ -1,9 +1,10 @@
 // Component for multi-chart view
-import { Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 import 'jquery';
@@ -31,6 +32,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private tableEnd;
   private chartStart;
   private chartEnd;
+  private portalSettings;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -42,7 +44,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private previousHeight;
 
   constructor(
+    @Inject('portal') private portal,
     private _uheroAPIService: UheroApiService,
+    private _dataPortalSettings: DataPortalSettingsService,
     private _catHelper: CategoryHelperService,
     private route: ActivatedRoute,
     private _router: Router,
@@ -52,6 +56,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   ngOnInit() {
     this.currentGeo = { fips: null, name: null, handle: null };
     this.currentFreq = { freq: null, label: null };
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
   ngAfterViewInit() {

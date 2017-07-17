@@ -20,6 +20,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
   @Input() freq;
   @Input() yoy;
   @Input() ytd;
+  @Input() c5ma;
   private tableWidget;
 
   constructor() { }
@@ -89,6 +90,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
   formatTable(displaySeries: Array<any>, tableDates: Array<any>) {
     const yoySelected = this.yoy;
     const ytdSelected = this.ytd;
+    const c5maSelected = this.c5ma;
     // Format table for jquery datatables
     const tableData = [];
     const tableColumns = [];
@@ -156,6 +158,30 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         tableData.push({
           series: title + ytdLabel,
           observations: ytd
+        });
+      });
+    }
+    if (c5maSelected) {
+      tableData.push({
+        series: '',
+        observations: ''
+      }, {
+        series: '',
+        observations: ''
+      }, {
+        series: 'Centered 5 Year Moving Avg',
+        observations: ''
+      });
+      displaySeries.forEach((series) => {
+        const c5ma = {};
+        const percent = series.seriesInfo.percent;
+        const title = series.seriesInfo.title;
+        series.categoryTable.forEach((obs) => {
+          c5ma[obs.tableDate] = obs.c5ma;
+        });
+        tableData.push({
+          series: title,
+          observations: c5ma
         });
       });
     }

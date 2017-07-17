@@ -50,7 +50,6 @@
                 return item.name + (keyLength > 1 ? ' ('+ key + ')' : '');
             };
         // Get chart title (series name, region, and frequency) and source info from chart labels
-        var series = this.title.textStr;
         var chartLabels = this.userOptions.labels.items;
         var sourceDescription, sourceLink, sourceDetails;
         if (chartLabels[0].html) {
@@ -65,7 +64,7 @@
         var seriesLink = [chartLabels[3].html];
         var uhero = [chartLabels[4].html];
         var dpLink = [chartLabels[5].html];
-        var seriesInfo = ['Series: ' + series];
+        var seriesInfo = ['Series: ' + chartLabels[6].html];
 
         // Loop the series and index values
         i = 0;

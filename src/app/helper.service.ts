@@ -44,9 +44,10 @@ export class HelperService {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const level = observations.transformationResults[0].observations;
-    const yoy = observations.transformationResults[1].observations;
-    const ytd = observations.transformationResults[2].observations;
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl').observations;
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1').observations;
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd').observations;
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma').observations;
     const pseudoZones = [];
 
     if (level) {
@@ -56,10 +57,10 @@ export class HelperService {
           pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
         }
       });
-      const combineData = this.combineObsData(level, yoy, ytd);
+      const combineData = this.combineObsData(level, yoy, ytd, c5ma);
       const tableData = this.seriesTable(combineData, dates, decimals);
       const chart = this.seriesChart(combineData, dates);
-      const chartData = { level: chart[0], pseudoZones: pseudoZones, yoy: chart[1], ytd: chart[2] };
+      const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
       results = { chartData: chartData, tableData: tableData, start: start, end: end };
     }
     return results;
@@ -68,7 +69,7 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
@@ -79,6 +80,8 @@ export class HelperService {
       tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, decimals);
       tableEntry.ytd = data.ytdValue;
       tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, decimals);
+      tableEntry.c5ma = data.c5maValue;
+      tableEntry.formattedC5ma = data.c5maValue === null ? ' ' : this.formatNum(+data.c5maValue, decimals);
     });
     return table;
   }
@@ -87,26 +90,29 @@ export class HelperService {
     const levelValue = [];
     const yoyValue = [];
     const ytdValue = [];
+    const c5maValue = [];
     dateRange.forEach((date) => {
       const data = seriesData.find(obs => obs.date === date.date);
       if (data) {
         levelValue.push([Date.parse(date.date), data.value]);
         yoyValue.push([Date.parse(date.date), data.yoyValue]);
         ytdValue.push([Date.parse(date.date), data.ytdValue]);
+        c5maValue.push([Date.parse(date.date), data.c5maValue]);
       } else {
         levelValue.push([Date.parse(date.date), null]);
         yoyValue.push([Date.parse(date.date), null]);
         ytdValue.push([Date.parse(date.date), null]);
+        c5maValue.push([Date.parse(date.date), null]);
       }
     });
-    return [levelValue, yoyValue, ytdValue];
+    return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
 
   catTable(seriesTableData: Array<any>, dateRange: Array<any>, decimals: number) {
     // Format series data for the category table
     const categoryTableData = [];
     dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ' });
+      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
     });
     seriesTableData.forEach((data) => {
       const tableObs = categoryTableData.find(obs => obs.date === data.date);
@@ -114,6 +120,7 @@ export class HelperService {
         tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
         tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
         tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
+        tableObs.c5ma = data.c5ma === null ? ' ' : this.formatNum(+data.c5ma, decimals);
       }
     });
     return categoryTableData;
@@ -134,19 +141,20 @@ export class HelperService {
 
   // Combine level and percent arrays from Observation data
   // Used to construct table data for single series view
-  combineObsData(level, yoy, ytd) {
-    let table;
+  combineObsData(level, yoy, ytd, c5ma) {
+    let data;
     if (level) {
-      table = level;
+      data = level;
       for (let i = 0; i < level.length; i++) {
-        table[i].yoyValue = null;
-        table[i].ytdValue = null;
-        table[i].value = +level[i].value;
+        data[i].yoyValue = null;
+        data[i].ytdValue = null;
+        data[i].c5maValue = null;
+        data[i].value = +level[i].value;
       }
     }
     if (yoy) {
       for (let i = 0; i < yoy.length; i++) {
-        const seriesObs = table.find(obs => obs.date === yoy[i].date);
+        const seriesObs = data.find(obs => obs.date === yoy[i].date);
         if (seriesObs) {
           seriesObs.yoyValue = +yoy[i].value;
         }
@@ -154,13 +162,21 @@ export class HelperService {
     }
     if (ytd) {
       for (let i = 0; i < ytd.length; i++) {
-        const seriesObs = table.find(obs => obs.date === ytd[i].date);
+        const seriesObs = data.find(obs => obs.date === ytd[i].date);
         if (seriesObs) {
           seriesObs.ytdValue = +ytd[i].value;
         }
       }
     }
-    return table;
+    if (c5ma) {
+      for (let i = 0; i < c5ma.length; i++) {
+        const seriesObs = data.find(obs => obs.date === c5ma[i].date);
+        if (seriesObs) {
+          seriesObs.c5maValue = +c5ma[i].value;
+        }
+      }
+    }
+    return data;
   }
 
   formatDate(date: string, freq: string) {

@@ -28,6 +28,7 @@ import { routing } from './app.routes';
 import { AppComponent } from './app.component';
 import { UheroApiService } from './uhero-api.service';
 import { CategoryHelperService } from './category-helper.service';
+import { DataPortalSettingsService } from './data-portal-settings.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
@@ -49,6 +50,7 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
   ],
   providers: [
     UheroApiService,
+    DataPortalSettingsService,
     CategoryHelperService,
     SeriesHelperService,
     HelperService,
@@ -66,8 +68,8 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
       useValue: '../../assets/UHEROdata-Logo-color.svg'
     },
     {
-      provide: 'seriesType',
-      useValue: 'column'
+      provide: 'portal',
+      useValue: 'uhero'
     }
   ],
   bootstrap: [AppComponent]

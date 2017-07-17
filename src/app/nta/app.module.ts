@@ -31,7 +31,7 @@ import { RecaptchaModule } from 'ng2-recaptcha';
 import { AppComponent } from './app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
-// import { CategoryHelperService } from '../category-helper.service';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
@@ -55,7 +55,7 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
   ],
   providers: [
     UheroApiService,
-    // CategoryHelperService,
+    DataPortalSettingsService,
     NtaHelperService,
     SeriesHelperService,
     HelperService,
@@ -73,8 +73,8 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
       useValue: '../../assets/nta-logo.svg'
     },
     {
-      provide: 'seriesType',
-      useValue: 'line'
+      provide: 'portal',
+      useValue: 'nta'
     }
   ],
   bootstrap: [AppComponent]

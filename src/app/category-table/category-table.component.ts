@@ -24,6 +24,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   @Input() noSeries;
   @Input() yoyActive;
   @Input() ytdActive;
+  @Input() c5maActive;
   @Input() params;
   @Input() subcatIndex;
   @Input() tableStart;

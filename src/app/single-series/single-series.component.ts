@@ -1,7 +1,8 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
@@ -21,6 +22,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private endDate;
   private chartStart;
   private chartEnd;
+  private portalSettings;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -28,7 +30,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   public seriesData;
 
   constructor(
+    @Inject('portal') private portal,
     private _uheroAPIService: UheroApiService,
+    private _dataPortalSettings: DataPortalSettingsService,
     private _series: SeriesHelperService,
     private route: ActivatedRoute,
     private _router: Router,
@@ -38,6 +42,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.currentGeo = {fips: null, handle: null, name: null};
     this.currentFreq = {freq: null, label: null};
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
   ngAfterViewInit() {

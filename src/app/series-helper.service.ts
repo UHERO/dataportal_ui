@@ -16,11 +16,10 @@ export class SeriesHelperService {
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
-  getSeriesData(id: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+  getSeriesData(id: number): Observable<any> {
     let currentFreq, currentGeo, decimals;
     this.seriesData = {
       seriesDetail: {},
-      change: '',
       saPairAvail: null,
       regions: [],
       currentGeo: <Geography>{},

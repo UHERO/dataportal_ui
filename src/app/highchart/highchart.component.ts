@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
@@ -15,6 +15,7 @@ Highcharts.setOptions({
   encapsulation: ViewEncapsulation.None
 })
 export class HighchartComponent implements OnInit, OnChanges {
+  @Input() portalSettings;
   @Input() seriesData;
   @Input() currentFreq;
   @Input() chartStart;
@@ -30,24 +31,25 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(@Inject('seriesType') private seriesType, private _helper: HelperService) { }
+  constructor(private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
     }
   }
 
   ngOnChanges() {
-    this.drawChart(this.seriesData, this.currentFreq, this.seriesType, this.chartStart, this.chartEnd);
+    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
   }
 
-  drawChart(seriesData, currentFreq, seriesType, start?, end?) {
-    let level, ytd;
-    level = this.trimData(seriesData.categoryChart.chartData.level, start, end);
-    ytd = this.trimData(ytd = seriesData.categoryChart.chartData.ytd, start, end);
+  drawChart(seriesData, currentFreq, portalSettings, start?, end?) {
+    let series0 = seriesData.categoryChart.chartData[portalSettings.highcharts.series0Name];
+    let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
+    series0 = this.trimData(series0, start, end);
+    series1 = this.trimData(series1, start, end);
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
@@ -83,10 +85,13 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (seriesName === 'Level') {
               return ': ';
             }
-            if (seriesName === 'YTD' && freq === 'A') {
+            if (seriesName === 'c5ma') {
+              return 'Centered 5 Year Moving Avg: ';
+            }
+            if (seriesName === 'ytd' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
             }
-            if (seriesName === 'YTD' && freq !== 'A') {
+            if (seriesName === 'ytd' && freq !== 'A') {
               return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
             }
           };
@@ -142,7 +147,8 @@ export class HighchartComponent implements OnInit, OnChanges {
             }
           });
           return s;
-        }
+        },
+        useHTML: true
       },
       legend: {
         enabled: false
@@ -185,7 +191,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        data: level,
+        data: series0,
         states: {
           hover: {
             lineWidth: 2
@@ -195,11 +201,12 @@ export class HighchartComponent implements OnInit, OnChanges {
           enabled: false
         },
         zoneAxis: 'x',
-        zones: pseudoZones
+        zones: pseudoZones,
+        zIndex: 1
       }, {
-        name: 'YTD',
-        type: seriesType,
-        data: ytd,
+        name: portalSettings.highcharts.series1Name,
+        type: portalSettings.highcharts.series1Type,
+        data: series1,
         dataGrouping: {
           enabled: false
         },
@@ -244,25 +251,25 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   render(event) {
     this.chart = event;
-    let latestLevel, latestYtd;
-    const level = this.chart.series[0];
-    const ytd = this.chart.series[1];
+    let latestSeries0, latestSeries1;
+    const series0 = this.chart.series[0];
+    const series1 = this.chart.series[1];
     // Get position of last non-null value
-    latestLevel = (level !== undefined) ? HighchartComponent.findLastValue(level.points) : null;
-    latestYtd = (ytd !== undefined) ? HighchartComponent.findLastValue(ytd.points) : null;
+    latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : null;
+    latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : null;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
     this.chart.tooltip.hide = function() {
-      if (latestLevel > 0 && latestYtd > 0) {
-        this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
-        level.points[latestLevel].setState('hover');
+      if (latestSeries0 > 0 && latestSeries1 > 0) {
+        this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
+        series0.points[latestSeries0].setState('hover');
       }
     };
 
     // Display tooltip when chart loads
-    if (latestLevel > 0 && latestYtd > 0) {
-      this.chart.tooltip.refresh([level.points[latestLevel], ytd.points[latestYtd]]);
+    if (latestSeries0 > 0 && latestSeries1 > 0) {
+      this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
     }
   }
 
