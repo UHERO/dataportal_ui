@@ -1,7 +1,6 @@
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-// import 'rxjs/add/operator/mergeMap';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
@@ -17,9 +16,6 @@ export class NtaHelperService {
   private requestsRemain;
   private defaultFreq: string;
   private categoryData = {};
-  private categoryDates = [];
-  private seriesDates = [];
-  private series = [];
 
   static setCacheId(category, routeFreq) {
     let id = '' + category;
@@ -33,32 +29,41 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: number, routeFreq?: string): Observable<any> {
+  initContent(catId: any, routeFreq?: string): Observable<any> {
     const cacheId = NtaHelperService.setCacheId(catId, routeFreq);
     if (this.categoryData[cacheId]) {
       return Observable.of([this.categoryData[cacheId]]);
-    } else {
-      this.categoryData[cacheId] = <CategoryData>{};
-      this._uheroAPIService.fetchCategories().subscribe((categories) => {
-        const cat = categories.find(category => category.id === catId);
-        if (cat) {
-          const selectedCategory = cat.name;
-          const sublist = cat.children;
-          this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
-          this.categoryData[cacheId].selectedCategory = selectedCategory;
-          this.categoryData[cacheId].categoryId = cat.id;
-          const sublistCopy = [];
-          sublist.forEach((sub) => {
-            sublistCopy.push(Object.assign({}, sub));
-          });
-          this.categoryData[cacheId].sublist = sublistCopy;
-          this.getSubcategoryData(selectedCategory, cacheId, this.categoryData[cacheId].sublist, routeFreq);
-        } else {
-          this.categoryData[cacheId].invalid = 'Category does not exist.';
-        }
-      });
+    }
+    if (!this.categoryData[cacheId] && typeof catId === 'number') {
+      this.getCategory(cacheId, catId, routeFreq);
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
+    if (!this.categoryData[cacheId] && typeof catId === 'string') {
+      this.getSeach(cacheId, catId, routeFreq);
+      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+    }
+  }
+
+  getCategory(cacheId, catId, routeFreq?) {
+    this.categoryData[cacheId] = <CategoryData>{};
+    this._uheroAPIService.fetchCategories().subscribe((categories) => {
+      const cat = categories.find(category => category.id === catId);
+      if (cat) {
+        const selectedCategory = cat.name;
+        const sublist = cat.children;
+        this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
+        this.categoryData[cacheId].selectedCategory = selectedCategory;
+        this.categoryData[cacheId].categoryId = cat.id;
+        const sublistCopy = [];
+        sublist.forEach((sub) => {
+          sublistCopy.push(Object.assign({}, sub));
+        });
+        this.categoryData[cacheId].sublist = sublistCopy;
+        this.getSubcategoryData(selectedCategory, cacheId, this.categoryData[cacheId].sublist, routeFreq);
+      } else {
+        this.categoryData[cacheId].invalid = 'Category does not exist.';
+      }
+    });
   }
 
   getSubcategoryData(catName: string, cacheId, sublist: Array<any>, routeFreq?: string) {
@@ -79,23 +84,28 @@ export class NtaHelperService {
           if (index === sublist.length - 1) {
             this.requestsRemain = sublist.length;
             const measurementsArray = [];
-            sublist.forEach((subcat, i) => {
-              let selectedFreq;
-              selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-              if (routeFreq) {
-                const selected = this.checkSelectedFreqs(routeFreq, freqArray);
-                selectedFreq = selected.freq;
-              }
-              // Get frequencies available for a selected region
-              const currentFreq = freqArray.find(freq => freq.freq === selectedFreq);
-              this.categoryData[cacheId].frequencies = freqArray;
-              this.categoryData[cacheId].currentFreq = currentFreq;
-              subcat.parentName = catName;
-              this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
-              this.getMeasurementData(subcat, currentFreq.freq, this.categoryData[cacheId], measurementsArray);
-            });
+            this.formatSubcategories(sublist, freqArray, cacheId, categoryDateWrapper, catName, routeFreq);
           }
         });
+    });
+  }
+
+  formatSubcategories(sublist: Array<any>, freqArray: Array<Frequency>, cacheId: string, catDateWrapper: DateWrapper, catName: string, routeFreq?: string) {
+    const measurementsArray = [];
+    sublist.forEach((subcat, i) => {
+      let selectedFreq;
+      selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+      if (routeFreq) {
+        const selected = this.checkSelectedFreqs(routeFreq, freqArray);
+        selectedFreq = selected.freq;
+      }
+      // Get frequencies available for a selected region
+      const currentFreq = freqArray.find(freq => freq.freq === selectedFreq);
+      this.categoryData[cacheId].frequencies = freqArray;
+      this.categoryData[cacheId].currentFreq = currentFreq;
+      subcat.parentName = catName;
+      this.categoryData[cacheId].categoryDateWrapper = catDateWrapper;
+      this.getMeasurementData(subcat, currentFreq.freq, this.categoryData[cacheId], measurementsArray);
     });
   }
 
@@ -167,6 +177,102 @@ export class NtaHelperService {
         });
       }
     });
+  }
+
+    getSeach(cacheId, catId, routeFreq?) {
+    this.categoryData[cacheId] = <CategoryData>{};
+    let freqGeos, obsEnd, obsStart;
+    this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
+      this.defaults = results.defaults;
+      freqGeos = results.freqGeos;
+      obsEnd = results.observationEnd;
+      obsStart = results.observationStart;
+    },
+      (error) => {
+        this.errorMessage = error;
+      },
+      () => {
+        if (obsEnd && obsStart) {
+          const dateWrapper = <DateWrapper>{};
+          this.searchSettings(catId, cacheId, dateWrapper, freqGeos, routeFreq);
+          this.categoryData[cacheId].selectedCategory = 'Search: ' + catId;
+        } else {
+          this.categoryData[cacheId].invalid = catId;
+        }
+      });
+  }
+
+  searchSettings(search: string, cacheId, dateWrapper: DateWrapper, freqGeos, routeFreq?: string) {
+    const dateArray = [];
+    let selectedFreq;
+    selectedFreq = this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
+    if (routeFreq) {
+      const selected = this.checkSelectedFreqs(routeFreq, freqGeos);
+      selectedFreq = selected.freq;
+    }
+    let freqs, currentFreq;
+    freqs = freqGeos;
+    // freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
+    const selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
+    // Check if the selected frequency exists in the list of freqs for a selected geo
+    selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
+    currentFreq = freqs.find(freq => freq.freq === selectedFreq);
+    this.categoryData[cacheId].frequencies = freqs;
+    this.categoryData[cacheId].currentFreq = currentFreq;
+    this.getSearchData(search, cacheId, currentFreq.freq, dateWrapper, routeFreq);
+  }
+
+  getSearchData(search: string, cacheId, freq: string, dateWrapper: DateWrapper, routeFreq?: string) {
+    let searchResults;
+    const categoryDateWrapper = { firstDate: '', endDate: '' };
+    // Get series for a requested search term
+    this._uheroAPIService.fetchSearchSeries(search).subscribe((searchRes) => {
+      searchResults = searchRes;
+    },
+      (error) => {
+        this.errorMessage = error;
+      },
+      () => {
+        if (searchResults) {
+          const searchSeries = [];
+          searchResults.forEach((series, index) => {
+            this.getSearchObservations(series, index, searchSeries, searchResults, search, categoryDateWrapper, cacheId, freq);
+          });
+        }
+      });
+  }
+
+  // Get observations for series in search results
+  getSearchObservations(series, index, searchSeries, searchResults, search, catDateWrapper, cacheId, freq) {
+    // TODO: Remove condition when NTA data is live
+    if (series.frequencyShort === 'A') {
+      this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
+        series.seriesObservations = obs;
+      },
+        (error) => {
+          this.errorMessage = error;
+        },
+        () => {
+          searchSeries.push(series);
+          if (index === searchResults.length - 1) {
+            const measurements = {
+              id: 'search',
+              parentName: 'Search',
+              name: search,
+              series: searchSeries
+            };
+            const categoryDateArray = [];
+            this.categoryData[cacheId].measurements = [measurements];
+            this.categoryData[cacheId].sublist = [measurements];
+            this.categoryData[cacheId].categoryDateWrapper = catDateWrapper;
+            this.formatCategoryData(this.categoryData[cacheId]);
+            this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, freq, categoryDateArray);
+            this.categoryData[cacheId].categoryDates = categoryDateArray;
+            this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
+            this.categoryData[cacheId].requestComplete = true;
+          }
+        });
+    }
   }
 
   // Format series data for chart and table displays

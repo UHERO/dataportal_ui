@@ -69,7 +69,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this.getData(this.id, this.routeFreq);
+      this.categoryData = this.routeFreq ? this._ntaHelper.initContent(this.id, this.routeFreq) : this._ntaHelper.initContent(this.id);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
@@ -98,15 +98,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     if (id && +id) {
       // id of category selected in sidebar
       return +id;
-    }
-  }
-
-  getData(id, freq) {
-    if (typeof id === 'number' && freq) {
-      return this._ntaHelper.initContent(id, freq);
-    }
-    if (typeof id === 'number' && !freq) {
-      return this._ntaHelper.initContent(id, freq);
     }
   }
 
