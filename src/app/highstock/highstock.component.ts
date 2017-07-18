@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -27,6 +27,7 @@ Highcharts.setOptions({
   encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
+  @Input() portalSettings;
   @Input() chartData;
   @Input() currentFreq;
   @Input() currentGeo;
@@ -40,11 +41,12 @@ export class HighstockComponent implements OnChanges {
   @Output() chartExtremes = new EventEmitter(true);
   public options: Object;
   private extremes;
+  private chartObject;
 
-  constructor(@Inject('seriesType') private seriesType) { }
+  constructor() { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.seriesType);
+    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
     // Emit dates when user selects a new range
     const $chart = $('#chart');
     const chartExtremes = this.chartExtremes;
@@ -60,22 +62,24 @@ export class HighstockComponent implements OnChanges {
     });
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, type: string) {
-    const level = chartData.level;
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
+    const series0 = chartData[portalSettings.highstock.series0Name];
+    const series1 = chartData[portalSettings.highstock.series1Name];
+    const series2 = chartData[portalSettings.highstock.series2Name];
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
-    const yoy = chartData.yoy;
-    const ytd = chartData.ytd;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = 'Centered 5 Year Moving Avg';
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
 
     this.options = {
       chart: {
@@ -97,6 +101,8 @@ export class HighstockComponent implements OnChanges {
           html: 'The University of Hawaii Economic Research Organization (UHERO)',
         }, {
           html: 'Data Portal: http://data.uhero.hawaii.edu/'
+        }, {
+          html: name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
         style: {
           display: 'none'
@@ -158,6 +164,7 @@ export class HighstockComponent implements OnChanges {
         },
         filename: name + '_' + geo.name + '_' + freq.label,
         chartOptions: {
+          events: null,
           navigator: {
             enabled: false
           },
@@ -302,9 +309,9 @@ export class HighstockComponent implements OnChanges {
         }
       },
       series: [{
-        name: yoyLabel,
-        type: type,
-        data: yoy,
+        name: seriesLabels[portalSettings.highstock.series0Name],
+        type: portalSettings.highstock.series0Type,
+        data: series0,
         showInNavigator: false,
         dataGrouping: {
           enabled: false
@@ -313,7 +320,7 @@ export class HighstockComponent implements OnChanges {
         name: 'Level',
         type: 'line',
         yAxis: 1,
-        data: level,
+        data: series1,
         states: {
           hover: {
             lineWidth: 2
@@ -326,8 +333,8 @@ export class HighstockComponent implements OnChanges {
         zoneAxis: 'x',
         zones: pseudoZones
       }, {
-        name: ytdLabel,
-        data: ytd,
+        name: seriesLabels[portalSettings.highstock.series2Name],
+        data: series2,
         includeInCSVExport: freq.freq === 'A' ? false : true,
         visible: false,
         dataGrouping: {
@@ -338,7 +345,12 @@ export class HighstockComponent implements OnChanges {
   }
 
   setTableExtremes(e) {
-    const extremes = this.getChartExtremes(e);
+    // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
+    // Exporting calls load event and creates empty e.context object, emitting wrong values to series table
+    if (!this.chartObject || this.chartObject.series.length < 4) {
+      this.chartObject = Object.assign({}, e.context);
+    }
+    const extremes = this.getChartExtremes(this.chartObject);
     if (extremes) {
       this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     }
@@ -346,19 +358,19 @@ export class HighstockComponent implements OnChanges {
 
   updateExtremes(e) {
     e.context._hasSetExtremes = true;
-    e.context._extremes = this.getChartExtremes(e);
+    e.context._extremes = this.getChartExtremes(e.context);
   }
 
-  getChartExtremes(e) {
+  getChartExtremes(chartObject) {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (e.context.series[0].points) {
-      selectedRange = e.context.series[0].points;
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
     }
-    if (!e.context.series[0].points.length) {
+    if (!chartObject.series[0].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {

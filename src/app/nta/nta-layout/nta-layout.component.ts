@@ -1,9 +1,10 @@
 // Component for multi-chart view
-import { Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../../uhero-api.service';
 import { NtaHelperService } from '../nta-helper.service';
+import { DataPortalSettingsService } from '../../data-portal-settings.service';
 import { Frequency } from '../../frequency';
 import { Geography } from '../../geography';
 import 'jquery';
@@ -17,11 +18,9 @@ declare var $: any;
 export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   private sub;
   private id: number;
-  private routeGeo: string;
   private routeFreq: string;
   private routeView: string;
-  private routeYoy;
-  private routeYtd;
+  private routeC5ma;
   private routeStart;
   private routeEnd;
   private search = false;
@@ -39,10 +38,13 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private fragment;
   private userEvent;
   private previousHeight;
+  private portalSettings;
 
   constructor(
+    @Inject('portal') private portal, 
     private _uheroAPIService: UheroApiService,
     private _ntaHelper: NtaHelperService,
+    private _dataPortalSettings: DataPortalSettingsService,
     private route: ActivatedRoute,
     private _router: Router,
     private cdRef: ChangeDetectorRef
@@ -51,25 +53,22 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   ngOnInit() {
     this.currentGeo = { fips: null, name: null, handle: null };
     this.currentFreq = { freq: null, label: null };
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
       this.search = typeof this.id === 'string' ? true : false;
-      this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
       this.routeView = params['view'];
-      this.routeYoy = params['yoy'];
-      this.routeYtd = params['ytd'];
+      this.routeC5ma = params['c5ma'];
       this.routeStart = params['start'];
       this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
-      if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
-      if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
+      if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       this.categoryData = this.getData(this.id, this.routeFreq);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
@@ -139,20 +138,10 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.scrollToFragment();
   }
 
-  yoyActive(e, subId) {
+  c5maActive(e, subId) {
     this.loading = true;
     setTimeout(() => {
-      this.queryParams.yoy = e.target.checked;
-      this.fragment = subId;
-      this.updateRoute();
-    }, 10);
-    this.scrollToFragment();
-  }
-
-  ytdActive(e, subId) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.ytd = e.target.checked;
+      this.queryParams.c5ma = e.target.checked;
       this.fragment = subId;
       this.updateRoute();
     }, 10);

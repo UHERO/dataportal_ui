@@ -30,7 +30,7 @@ describe('Service: Helper', () => {
     expect(service.createDateArray(startDate, endDate, freq, dateArray)).toEqual(expected);
   }));
 
-  it('dataTransform format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
+  it('dataTransform should format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
     const seriesObservations = {
       observationStart: "1960-01-01",
       observationEnd: "1962-01-01",
@@ -51,6 +51,9 @@ describe('Service: Helper', () => {
         }, {
           transformation: 'ytd',
           observations: []
+        }, {
+          transformation: 'c5ma',
+          observations: []
         }
       ]
     };
@@ -70,25 +73,33 @@ describe('Service: Helper', () => {
       [Date.parse('1961-01-01'), null],
       [Date.parse('1962-01-01'), null]
     ];
+    const c5ma = [
+      [Date.parse('1960-01-01'), null],
+      [Date.parse('1961-01-01'), null],
+      [Date.parse('1962-01-01'), null]
+    ];
     const chartData = {
       level: level,
       pseudoZones: [],
       yoy: yoy,
-      ytd: yoy
+      ytd: yoy,
+      c5ma: c5ma
     };
     const tableData = [{
       date: '1960-01-01',
       tableDate: '1960',
       value: ' ',
       yoy: ' ',
-      ytd: ' '
+      ytd: ' ',
+      c5ma: ' '
     },
     {
       date: '1961-01-01',
       tableDate: '1961',
       value: ' ',
       yoy: ' ',
-      ytd: ' '
+      ytd: ' ',
+      c5ma: ' '
     },
     {
       date: '1962-01-01',
@@ -96,9 +107,11 @@ describe('Service: Helper', () => {
       value: 195.2833,
       yoy: null,
       ytd: null,
+      c5ma: null,
       formattedValue: '195.28',
       formattedYoy: ' ',
-      formattedYtd: ' '
+      formattedYtd: ' ',
+      formattedC5ma: ' '
     }]
     const expected = {
       chartData: chartData,
