@@ -66,7 +66,7 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
     },
     {
       provide: 'rootCategory',
-      useValue: 59
+      useValue: 2487
     },
     {
       provide: 'logo',

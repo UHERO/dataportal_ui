@@ -35,44 +35,45 @@ export class NtaHelperService {
       return Observable.of([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && typeof catId === 'number') {
-      this.getCategory(cacheId, catId, routeFreq);
+      this.getCategory(cacheId, catId);
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
-      this.getSeach(cacheId, catId, routeFreq);
+      this.getSearch(cacheId, catId);
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
   }
 
-  getCategory(cacheId, catId, routeFreq?) {
+  getCategory(cacheId, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       const cat = categories.find(category => category.id === catId);
       if (cat) {
-        const selectedCategory = cat.name;
         const sublist = cat.children;
-        this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
-        this.categoryData[cacheId].selectedCategory = selectedCategory;
+        this.categoryData[cacheId].selectedCategory = cat.name;
         this.categoryData[cacheId].categoryId = cat.id;
         const sublistCopy = [];
         sublist.forEach((sub) => {
+          sub.parentName = cat.name;
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        this.getSubcategoryData(selectedCategory, cacheId, this.categoryData[cacheId].sublist, routeFreq);
+        this.getSubcategoryData(cacheId, this.categoryData[cacheId]);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
     });
   }
 
-  getSubcategoryData(catName: string, cacheId, sublist: Array<any>, routeFreq?: string) {
+  getSubcategoryData(cacheId, category) {
     const freqArray = [];
     const categoryDateWrapper = { firstDate: '', endDate: '' };
-    sublist.forEach((sub, index) => {
+    const measurementsArray = [];
+    category.sublist.forEach((sub, index) => {
+      category.categoryDateWrapper = categoryDateWrapper;
       // Get all regions available in a given category
-      this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
-        const freqGeos = category.freqGeos;
+      this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((cat) => {
+        const freqGeos = cat.freqGeos;
         freqGeos.forEach((freq) => {
           this._helper.uniqueFreqs(freq, freqArray);
         });
@@ -81,61 +82,45 @@ export class NtaHelperService {
           this.errorMessage = error;
         },
         () => {
-          if (index === sublist.length - 1) {
-            this.requestsRemain = sublist.length;
+          if (index === category.sublist.length - 1) {
+            this.requestsRemain = category.sublist.length;
+            // All NTA data has an annual frequency
+            category.currentFreq = freqArray[0]
             const measurementsArray = [];
-            this.formatSubcategories(sublist, freqArray, cacheId, categoryDateWrapper, catName, routeFreq);
+            this.getMeasurementData(category.sublist, this.categoryData[cacheId], measurementsArray);
           }
         });
     });
   }
 
-  formatSubcategories(sublist: Array<any>, freqArray: Array<Frequency>, cacheId: string, catDateWrapper: DateWrapper, catName: string, routeFreq?: string) {
-    const measurementsArray = [];
-    sublist.forEach((subcat, i) => {
-      let selectedFreq;
-      selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-      if (routeFreq) {
-        const selected = this.checkSelectedFreqs(routeFreq, freqArray);
-        selectedFreq = selected.freq;
-      }
-      // Get frequencies available for a selected region
-      const currentFreq = freqArray.find(freq => freq.freq === selectedFreq);
-      this.categoryData[cacheId].frequencies = freqArray;
-      this.categoryData[cacheId].currentFreq = currentFreq;
-      subcat.parentName = catName;
-      this.categoryData[cacheId].categoryDateWrapper = catDateWrapper;
-      this.getMeasurementData(subcat, currentFreq.freq, this.categoryData[cacheId], measurementsArray);
+  getMeasurementData(sublist: Array<any>, category, measurementsArray) {
+    sublist.forEach((subcat) => {
+      this._uheroAPIService.fetchCategoryMeasurements(subcat.id).subscribe((measurements) => {
+        measurements.forEach((measurement) => {
+          measurementsArray.push(Object.assign({}, measurement));
+        });
+      },
+        (error) => {
+          this.errorMessage = error;
+        },
+        () => {
+          this.requestsRemain -= 1;
+          if (this.requestsRemain === 0) {
+            category.measurements = measurementsArray;
+            this.getSeriesData(category);
+          }
+        });
     });
   }
 
-  // Get list of measurements belonging to a category
-  getMeasurementData(subcategory, freq, category, measurementsArray) {
-    this._uheroAPIService.fetchCategoryMeasurements(subcategory.id).subscribe((measurements) => {
-      measurements.forEach((measurement) => {
-        measurementsArray.push(Object.assign({}, measurement));
-      });
-    },
-      (error) => {
-        this.errorMessage = error;
-      },
-      () => {
-        this.requestsRemain -= 1;
-        if (this.requestsRemain === 0) {
-          category.measurements = measurementsArray;
-          this.getSeriesData(category, freq);
-        }
-      });
-  }
-
   // Get list of series belonging to each measurement
-  getSeriesData(category, freq) {
+  getSeriesData(category) {
     const measurements = category.measurements;
     let seriesCount = 0;
     let measurementCount = measurements.length;
     measurements.forEach((measurement, mIndex) => {
       measurement.parentId = category.categoryId.toString();
-      this._uheroAPIService.fetchMeasurementSeries(measurement.id, freq).subscribe((series) => {
+      this._uheroAPIService.fetchMeasurementSeries(measurement.id, 'A').subscribe((series) => {
         if (series) {
           seriesCount += series.length;
         }
@@ -179,7 +164,7 @@ export class NtaHelperService {
     });
   }
 
-    getSeach(cacheId, catId, routeFreq?) {
+  getSearch(cacheId, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
@@ -194,7 +179,8 @@ export class NtaHelperService {
       () => {
         if (obsEnd && obsStart) {
           const dateWrapper = <DateWrapper>{};
-          this.searchSettings(catId, cacheId, dateWrapper, freqGeos, routeFreq);
+          this.getSearchData(catId, cacheId, dateWrapper);
+          this.categoryData[cacheId].currentFreq = freqGeos[0];
           this.categoryData[cacheId].selectedCategory = 'Search: ' + catId;
         } else {
           this.categoryData[cacheId].invalid = catId;
@@ -202,27 +188,7 @@ export class NtaHelperService {
       });
   }
 
-  searchSettings(search: string, cacheId, dateWrapper: DateWrapper, freqGeos, routeFreq?: string) {
-    const dateArray = [];
-    let selectedFreq;
-    selectedFreq = this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
-    if (routeFreq) {
-      const selected = this.checkSelectedFreqs(routeFreq, freqGeos);
-      selectedFreq = selected.freq;
-    }
-    let freqs, currentFreq;
-    freqs = freqGeos;
-    // freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
-    const selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
-    // Check if the selected frequency exists in the list of freqs for a selected geo
-    selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
-    currentFreq = freqs.find(freq => freq.freq === selectedFreq);
-    this.categoryData[cacheId].frequencies = freqs;
-    this.categoryData[cacheId].currentFreq = currentFreq;
-    this.getSearchData(search, cacheId, currentFreq.freq, dateWrapper, routeFreq);
-  }
-
-  getSearchData(search: string, cacheId, freq: string, dateWrapper: DateWrapper, routeFreq?: string) {
+  getSearchData(search: string, cacheId, dateWrapper: DateWrapper) {
     let searchResults;
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     // Get series for a requested search term
@@ -236,63 +202,71 @@ export class NtaHelperService {
         if (searchResults) {
           const searchSeries = [];
           searchResults.forEach((series, index) => {
-            this.getSearchObservations(series, index, searchSeries, searchResults, search, categoryDateWrapper, cacheId, freq);
+            this.getSearchObservations(series, index, searchSeries, searchResults, search, categoryDateWrapper, cacheId);
           });
         }
       });
   }
 
   // Get observations for series in search results
-  getSearchObservations(series, index, searchSeries, searchResults, search, catDateWrapper, cacheId, freq) {
-    // TODO: Remove condition when NTA data is live
-    if (series.frequencyShort === 'A') {
-      this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
-        series.seriesObservations = obs;
+  getSearchObservations(series, index, searchSeries, searchResults, search, catDateWrapper, cacheId) {
+    this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
+      series.seriesObservations = obs;
+    },
+      (error) => {
+        this.errorMessage = error;
       },
-        (error) => {
-          this.errorMessage = error;
-        },
-        () => {
-          searchSeries.push(series);
-          if (index === searchResults.length - 1) {
-            const measurements = {
-              id: 'search',
-              parentName: 'Search',
-              name: search,
-              series: searchSeries
-            };
-            const categoryDateArray = [];
-            this.categoryData[cacheId].measurements = [measurements];
-            this.categoryData[cacheId].sublist = [measurements];
-            this.categoryData[cacheId].categoryDateWrapper = catDateWrapper;
-            this.formatCategoryData(this.categoryData[cacheId]);
-            this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, freq, categoryDateArray);
-            this.categoryData[cacheId].categoryDates = categoryDateArray;
-            this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
-            this.categoryData[cacheId].requestComplete = true;
-          }
-        });
-    }
+      () => {
+        searchSeries.push(series);
+        if (index === searchResults.length - 1) {
+          // Group search results by measurement
+          const measurements = this.groupSearchMeasurements(searchSeries);
+          const categoryDateArray = [];
+          this.categoryData[cacheId].measurements = measurements;
+          this.categoryData[cacheId].sublist = measurements;
+          this.categoryData[cacheId].categoryDateWrapper = catDateWrapper;
+          this.formatCategoryData(this.categoryData[cacheId]);
+          this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, 'A', categoryDateArray);
+          this.categoryData[cacheId].categoryDates = categoryDateArray;
+          this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
+          this.categoryData[cacheId].requestComplete = true;
+        }
+      });
+  }
+
+  groupSearchMeasurements(searchSeries: Array<any>) {
+    const measurements = [];
+    searchSeries.forEach((series) => {
+      const measurementExists = measurements.find(measurement => measurement.id === series.measurementId);
+      if (!measurementExists && series.frequencyShort === 'A') {
+        measurements.push({ id: series.measurementId ? series.measurementId : 'null', series: [series] })
+      }
+      if (measurementExists && series.frequencyShort === 'A') {
+        measurementExists.series.push(series);
+      }
+    });
+    return measurements;
   }
 
   // Format series data for chart and table displays
   formatCategoryData(category) {
     const categoryDateArray = [];
     const measurements = category.measurements;
-    const freq = category.currentFreq.freq;
     const catDateWrapper = category.categoryDateWrapper;
     measurements.forEach((measurement) => {
       if (measurement.series) {
-        measurement.displaySeries = this.filterSeries(measurement.series, freq, catDateWrapper);
+        measurement.displaySeries = this.filterSeries(measurement.series, 'A', catDateWrapper);
       }
     });
-    this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, freq, categoryDateArray);
+    this._helper.createDateArray(catDateWrapper.firstDate, catDateWrapper.endDate, 'A', categoryDateArray);
     category.categoryDates = categoryDateArray;
     measurements.forEach((measurement, i) => {
       if (measurement.series) {
         const displaySeries = measurement.displaySeries;
         displaySeries.forEach((series) => {
-          series.seriesInfo.title = series.seriesInfo.geography.name;
+          //series.seriesInfo.title =
+          this.getGeoName(series, series.seriesInfo.geography.handle);
+          console.log('title', series.seriesInfo.title)
           const catData = this.formatSeriesData(series, categoryDateArray);
           series.categoryTable = catData.catTable;
           series.categoryChart = catData.catChart;
@@ -306,16 +280,19 @@ export class NtaHelperService {
     category.sliderDates = this._helper.getTableDates(categoryDateArray);
   }
 
-  checkSelectedFreqs(routeFreq, freqArray) {
-    // Check if freq specified in route exists in a category's list of freqs
-    const freqExist = freqArray.find(freq => freq.freq === routeFreq);
-    // If it does not exist, set selected freq to the category's default
-    // or first element of freq array, if default is not specified
-    if (!freqExist) {
-      return { freq: this.defaultFreq ? this.defaultFreq : freqArray[0].freq };
-    } else {
-      return { freq: routeFreq };
-    }
+  getGeoName(series, geoHandle: string) {
+    let geographies;
+    this._uheroAPIService.fetchGeographies().subscribe((geos) => {
+      geographies = geos;
+    },
+      (error) => {
+        this.errorMessage = error;
+      },
+      () => {
+        const geo = geographies.find(geos => geos.handle === geoHandle);
+        console.log(geo)
+        series.seriesInfo.title = geo ? geo.name : geoHandle;
+      });
   }
 
   filterSeries(seriesArray: Array<any>, freq: string, categoryDateWrapper) {

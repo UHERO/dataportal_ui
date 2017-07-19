@@ -16,6 +16,7 @@ export class UheroApiService {
   private requestOptionsArgs: RequestOptionsArgs;
   private headers: Headers;
   private cachedCategories;
+  private cachedGeos;
   private cachedExpanded = [];
   private cachedSelectedCategory = [];
   private cachedGeoSeries = [];
@@ -49,6 +50,20 @@ export class UheroApiService {
           categories$ = null;
         });
       return categories$;
+    }
+  }
+
+  fetchGeographies(): Observable<Geography[]> {
+    if (this.cachedGeos) {
+      return Observable.of(this.cachedGeos);
+    } else {
+      let geos$ = this.http.get(`${this.baseUrl}/geo`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedGeos = val;
+          geos$ = null;
+        });
+      return geos$;
     }
   }
 
