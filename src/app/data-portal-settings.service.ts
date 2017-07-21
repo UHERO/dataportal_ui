@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class DataPortalSettingsService {
-
-  constructor() { }
-  
   public dataPortalSettings = {
     nta: {
       highcharts: {
@@ -59,5 +56,5 @@ export class DataPortalSettingsService {
       },
       sliderInteraction: true
     }
-  }
+  };
 }

@@ -65,7 +65,7 @@ export class NtaHelperService {
           this.errorMessage = error;
         },
         () => {
-          this.getSubcategoryData(cacheId, this.categoryData[cacheId])
+          this.getSubcategoryData(cacheId, this.categoryData[cacheId]);
         });
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
@@ -75,7 +75,6 @@ export class NtaHelperService {
 
   getSubcategoryData(cacheId, category) {
     const freqArray = [];
-    const measurementsArray = [];
     category.sublist.forEach((sub, index) => {
       // Get all regions available in a given category
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((cat) => {
@@ -91,7 +90,7 @@ export class NtaHelperService {
           if (index === category.sublist.length - 1) {
             this.requestsRemain = category.sublist.length;
             // All NTA data has an annual frequency
-            category.currentFreq = freqArray[0]
+            category.currentFreq = freqArray[0];
             const measurementsArray = [];
             this.getMeasurementData(category.sublist, this.categoryData[cacheId], measurementsArray);
           }
@@ -262,9 +261,10 @@ export class NtaHelperService {
     const measurements = category.measurements;
     measurements.forEach((measurement) => {
       const measurementDateArray = [];
+      const dateWrapper = measurement.dateWrapper;
       if (measurement.series) {
         measurement.displaySeries = this.filterSeries(measurement.series, measurement);
-        measurement.dateArray = this._helper.createDateArray(measurement.dateWrapper.firstDate, measurement.dateWrapper.endDate, 'A', measurementDateArray);
+        measurement.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', measurementDateArray);
         measurement.sliderDates = this._helper.getTableDates(measurement.dateArray);
       }
     });
@@ -272,9 +272,6 @@ export class NtaHelperService {
       if (measurement.series) {
         const displaySeries = measurement.displaySeries;
         displaySeries.forEach((series) => {
-          //series.seriesInfo.title =
-          //this.getGeoName(series, series.seriesInfo.geography.handle);
-          // series.seriesInfo.title = series.seriesInfo.geography.handle;
           const catData = this.formatSeriesData(series, measurement.dateArray);
           series.categoryTable = catData.catTable;
           series.categoryChart = catData.catChart;

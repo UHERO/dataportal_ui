@@ -41,7 +41,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private portalSettings;
 
   constructor(
-    @Inject('portal') private portal, 
+    @Inject('portal') private portal,
     private _uheroAPIService: UheroApiService,
     private _ntaHelper: NtaHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
@@ -123,7 +123,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   }
 
   changeRange(e, measurement) {
-    console.log('measurement', measurement)
     measurement.tableStart = e.tableStart;
     measurement.tableEnd = e.tableEnd;
     measurement.chartStart = e.chartStart;

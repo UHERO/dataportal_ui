@@ -20,7 +20,12 @@ export class SidebarNavComponent implements OnInit, Input {
   private ytd: string;
   private loading;
 
-  constructor(@Inject('defaultCategory') private defaultCategory, private _uheroAPIService: UheroApiService, private route: ActivatedRoute, private _router: Router) { }
+  constructor(
+    @Inject('defaultCategory') private defaultCategory,
+    private _uheroAPIService: UheroApiService,
+    private route: ActivatedRoute,
+    private _router: Router
+  ) { }
 
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe(
