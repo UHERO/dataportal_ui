@@ -30,7 +30,6 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
   ngAfterViewInit() {
     const that = this;
     const freq = this.freq;
-    console.log('start', this.start)
     $('#' + this.subCat.id).ionRangeSlider({
       min: 0,
       from: this.start,
@@ -63,7 +62,7 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
         this.updateSlider(slider);
       });
     }
-    if (!this.portalSettings.sliderInteraction && this.dates && this.dateFrom.length) {
+    if (!this.portalSettings.sliderInteraction && this.dates && this.dates.length) {
       const defaultRanges = this.findDefaultRange();
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range

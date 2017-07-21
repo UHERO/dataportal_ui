@@ -69,6 +69,10 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
       useValue: 2487
     },
     {
+      provide: 'defaultCategory',
+      useValue: 2488
+    },
+    {
       provide: 'logo',
       useValue: '../../assets/nta-logo.svg'
     },

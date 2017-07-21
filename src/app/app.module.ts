@@ -64,6 +64,10 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
       useValue: 59
     },
     {
+      provide: 'defaultCategory',
+      useValue: 42
+    },
+    {
       provide: 'logo',
       useValue: '../../assets/UHEROdata-Logo-color.svg'
     },

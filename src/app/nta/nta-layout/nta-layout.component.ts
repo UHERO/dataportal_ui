@@ -60,8 +60,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
-      this.routeStart = params['start'];
-      this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
