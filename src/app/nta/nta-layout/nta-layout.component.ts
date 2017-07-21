@@ -124,7 +124,12 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.scrollToFragment();
   }
 
-  changeRange(e) {
+  changeRange(e, measurement) {
+    console.log('measurement', measurement)
+    measurement.tableStart = e.tableStart;
+    measurement.tableEnd = e.tableEnd;
+    measurement.chartStart = e.chartStart;
+    measurement.chartEnd = e.chartEnd;
     this.tableStart = e.tableStart;
     this.tableEnd = e.tableEnd;
     this.chartStart = e.chartStart;

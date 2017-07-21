@@ -25,9 +25,7 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   static findLastValue(valueArray) {
     let counter = valueArray.length - 1;
-    console.log(valueArray[-1])
     while (valueArray[counter].y === null) {
-      console.log(counter)
       counter--;
       if (counter === -1) {
         return null;
@@ -258,9 +256,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     this.chart = event;
     let latestSeries0, latestSeries1;
     const series0 = this.chart.series[0];
-    console.log('series0', series0.points);
     const series1 = this.chart.series[1];
-    console.log('series1', series1.points)
     // Get position of last non-null value
     latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : null;
     latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : null;

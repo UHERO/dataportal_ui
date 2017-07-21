@@ -170,14 +170,14 @@ export class UheroApiService {
     }
   }
 
-  fetchMeasurementSeries(id: number, freq: string) {
-    if (this.cachedMeasureSeries[id + freq]) {
-      return Observable.of(this.cachedMeasureSeries[id + freq]);
+  fetchMeasurementSeries(id: number) {
+    if (this.cachedMeasureSeries[id]) {
+      return Observable.of(this.cachedMeasureSeries[id]);
     } else {
-    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&freq=` + freq, this.requestOptionsArgs)
+    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id, this.requestOptionsArgs)
       .map(mapData)
       .do(val => {
-        this.cachedMeasureSeries[id + freq] = val;
+        this.cachedMeasureSeries[id] = val;
         measureSeries$ = null;
       });
     return measureSeries$;

@@ -5,7 +5,7 @@
     <p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fa fa-spinner fa-pulse fa-fw"></i>
     <ng-template ngFor let-measure [ngForOf]="data.measurements" let-m="index">
-			  <ul class="content-links" *ngIf="data.measurements" [attr.id]="'id_' + measure.id">
+			  <ul class="content-links" *ngIf="data.measurements.length > 1" [attr.id]="'id_' + measure.id">
 				  <li *ngFor="let measure of data.measurements; let mInd='index'">
 					  <a [routerLink]="['/category']" [fragment]="measure.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="mInd === m">{{measure.name}}</a>
 				  </li>
@@ -17,12 +17,12 @@
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
           <input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event, sub.id)">Centered 5 Year Moving Average
         </label>
-        <app-date-slider class="sliders" *ngIf="data.requestComplete" [dates]="data.sliderDates" [sublist]="data.measurements" [subCat]="measure" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
-        <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [c5ma]="queryParams.c5ma === 'true'" [categoryDates]="data.categoryDates" [sublist]="measure" [tableId]="measure.id"></app-category-datatables>
+        <app-date-slider class="sliders" *ngIf="data.requestComplete" [portalSettings]="portalSettings" [dates]="measure.sliderDates" [sublist]="data.measurements" [subCat]="measure" [dateFrom]="measure.tableStart ? measure.tableStart : null" [dateTo]="measure.tableEnd ? measure.tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, measure)"></app-date-slider>
+        <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [c5ma]="queryParams.c5ma === 'true'" [categoryDates]="measure.dateArray" [sublist]="measure" [tableId]="measure.id"></app-category-datatables>
 				<i *ngIf="!data.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="data.measurements" [data]="measure.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="measure.id" [c5maActive]="queryParams.c5ma === 'true'" [noSeries]="measure.noData" [params]="queryParams"></app-category-table>
-      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [data]="measure.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="measure.noData" [params]="queryParams"></app-category-charts>
+			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="measure.dateArray" [tableStart]="measure.tableStart" [tableEnd]="measure.tableEnd" [subCats]="data.measurements" [data]="measure.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="measure.id" [c5maActive]="queryParams.c5ma === 'true'" [noSeries]="measure.noData" [params]="queryParams"></app-category-table>
+      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="measure.chartStart" [chartEnd]="measure.chartEnd" [data]="measure.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="measure.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>
