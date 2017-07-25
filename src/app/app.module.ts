@@ -33,11 +33,14 @@ import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { HelpDocService } from './help-doc.service';
+import { HelpOutletDirective } from './help-outlet.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LandingPageComponent
+    LandingPageComponent,
+    HelpOutletDirective,
   ],
   imports: [
     Shared,
@@ -55,6 +58,7 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
     SeriesHelperService,
     HelperService,
     GoogleAnalyticsEventsService,
+    HelpDocService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory

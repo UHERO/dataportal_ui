@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 
@@ -7,7 +7,7 @@ import { UheroApiService } from '../uhero-api.service';
   templateUrl: './sidebar-nav.component.html',
   styleUrls: ['./sidebar-nav.component.scss']
 })
-export class SidebarNavComponent implements OnInit, Input {
+export class SidebarNavComponent implements OnInit {
   public categories;
   private errorMessage: string;
   public expand: string = null;

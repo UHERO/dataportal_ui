@@ -36,6 +36,7 @@ import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
+import { HelpDocService } from '../help-doc.service';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
     SeriesHelperService,
     HelperService,
     GoogleAnalyticsEventsService,
+    HelpDocService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
