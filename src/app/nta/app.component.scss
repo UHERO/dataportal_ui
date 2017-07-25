@@ -5,13 +5,16 @@
    height: 100%;
 
    .container, .row {
-     margin: 0;
      padding: 0;
      min-height: 100%;
 
      @media (min-width: 1200px) {
        width: 1300px;
        max-width: 100%;
+     }
+
+     @media (max-width: 767px) {
+       margin: 0;
      }
    }
 

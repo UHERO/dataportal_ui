@@ -19,9 +19,11 @@ export class SidebarNavComponent implements OnInit, Input {
   private yoy: string;
   private ytd: string;
   private loading;
-
+  public headerLogo;
+  
   constructor(
     @Inject('defaultCategory') private defaultCategory,
+    @Inject('logo') private logo,
     private _uheroAPIService: UheroApiService,
     private route: ActivatedRoute,
     private _router: Router
@@ -39,6 +41,7 @@ export class SidebarNavComponent implements OnInit, Input {
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
       this.selectedCategory = this.findSelectedCategory(this.id);
     });
+    this.headerLogo = this.logo;
   }
 
   findSelectedCategory(id) {
