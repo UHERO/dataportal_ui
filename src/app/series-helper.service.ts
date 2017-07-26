@@ -53,10 +53,8 @@ export class SeriesHelperService {
       this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
         this.seriesData.siblings = siblings;
         const geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
-        // If saPairAvail === true, display SA toggle in single series view
-        if (geoFreqPair.length > 1) {
-          this.seriesData.saPairAvail = true;
-        }
+        // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
+        this.seriesData.saPairAvail = this.checkSaPairs(geoFreqPair);
       });
       this.getSeriesObservations(id, decimals);
     });
@@ -90,6 +88,15 @@ export class SeriesHelperService {
       }
     });
     return saSiblings;
+  }
+
+  checkSaPairs(seriesSiblings) {
+    const saSeries = seriesSiblings.find(series => series.seasonallyAdjusted === true);
+    const nsaSeries = seriesSiblings.find(series => series.seasonallyAdjusted === false);
+    if (saSeries && nsaSeries) {
+      return true;
+    }
+    return false;
   }
 
   // Get summary statistics for single series displays
