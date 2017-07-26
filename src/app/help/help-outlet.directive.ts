@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Shared } from './shared/shared.module';
+import { Shared } from '../shared/shared.module';
 
 export function createComponentFactory(compiler: Compiler, metadata: Component): Promise<ComponentFactory<any>> {
   const cmpClass = class DynamicComponent {};

@@ -21,7 +21,7 @@ import { CategoryDatatablesComponent } from '../category-datatables/category-dat
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
 import { HelpComponent } from '../help/help.component';
-import { HelpOutletDirective } from '../help-outlet.directive';
+import { HelpOutlet } from '../help/help-outlet.directive';
 
 @NgModule({
   declarations: [
@@ -39,7 +39,7 @@ import { HelpOutletDirective } from '../help-outlet.directive';
     DateSliderComponent,
     GeoSelectorComponent,
     HelpComponent,
-    HelpOutletDirective
+    HelpOutlet
   ],
   imports: [
     CommonModule,

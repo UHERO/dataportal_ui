@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HelpDocService } from '../help-doc.service';
-import { HelpOutletDirective } from '../help-outlet.directive';
+import { HelpOutlet } from '../help-outlet.directive';
 
 class Help {
   title: string;
