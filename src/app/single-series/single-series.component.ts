@@ -57,7 +57,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries(saPair: boolean, siblings: Array<any>, freq: string, geo: string, sa: boolean) {
+  goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
