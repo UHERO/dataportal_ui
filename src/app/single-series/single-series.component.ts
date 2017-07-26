@@ -60,10 +60,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
-    let id;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
-    id = this.selectSibling(geoFreqSib, sa, freq);
+    const id = geoFreqSib.length ? this.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
         id: id,
@@ -80,16 +79,21 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
+    const saSeries = geoFreqSiblings.find(series => series.seasonallyAdjusted === true);
+    const nsaSeries = geoFreqSiblings.find(series => series.seasonallyAdjusted === false);
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonallyAdjusted matches sa
-    if (geoFreqSiblings.length > 1) {
+    if (freq === 'A') {
+      return geoFreqSiblings[0].id;
+    }
+    if (saSeries && nsaSeries) {
       return geoFreqSiblings.find(sibling => sibling.seasonallyAdjusted === sa).id;
     }
-    if (geoFreqSiblings.length <= 1) {
-      if (sa !== geoFreqSiblings[0].seasonallyAdjusted && freq !== 'A') {
-        this.seasonallyAdjusted = geoFreqSiblings[0].seasonallyAdjusted;
-      }
-      return geoFreqSiblings[0].id;
+    if (!saSeries && nsaSeries) {
+      return nsaSeries.id;
+    }
+    if (saSeries && !nsaSeries) {
+      return saSeries.id;
     }
   }
 
