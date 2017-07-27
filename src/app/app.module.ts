@@ -32,15 +32,15 @@ import { DataPortalSettingsService } from './data-portal-settings.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
+import { HelpService } from './help.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
-import { HelpDocService } from './help-doc.service';
-import { HelpOutletDirective } from './help-outlet.directive';
+import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LandingPageComponent,
-    HelpOutletDirective,
+    UheroHelpComponent
   ],
   imports: [
     Shared,
@@ -51,14 +51,17 @@ import { HelpOutletDirective } from './help-outlet.directive';
     ReactiveFormsModule,
     HttpModule
   ],
+  entryComponents: [
+    UheroHelpComponent
+  ],
   providers: [
     UheroApiService,
     DataPortalSettingsService,
     CategoryHelperService,
     SeriesHelperService,
     HelperService,
+    HelpService,
     GoogleAnalyticsEventsService,
-    HelpDocService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory

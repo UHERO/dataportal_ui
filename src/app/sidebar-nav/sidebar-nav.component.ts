@@ -20,7 +20,7 @@ export class SidebarNavComponent implements OnInit {
   private ytd: string;
   private loading;
   public headerLogo;
-  
+
   constructor(
     @Inject('defaultCategory') private defaultCategory,
     @Inject('logo') private logo,
