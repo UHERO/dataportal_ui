@@ -5,11 +5,22 @@
     <p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fa fa-spinner fa-pulse fa-fw"></i>
     <ng-template ngFor let-measure [ngForOf]="data.measurements" let-m="index">
-			  <ul class="content-links" *ngIf="data.measurements.length > 1" [attr.id]="'id_' + measure.id">
+			  <!-- <ul class="content-links" *ngIf="data.measurements.length > 1" [attr.id]="'id_' + measure.id">
 				  <li *ngFor="let measure of data.measurements; let mInd='index'">
 					  <a [routerLink]="['/category']" [fragment]="measure.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="mInd === m">{{measure.name}}</a>
 				  </li>
-			  </ul> 
+				</ul> -->
+				<ul class="nav content-links" *ngIf="data.measurements.length > 1" [attr.id]="'id_' + measure.id">
+					<li class="">
+						<a class="current-sub">{{measure.name}}</a>
+					</li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+						<div class="dropdown-menu">
+							<a *ngFor="let measure of data.measurements; let mInd='index'" class="dropdown-item" [routerLink]="['/category']" [fragment]="measure.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="mInd === m">{{measure.name}}</a>
+						</div>
+					</li>
+				</ul>
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
 			<div class="filters">
 				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View <i class="material-icons md-18">show_chart</i></a>
