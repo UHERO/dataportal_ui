@@ -27,6 +27,9 @@ export class HighchartComponent implements OnInit, OnChanges {
     let counter = valueArray.length - 1;
     while (valueArray[counter].y === null) {
       counter--;
+      if (counter === -1) {
+        return null;
+      }
     }
     return counter;
   }
@@ -86,7 +89,7 @@ export class HighchartComponent implements OnInit, OnChanges {
               return ': ';
             }
             if (seriesName === 'c5ma') {
-              return 'Centered 5 Year Moving Avg: ';
+              return percent ? 'Centered 5 Year Moving Avg Chg: ' : 'Centered 5 Year Moving Avg % Chg: ';
             }
             if (seriesName === 'ytd' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';

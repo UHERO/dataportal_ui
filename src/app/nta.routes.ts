@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { NtaLayoutComponent } from './nta/nta-layout/nta-layout.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
-
+import { HelpComponent } from './help/help.component';
 
 const routes: Routes = [
   // map / to the landing page
@@ -11,15 +11,17 @@ const routes: Routes = [
     path: '',
     component: NtaLayoutComponent
   },
-
   {
     path: 'category',
     component: NtaLayoutComponent
   },
-
   {
     path: 'series',
     component: SingleSeriesComponent
+  },
+  {
+    path: 'help',
+    component: HelpComponent
   }
 ];
 

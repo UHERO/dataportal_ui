@@ -11,6 +11,7 @@ import 'ion-rangeslider';
   encapsulation: ViewEncapsulation.None
 })
 export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
+  @Input() portalSettings;
   @Input() subCat;
   @Input() dates;
   @Input() freq;
@@ -39,7 +40,7 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
       keyboard: true,
       keyboard_step: 1,
       type: 'double',
-      onFinish: function(data) {
+      onFinish: function (data) {
         const chartStart = that.formatChartDate(data.from_value, freq);
         const chartEnd = that.formatChartDate(data.to_value, freq);
         const tableStart = data.from_value.toString();
@@ -50,30 +51,48 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnChanges() {
-    if (this.dates && this.dates.length) {
-      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
-      let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
-      this.dates.forEach((date, index) => {
-        // Range slider is converting annual year strings to numbers
-        if (date == this.dateFrom) {
-          startIndex = index;
-        }
-        if (date == this.dateTo) {
-          endIndex = index;
-        }
-      });
+    if (this.portalSettings.sliderInteraction && this.dates && this.dates.length) {
+      const defaultRanges = this.findDefaultRange();
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
-      this.start = startIndex;
-      this.end = endIndex;
+      this.start = defaultRanges.start;
+      this.end = defaultRanges.end;
       this.sublist.forEach((sub) => {
         const slider = $('#' + sub.id).data('ionRangeSlider');
-        if (slider) {
-          slider.update({
-            from: this.start,
-            to: this.end
-          });
-        }
+        this.updateSlider(slider);
+      });
+    }
+    if (!this.portalSettings.sliderInteraction && this.dates && this.dates.length) {
+      const defaultRanges = this.findDefaultRange();
+      // Start and end used for 'from' and 'to' inputs in slider
+      // If start/end exist in values array, position handles at start/end; otherwise, use default range
+      this.start = defaultRanges.start;
+      this.end = defaultRanges.end;
+      const slider = $('#' + this.subCat.id).data('ionRangeSlider');
+      this.updateSlider(slider);
+    }
+  }
+
+  findDefaultRange() {
+    const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+    let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+    this.dates.forEach((date, index) => {
+      // Range slider is converting annual year strings to numbers
+      if (date == this.dateFrom) {
+        startIndex = index;
+      }
+      if (date == this.dateTo) {
+        endIndex = index;
+      }
+    });
+    return { start: startIndex, end: endIndex };
+  }
+
+  updateSlider(slider) {
+    if (slider) {
+      slider.update({
+        from: this.start,
+        to: this.end
       });
     }
   }

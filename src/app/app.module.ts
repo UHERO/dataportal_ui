@@ -32,12 +32,15 @@ import { DataPortalSettingsService } from './data-portal-settings.service';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
+import { HelpService } from './help.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LandingPageComponent
+    LandingPageComponent,
+    UheroHelpComponent
   ],
   imports: [
     Shared,
@@ -48,12 +51,16 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
     ReactiveFormsModule,
     HttpModule
   ],
+  entryComponents: [
+    UheroHelpComponent
+  ],
   providers: [
     UheroApiService,
     DataPortalSettingsService,
     CategoryHelperService,
     SeriesHelperService,
     HelperService,
+    HelpService,
     GoogleAnalyticsEventsService,
     {
       provide: HighchartsStatic,
@@ -62,6 +69,10 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
     {
       provide: 'rootCategory',
       useValue: 59
+    },
+    {
+      provide: 'defaultCategory',
+      useValue: 42
     },
     {
       provide: 'logo',

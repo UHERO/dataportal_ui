@@ -20,6 +20,8 @@ import { FeedbackComponent } from '../feedback/feedback.component';
 import { CategoryDatatablesComponent } from '../category-datatables/category-datatables.component';
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
+import { HelpComponent } from '../help/help.component';
+import { HelpDirective } from '../help.directive';
 
 @NgModule({
   declarations: [
@@ -35,9 +37,12 @@ import { DateSliderComponent } from '../date-slider/date-slider.component';
     CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
-    GeoSelectorComponent
+    GeoSelectorComponent,
+    HelpComponent,
+    HelpDirective
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     ChartModule,
     FormsModule,

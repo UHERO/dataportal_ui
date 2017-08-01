@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class DataPortalSettingsService {
-
-  constructor() { }
-  
   public dataPortalSettings = {
     nta: {
       highcharts: {
@@ -26,9 +23,10 @@ export class DataPortalSettingsService {
         series1: 'formattedValue',
         series1Label: 'Level',
         series2: 'formattedC5ma',
-        series2Label: 'Centered 5 Year Moving Avg',
-        series2PercLabel: 'Centered 5 Year Moving Avg'
-      }
+        series2Label: 'Centered 5 Year Moving Avg % Chg',
+        series2PercLabel: 'Centered 5 Year Moving Avg Chg'
+      },
+      sliderInteraction: false
     },
     uhero: {
       highcharts: {
@@ -55,7 +53,8 @@ export class DataPortalSettingsService {
         series3: 'formattedYtd',
         series3Label: 'Year-to-Date % Chg',
         series3PercLabel: 'Year-to-Date Chg'
-      }
+      },
+      sliderInteraction: true
     }
-  }
+  };
 }

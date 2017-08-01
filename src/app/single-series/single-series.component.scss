@@ -37,9 +37,11 @@
   .source {
     width: 100%;
     background-color: $chart-background;
-    padding: 10px 0px 0px;
+    padding: 10px 10px 0 10px;
     font-size: 0.9em;
     text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     a {
       color: $primary;

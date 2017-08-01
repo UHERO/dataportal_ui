@@ -35,12 +35,15 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+import { HelpService } from '../help.service';
+import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NtaLayoutComponent
+    NtaLayoutComponent,
+    NtaHelpComponent
   ],
   imports: [
     Shared,
@@ -53,6 +56,9 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
     DataTableModule, SharedModule,
     RecaptchaModule.forRoot()
   ],
+  entryComponents: [
+    NtaHelpComponent
+  ],
   providers: [
     UheroApiService,
     DataPortalSettingsService,
@@ -60,13 +66,18 @@ import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
     SeriesHelperService,
     HelperService,
     GoogleAnalyticsEventsService,
+    HelpService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
     },
     {
       provide: 'rootCategory',
-      useValue: 59
+      useValue: 2487
+    },
+    {
+      provide: 'defaultCategory',
+      useValue: 2488
     },
     {
       provide: 'logo',

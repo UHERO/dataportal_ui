@@ -177,6 +177,6 @@ export class SeriesHelperService {
         maxValueDate = item.date;
       }
     });
-    return { minValue: minValue, minValueDate: minValueDate, maxValue: maxValue, maxValueDate: maxValueDate }
+    return { minValue: minValue, minValueDate: minValueDate, maxValue: maxValue, maxValueDate: maxValueDate };
   }
 }
