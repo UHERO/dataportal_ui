@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 
@@ -7,7 +7,7 @@ import { UheroApiService } from '../uhero-api.service';
   templateUrl: './sidebar-nav.component.html',
   styleUrls: ['./sidebar-nav.component.scss']
 })
-export class SidebarNavComponent implements OnInit, Input {
+export class SidebarNavComponent implements OnInit {
   public categories;
   private errorMessage: string;
   public expand: string = null;
@@ -19,8 +19,15 @@ export class SidebarNavComponent implements OnInit, Input {
   private yoy: string;
   private ytd: string;
   private loading;
+  public headerLogo;
 
-  constructor(private _uheroAPIService: UheroApiService, private route: ActivatedRoute, private _router: Router) { }
+  constructor(
+    @Inject('defaultCategory') private defaultCategory,
+    @Inject('logo') private logo,
+    private _uheroAPIService: UheroApiService,
+    private route: ActivatedRoute,
+    private _router: Router
+  ) { }
 
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe(
@@ -34,11 +41,12 @@ export class SidebarNavComponent implements OnInit, Input {
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
       this.selectedCategory = this.findSelectedCategory(this.id);
     });
+    this.headerLogo = this.logo;
   }
 
   findSelectedCategory(id) {
     if (id === undefined) {
-      return 42;
+      return this.defaultCategory;
     }
     if (id && isNaN(id)) {
       return null;

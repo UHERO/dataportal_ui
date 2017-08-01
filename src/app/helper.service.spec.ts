@@ -32,17 +32,17 @@ describe('Service: Helper', () => {
 
   it('dataTransform should format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
     const seriesObservations = {
-      observationStart: "1960-01-01",
-      observationEnd: "1962-01-01",
-      orderBy: "",
-      sortOrder: "",
+      observationStart: '1960-01-01',
+      observationEnd: '1962-01-01',
+      orderBy: '',
+      sortOrder: '',
       transformationResults: [
         {
-          transformation: "lvl",
+          transformation: 'lvl',
           observations: [
             {
-              date: "1962-01-01",
-              value: "195.2833"
+              date: '1962-01-01',
+              value: '195.2833'
             }
           ]
         }, {
@@ -112,7 +112,7 @@ describe('Service: Helper', () => {
       formattedYoy: ' ',
       formattedYtd: ' ',
       formattedC5ma: ' '
-    }]
+    }];
     const expected = {
       chartData: chartData,
       tableData: tableData,
@@ -124,7 +124,7 @@ describe('Service: Helper', () => {
 
   it('formatDate should return a formatted date string', inject([HelperService], (service: HelperService) => {
     const freqs = ['A', 'Q', 'M', 'S'];
-    const date = '2000-01-01'
+    const date = '2000-01-01';
     const expected = ['2000', 'Q1 2000', '01-2000', '01-2000'];
     freqs.forEach((freq, index) => {
       expect(service.formatDate(date, freq)).toEqual(expected[index]);

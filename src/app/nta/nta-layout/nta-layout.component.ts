@@ -41,7 +41,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private portalSettings;
 
   constructor(
-    @Inject('portal') private portal, 
+    @Inject('portal') private portal,
     private _uheroAPIService: UheroApiService,
     private _ntaHelper: NtaHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
@@ -51,8 +51,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   ) {}
 
   ngOnInit() {
-    this.currentGeo = { fips: null, name: null, handle: null };
-    this.currentFreq = { freq: null, label: null };
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
@@ -60,16 +58,12 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
       this.search = typeof this.id === 'string' ? true : false;
-      this.routeFreq = params['freq'];
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
-      this.routeStart = params['start'];
-      this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this.getData(this.id, this.routeFreq);
+      this.categoryData = this._ntaHelper.initContent(this.id);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
@@ -89,7 +83,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
 
   getIdParam(id) {
     if (id === undefined) {
-      return 42;
+      return 2488;
     }
     if (id && isNaN(+id)) {
       // id param is a string, display search results
@@ -101,31 +95,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     }
   }
 
-  getData(id, freq) {
-    if (typeof id === 'number' && freq) {
-      return this._ntaHelper.initContent(id, freq);
-    }
-    if (typeof id === 'number' && !freq) {
-      return this._ntaHelper.initContent(id, freq);
-    }
-  }
-
   checkContainerHeight() {
     const contianer = $('.multi-series-container');
     const heightDiff = (this.previousHeight !== contianer.height());
     this.previousHeight = contianer.height();
     return heightDiff;
-  }
-
-  // Redraw series when a new frequemcy is selected
-  redrawSeriesFreq(event, subId) {
-    this.loading = true;
-    setTimeout(() => {
-      this.queryParams.freq = event.freq;
-      this.fragment = subId;
-      this.updateRoute();
-    }, 10);
-    this.scrollToFragment();
   }
 
   switchView(subId) {
@@ -148,7 +122,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.scrollToFragment();
   }
 
-  changeRange(e) {
+  changeRange(e, measurement) {
+    measurement.tableStart = e.tableStart;
+    measurement.tableEnd = e.tableEnd;
+    measurement.chartStart = e.chartStart;
+    measurement.chartEnd = e.chartEnd;
     this.tableStart = e.tableStart;
     this.tableEnd = e.tableEnd;
     this.chartStart = e.chartStart;
