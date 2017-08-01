@@ -84,6 +84,14 @@
     
     @media (min-width: 768px) {
       width: fit-content;
+
+      hr {
+        display: none;
+      }
+
+      #about-link {
+        display: none;
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, OnChanges } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class SidebarNavComponent implements OnInit {
   public expand: string = null;
   public reveal = false;
   public overlay = false;
-  private selectedCategory: number;
+  private selectedCategory: any;
   private id: number;
   private view: string;
   private yoy: string;
@@ -40,6 +40,11 @@ export class SidebarNavComponent implements OnInit {
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
       this.selectedCategory = this.findSelectedCategory(this.id);
+    });
+    this._router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.selectedCategory = event.url === '/help' ? 'help' : this.selectedCategory;
+      }
     });
     this.headerLogo = this.logo;
   }

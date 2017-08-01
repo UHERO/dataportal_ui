@@ -84,14 +84,14 @@
        }
 
        @media (max-width: 767px) {
-         min-width: 50%;
+         // min-width: 50%;
          margin-right: 0px;
        }
     }
   }
 
   .selected-category {
-    display: inline-block;
+    display: block;
     color: $primary;
     font-size: 1.4em;
     margin: 0px;
