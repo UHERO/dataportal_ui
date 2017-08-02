@@ -174,7 +174,7 @@ export class UheroApiService {
     if (this.cachedMeasureSeries[id]) {
       return Observable.of(this.cachedMeasureSeries[id]);
     } else {
-    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id, this.requestOptionsArgs)
+    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&expand=true`, this.requestOptionsArgs)
       .map(mapData)
       .do(val => {
         this.cachedMeasureSeries[id] = val;

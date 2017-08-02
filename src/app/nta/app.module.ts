@@ -38,12 +38,14 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 import { HelpService } from '../help.service';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
+import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NtaLayoutComponent,
-    NtaHelpComponent
+    NtaHelpComponent,
+    MeasurementSelectorComponent
   ],
   imports: [
     Shared,
