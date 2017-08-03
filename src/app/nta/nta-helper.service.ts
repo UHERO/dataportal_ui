@@ -95,45 +95,22 @@ export class NtaHelperService {
 
   // Get list of series belonging to each measurement
   getSeriesData(category) {
-    let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
+      const sublistDateArray = [];
       sub.dateWrapper = { firstDate: '', endDate: '' };
       this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
-        sub.series = series;
+        if (series) {
+          sub.series = series;
+          this.formatCategoryData(category, sub, sublistDateArray);
+        }
+        sub.id = sub.id.toString();
         if (!series) {
           sub.noData = true;
         }
       },
         (error) => {
           this.errorMessage = error;
-        },
-        () => {
-          subcategoryCount--;
-          if (subcategoryCount === 0) {
-            this.formatCategoryData(category);
-          }
         });
-    });
-  }
-
-  // Get observations beloning to each series
-  getObservationData(category) {
-    category.sublist.forEach((sub, i) => {
-      if (sub.series) {
-        sub.series.forEach((serie, s) => {
-          this._uheroAPIService.fetchObservations(serie.id).subscribe((obs) => {
-            serie.seriesObservations = obs;
-          },
-            (error) => {
-              this.errorMessage = error;
-            },
-            () => {
-              if (i === category.sublist.length - 1 && s === sub.series.length - 1) {
-                this.formatCategoryData(category);
-              }
-            });
-        });
-      }
     });
   }
 
@@ -173,33 +150,35 @@ export class NtaHelperService {
       () => {
         if (searchResults) {
           const searchSeries = [];
-          searchResults.forEach((series, index) => {
-            this.getSearchObservations(series, index, searchSeries, searchResults, search, cacheId);
-          });
+          let seriesTotal = searchResults.length;
+          this.getSearchObservations(searchResults, this.categoryData[cacheId])
         }
       });
   }
 
   // Get observations for series in search results
-  getSearchObservations(series, index, searchSeries, searchResults, search, cacheId) {
-    this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
-      series.seriesObservations = obs;
-    },
+  getSearchObservations(searchSeries, category) {
+    let seriesTotal = searchSeries.length;
+    searchSeries.forEach((series) => {
+      this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
+        series.seriesObservations = obs;
+      },
       (error) => {
         this.errorMessage = error;
       },
       () => {
-        searchSeries.push(series);
-        if (index === searchResults.length - 1) {
-          // Group search results by measurement
-          const measurements = this.groupSearchMeasurements(searchSeries);
-          const categoryDateArray = [];
-          this.categoryData[cacheId].measurements = measurements;
-          this.categoryData[cacheId].sublist = measurements;
-          this.formatCategoryData(this.categoryData[cacheId]);
-          this.categoryData[cacheId].requestComplete = true;
+        seriesTotal--;
+        if (seriesTotal === 0) {
+          const sublist = {
+            dateWrapper: { firstDate: '', endDate: '' },
+            id: 'search',
+            series: searchSeries
+          }
+          this.formatCategoryData(category, sublist, [])
+          category.sublist = [sublist];
         }
       });
+    });
   }
 
   groupSearchMeasurements(searchSeries: Array<any>) {
@@ -222,27 +201,17 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category) {
-    const sublistCopy = [];
-    category.sublist.forEach((sub, index) => {
-      const sublistDateArray = [];
-      const dateWrapper = sub.dateWrapper;
-      if (sub.series) {
-        sub.displaySeries = this.filterSeries(sub.series, sub);
-        sub.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', sublistDateArray);
-        sub.sliderDates = this._helper.getTableDates(sub.dateArray);
-        sub.displaySeries.forEach((series, s) => {
-          const catData = this.formatSeriesData(series, sub.dateArray);
-          series.categoryTable = catData.catTable;
-          series.categoryChart = catData.catChart;
-          if (s === sub.displaySeries.length - 1) {
-            sub.requestComplete = true;
-          }
-          if (s === sub.displaySeries.length - 1 && index === category.sublist.length - 1) {
-            category.requestComplete = true;
-          }
-        });
-        sub.id = sub.id.toString();
+  formatCategoryData(category, subcategory, subcategoryDateArray) {
+    const dateWrapper = subcategory.dateWrapper;
+    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory);
+    subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
+    subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
+    subcategory.displaySeries.forEach((series, s) => {
+      const catData = this.formatSeriesData(series, subcategory.dateArray);
+      series.categoryTable = catData.catTable;
+      series.categoryChart = catData.catChart;
+      if (s === subcategory.displaySeries.length - 1) {
+        subcategory.requestComplete = true;
       }
     });
   }
