@@ -35,7 +35,7 @@ export class NtaHelperService {
       return Observable.of([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && typeof catId === 'number') {
-      this.getCategory(cacheId, catId);
+      this.getCategory(cacheId, catId, selectedMeasure);
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
@@ -46,7 +46,6 @@ export class NtaHelperService {
 
   getCategory(cacheId: string, catId: any, selectedMeasure?: string) {
     this.categoryData[cacheId] = <CategoryData>{};
-    console.log(this.categoryData)
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       const cat = categories.find(category => category.id === catId);
       if (cat) {
@@ -60,15 +59,7 @@ export class NtaHelperService {
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        this._uheroAPIService.fetchGeographies().subscribe((geos) => {
-          this.categoryData[cacheId].geographies = geos;
-        },
-          (error) => {
-            this.errorMessage = error;
-          },
-          () => {
-            this.getSubcategoryData(cacheId, this.categoryData[cacheId], selectedMeasure);
-          });
+        this.getSubcategoryData(cacheId, this.categoryData[cacheId], selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
@@ -76,48 +67,49 @@ export class NtaHelperService {
   }
 
   getSubcategoryData(cacheId: string, category, selectedMeasure?: string) {
-    const freqArray = [];
-    const measurementsList = [];
+    let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
       this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {
         sub.measurements = measures;
-        // Build list of all measurements for parent category from measurements available to its subcategories
-        measures.forEach((m) => {
-          const measurementExist = measurementsList.find(measurement => measurement === m.name);
-          if (!measurementExist) {
-            measurementsList.push({ name: m.name, id: null });
-          }
-        });
       },
         (error) => {
           this.errorMessage = error;
         },
         () => {
-          if (index === category.sublist.length - 1) {
-            const selectedMeasurement = selectedMeasure ? selectedMeasure : measurementsList[1];
-            console.log(selectedMeasurement)
-            category.currentMeasurement = Object.assign({}, selectedMeasurement);
-            category.measurements = measurementsList;
+          subcategoryCount--;
+          if (subcategoryCount === 0) {
+            category.sublist.forEach((sub) => {
+              this.findSelectedMeasurement(sub, selectedMeasure);
+            });
             this.getSeriesData(category)
           }
         });
     });
   }
 
+  findSelectedMeasurement(sublist, selectedMeasure) {
+    sublist.measurements.forEach((m) => {
+      sublist.currentMeasurement = selectedMeasure ? sublist.measurements.find(m => m.name === selectedMeasure) : sublist.measurements[1];
+    });
+  }
+
   // Get list of series belonging to each measurement
   getSeriesData(category) {
-    const selectedMeasurement = category.currentMeasurement;
+    let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
       sub.dateWrapper = { firstDate: '', endDate: '' };
-      const measurementId = sub.measurements.find(measurement => measurement.name === selectedMeasurement.name).id;
-      this._uheroAPIService.fetchMeasurementSeries(measurementId).subscribe((series) => {
+      this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
         sub.series = series;
+        if (!series) {
+          sub.noData = true;
+        }
       },
         (error) => {
           this.errorMessage = error;
         },
         () => {
-          if (index === category.sublist.length - 1) {
+          subcategoryCount--;
+          if (subcategoryCount === 0) {
             this.formatCategoryData(category);
           }
         });
@@ -231,6 +223,7 @@ export class NtaHelperService {
 
   // Format series data for chart and table displays
   formatCategoryData(category) {
+    const sublistCopy = [];
     category.sublist.forEach((sub, index) => {
       const sublistDateArray = [];
       const dateWrapper = sub.dateWrapper;
@@ -238,23 +231,20 @@ export class NtaHelperService {
         sub.displaySeries = this.filterSeries(sub.series, sub);
         sub.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', sublistDateArray);
         sub.sliderDates = this._helper.getTableDates(sub.dateArray);
-      }
-    });
-    category.sublist.forEach((sub, i) => {
-      if (sub.series) {
-        const displaySeries = sub.displaySeries;
-        displaySeries.forEach((series) => {
+        sub.displaySeries.forEach((series, s) => {
           const catData = this.formatSeriesData(series, sub.dateArray);
           series.categoryTable = catData.catTable;
           series.categoryChart = catData.catChart;
+          if (s === sub.displaySeries.length - 1) {
+            sub.requestComplete = true;
+          }
+          if (s === sub.displaySeries.length - 1 && index === category.sublist.length - 1) {
+            category.requestComplete = true;
+          }
         });
+        sub.id = sub.id.toString();
       }
-      sub.id = sub.id.toString();
-      if (i === category.sublist.length - 1) {
-        console.log('complete', category)
-        category.requestComplete = true;
-      }
-    })
+    });
   }
 
   getGeoName(series, geoHandle: string) {

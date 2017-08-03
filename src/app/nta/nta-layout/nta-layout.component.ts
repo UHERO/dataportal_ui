@@ -62,7 +62,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
       this.selectedMeasure = params['m'];
-      console.log(this.selectedMeasure)
       if (this.id) { this.queryParams.id = this.id; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
@@ -86,7 +85,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
 
   getIdParam(id) {
     if (id === undefined) {
-      return 2488;
+      return 2539;
     }
     if (id && isNaN(+id)) {
       // id param is a string, display search results

@@ -30,10 +30,9 @@ export class SidebarNavComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._uheroAPIService.fetchCategories().subscribe(
-      categories => this.categories = categories,
-      error => this.errorMessage = error);
-
+    this._uheroAPIService.fetchCategories().subscribe((categories) => {
+      this.categories = categories;
+    });
     this.route.queryParams.subscribe((params) => {
       this.id = params['id'];
       this.view = params['view'] ? params['view'] : 'chart';
@@ -81,7 +80,7 @@ export class SidebarNavComponent implements OnInit {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' } );
+    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' });
   }
 
 }
