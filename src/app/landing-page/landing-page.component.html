@@ -24,12 +24,12 @@
 				<label *ngIf="routeView === 'table' && data.currentFreq?.freq !== 'A'" class="form-check-inline">
           <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event, sub.id)">Year-to-Date
         </label>
-        <app-date-slider class="sliders" *ngIf="data.requestComplete" [portalSettings]="portalSettings" [dates]="sub.sliderDates" [sublist]="data.sublist" [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
+        <app-date-slider class="sliders" *ngIf="data.requestComplete" [portalSettings]="portalSettings" [dates]="data.sliderDates" [sublist]="data.sublist" [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
         <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates" [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
 				<i *ngIf="!data.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="data.sublist" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
-      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
+			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>

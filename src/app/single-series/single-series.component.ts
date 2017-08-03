@@ -23,6 +23,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private chartStart;
   private chartEnd;
   private portalSettings;
+  private category;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -50,6 +51,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
+      }
+      if (params['category']) {
+        this.category = params['category'];
       }
       this.seriesData = this._series.getSeriesData(seriesId);
     });

@@ -89,7 +89,7 @@ export class NtaHelperService {
 
   findSelectedMeasurement(sublist, selectedMeasure) {
     sublist.measurements.forEach((m) => {
-      sublist.currentMeasurement = selectedMeasure ? sublist.measurements.find(m => m.name === selectedMeasure) : sublist.measurements[1];
+      sublist.currentMeasurement = selectedMeasure ? sublist.measurements.find(m => m.name === selectedMeasure) : sublist.measurements.find(m => m.name === 'Region');
     });
   }
 
@@ -118,6 +118,7 @@ export class NtaHelperService {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
+      console.log('search results', results)
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       obsEnd = results.observationEnd;
@@ -212,6 +213,7 @@ export class NtaHelperService {
       series.categoryChart = catData.catChart;
       if (s === subcategory.displaySeries.length - 1) {
         subcategory.requestComplete = true;
+        category.requestComplete = true;
       }
     });
   }

@@ -8,6 +8,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 })
 export class CategoryChartsComponent implements OnInit {
   @Input() portalSettings;
+  @Input() sublist;
   @Input() data;
   @Input() freq;
   @Input() noSeries;
