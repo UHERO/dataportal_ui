@@ -78,18 +78,20 @@ export class NtaHelperService {
         () => {
           subcategoryCount--;
           if (subcategoryCount === 0) {
-            category.sublist.forEach((sub) => {
-              this.findSelectedMeasurement(sub, selectedMeasure);
+            category.sublist.forEach((subcategory) => {
+              this.findSelectedMeasurement(subcategory, selectedMeasure);
             });
-            this.getSeriesData(category)
+            this.getSeriesData(category);
           }
         });
     });
   }
 
   findSelectedMeasurement(sublist, selectedMeasure) {
-    sublist.measurements.forEach((m) => {
-      sublist.currentMeasurement = selectedMeasure ? sublist.measurements.find(m => m.name === selectedMeasure) : sublist.measurements.find(m => m.name === 'Region');
+    sublist.measurements.forEach((measurement) => {
+      sublist.currentMeasurement = selectedMeasure ?
+        sublist.measurements.find(m => m.name === selectedMeasure) :
+        sublist.measurements.find(m => m.name === 'Region');
     });
   }
 
@@ -118,7 +120,6 @@ export class NtaHelperService {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
-      console.log('search results', results)
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       obsEnd = results.observationEnd;
@@ -151,8 +152,7 @@ export class NtaHelperService {
       () => {
         if (searchResults) {
           const searchSeries = [];
-          let seriesTotal = searchResults.length;
-          this.getSearchObservations(searchResults, this.categoryData[cacheId])
+          this.getSearchObservations(searchResults, this.categoryData[cacheId]);
         }
       });
   }
@@ -164,21 +164,21 @@ export class NtaHelperService {
       this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
         series.seriesObservations = obs;
       },
-      (error) => {
-        this.errorMessage = error;
-      },
-      () => {
-        seriesTotal--;
-        if (seriesTotal === 0) {
-          const sublist = {
-            dateWrapper: { firstDate: '', endDate: '' },
-            id: 'search',
-            series: searchSeries
+        (error) => {
+          this.errorMessage = error;
+        },
+        () => {
+          seriesTotal--;
+          if (seriesTotal === 0) {
+            const sublist = {
+              dateWrapper: { firstDate: '', endDate: '' },
+              id: 'search',
+              series: searchSeries
+            };
+            this.formatCategoryData(category, sublist, []);
+            category.sublist = [sublist];
           }
-          this.formatCategoryData(category, sublist, [])
-          category.sublist = [sublist];
-        }
-      });
+        });
     });
   }
 

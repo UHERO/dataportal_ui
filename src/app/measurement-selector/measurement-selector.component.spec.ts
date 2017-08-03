@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MeasurementSelectorComponent } from './measurement-selector.component';
 
-describe('MeasurementSelectorComponent', () => {
+/* describe('MeasurementSelectorComponent', () => {
   let component: MeasurementSelectorComponent;
   let fixture: ComponentFixture<MeasurementSelectorComponent>;
 
@@ -22,4 +22,12 @@ describe('MeasurementSelectorComponent', () => {
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
+}); */
+
+describe('Component: MeasurementSelector', () => {
+  it('should create an instance', () => {
+    const component = new MeasurementSelectorComponent();
+    expect(component).toBeTruthy();
+  });
 });
+

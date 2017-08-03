@@ -50,7 +50,8 @@ describe('Service: UheroApi', () => {
       providers: [
         UheroApiService,
         { provide: XHRBackend, useClass: MockBackend },
-        { provide: 'rootCategory', useValue: 59 }
+        { provide: 'rootCategory', useValue: 59 },
+        { provide: 'portal', useValue: 'test' }
       ]
     })
     .compileComponents();
@@ -61,9 +62,9 @@ describe('Service: UheroApi', () => {
   }));
 
   describe('fetchCategories', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal: string) => {
       backend = be;
-      service = new UheroApiService(root, http);
+      service = new UheroApiService(root, portal, http);
       const mockCategories = mockCategoryData();
       const options = new ResponseOptions({status: 200, body: { data: mockCategories}});
       response = new Response(options);
@@ -90,9 +91,9 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchSeries', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal: string) => {
       backend = be;
-      service = new UheroApiService(root, http);
+      service = new UheroApiService(root, portal, http);
       const mockSeries = mockSeriesData();
       const options = new ResponseOptions({status: 200, body: { data: mockSeries}});
       response = new Response(options);
@@ -109,9 +110,9 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchObservations', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal: string) => {
       backend = be;
-      service = new UheroApiService(root, http);
+      service = new UheroApiService(root, portal, http);
       const mockObservations = mockObservationData();
       const options = new ResponseOptions({status: 200, body: { data: mockObservations}});
       response = new Response(options);

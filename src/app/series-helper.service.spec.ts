@@ -15,7 +15,8 @@ describe('Service: SeriesHelper', () => {
         SeriesHelperService,
         HelperService,
         UheroApiService,
-        { provide: 'rootCategory', useValue: 59 }
+        { provide: 'rootCategory', useValue: 59 },
+        { provide: 'portal', useValue: 'test' }
       ]
     });
   });
