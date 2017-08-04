@@ -1,14 +1,7 @@
 <header id="header" class="navbar navbar-fixed-top navbar-light">
-    <!-- <div class="portal-header"> -->
-        <a class="navbar-brand" id="uhero-header" routerLink="/">
+    <a class="navbar-brand" id="uhero-header" routerLink="/">
         <img [src]="headerLogo" alt="UHERO.data logo">
-        </a>
-    <!-- </div> -->
-    <!-- <a [routerLink]="['/']"><i class="material-icons">&#xE887;</i></a> -->
+    </a>
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
+    <a routerLink="/help" class="about-portal"><i class="material-icons">&#xE887;</i></a>
 </header>
-<!-- <div class="about-portal">
-   <a href="/" [routerLink]="['/']">About the Data</a>
-   <a href="/" [routerLink]="['/']">About UHERO</a>
-   <a href="/" [routerLink]="['/']">Help/FAQ</a>
-</div> -->

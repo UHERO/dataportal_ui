@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, OnChanges } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class SidebarNavComponent implements OnInit {
   public expand: string = null;
   public reveal = false;
   public overlay = false;
-  private selectedCategory: number;
+  public selectedCategory: any;
   private id: number;
   private view: string;
   private yoy: string;
@@ -30,16 +30,20 @@ export class SidebarNavComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._uheroAPIService.fetchCategories().subscribe(
-      categories => this.categories = categories,
-      error => this.errorMessage = error);
-
+    this._uheroAPIService.fetchCategories().subscribe((categories) => {
+      this.categories = categories;
+    });
     this.route.queryParams.subscribe((params) => {
       this.id = params['id'];
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
       this.ytd = params['ytd'] ? params['ytd'] : 'false';
       this.selectedCategory = this.findSelectedCategory(this.id);
+    });
+    this._router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.selectedCategory = event.url === '/help' ? 'help' : this.selectedCategory;
+      }
     });
     this.headerLogo = this.logo;
   }
@@ -76,7 +80,7 @@ export class SidebarNavComponent implements OnInit {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' } );
+    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' });
   }
 
 }

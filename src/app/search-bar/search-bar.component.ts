@@ -14,9 +14,14 @@ export class SearchBarComponent implements OnInit {
   }
 
   search(searchTerm: HTMLInputElement): void {
-    this.onSearch.emit(searchTerm.value);
-    this.submitGAEvent(searchTerm.value);
-    searchTerm.value = '';
+    if (searchTerm.value) {
+      this.onSearch.emit(searchTerm.value);
+      this.submitGAEvent(searchTerm.value);
+      searchTerm.value = '';
+    }
+    if (!searchTerm.value) {
+      return;
+    }
   }
 
   // Google Analytics: Track search event
