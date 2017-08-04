@@ -13,7 +13,7 @@ export class SidebarNavComponent implements OnInit {
   public expand: string = null;
   public reveal = false;
   public overlay = false;
-  private selectedCategory: any;
+  public selectedCategory: any;
   private id: number;
   private view: string;
   private yoy: string;
