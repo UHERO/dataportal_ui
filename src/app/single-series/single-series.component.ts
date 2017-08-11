@@ -18,6 +18,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private newTableData;
   private summaryStats;
   private seasonallyAdjusted = null;
+  private seasonalAdjustment;
   private startDate;
   private endDate;
   private chartStart;
@@ -29,6 +30,36 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   public currentFreq: Frequency;
   public currentGeo: Geography;
   public seriesData;
+
+  static saFromSeasonalAdjustment(seasonalAdjustment: string): boolean {
+    return seasonalAdjustment !== 'not_seasonally_adjusted';
+  }
+
+  static selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
+    const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
+    const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
+    const naSeries =  geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
+    // If more than one sibling exists (i.e. seasonal & non-seasonal)
+    // Select series where seasonalAdjustment matches sa setting
+    console.log('saSeries', saSeries);
+    console.log('nsaSeries', nsaSeries);
+    console.log('naSeries', naSeries);
+    if (freq === 'A') {
+      return geoFreqSiblings[0].id;
+    }
+    if (saSeries && nsaSeries) {
+      if (sa) {
+        return geoFreqSiblings.find(sibling => sibling.seasonalAdjustment === 'seasonally_adjusted').id;
+      }
+      return geoFreqSiblings.find(sibling => 'not_seasonally_adjusted|not_applicable'.indexOf(sibling.seasonalAdjustment) !== -1).id;
+    }
+    if (!saSeries && nsaSeries) {
+      return nsaSeries.id;
+    }
+    if (saSeries && !nsaSeries) {
+      return saSeries.id;
+    }
+  }
 
   constructor(
     @Inject('portal') private portal,
@@ -62,11 +93,13 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   // Redraw chart when selecting a new region or frequency
   goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
+    console.log(`Trying to go to aeries= freq: ${freq}, geo: ${geo}, sa: ${sa}`);
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
-    const id = geoFreqSib.length ? this.selectSibling(geoFreqSib, sa, freq) : null;
+    console.log('geoFreqSib:', geoFreqSib);
+    const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
         id: id,
@@ -79,25 +112,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       this._router.navigate(['/series/'], {queryParams: queryParams, queryParamsHandling: 'merge'});
     } else {
       this.noSelection = 'Selection Not Available';
-    }
-  }
-
-  selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
-    const saSeries = geoFreqSiblings.find(series => series.seasonallyAdjusted === true);
-    const nsaSeries = geoFreqSiblings.find(series => series.seasonallyAdjusted === false);
-    // If more than one sibling exists (i.e. seasonal & non-seasonal)
-    // Select series where seasonallyAdjusted matches sa
-    if (freq === 'A') {
-      return geoFreqSiblings[0].id;
-    }
-    if (saSeries && nsaSeries) {
-      return geoFreqSiblings.find(sibling => sibling.seasonallyAdjusted === sa).id;
-    }
-    if (!saSeries && nsaSeries) {
-      return nsaSeries.id;
-    }
-    if (saSeries && !nsaSeries) {
-      return saSeries.id;
     }
   }
 
