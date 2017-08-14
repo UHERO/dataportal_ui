@@ -165,7 +165,9 @@ export class CategoryHelperService {
             this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, currentFreq.freq, categoryDateArray);
             const category = this.categoryData[cacheId];
             category.sublist.forEach((sub, i) => {
-              this.formatCategoryData(sub.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
+              if (typeof sub.displaySeries !== 'undefined') {
+                this.formatCategoryData(sub.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
+              }
               if (i === category.sublist.length - 1) {
                 category.categoryDates = categoryDateArray;
                 category.sliderDates = this._helper.getTableDates(categoryDateArray);
@@ -308,7 +310,7 @@ export class CategoryHelperService {
       if (levelData) {
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
-        res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
+        res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         filtered.push(series);
       }
