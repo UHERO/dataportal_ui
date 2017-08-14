@@ -13,7 +13,8 @@ describe('NtaHelperService', () => {
         NtaHelperService,
         UheroApiService,
         HelperService,
-        { provide: 'rootCategory', useValue: 59 }
+        { provide: 'rootCategory', useValue: 59 },
+        { provide: 'portal', useValue: 'test' }
       ]
     });
   });

@@ -14,9 +14,9 @@
 						<tr>
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.title}}"
 							 data-animation='false' data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
-								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge'
+								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam, category: subCats.name }" queryParamsHandling='merge'
 								 (click)="hideInfo(serie.seriesInfo.id)">
-                  					{{serie.seriesInfo.title}}
+                  					{{serie.seriesInfo.tablePrefix + serie.seriesInfo.title + serie.seriesInfo.tablePostfix}}
                 				</a>
 								<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(subcatIndex, serie.seriesInfo)" role="button" data-animation='false' data-toggle="popover">
 									<i class="material-icons info-icon">&#xE88F;</i>

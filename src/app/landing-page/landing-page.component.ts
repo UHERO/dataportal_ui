@@ -96,7 +96,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   getIdParam(id) {
     if (id === undefined) {
-      return 42;
+      return null;
     }
     if (id && isNaN(+id)) {
       // id param is a string, display search results
@@ -109,17 +109,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   getData(id, geo, freq) {
-    if (typeof id === 'string' && geo && freq) {
-      return this._catHelper.initSearch(id, geo, freq);
+    if (geo && freq) {
+      return (typeof id === 'number' || id === null) ?
+        this._catHelper.initContent(id, geo, freq) :
+        this._catHelper.initSearch(id, geo, freq);
     }
-    if (typeof id === 'string' && !geo && !freq) {
-      return this._catHelper.initSearch(id);
-    }
-    if (typeof id === 'number' && geo && freq) {
-      return this._catHelper.initContent(id, geo, freq);
-    }
-    if (typeof id === 'number' && !geo && !freq) {
-      return this._catHelper.initContent(id, geo, freq);
+    if (!geo && !freq) {
+      return (typeof id === 'number' || id === null) ?
+        this._catHelper.initContent(id) :
+        this._catHelper.initSearch(id);
     }
   }
 

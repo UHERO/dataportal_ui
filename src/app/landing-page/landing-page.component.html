@@ -28,8 +28,8 @@
         <app-category-datatables *ngIf="routeView === 'table' && data.requestComplete" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates" [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
 				<i *ngIf="!data.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="data.sublist" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
-      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
+			<app-category-table *ngIf="routeView === 'table' && data.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
+      <app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>

@@ -34,6 +34,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   public currentGeo: Geography;
   public currentFreq: Frequency;
   public categoryData;
+  private selectedMeasure;
   private loading = false;
   private fragment;
   private userEvent;
@@ -48,7 +49,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     private route: ActivatedRoute,
     private _router: Router,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
@@ -60,10 +61,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
+      this.selectedMeasure = params['m'];
       if (this.id) { this.queryParams.id = this.id; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this._ntaHelper.initContent(this.id);
+      this.categoryData = this._ntaHelper.initContent(this.id, this.selectedMeasure);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
@@ -100,6 +102,16 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     const heightDiff = (this.previousHeight !== contianer.height());
     this.previousHeight = contianer.height();
     return heightDiff;
+  }
+
+  // Redraw series when a new measurement is selected
+  redrawSeries(event) {
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.m = event.name;
+      this.updateRoute();
+    }, 10);
+    this.scrollToFragment();
   }
 
   switchView(subId) {

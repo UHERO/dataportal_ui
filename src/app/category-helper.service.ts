@@ -38,13 +38,16 @@ export class CategoryHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+  initContent(catId: any, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
       return Observable.of([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchCategories().subscribe((categories) => {
+        if (catId === null) {
+          catId = categories[0].id;
+        }
         const cat = categories.find(category => category.id === catId);
         if (cat) {
           const selectedCategory = cat.name;
@@ -156,7 +159,7 @@ export class CategoryHelperService {
             subcat.noData = false;
           }
           if (!splitSeries) {
-          // No series exist for a subcateogry
+            // No series exist for a subcateogry
             this.setNoData(subcat);
           }
           if (this.requestsRemain === 0) {
@@ -165,7 +168,9 @@ export class CategoryHelperService {
             this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, currentFreq.freq, categoryDateArray);
             const category = this.categoryData[cacheId];
             category.sublist.forEach((sub, i) => {
-              this.formatCategoryData(sub.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
+              if (typeof sub.displaySeries !== 'undefined') {
+                this.formatCategoryData(sub.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
+              }
               if (i === category.sublist.length - 1) {
                 category.categoryDates = categoryDateArray;
                 category.sliderDates = this._helper.getTableDates(categoryDateArray);
@@ -308,7 +313,7 @@ export class CategoryHelperService {
       if (levelData) {
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
-        res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
+        res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         filtered.push(series);
       }

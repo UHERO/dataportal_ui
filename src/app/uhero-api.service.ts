@@ -29,7 +29,7 @@ export class UheroApiService {
   private cachedCatMeasures = [];
   private cachedMeasureSeries =  [];
 
-  constructor(@Inject('rootCategory') private rootCategory, private http: Http) {
+  constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
      this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
@@ -174,7 +174,7 @@ export class UheroApiService {
     if (this.cachedMeasureSeries[id]) {
       return Observable.of(this.cachedMeasureSeries[id]);
     } else {
-    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id, this.requestOptionsArgs)
+    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&expand=true`, this.requestOptionsArgs)
       .map(mapData)
       .do(val => {
         this.cachedMeasureSeries[id] = val;
@@ -188,7 +188,7 @@ export class UheroApiService {
     if (this.cachedSearch[search]) {
       return Observable.of(this.cachedSearch[search]);
     } else {
-      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search, this.requestOptionsArgs)
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search + `&u=` + this.portal, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearch[search] = val;
@@ -202,7 +202,7 @@ export class UheroApiService {
     if (this.cachedSearchExpand[search]) {
       return Observable.of(this.cachedSearchExpand[search]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search, this.requestOptionsArgs)
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&u=` + this.portal, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search] = val;
@@ -217,7 +217,7 @@ export class UheroApiService {
       return Observable.of(this.cachedSearchExpand[search + geo + freq]);
     } else {
       let search$ = this.http.get(`${this.baseUrl}/search/series?q=` +
-        search + `&geo=` + geo + `&freq=` + freq + `&expand=true`, this.requestOptionsArgs)
+        search + `&geo=` + geo + `&freq=` + freq + `&u=` + this.portal + `&expand=true`, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
