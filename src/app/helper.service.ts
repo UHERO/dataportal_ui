@@ -273,8 +273,34 @@ export class HelperService {
     }
   }
 
-  setDefaultRange(freq, dataArray) {
-    // Default to last 10 years
+  setDefaultChartRange(freq, dataArray) {
+    const lastDate = dataArray[dataArray.length - 1][0];
+    const lastYear = new Date(lastDate).toISOString().substr(0, 4);
+    const currentYear = new Date().toISOString().substr(0, 4);
+    let counter;
+    // If last year of available data is greater than the current year,
+    // find index of the last observation for the current year
+    if (lastYear > currentYear) {
+      counter = dataArray.length - 1;
+      while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > currentYear) {
+        counter--;
+      }
+
+      // Default to last 10 years
+      if (freq === 'A') {
+        return { start: counter - 10, end: counter };
+      }
+      if (freq === 'Q') {
+        return { start: counter - 40, end: counter };
+      }
+      if (freq === 'S') {
+        return { start: counter - 20, end: counter };
+      }
+      if (freq === 'M') {
+        return { start: counter - 120, end: counter };
+      }
+    }
+
     if (freq === 'A') {
       return { start: dataArray.length - 11, end: dataArray.length - 1 };
     }
@@ -286,6 +312,54 @@ export class HelperService {
     }
     if (freq === 'M') {
       return { start: dataArray.length - 121, end: dataArray.length - 1 };
+    }
+  }
+
+  setDefaultRange(freq, dateArray) {
+    const lastDate = dateArray[dateArray.length - 1];
+    let lastTableDate = lastDate.date ? lastDate.date : null;
+    let lastSliderDate = lastDate.date ? null : lastDate;
+    console.log('lastSliderDate', lastSliderDate)
+    const lastYear = lastTableDate ? new Date(lastTableDate).toISOString().substr(0, 4) : new Date(lastSliderDate.substr(0, 4)).toISOString().substr(0, 4);
+    const currentYear = new Date().toISOString().substr(0, 4);
+    let counter;
+    if (lastYear > currentYear) {
+      counter = dateArray.length - 1;
+      let tableDate = dateArray[counter].date;
+      let sliderDate = dateArray[counter];
+      let dateToCheck = tableDate ? new Date(tableDate).toISOString().substr(0, 4) : new Date(sliderDate).toISOString().substr(0, 4);
+      while (dateToCheck > currentYear) {
+        counter--;
+        tableDate = dateArray[counter].date;
+        sliderDate = dateArray[counter];
+        dateToCheck = tableDate ? new Date(tableDate).toISOString().substr(0, 4) : new Date(sliderDate).toISOString().substr(0, 4);
+      }
+
+      if (freq === 'A') {
+        return { start: counter - 10, end: counter };
+      }
+      if (freq === 'Q') {
+        return { start: counter - 40, end: counter };
+      }
+      if (freq === 'S') {
+        return { start: counter - 20, end: counter };
+      }
+      if (freq === 'M') {
+        return { start: counter - 120, end: counter };
+      }
+    }
+    // Default to last 10 years
+    if (freq === 'A') {
+      return { start: dateArray.length - 11, end: dateArray.length - 1 };
+    }
+    if (freq === 'Q') {
+      return { start: dateArray.length - 41, end: dateArray.length - 1 };
+    }
+    if (freq === 'S') {
+      return { start: dateArray.length - 21, end: dateArray.length - 1 };
+    }
+    if (freq === 'M') {
+      return { start: dateArray.length - 121, end: dateArray.length - 1 };
     }
   }
 

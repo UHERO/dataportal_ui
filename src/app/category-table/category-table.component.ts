@@ -47,6 +47,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
 
   ngOnChanges() {
     if (this.dates) {
+      console.log('table', this.dates)
       const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
       let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {

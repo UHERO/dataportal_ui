@@ -277,7 +277,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   }
 
   trimData(dataArray, start, end) {
-    const defaultRange = this._helper.setDefaultRange(this.currentFreq, dataArray);
+    const defaultRange = this._helper.setDefaultChartRange(this.currentFreq, dataArray);
     let startIndex = defaultRange.start, endIndex = defaultRange.end;
     dataArray.forEach((item, index) => {
       if (item[0] === start) {
