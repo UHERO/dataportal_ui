@@ -34,7 +34,7 @@ export class NtaHelperService {
     if (this.categoryData[cacheId]) {
       return Observable.of([this.categoryData[cacheId]]);
     }
-    if (!this.categoryData[cacheId] && typeof catId === 'number') {
+    if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
       this.getCategory(cacheId, catId, selectedMeasure);
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
@@ -47,6 +47,9 @@ export class NtaHelperService {
   getCategory(cacheId: string, catId: any, selectedMeasure?: string) {
     this.categoryData[cacheId] = <CategoryData>{};
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
+      if (catId === null) {
+        catId = categories[0].id;
+      }
       const cat = categories.find(category => category.id === catId);
       if (cat) {
         const sublist = cat.children;

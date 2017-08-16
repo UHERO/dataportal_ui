@@ -85,7 +85,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
 
   getIdParam(id) {
     if (id === undefined) {
-      return 2539;
+      return null;
     }
     if (id && isNaN(+id)) {
       // id param is a string, display search results

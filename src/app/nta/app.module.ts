@@ -79,7 +79,7 @@ import { MeasurementSelectorComponent } from '../measurement-selector/measuremen
     },
     {
       provide: 'defaultCategory',
-      useValue: 2539
+      useValue: 2597
     },
     {
       provide: 'logo',
