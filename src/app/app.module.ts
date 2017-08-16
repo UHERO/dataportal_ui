@@ -79,6 +79,10 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       useValue: '../../assets/UHEROdata-Logo-color.svg'
     },
     {
+      provide: 'defaultRange',
+      useValue: { start: '2007', end: '2017', range: 10 }
+    },
+    {
       provide: 'portal',
       useValue: 'uhero'
     }

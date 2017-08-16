@@ -273,19 +273,48 @@ export class HelperService {
     }
   }
 
-  setDefaultRange(freq, dataArray) {
-    // Default to last 10 years
+  setDefaultChartRange(freq, dataArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dataArray.length - 1;
+    while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
+    }
+    return this.getRanges(freq, counter, defaults.range);
+  }
+
+  setDefaultSliderRange(freq, dateArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dateArray.length - 1;
+    // https://github.com/IonDen/ion.rangeSlider/issues/298
+    // Slider values being converted from strings to numbers for annual dates
+    while (new Date(dateArray[counter].toString().substr(0, 4)).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
+    }
+    return this.getRanges(freq, counter, defaults.range);
+  }
+
+  setDefaultTableRange(freq, dateArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dateArray.length - 1;
+    while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
+    }
+    return this.getRanges(freq, counter, defaults.range);
+  }
+
+  getRanges(freq, counter, range) {
+    // Range = default amount of years to display
     if (freq === 'A') {
-      return { start: dataArray.length - 11, end: dataArray.length - 1 };
+      return { start: counter - 1 * range, end: counter };
     }
     if (freq === 'Q') {
-      return { start: dataArray.length - 41, end: dataArray.length - 1 };
+      return { start: counter - 4 * range, end: counter };
     }
     if (freq === 'S') {
-      return { start: dataArray.length - 21, end: dataArray.length - 1 };
+      return { start: counter - 2 * range, end: counter };
     }
     if (freq === 'M') {
-      return { start: dataArray.length - 121, end: dataArray.length - 1 };
+      return { start: counter - 12 * range, end: counter };
     }
   }
 
