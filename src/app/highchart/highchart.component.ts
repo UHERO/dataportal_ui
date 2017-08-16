@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
@@ -34,7 +34,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(private _helper: HelperService) { }
+  constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
@@ -277,8 +277,8 @@ export class HighchartComponent implements OnInit, OnChanges {
   }
 
   trimData(dataArray, start, end) {
-    const defaultRange = this._helper.setDefaultChartRange(this.currentFreq, dataArray);
-    let startIndex = defaultRange.start, endIndex = defaultRange.end;
+    const defaultRanges = this._helper.setDefaultChartRange(this.currentFreq, dataArray, this.defaultRange);
+    let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
     dataArray.forEach((item, index) => {
       if (item[0] === start) {
         startIndex = index;

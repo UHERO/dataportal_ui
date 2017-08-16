@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChildren, ViewEncapsulation, OnChanges, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnChanges, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -15,7 +15,7 @@ declare var $: any;
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
+export class CategoryTableComponent implements AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
   @Input() subCats;
@@ -35,6 +35,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   private tableWidths = [];
 
   constructor(
+    @Inject('defaultRange') private defaultRange,
     private _uheroAPIService: UheroApiService,
     private _helper: HelperService,
     private route: ActivatedRoute,
@@ -42,13 +43,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
     private googleAES: GoogleAnalyticsEventsService
   ) { }
 
-  ngOnInit() {
-  }
-
   ngOnChanges() {
     if (this.dates) {
-      console.log('table', this.dates)
-      const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+      const defaultRanges = this._helper.setDefaultTableRange(this.freq, this.dates, this.defaultRange);
       let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers

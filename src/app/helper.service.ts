@@ -273,93 +273,48 @@ export class HelperService {
     }
   }
 
-  setDefaultChartRange(freq, dataArray) {
-    const lastDate = dataArray[dataArray.length - 1][0];
-    const lastYear = new Date(lastDate).toISOString().substr(0, 4);
-    const currentYear = new Date().toISOString().substr(0, 4);
-    let counter;
-    // If last year of available data is greater than the current year,
-    // find index of the last observation for the current year
-    if (lastYear > currentYear) {
-      counter = dataArray.length - 1;
-      while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > currentYear) {
-        counter--;
-      }
-
-      // Default to last 10 years
-      if (freq === 'A') {
-        return { start: counter - 10, end: counter };
-      }
-      if (freq === 'Q') {
-        return { start: counter - 40, end: counter };
-      }
-      if (freq === 'S') {
-        return { start: counter - 20, end: counter };
-      }
-      if (freq === 'M') {
-        return { start: counter - 120, end: counter };
-      }
+  setDefaultChartRange(freq, dataArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dataArray.length - 1;
+    while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
     }
-
-    if (freq === 'A') {
-      return { start: dataArray.length - 11, end: dataArray.length - 1 };
-    }
-    if (freq === 'Q') {
-      return { start: dataArray.length - 41, end: dataArray.length - 1 };
-    }
-    if (freq === 'S') {
-      return { start: dataArray.length - 21, end: dataArray.length - 1 };
-    }
-    if (freq === 'M') {
-      return { start: dataArray.length - 121, end: dataArray.length - 1 };
-    }
+    return this.getRanges(freq, counter, defaults.range);
   }
 
-  setDefaultRange(freq, dateArray) {
-    const lastDate = dateArray[dateArray.length - 1];
-    let lastTableDate = lastDate.date ? lastDate.date : null;
-    let lastSliderDate = lastDate.date ? null : lastDate;
-    console.log('lastSliderDate', lastSliderDate)
-    const lastYear = lastTableDate ? new Date(lastTableDate).toISOString().substr(0, 4) : new Date(lastSliderDate.substr(0, 4)).toISOString().substr(0, 4);
-    const currentYear = new Date().toISOString().substr(0, 4);
-    let counter;
-    if (lastYear > currentYear) {
-      counter = dateArray.length - 1;
-      let tableDate = dateArray[counter].date;
-      let sliderDate = dateArray[counter];
-      let dateToCheck = tableDate ? new Date(tableDate).toISOString().substr(0, 4) : new Date(sliderDate).toISOString().substr(0, 4);
-      while (dateToCheck > currentYear) {
-        counter--;
-        tableDate = dateArray[counter].date;
-        sliderDate = dateArray[counter];
-        dateToCheck = tableDate ? new Date(tableDate).toISOString().substr(0, 4) : new Date(sliderDate).toISOString().substr(0, 4);
-      }
-
-      if (freq === 'A') {
-        return { start: counter - 10, end: counter };
-      }
-      if (freq === 'Q') {
-        return { start: counter - 40, end: counter };
-      }
-      if (freq === 'S') {
-        return { start: counter - 20, end: counter };
-      }
-      if (freq === 'M') {
-        return { start: counter - 120, end: counter };
-      }
+  setDefaultSliderRange(freq, dateArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dateArray.length - 1;
+    // https://github.com/IonDen/ion.rangeSlider/issues/298
+    // Slider values being converted from strings to numbers for annual dates
+    while (new Date(dateArray[counter].toString().substr(0, 4)).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
     }
-    // Default to last 10 years
+    return this.getRanges(freq, counter, defaults.range);
+  }
+
+  setDefaultTableRange(freq, dateArray, defaults) {
+    const defaultEnd = defaults.end;
+    let counter = dateArray.length - 1;
+    while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
+      counter--;
+    }
+    return this.getRanges(freq, counter, defaults.range);
+  }
+
+  getRanges(freq, counter, range) {
+    // Range = default amount of years to display
     if (freq === 'A') {
-      return { start: dateArray.length - 11, end: dateArray.length - 1 };
+      return { start: counter - 1 * range, end: counter };
     }
     if (freq === 'Q') {
-      return { start: dateArray.length - 41, end: dateArray.length - 1 };
+      return { start: counter - 4 * range, end: counter };
     }
     if (freq === 'S') {
-      return { start: dateArray.length - 21, end: dateArray.length - 1 };
+      return { start: counter - 2 * range, end: counter };
     }
     if (freq === 'M') {
-      return { start: dateArray.length - 121, end: dateArray.length - 1 };
+      return { start: counter - 12 * range, end: counter };
     }
   }
 
