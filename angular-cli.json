@@ -56,7 +56,7 @@
       "assets":[
         "assets"
       ],
-      "index": "nta-index.html",
+      "index": "index.html",
       "main": "ntaMain.ts",
       "polyfills": "polyfills.ts",
       "test": "test.ts",

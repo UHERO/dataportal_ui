@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 declare var ga: Function;
 
@@ -9,7 +10,9 @@ declare var ga: Function;
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  constructor(public _router: Router) {
+  constructor(private titleService: Title, public _router: Router) {
+    this.titleService.setTitle('NTA Dataportal')
+    
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         // Send page views to Google Analytics

@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -69,6 +69,7 @@ import { MeasurementSelectorComponent } from '../measurement-selector/measuremen
     HelperService,
     GoogleAnalyticsEventsService,
     HelpService,
+    Title,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
