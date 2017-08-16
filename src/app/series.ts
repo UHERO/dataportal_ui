@@ -14,7 +14,6 @@ export interface Series {
   unitsLabelShort: string;
   geography: Geography;
   geoFreqs: Array<any>;
-  seasonallyAdjusted: boolean;
   seasonalAdjustment: string;
   source?: string;
   sourceDescription?: string;

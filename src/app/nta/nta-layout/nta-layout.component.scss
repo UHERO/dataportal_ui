@@ -49,6 +49,15 @@
     display: inline-block;
     margin-top: 10px;
     margin-bottom: 0;
+    border-color: transparent;
+
+    .dropdown-menu {
+      border-radius: 0;
+
+      .current-sub {
+        border-radius: 0;
+      }
+    }
 
     li {
       display: inline-block;
@@ -75,14 +84,14 @@
        }
 
        @media (max-width: 767px) {
-         min-width: 50%;
+         // min-width: 50%;
          margin-right: 0px;
        }
     }
   }
 
   .selected-category {
-    display: inline-block;
+    display: block;
     color: $primary;
     font-size: 1.4em;
     margin: 0px;
@@ -121,6 +130,7 @@
   }
 
   .material-icons.md-18 {
+    max-width: 18px;
     font-size: 18px;
     color: $secondary;
     vertical-align: middle;

@@ -91,8 +91,8 @@ export class SeriesHelperService {
   }
 
   checkSaPairs(seriesSiblings) {
-    const saSeries = seriesSiblings.find(series => series.seasonallyAdjusted === true);
-    const nsaSeries = seriesSiblings.find(series => series.seasonallyAdjusted === false);
+    const saSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
+    const nsaSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
     if (saSeries && nsaSeries) {
       return true;
     }

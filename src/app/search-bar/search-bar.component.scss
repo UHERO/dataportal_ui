@@ -3,7 +3,7 @@
 .search-bar {
   position: fixed;
   top: 12px;
-  right: 0px;
+  right: 30px;
 
   .form-control {
     padding: 0.25rem 1rem;
@@ -41,8 +41,8 @@
   }
 
   @media (max-width: 767px) {
-    width: 35%;
-    top: 5px;
+    position: relative;
+    top: 8px;
     right: 3px;
 
     .form-control {
