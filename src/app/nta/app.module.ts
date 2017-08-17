@@ -79,11 +79,15 @@ import { MeasurementSelectorComponent } from '../measurement-selector/measuremen
     },
     {
       provide: 'defaultCategory',
-      useValue: 2539
+      useValue: 2597
     },
     {
       provide: 'logo',
       useValue: '../../assets/nta-logo.svg'
+    },
+    {
+      provide: 'defaultRange',
+      useValue: { start: '2000', end: '2040', range: 40 }
     },
     {
       provide: 'portal',
