@@ -41,9 +41,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     const naSeries =  geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonalAdjustment matches sa setting
-    console.log('saSeries', saSeries);
-    console.log('nsaSeries', nsaSeries);
-    console.log('naSeries', naSeries);
     if (freq === 'A') {
       return geoFreqSiblings[0].id;
     }
@@ -58,6 +55,9 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
     if (saSeries && !nsaSeries) {
       return saSeries.id;
+    }
+    if (!saSeries && !nsaSeries) {
+      return naSeries.id;
     }
   }
 
@@ -93,12 +93,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   // Redraw chart when selecting a new region or frequency
   goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
-    console.log(`Trying to go to aeries= freq: ${freq}, geo: ${geo}, sa: ${sa}`);
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
-    console.log('geoFreqSib:', geoFreqSib);
     const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
