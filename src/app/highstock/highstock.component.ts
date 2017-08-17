@@ -284,7 +284,7 @@ export class HighstockComponent implements OnChanges {
       yAxis: [{
         className: 'series1',
         labels: {
-          format: '{value:,.2f}'
+          format: portalSettings.highstock.axisValues
         },
         title: {
           text: change
@@ -298,7 +298,7 @@ export class HighstockComponent implements OnChanges {
           text: units
         },
         labels: {
-          format: '{value:,.2f}'
+          format: portalSettings.highstock.axisValues
         },
         gridLineWidth: 0,
         minPadding: 0,

@@ -1,15 +1,15 @@
 $black: #000;
 $white: #FFF;
-$blue: #0068B3;
-$green: #008b78;
+$blue: #1D667F;
+$orange: #F6A01B;
 $dark-gray: #505050;
+$series-gray: #727272; 
 $gray: #E5E5E5;
-$light-gray: #F7F7F7;
-$series-gray: #727272;
+$light-gray: #F9F9F9;
 
 $primary: $blue;
 $primary-text: $dark-gray;
-$secondary: $green;
+$secondary: $orange;
 $border: $gray;
 $tooltip: $light-gray;
 
@@ -19,5 +19,3 @@ $highcharts-series0: $blue;
 $highcharts-series1: none;
 $highstock-series0: $series-gray;
 $highstock-series1: $blue;
-
-

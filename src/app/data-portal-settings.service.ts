@@ -8,15 +8,16 @@ export class DataPortalSettingsService {
         series0Name: 'level',
         series0Type: 'line',
         series1Name: 'c5ma',
-        series1Type: 'line'
+        series1Type: 'column'
       },
       highstock: {
         series0Name: 'c5ma',
-        series0Type: 'line',
+        series0Type: 'column',
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'none',
-        series2Type: ''
+        series2Type: '',
+        axisValues: '{value:,.5f}'
       },
       seriesTable: {
         columns: 3,
@@ -41,7 +42,8 @@ export class DataPortalSettingsService {
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'ytd',
-        series2Type: 'column'
+        series2Type: 'column',
+        axisValues: '{value:,.2f}'
       },
       seriesTable: {
         columns: 4,
