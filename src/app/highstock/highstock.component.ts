@@ -97,11 +97,11 @@ export class HighstockComponent implements OnChanges {
         }, {
           html: sourceDetails
         }, {
-          html: name + ': http://data.uhero.hawaii.edu/#/series?id=' + seriesDetail.id
+          html: name + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
         }, {
-          html: 'The University of Hawaii Economic Research Organization (UHERO)',
+          html: portalSettings.highstock.labels.portal,
         }, {
-          html: 'Data Portal: http://data.uhero.hawaii.edu/'
+          html: portalSettings.highstock.labels.portalLink
         }, {
           html: name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
@@ -177,7 +177,7 @@ export class HighstockComponent implements OnChanges {
           },
           credits: {
             enabled: true,
-            text: 'data.uhero.hawaii.edu',
+            text: portalSettings.highstock.credits,
             position: {
               align: 'right',
               x: -115,
@@ -388,7 +388,7 @@ export class HighstockComponent implements OnChanges {
     }
     const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
     const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
-    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6)
+    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
     return { start: start , end: end };
   }
 

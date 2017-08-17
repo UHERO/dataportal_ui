@@ -12,7 +12,6 @@ declare var ga: Function;
 export class AppComponent implements OnInit {
   constructor(private titleService: Title, public _router: Router) {
     this.titleService.setTitle('NTA Dataportal');
-    console.log($('#loading-header'))
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         // Send page views to Google Analytics
@@ -23,7 +22,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log($('#loading-header'))
     if (navigator.userAgent.search('Chrome') === -1) {
       $('.browser').show();
     } else {

@@ -1,0 +1,24 @@
+$black: #000;
+$white: #FFF;
+$blue: #0068B3;
+$green: #008b78;
+$dark-gray: #505050;
+$gray: #E5E5E5;
+$light-gray: #F7F7F7;
+$series-gray: #4C4D4F;
+
+$primary: $blue;
+$primary-text: $dark-gray;
+$secondary: $green;
+$border: $gray;
+$tooltip: $light-gray;
+
+/* Highcharts */
+$chart-background: $light-gray;
+$highcharts-series0: $blue;
+$highcharts-series1: $series-gray;
+$highstock-series0: $series-gray;
+$highstock-series1: $blue;
+
+/* Loading Screen */
+$img-src: '/../../assets/nta-logo.svg';
