@@ -5,13 +5,39 @@
     color: $primary-text;
     position: fixed;
     bottom: 0;
-    left: 15px;
+    left: 10px;
     line-height: 1;
     font-size: 0.9em;
     border: 1px solid $border;
     border-bottom: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+
+    @media (max-width: 767px) {
+        right: 10px;
+        bottom: 0px;
+        left: unset;
+    }
+}
+
+#uhero-link {
+    position: fixed;
+    left: 100px;
+    bottom: 0;
+    font-size: 0.9em;
+    padding: 0.5rem 1rem;
+    line-height: 1em;
+
+    a {
+        color: $primary;
+        text-decoration: none;
+    }
+
+    @media (max-width: 767px) {
+        right: -5px;
+        bottom: 28px;
+        left: unset;
+    }
 }
 
 .modal-title {
