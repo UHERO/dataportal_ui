@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, AfterViewInit, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Inject, OnChanges, AfterViewInit, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import 'jquery';
 declare var $: any;
@@ -10,7 +10,7 @@ import 'ion-rangeslider';
   styleUrls: ['./date-slider.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
+export class DateSliderComponent implements OnChanges, AfterViewInit {
   @Input() portalSettings;
   @Input() subCat;
   @Input() dates;
@@ -22,10 +22,7 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
   private start;
   private end;
 
-  constructor(private _helper: HelperService) { }
-
-  ngOnInit() {
-  }
+  constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngAfterViewInit() {
     const that = this;
@@ -74,7 +71,7 @@ export class DateSliderComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   findDefaultRange() {
-    const defaultRanges = this._helper.setDefaultRange(this.freq, this.dates);
+    const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.dates, this.defaultRange);
     let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
     this.dates.forEach((date, index) => {
       // Range slider is converting annual year strings to numbers
