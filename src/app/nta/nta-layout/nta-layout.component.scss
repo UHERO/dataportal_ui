@@ -5,11 +5,14 @@
   min-height: 100%;
   
   .fa-spinner {
+    display: block;
+    margin: 20px;
     color: $primary;
   }
 
   .filters {
-    display: inline-block;
+    display: block;
+    // display: inline-block;
     color: $primary;
     margin-bottom: 5px;
     margin-right: 10px;
