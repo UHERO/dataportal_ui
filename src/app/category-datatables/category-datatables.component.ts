@@ -13,6 +13,7 @@ import 'datatables.net-buttons/js/buttons.flash.js';
   encapsulation: ViewEncapsulation.None
 })
 export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnChanges {
+  @Input() portalSettings;
   @Input() tableId;
   @Input() sublist;
   @Input() categoryDates;
@@ -55,6 +56,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     const freq = this.freq;
     const catId = this.sublist.parentId;
     const tableId = this.tableId;
+    const portalSettings = this.portalSettings;
     this.tableWidget = tableElement.DataTable({
       data: tableData,
       dom: 'B',
@@ -64,9 +66,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         text: 'Download CSV <i class="fa fa-file-excel-o" aria-hidden="true"></i>',
         filename: sublistName,
         customize: function (csv) {
-          return 'The University of Hawaii Economic Research Organization (UHERO) \n Data Portal: http://data.uhero.hawaii.edu/ \n ' +
+          return portalSettings.catTable.portalSource +
           parentName + sublistName + ' (' + geoName + freq.label + ')' +
-          ': http://data.uhero.hawaii.edu/#/category?id=' + catId + '&view=table#' + tableId +
+          ': ' + portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
           '\n\n' + csv;
         }
       }],
