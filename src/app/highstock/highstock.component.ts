@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -43,7 +43,7 @@ export class HighstockComponent implements OnChanges {
   private extremes;
   private chartObject;
 
-  constructor() { }
+  constructor(@Inject('defaultRange') private defaultRange) { }
 
   ngOnChanges() {
     this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
@@ -77,8 +77,9 @@ export class HighstockComponent implements OnChanges {
     const sourceDescription = seriesDetail.sourceDescription;
     const sourceLink = seriesDetail.sourceLink;
     const sourceDetails = seriesDetail. sourceDetails;
-    const startDate = this.start ? this.start : null;
-    const endDate = this.end ? this.end : null;
+    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
+    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
+    const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
 
     this.options = {
@@ -109,7 +110,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       rangeSelector: {
-        selected: !this.start && !this.end ? 2 : null,
+        selected: !startDate && !endDate ? 2 : null,
         buttons: [{
           type: 'year',
           count: 1,
@@ -250,8 +251,8 @@ export class HighstockComponent implements OnChanges {
       },
       xAxis: {
         minRange: 1000 * 3600 * 24 * 30 * 12,
-        min: this.start ? Date.parse(startDate) : null,
-        max: this.end ? Date.parse(endDate) : null,
+        min: Date.parse(startDate),
+        max: Date.parse(endDate),
         ordinal: false,
         labels: {
           formatter: function() {
@@ -378,6 +379,17 @@ export class HighstockComponent implements OnChanges {
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
+  }
+
+  getSelectedChartRange(userStart, userEnd, levelData, defaults) {
+    let counter = levelData.length ? levelData.length - 1 : null;
+    while (new Date(levelData[counter][0]).toISOString().substr(0, 4) > defaults.end) {
+      counter--;
+    }
+    const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
+    const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
+    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6)
+    return { start: start , end: end };
   }
 
   checkDates(date, levelArray) {
