@@ -48,7 +48,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (sa) {
         return geoFreqSiblings.find(sibling => sibling.seasonalAdjustment === 'seasonally_adjusted').id;
       }
-      return geoFreqSiblings.find(sibling => 'not_seasonally_adjusted|not_applicable'.indexOf(sibling.seasonalAdjustment) !== -1).id;
+      return geoFreqSiblings.find(sibling => sibling.seasonalAdjustment === 'not_seasonally_adjusted').id;
     }
     if (!saSeries && nsaSeries) {
       return nsaSeries.id;
