@@ -16,8 +16,7 @@ export class DataPortalSettingsService {
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'none',
-        series2Type: '',
-        axisValues: '{value:,.5f}'
+        series2Type: ''
       },
       seriesTable: {
         columns: 3,
@@ -42,8 +41,7 @@ export class DataPortalSettingsService {
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'ytd',
-        series2Type: 'column',
-        axisValues: '{value:,.2f}'
+        series2Type: 'column'
       },
       seriesTable: {
         columns: 4,
