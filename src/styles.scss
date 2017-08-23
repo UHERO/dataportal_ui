@@ -5,6 +5,40 @@ html, body {
     height: 100%;
 }
 
+#loading-header {
+  top: 0;
+  width: 100%;
+  background-color: $white;
+  color: $white;
+  padding: 0;
+  box-shadow: 0 4px 6px -6px $black;
+  -moz-box-shadow: 0 4px 6px -6px $black;
+  -webkit-box-shadow: 0 4px 6px -6px $black;
+
+  @media (max-width: 767px) {
+    img {
+      width: 185px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    z-index: 1;
+  }
+
+  a {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .loading-img {
+    content:url($img-src);
+    height: 55px;
+    position: absolute;
+    left: 10px;
+    padding: 5px;
+  }
+}
+
 body {
    position: relative;
    padding: 0;
