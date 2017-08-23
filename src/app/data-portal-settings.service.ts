@@ -4,6 +4,10 @@ import { Injectable } from '@angular/core';
 export class DataPortalSettingsService {
   public dataPortalSettings = {
     nta: {
+      catTable: {
+        portalSource: 'National Transfer Accounts (NTA) Dataportal: http://data.uhero.hawaii.edu/nta \n ',
+        portalLink: 'http://data.uhero.hawaii.edu/nta/#/category?id='
+      },
       highcharts: {
         series0Name: 'level',
         series0Type: 'line',
@@ -11,12 +15,18 @@ export class DataPortalSettingsService {
         series1Type: 'line'
       },
       highstock: {
+        credits: 'data.uhero.hawaii.edu/nta',
+        labels: {
+          seriesLink: 'http://data.uhero.hawaii.edu/nta/#/series?id=',
+          portal: 'National Transfer Accounts (NTA)',
+          portalLink: 'NTA Dataportal: http://data.uhero.hawaii.edu/nta'
+        },
         series0Name: 'c5ma',
         series0Type: 'line',
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'none',
-        series2Type: ''
+        series2Type: '',
       },
       seriesTable: {
         columns: 3,
@@ -29,6 +39,10 @@ export class DataPortalSettingsService {
       sliderInteraction: false
     },
     uhero: {
+      catTable: {
+        portalSource: 'The University of Hawaii Economic Research Organization (UHERO) Dataportal: http://data.uhero.hawaii.edu/ \n ',
+        portalLink: 'http://data.uhero.hawaii.edu/#/category?id='
+      },
       highcharts: {
         series0Name: 'level',
         series0Type: 'line',
@@ -36,12 +50,18 @@ export class DataPortalSettingsService {
         series1Type: 'column'
       },
       highstock: {
+        credits: 'data.uhero.hawaii.edu',
+        labels: {
+          seriesLink: 'http://data.uhero.hawaii.edu/#/series?id=',
+          portal: 'The University of Hawaii Economic Research Organization (UHERO)',
+          portalLink: 'Data Portal: http://data.uhero.hawaii.edu/'
+        },
         series0Name: 'yoy',
         series0Type: 'column',
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'ytd',
-        series2Type: 'column'
+        series2Type: 'column',
       },
       seriesTable: {
         columns: 4,
