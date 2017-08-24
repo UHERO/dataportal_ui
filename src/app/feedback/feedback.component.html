@@ -1,17 +1,18 @@
-<button type="button" class="btn btn-feedback" (click)="reset()" data-toggle="modal" data-target="#feedback">
+<div class="feedback">
+  <button type="button" class="btn btn-feedback" (click)="reset()" data-toggle="modal" data-target="#feedback">
   Feedback
 </button>
+  <span id="uhero-link">Made by <a href="http://uhero.hawaii.edu">UHERO</a></span>
+</div>
 <div *ngIf="successMsg" [hidden]="hideAlert" class="alert alert-success alert-dismissible fade show" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
-  </button>
-  {{successMsg}}
+  </button> {{successMsg}}
 </div>
 <div *ngIf="errorMsg" [hidden]="hideAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
-  </button>
-  {{errorMsg}}
+  </button> {{errorMsg}}
 </div>
 <div class="modal fade" id="feedback" tabindex="-1" role="dialog" aria-labelledby="feedback" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -27,7 +28,8 @@
           <div class="form-group row">
             <div class="col-2 col-form-label"><i class="material-icons">&#xE7FD;</i></div>
             <div class="col-10">
-              <input type="text" formControlName="name" aria-label="Your Name" class="form-control custom-input" placeholder="Your Name" />
+              <input type="text" formControlName="name" aria-label="Your Name" class="form-control custom-input" placeholder="Your Name"
+              />
               <small class="form-text text-muted"> * Optional</small>
             </div>
           </div>
@@ -41,21 +43,24 @@
           <div class="form-group row">
             <div class="col-2 col-form-label"><i class="material-icons">&#xE0B9;</i></div>
             <div class="col-10">
-              <textarea type="text" class="form-control custom-input" aria-label="Feedback" formControlName="feedback" placeholder="Feedback" required></textarea>
+              <textarea type="text" class="form-control custom-input" aria-label="Feedback" formControlName="feedback" placeholder="Feedback"
+                required></textarea>
               <small class="form-text text-muted"> * Required</small>
             </div>
           </div>
           <div class="form-group row">
             <div class="col-2"></div>
             <div class="col-10">
-              <recaptcha name="captcha" area-label="Google captcha" formControlName="captcha" required siteKey=" 6LcN3hQUAAAAAOUb0_Z_wpk3dLvbVz7S45Bgcv7c" class="captcha"></recaptcha>
+              <recaptcha name="captcha" area-label="Google captcha" formControlName="captcha" required siteKey=" 6LcN3hQUAAAAAOUb0_Z_wpk3dLvbVz7S45Bgcv7c"
+                class="captcha"></recaptcha>
               <small class="form-text text-muted"> * Required</small>
             </div>
           </div>
           <div class="row">
             <div class="col-4"></div>
             <div class="col-4">
-              <button type="button" (click)="onSubmit()" data-dismiss="modal" class="btn btn-submit" label="Submit" [disabled]="!feedbackForm.valid" [title]="!feedbackForm.valid ? 'Feedback is required.' : 'Submit feedback.'">Submit</button>
+              <button type="button" (click)="onSubmit()" data-dismiss="modal" class="btn btn-submit" label="Submit" [disabled]="!feedbackForm.valid"
+                [title]="!feedbackForm.valid ? 'Feedback is required.' : 'Submit feedback.'">Submit</button>
             </div>
             <div class="col-4"></div>
           </div>

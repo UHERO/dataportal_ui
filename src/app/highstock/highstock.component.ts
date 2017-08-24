@@ -291,7 +291,8 @@ export class HighstockComponent implements OnChanges {
         },
         opposite: false,
         minPadding: 0,
-        maxPadding: 0
+        maxPadding: 0,
+        minTickInterval: 0.01
       }, {
         className: 'series2',
         title: {
@@ -302,7 +303,8 @@ export class HighstockComponent implements OnChanges {
         },
         gridLineWidth: 0,
         minPadding: 0,
-        maxPadding: 0
+        maxPadding: 0,
+        showLastLabel: true
       }],
       plotOptions: {
         series: {

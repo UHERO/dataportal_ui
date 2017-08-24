@@ -12,7 +12,7 @@ export class DataPortalSettingsService {
         series0Name: 'level',
         series0Type: 'line',
         series1Name: 'c5ma',
-        series1Type: 'line'
+        series1Type: 'column'
       },
       highstock: {
         credits: 'data.uhero.hawaii.edu/nta',
@@ -22,7 +22,7 @@ export class DataPortalSettingsService {
           portalLink: 'NTA Dataportal: http://data.uhero.hawaii.edu/nta'
         },
         series0Name: 'c5ma',
-        series0Type: 'line',
+        series0Type: 'column',
         series1Name: 'level',
         series1Type: 'line',
         series2Name: 'none',
