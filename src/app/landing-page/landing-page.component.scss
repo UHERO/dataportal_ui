@@ -6,10 +6,12 @@
   
   .fa-spinner {
     color: $primary;
+    display: block;
+    margin: 20px;
   }
 
   .filters {
-    display: inline-block;
+    display: block;
     color: $primary;
     margin-bottom: 5px;
     margin-right: 10px;

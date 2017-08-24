@@ -143,9 +143,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.tableEnd = e.tableEnd;
     this.chartStart = e.chartStart;
     this.chartEnd = e.chartEnd;
-    // this.queryParams.start = e.start.replace(/\s|-/g, '');
-    // this.queryParams.end = e.end.replace(/\s|-/g, '');
-    // this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
   }
 
   // Work around for srolling to page anchor

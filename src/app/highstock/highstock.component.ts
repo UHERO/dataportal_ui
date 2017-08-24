@@ -97,11 +97,11 @@ export class HighstockComponent implements OnChanges {
         }, {
           html: sourceDetails
         }, {
-          html: name + ': http://data.uhero.hawaii.edu/#/series?id=' + seriesDetail.id
+          html: name + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
         }, {
-          html: 'The University of Hawaii Economic Research Organization (UHERO)',
+          html: portalSettings.highstock.labels.portal,
         }, {
-          html: 'Data Portal: http://data.uhero.hawaii.edu/'
+          html: portalSettings.highstock.labels.portalLink
         }, {
           html: name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
@@ -177,7 +177,7 @@ export class HighstockComponent implements OnChanges {
           },
           credits: {
             enabled: true,
-            text: 'data.uhero.hawaii.edu',
+            text: portalSettings.highstock.credits,
             position: {
               align: 'right',
               x: -115,
@@ -291,7 +291,8 @@ export class HighstockComponent implements OnChanges {
         },
         opposite: false,
         minPadding: 0,
-        maxPadding: 0
+        maxPadding: 0,
+        minTickInterval: 0.01
       }, {
         className: 'series2',
         title: {
@@ -302,7 +303,8 @@ export class HighstockComponent implements OnChanges {
         },
         gridLineWidth: 0,
         minPadding: 0,
-        maxPadding: 0
+        maxPadding: 0,
+        showLastLabel: true
       }],
       plotOptions: {
         series: {
@@ -388,7 +390,7 @@ export class HighstockComponent implements OnChanges {
     }
     const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
     const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
-    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6)
+    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
     return { start: start , end: end };
   }
 
