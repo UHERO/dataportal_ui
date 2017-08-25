@@ -70,12 +70,36 @@ export class CategoryHelperService {
   }
 
   getSubcategoryData(catName: string, cacheId, catId: number, sublist: Array<any>, routeGeo?: string, routeFreq?: string) {
+    console.log('sublist', sublist);
     const geoArray = [], freqArray = [];
     const categoryDateWrapper = { firstDate: '', endDate: '' };
+    let freqGeos, geoFreqs;
     sublist.forEach((sub, index) => {
       // Get all regions available in a given category
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
-        let freqGeos, geoFreqs;
+        sub.freqGeos = category.freqGeos;
+        sub.geoFreqs = category.geoFreqs;
+        freqGeos = category.freqGeos;
+        geoFreqs = category.geoFreqs;
+        geoFreqs.forEach((geo) => {
+          this._helper.uniqueGeos(geo, geoArray);
+        });
+        freqGeos.forEach((freq) => {
+          this._helper.uniqueFreqs(freq, freqArray);
+        });
+      },
+        (error) => {
+          this.errorMessage = error;
+        },
+        () => {
+          console.log('done');
+        });
+    });
+    /* sublist.forEach((sub, index) => {
+      // Get all regions available in a given category
+      this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
+        sub.freqGeos = category.freqGeos;
+        sub.geoFreqs = category.geoFreqs;
         freqGeos = category.freqGeos;
         geoFreqs = category.geoFreqs;
         geoFreqs.forEach((geo) => {
@@ -91,6 +115,11 @@ export class CategoryHelperService {
         () => {
           this.requestsRemain = sublist.length;
           if (index === sublist.length - 1) {
+            console.log(freqGeos);
+            console.log(geoFreqs)
+  
+            console.log('geo array', geoArray)
+            console.log('freq array', freqArray)            
             sublist.forEach((subcat, i) => {
               const dateWrapper = <DateWrapper>{};
               let selectedFreq, selectedGeo;
@@ -111,6 +140,7 @@ export class CategoryHelperService {
               this.categoryData[cacheId].frequencies = freqs;
               this.categoryData[cacheId].currentGeo = currentGeo;
               this.categoryData[cacheId].currentFreq = currentFreq;
+              console.log('category', this.categoryData[cacheId])
               subcat.parentName = catName;
               const subcategory = {
                 subcat: subcat,
@@ -124,7 +154,7 @@ export class CategoryHelperService {
             });
           }
         });
-    });
+    }); */
   }
 
   // Get regions and frequencies available for a selected category
