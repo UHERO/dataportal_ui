@@ -227,10 +227,6 @@ export class HelperService {
       this.addFreq(freqs, existGeo);
     }
     if (!existGeo) {
-      geo.freqs.forEach((freq) => {
-        freq.categoryStart = freq.observationStart;
-        freq.categoryEnd = freq.observationEnd;
-      });
       geoList.push(geo);
     }
   }
@@ -243,21 +239,10 @@ export class HelperService {
 
   addFreq(freqList, geo) {
     freqList.forEach((freq) => {
-      if (this.freqExist(geo.freqs, freq.freq)) {
-        freq.categoryStart = freq.observationStart < freq.categoryStart ? freq.observationStart : freq.categoryStart;
-        freq.categoryEnd = freq.observationEnd > freq.categoryEnd ? freq.observationEnd : freq.categoryEnd;
-      }
       if (!this.freqExist(geo.freqs, freq.freq)) {
-        freq.categoryStart = freq.observationStart;
-        freq.categoryEnd = freq.observationEnd;
         geo.freqs.push(freq);
       }
     });
-    /* for (const j in freqList) {
-      if (!this.freqExist(geo.freqs, freqList[j].freq)) {
-        geo.freqs.push(freqList[j]);
-      }
-    } */
   }
 
   // Get a unique array of available frequencies for a category
