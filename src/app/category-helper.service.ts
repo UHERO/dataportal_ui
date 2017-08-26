@@ -15,7 +15,6 @@ export class CategoryHelperService {
   private errorMessage: string;
   // Variables for geo and freq selectors
   private defaults;
-  private requestsRemain;
   private defaultFreq: string;
   private defaultGeo: string;
   private categoryData = {};
@@ -101,14 +100,9 @@ export class CategoryHelperService {
         this._helper.uniqueFreqs(freq, freqArray);
       });
     });
-    let selectedFreq, selectedGeo;
-    selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-    selectedGeo = this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
-    if (routeFreq || routeGeo) {
-      const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
-      selectedFreq = selected.freq;
-      selectedGeo = selected.geo;
-    }
+    const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
+    const selectedFreq = selected.freq;
+    const selectedGeo = selected.geo;
     let freqs, regions, currentGeo, currentFreq;
     // Get frequencies available for a selected region
     freqs = geoArray.find(geo => geo.handle === selectedGeo).freqs;
@@ -240,15 +234,9 @@ export class CategoryHelperService {
   }
 
   searchSettings(search: string, cacheId, dateWrapper: DateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
-    /* const dateArray = [];
-    let selectedFreq, selectedGeo;
-    selectedFreq = this.defaultFreq ? this.defaultFreq : freqGeos[0].freq;
-    selectedGeo = this.defaultGeo ? this.defaultGeo : geoFreqs[0].handle;
-    if (routeFreq || routeGeo) {
-      const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
-      selectedFreq = selected.freq;
-      selectedGeo = selected.geo;
-    }
+    const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
+    let selectedGeo = selected.geo;
+    let selectedFreq = selected.freq;
     let freqs, regions, currentFreq, currentGeo;
     freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
     const selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
@@ -265,11 +253,10 @@ export class CategoryHelperService {
     this.categoryData[cacheId].frequencies = freqs;
     this.categoryData[cacheId].currentFreq = currentFreq;
     this.getSearchData(search, cacheId, currentGeo.handle, currentFreq.freq, dateWrapper, routeGeo, routeFreq);
- */  
-}
+  }
 
   getSearchData(search: string, cacheId, geo: string, freq: string, dateWrapper: DateWrapper, routeGeo?: string, routeFreq?: string) {
-    /* let searchResults;
+    let searchResults;
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     // Get expanded search results for a selected region & frequency
     this._uheroAPIService.fetchSearchSeriesExpand(search, geo, freq).subscribe((searchRes) => {
@@ -281,39 +268,56 @@ export class CategoryHelperService {
       () => {
         if (searchResults) {
           // Get array of all series that have level data available
-          // const searchSeries = this.filterSeriesResults(searchResults, freq, dateWrapper);
-          const splitSeries = this.getDisplaySeries(searchResults, dateWrapper, freq, categoryDateWrapper);
+          const splitSeries = this.getDisplaySeries(searchResults, freq);
           const sublist = {
             id: 'search',
             parentName: 'Search',
             name: search,
-            dateWrapper: splitSeries.dateWrapper,
-            displaySeries: splitSeries.displaySeries
+            displaySeries: splitSeries.displaySeries,
+            requestComplete: false
           };
+          const catWrapper = this.getSearchDates(splitSeries.displaySeries);
           const categoryDateArray = [];
-          const catWrapper = splitSeries.categoryDateWrapper;
           this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-          this.formatCategoryData(splitSeries.displaySeries, categoryDateArray, splitSeries.categoryDateWrapper);
+          this.formatCategoryData(splitSeries.displaySeries, categoryDateArray, catWrapper);
           this.categoryData[cacheId].sublist = [sublist];
-          this.categoryData[cacheId].categoryDateWrapper = splitSeries.categoryDateWrapper;
+          this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
           this.categoryData[cacheId].categoryDates = categoryDateArray;
           this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
           this.categoryData[cacheId].requestComplete = true;
+          sublist.requestComplete = true;
         }
-      }); */
+      });
+  }
+
+  getSearchDates(displaySeries) {
+    const categoryDateWrapper = { firstDate: '', endDate: '' };
+    displaySeries.forEach((series) => {
+      if (series.start < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+        categoryDateWrapper.firstDate = series.start;
+      }
+      if (series.end > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+        categoryDateWrapper.endDate = series.end;
+      }
+    });
+    return categoryDateWrapper;
   }
 
   checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray) {
-    // Check if freq/geo specified in route exists in a category's list of freqs/geos
-    const freqExist = freqArray.find(freq => freq.freq === routeFreq);
-    const geoExist = geoArray.find(geo => geo.handle === routeGeo);
-    // If either does not exist, set selected freq & geo to the category's default
-    // or first element of freq/geo arrays if default is not specified
-    if (!freqExist || !geoExist) {
-      return { freq: this.defaultFreq ? this.defaultFreq : freqArray[0].freq, geo: this.defaultGeo ? this.defaultGeo : geoArray[0].handle };
-    } else {
+    let selectedFreq, selectedGeo;
+    selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
+    selectedGeo = this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+    // If a frequency/region is specified in the route, check if the frequency/region exists in a category
+    // If not display default freq/region for a given category
+    if (routeFreq || routeGeo) {
+      const freqExist = freqArray.find(freq => freq.freq === routeFreq);
+      const geoExist = geoArray.find(geo => geo.handle === routeGeo);
+      if (!freqExist || !geoExist) {
+        return { freq: this.defaultFreq ? this.defaultFreq : freqArray[0].freq, geo: this.defaultGeo ? this.defaultGeo : geoArray[0].handle };
+      }
       return { freq: routeFreq, geo: routeGeo };
     }
+    return { freq: selectedFreq, geo: selectedGeo };
   }
 
   filterSeriesResults(results: Array<any>, freq: string) {
@@ -358,7 +362,6 @@ export class CategoryHelperService {
     measurements.forEach((measurement) => displaySeries.push(measurement));
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq);
-    console.log('filtered', filtered);
     return filtered.length ? { displaySeries: filtered } : null;
   }
 

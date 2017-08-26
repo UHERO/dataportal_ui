@@ -266,11 +266,11 @@ export class HelperService {
   }
 
   addGeo(geoList, freq) {
-    for (const j in geoList) {
-      if (!this.geoExist(freq.geos, geoList[j].handle)) {
-        freq.geos.push(geoList[j]);
+    geoList.forEach((geo) => {
+      if (!this.geoExist(freq.geos, geo.handle)) {
+        freq.geos.push(geo);
       }
-    }
+    });
   }
 
   setDefaultChartRange(freq, dataArray, defaults) {
