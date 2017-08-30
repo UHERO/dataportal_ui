@@ -40,6 +40,10 @@
     float: left;
     font-size: 1.5em;
     color: $primary-text;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 
   .navbar-side {
