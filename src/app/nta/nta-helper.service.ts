@@ -155,13 +155,13 @@ export class NtaHelperService {
       () => {
         if (searchResults) {
           const searchSeries = [];
-          this.getSearchObservations(searchResults, this.categoryData[cacheId]);
+          this.getSearchObservations(searchResults, search, this.categoryData[cacheId]);
         }
       });
   }
 
   // Get observations for series in search results
-  getSearchObservations(searchSeries, category) {
+  getSearchObservations(searchSeries, search, category) {
     let seriesTotal = searchSeries.length;
     searchSeries.forEach((series) => {
       this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
@@ -176,7 +176,8 @@ export class NtaHelperService {
             const sublist = {
               dateWrapper: { firstDate: '', endDate: '' },
               id: 'search',
-              series: searchSeries
+              series: searchSeries,
+              name: search
             };
             this.formatCategoryData(category, sublist, []);
             category.sublist = [sublist];
