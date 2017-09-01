@@ -304,6 +304,7 @@ export class HighstockComponent implements OnChanges {
         gridLineWidth: 0,
         minPadding: 0,
         maxPadding: 0,
+        minTickInterval: 0.01,
         showLastLabel: true
       }],
       plotOptions: {

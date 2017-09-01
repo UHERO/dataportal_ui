@@ -174,6 +174,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         title: {
           text: ''
         },
+        minTickInterval: 0.01
       }, {
         title: {
           text: ''
@@ -181,6 +182,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         labels: {
           enabled: false
         },
+        minTickInterval: 0.01,
         opposite: true
       }],
       plotOptions: {
