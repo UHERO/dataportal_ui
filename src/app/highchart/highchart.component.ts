@@ -127,18 +127,20 @@ export class HighchartComponent implements OnInit, OnChanges {
           // Add year
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
+            const displayValue = Highcharts.numberFormat(point.y, decimals);
+            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             const name = getLabelName(point.series.name, dataFreq, percent);
-            let label = name + Highcharts.numberFormat(point.y, decimals);
+            let label = name + formattedValue;
             if (point.series.name === 'Level') {
               label += ' (' + unitsShort + ') <br>';
             }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  s += pseudo + name + Highcharts.numberFormat(point.y, decimals);
-                  if (point.series.name === 'Level') {
-                    s += ' (' + unitsShort + ') <br>';
-                  }
+                  const otherSeriesLabel =  pseudo + name + formattedValue;
+                  const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
+                  s += point.series.name === 'Level' ? levelLabel : otherSeriesLabel;
+                  s += pseudo + name + formattedValue;
                 }
                 if (point.x >= zone.value) {
                   s += label;

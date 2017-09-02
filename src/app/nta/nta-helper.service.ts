@@ -176,8 +176,7 @@ export class NtaHelperService {
             const sublist = {
               dateWrapper: { firstDate: '', endDate: '' },
               id: 'search',
-              series: searchSeries,
-              name: search
+              series: searchSeries
             };
             this.formatCategoryData(category, sublist, []);
             category.sublist = [sublist];

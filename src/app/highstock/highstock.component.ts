@@ -221,18 +221,15 @@ export class HighstockComponent implements OnChanges {
           s = s + getFreqLabel(freq.freq, this.x);
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
           this.points.forEach((point) => {
-            const label = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
-              point.series.name + ': ' +
-              Highcharts.numberFormat(point.y, decimals);
+            const displayValue = Highcharts.numberFormat(point.y, decimals);
+            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+            const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
+            const seriesNameValue = point.series.name + ': ' + formattedValue;
+            const label = seriesColor + seriesNameValue;
             if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  return s += '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ' +
-                    pseudo +
-                    point.series.name +
-                    ': ' +
-                    Highcharts.numberFormat(point.y, decimals) +
-                    '<br>';
+                  return s += seriesColor + pseudo + seriesNameValue + '<br>';
                 }
                 if (point.x > zone.value) {
                   return s += label;

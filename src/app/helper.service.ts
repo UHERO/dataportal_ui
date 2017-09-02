@@ -212,7 +212,7 @@ export class HelperService {
     const returnValue = intString.substr(0, i + 3) + r + (decimalString ? '.' + decimalString : '');
     // If int == 0, converting int to string drops minus sign
     if (int === 0 && num < 0) {
-      return '-' + returnValue;
+      return decimalString === '00' ? returnValue : '-' + returnValue;
     }
     return returnValue;
   }
