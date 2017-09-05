@@ -1,7 +1,7 @@
 <div *ngFor="let data of seriesData | async" class="single-series-view col-xs-12 col-sm-12 col-xl-11">
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
-    <h3 class="series-title">{{portal === 'nta' ? category : data.seriesDetail.title}}</h3>
+    <h3 class="series-title">{{data.seriesDetail.title}}</h3>
     <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)" class="geo-selector"></app-geo-selector>
     <app-freq-selector *ngIf="portal !== 'nta'" [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
     <div class="form-check" *ngIf="data.saPairAvail">
