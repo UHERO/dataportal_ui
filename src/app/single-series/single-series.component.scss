@@ -43,6 +43,10 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
 
+    .source_detail {
+      margin-bottom: 0;
+    }
+
     a {
       color: $primary;
     }
