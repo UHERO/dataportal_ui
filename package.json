@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start-uhero": "ng serve --app=uhero",
+    "start-nta": "ng serve --app=nta",
     "build-uhero": "ng build --app=uhero --prod",
     "build-nta": "ng build --app=nta --prod --base-href=/nta/",
     "test": "ng test",
