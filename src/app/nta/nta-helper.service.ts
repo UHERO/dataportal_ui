@@ -210,7 +210,14 @@ export class NtaHelperService {
     subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory);
     subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
     subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
+    subcategory.scrollSeries = [];
+    let seriesGroup = [];
     subcategory.displaySeries.forEach((series, s) => {
+      seriesGroup.push(series);
+      if (seriesGroup.length === 12 || s === subcategory.displaySeries.length - 1) {
+        subcategory.scrollSeries.push(seriesGroup);
+        seriesGroup = [];
+      }
       const catData = this.formatSeriesData(series, subcategory.dateArray);
       series.categoryTable = catData.catTable;
       series.categoryChart = catData.catChart;

@@ -39,13 +39,15 @@ import { HelpService } from '../help.service';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
+import { CategoryChartsScrollingComponent } from '../category-charts-scrolling/category-charts-scrolling.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NtaLayoutComponent,
     NtaHelpComponent,
-    MeasurementSelectorComponent
+    MeasurementSelectorComponent,
+    CategoryChartsScrollingComponent
   ],
   imports: [
     Shared,
