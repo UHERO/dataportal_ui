@@ -24,6 +24,12 @@
     .unavailable {
       color: $primary-text;
     }
+
+    p {
+      display: inline-block;
+      margin-bottom: 0;
+      font-size: 0.9em;
+    }
   }
 
   .multi-charts {

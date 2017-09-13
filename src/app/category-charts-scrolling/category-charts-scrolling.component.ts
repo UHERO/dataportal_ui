@@ -18,7 +18,7 @@ export class CategoryChartsScrollingComponent implements OnInit {
   @Input() params;
   @Input() chartStart;
   @Input() chartEnd;
-  private counter;
+  public counter;
 
   constructor(private googleAES: GoogleAnalyticsEventsService) { }
 
