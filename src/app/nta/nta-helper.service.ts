@@ -210,7 +210,10 @@ export class NtaHelperService {
     subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory);
     subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
     subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
+    // At most, display 12 series at a time in the multiple chart view
     subcategory.scrollSeries = [];
+    // Default to the first set of (12) series to display
+    subcategory.scrollIndex = 0;
     let seriesGroup = [];
     subcategory.displaySeries.forEach((series, s) => {
       seriesGroup.push(series);

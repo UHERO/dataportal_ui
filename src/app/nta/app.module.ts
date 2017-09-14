@@ -39,7 +39,7 @@ import { HelpService } from '../help.service';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
-import { CategoryChartsScrollingComponent } from '../category-charts-scrolling/category-charts-scrolling.component';
+import { SeriesPagingComponent } from '../series-paging/series-paging.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +47,7 @@ import { CategoryChartsScrollingComponent } from '../category-charts-scrolling/c
     NtaLayoutComponent,
     NtaHelpComponent,
     MeasurementSelectorComponent,
-    CategoryChartsScrollingComponent
+    SeriesPagingComponent
   ],
   imports: [
     Shared,
