@@ -136,6 +136,7 @@
         }
         
         .info {
+          cursor: pointer;
           width: initial;
           right: 5px;
           position: absolute;
@@ -162,11 +163,13 @@
     }
   }
 
-  &.tooltip-left,
+  &.bs-tooltip-left,
+  &.bs-tooltip-right,
   &.bs-tether-element-attached-right {
 
-    .tooltip-inner::before {
+    .arrow::before {
       border-left-color: $tooltip;
+      border-right-color: $tooltip;
     }
   }
 }
