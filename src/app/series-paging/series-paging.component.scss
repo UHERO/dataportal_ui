@@ -1,0 +1,23 @@
+  @import 'colors';
+
+  .series-scroll {
+    display: inline-block;
+    cursor: default;
+
+    i {
+      cursor: pointer;
+      color: $primary;
+      font-weight: bold;
+      vertical-align: middle;
+    }
+
+    .unavailable {
+      color: $primary-text;
+    }
+
+    p {
+      display: inline-block;
+      margin-bottom: 0;
+      font-size: 0.9em;
+    }
+  }
