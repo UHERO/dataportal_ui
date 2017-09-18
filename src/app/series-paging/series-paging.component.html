@@ -1,0 +1,5 @@
+<div class="series-scroll" *ngIf="data.length > 1">
+	<i class="material-icons" [class.unavailable]="counter === 0" (click)="back(counter)">&#xE314;</i>
+	<p>{{counter + 1}} of {{data.length}}</p>
+  <i class="material-icons" [class.unavailable]="counter === data.length - 1" (click)="forward(counter)">&#xE315;</i>
+</div>

@@ -18,11 +18,8 @@ declare var $: any;
 export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   private sub;
   private id: number;
-  private routeFreq: string;
   private routeView: string;
   private routeC5ma;
-  private routeStart;
-  private routeEnd;
   private search = false;
   private queryParams: any = {};
   private tableStart;
@@ -31,8 +28,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private chartEnd;
 
   // Variables for geo and freq selectors
-  public currentGeo: Geography;
-  public currentFreq: Frequency;
   public categoryData;
   private selectedMeasure;
   private loading = false;
@@ -112,6 +107,10 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.updateRoute();
     }, 10);
     this.scrollToFragment();
+  }
+
+  updatePageCounter(event, subcategory){
+    subcategory.scrollIndex = event;
   }
 
   switchView(subId) {
