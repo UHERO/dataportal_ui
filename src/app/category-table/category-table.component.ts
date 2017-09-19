@@ -1,6 +1,6 @@
-import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnChanges, AfterViewChecked } from '@angular/core';
+import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
@@ -40,8 +40,15 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
     private _helper: HelperService,
     private route: ActivatedRoute,
     private _router: Router,
+    private _analyzer: AnalyzerService,
     private googleAES: GoogleAnalyticsEventsService
   ) { }
+
+  ngOnInit() {
+    this.data.forEach((chartSeries) => {
+      chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+    });
+  }
 
   ngOnChanges() {
     if (this.dates) {
@@ -91,7 +98,7 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
     const tables = $('.table');
     const tableWidths = this.tableWidths;
     if (tables) {
-      tables.each(function(index) {
+      tables.each(function (index) {
         const widthDiff = (tableWidths[index] !== tables[index].scrollWidth);
         if (widthDiff) {
           tables[index].scrollLeft = tables[index].scrollWidth;
@@ -115,7 +122,7 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
     $('[data-toggle="tooltip"]').tooltip('hide');
     const popover = $('#' + subcatIndex + seriesInfo.id).popover({
       trigger: 'manual',
-      placement: function(popoverEl, el) {
+      placement: function (popoverEl, el) {
         // popoverEl = popover DOM element
         // el = DOM element that triggers popover
         let position = 'top';
@@ -126,7 +133,7 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
         return position;
       },
       html: true,
-      title: function() {
+      title: function () {
         let title = seriesInfo.title;
         title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
         return title;
@@ -152,12 +159,16 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
       $('.popover').not(e.target).popover('dispose');
       setTimeout(() => {
         // Close popover on next click (source link in popover is still clickable)
-        $('body').one('click', function() {
+        $('body').one('click', function () {
           popover.popover('dispose');
         });
       }, 1);
     });
     popover.popover('toggle');
+  }
+
+  updateAnalyze(seriesInfo) {
+    this._analyzer.updateAnalyzer(seriesInfo);
   }
 
   // On load, table scrollbars should start at the right -- showing most recent data

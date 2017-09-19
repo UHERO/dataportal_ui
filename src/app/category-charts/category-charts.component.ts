@@ -23,6 +23,9 @@ export class CategoryChartsComponent implements OnInit {
   constructor(private googleAES: GoogleAnalyticsEventsService, private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
+    this.data.forEach((chartSeries) => {
+      chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+    });
   }
 
   // Google Analytics: Track clicking on series
@@ -31,19 +34,7 @@ export class CategoryChartsComponent implements OnInit {
     this.googleAES.emitEvent('series', 'click', id);
   }
 
-  updateAnalyze(serie) {
-    if (serie.analyze) {
-      const analyzeSeries = this._analyzer.analyzerSeries.find(series => series.seriesInfo.id === serie.seriesInfo.id);
-      const seriesIndex = this._analyzer.analyzerSeries.indexOf(analyzeSeries);
-      if (seriesIndex > -1) {
-        this._analyzer.analyzerSeries.splice(seriesIndex, 1);
-      }
-      serie.analyze = false;
-      return;
-    }
-    if (!serie.analyze) {
-      this._analyzer.analyzerSeries.push(serie);
-      serie.analyze = true;
-    }
+  updateAnalyze(seriesInfo) {
+    this._analyzer.updateAnalyzer(seriesInfo);
   }
 }

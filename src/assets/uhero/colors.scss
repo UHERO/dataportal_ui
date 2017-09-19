@@ -3,9 +3,9 @@ $white: #FFF;
 $blue: #1D667F;
 $orange: #F6A01B;
 $dark-gray: #505050;
-$series-gray: #727272; 
+$series-gray: #9E9E9E; 
 $gray: #E5E5E5;
-$light-gray: #F9F9F9;
+$light-gray: #FBFBFB;
 
 $primary: $blue;
 $primary-text: $dark-gray;
@@ -19,6 +19,8 @@ $highcharts-series0: $blue;
 $highcharts-series1: none;
 $highstock-series0: $series-gray;
 $highstock-series1: $blue;
+
+$table-gray: #F9F9F9;
 
 /* Loading Screen */
 $img-src: '/../../assets/UHEROdata-Logo-color.svg';

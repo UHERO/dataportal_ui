@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
+import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
@@ -14,7 +14,11 @@ export class SeriesHelperService {
   private change;
   private seriesData;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
+  constructor(
+    private _uheroAPIService: UheroApiService,
+    private _analyzer: AnalyzerService,
+    private _helper: HelperService
+  ) { }
 
   getSeriesData(id: number): Observable<any> {
     let currentFreq, currentGeo, decimals;
@@ -31,8 +35,12 @@ export class SeriesHelperService {
       error: null,
       noData: ''
     };
+    const analyzerSeries = this._analyzer.analyzerSeries;
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesData.seriesDetail = series;
+      // Check if series is in the analyzer
+      const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === series.id);
+      this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
       decimals = series.decimals ? series.decimals : 1;

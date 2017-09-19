@@ -34,11 +34,19 @@
     }
   }
 
+  .analyze-button {
+    color: $primary;
+    cursor: pointer;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
   .source {
     width: 100%;
-    background-color: $chart-background;
+    background-color: $white;
     padding: 10px 10px 0 10px;
     font-size: 0.9em;
+    margin-top: 1%;
     text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -56,7 +64,7 @@
     width: 100%;
     display: table;
     table-layout: fixed;
-    background-color: $chart-background;
+    background-color: $white;
     padding: 10px 0;
     
     .stat {

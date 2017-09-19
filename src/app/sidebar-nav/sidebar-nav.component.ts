@@ -1,5 +1,6 @@
-import { Component, Inject, OnInit, OnChanges } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
@@ -20,11 +21,13 @@ export class SidebarNavComponent implements OnInit {
   private ytd: string;
   private loading;
   public headerLogo;
+  private analyzerSeries;
 
   constructor(
     @Inject('defaultCategory') private defaultCategory,
     @Inject('logo') private logo,
     private _uheroAPIService: UheroApiService,
+    private _analyzerService: AnalyzerService,
     private route: ActivatedRoute,
     private _router: Router
   ) { }
@@ -45,6 +48,7 @@ export class SidebarNavComponent implements OnInit {
         this.selectedCategory = event.url === '/help' ? 'help' : this.selectedCategory;
       }
     });
+    this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
   }
 
