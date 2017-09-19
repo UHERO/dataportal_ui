@@ -20,6 +20,7 @@ import { FeedbackComponent } from '../feedback/feedback.component';
 import { CategoryDatatablesComponent } from '../category-datatables/category-datatables.component';
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
+import { AnalyzerComponent } from '../analyzer/analyzer.component';
 import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 
@@ -38,6 +39,7 @@ import { HelpDirective } from '../help.directive';
     CategoryChartsComponent,
     DateSliderComponent,
     GeoSelectorComponent,
+    AnalyzerComponent,
     HelpComponent,
     HelpDirective
   ],

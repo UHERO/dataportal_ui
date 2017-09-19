@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { SingleSeriesComponent } from './single-series/single-series.component';
 import { CategoryTableComponent } from './category-table/category-table.component';
+import { AnalyzerComponent } from './analyzer/analyzer.component';
 import { HelpComponent } from './help/help.component';
 
 const routes: Routes = [
@@ -18,6 +19,10 @@ const routes: Routes = [
   {
     path: 'series',
     component: SingleSeriesComponent
+  },
+  {
+    path: 'analyze',
+    component: AnalyzerComponent
   },
   {
     path: 'help',

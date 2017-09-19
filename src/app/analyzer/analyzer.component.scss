@@ -1,0 +1,11 @@
+@import 'colors';
+
+.analyzer-view {
+  @media (min-width: 768px) {
+    margin-top: 70px;
+  }
+
+  @media (max-width: 767px) {
+    margin-top: 50px;
+  }
+}
