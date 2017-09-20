@@ -167,8 +167,8 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
     popover.popover('toggle');
   }
 
-  updateAnalyze(seriesInfo, tableData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData);
+  updateAnalyze(seriesInfo, tableData, chartData) {
+    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
   }
 
   // On load, table scrollbars should start at the right -- showing most recent data

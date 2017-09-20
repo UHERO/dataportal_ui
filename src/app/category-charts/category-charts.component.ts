@@ -35,7 +35,7 @@ export class CategoryChartsComponent implements OnInit {
     this.googleAES.emitEvent('series', 'click', id);
   }
 
-  updateAnalyze(seriesInfo, tableData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData);
+  updateAnalyze(seriesInfo, tableData, chartData) {
+    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
   }
 }

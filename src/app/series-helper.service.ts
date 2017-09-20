@@ -64,15 +64,16 @@ export class SeriesHelperService {
         // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
         this.seriesData.saPairAvail = this.checkSaPairs(geoFreqPair);
       });
-      this.getSeriesObservations(id, decimals);
+      this.getSeriesObservations(this.seriesData.seriesDetail, decimals);
     });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
-  getSeriesObservations(id: number, decimals: number) {
+  getSeriesObservations(seriesDetail, decimals: number) {
     const dateArray = [];
-    this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
-      const obs = observations;
+    this._uheroAPIService.fetchObservations(seriesDetail.id).subscribe((observations) => {
+      const obs = observations;      
+      seriesDetail.seriesObservations = obs;
       const levelData = obs.transformationResults[0].observations;
       const obsStart = obs.observationStart;
       const obsEnd = obs.observationEnd;

@@ -22,6 +22,7 @@ import { CategoryChartsComponent } from '../category-charts/category-charts.comp
 import { DateSliderComponent } from '../date-slider/date-slider.component';
 import { AnalyzerComponent } from '../analyzer/analyzer.component';
 import { AnalyzerTableComponent } from '../analyzer-table/analyzer-table.component';
+import { AnalyzerHighstockComponent } from '../analyzer-highstock/analyzer-highstock.component';
 import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 
@@ -41,6 +42,7 @@ import { HelpDirective } from '../help.directive';
     DateSliderComponent,
     GeoSelectorComponent,
     AnalyzerComponent,
+    AnalyzerHighstockComponent,
     AnalyzerTableComponent,
     HelpComponent,
     HelpDirective

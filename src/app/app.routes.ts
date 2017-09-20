@@ -21,7 +21,7 @@ const routes: Routes = [
     component: SingleSeriesComponent
   },
   {
-    path: 'analyze',
+    path: 'analyzer',
     component: AnalyzerComponent
   },
   {
