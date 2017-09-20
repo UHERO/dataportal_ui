@@ -19,14 +19,14 @@
                   					{{serie.seriesInfo.tablePrefix + serie.seriesInfo.title + serie.seriesInfo.tablePostfix}}
 								</a>
 								<i [class.fa-plus-square]="!serie.seriesInfo.analyze" [class.fa-minus-square]="serie.seriesInfo.analyze" class="fa analyze-button" aria-hidden="true"
-								 (click)="updateAnalyze(serie.seriesInfo)"></i>
+								 (click)="updateAnalyze(serie.seriesInfo, serie.tableData)"></i>
 								<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(subcatIndex, serie.seriesInfo)"
 								 role="button" data-animation='false' data-toggle="popover">
 									<i class="material-icons info-icon">&#xE88F;</i>
 								</a>
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
-								<td>{{item.level}}</td>
+								<td>{{item.value}}</td>
 							</ng-template>
 						</tr>
 						<tr *ngIf="yoyActive">

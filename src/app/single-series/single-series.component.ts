@@ -114,8 +114,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateAnalyze(seriesInfo) {
-    this._analyzer.updateAnalyzer(seriesInfo);
+  updateAnalyze(seriesInfo, tableData) {
+    this._analyzer.updateAnalyzer(seriesInfo, tableData);
   }
 
   updateChartExtremes(e) {

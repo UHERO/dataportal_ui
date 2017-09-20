@@ -1,0 +1,113 @@
+@import 'colors';
+
+.analyzer-table {
+    vertical-align: top;
+    display: inline-block;
+    min-height: 100%;
+    overflow: auto;
+    width: 100%;
+    position: relative;
+  
+    @media (min-width: 768px) {
+      margin-top: 10px;
+    }
+  
+    @media (max-width: 767px) {
+      margin-top: 50px;
+    }
+  
+    .material-icons.md-18 {
+      font-size: 18px;
+      color: $secondary;
+      vertical-align: middle;
+    }
+
+    .table-row {
+      position: relative;
+
+      .table {
+        overflow-x: scroll;
+        overflow-y: visible;
+        width: 58%;
+        margin-left: 32%;
+        margin-bottom: 40px;
+      
+        table {
+          table-layout: fixed;
+          width: 100%;
+          *margin-left: -32%;
+    
+          td, th {
+            vertical-align: top;
+            width: 125px;
+            text-align: right;
+            font-size: 0.8em;
+            padding: 0.4em;
+            border: 1px solid $border;
+            &:empty:after {
+              content: "\00a0";
+            }
+          }
+    
+          th {
+            position: absolute;
+            *position: relative;
+            left: 0;
+            width: 32%;
+            white-space: nowrap;
+            border-right: 1px solid $border;
+            text-align: left;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 0.8em;
+            font-weight: normal;
+            border-bottom: 0;
+          }
+    
+          .empty-header {
+            border: none;
+            border-right: 1px solid $border;
+          }
+    
+          .info-icon {
+            font-size: 1.2em;
+            vertical-align: middle;
+          }
+    
+          tr:last-child {
+            th {
+              border: 1px solid $border;
+            }
+          }
+    
+          tr:nth-child(even) {
+            background-color: $table-gray;
+    
+            td:first-child, th:first-child {
+              background: $table-gray;
+            }
+          }
+    
+          a {
+            display: inline-block;
+            width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: $primary-text;
+            vertical-align: top;
+          }
+            
+          .info {
+            cursor: pointer;
+            width: initial;
+            right: 5px;
+            position: absolute;
+    
+            &:focus {
+              outline: 0;
+            }
+          }
+        }
+      }
+    }
+}

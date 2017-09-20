@@ -1,0 +1,57 @@
+<label class="form-check-inline">
+  <input type="checkbox" (change)="yoyActive($event)">Year/Year
+</label>
+<label class="form-check-inline">
+  <input type="checkbox" (change)="ytdActive($event)">Year-to-Date
+</label>
+
+<div class="analyzer-table">
+  <div class="table-row">
+    <div class="table">
+      <table *ngIf="series && series.length">
+        <tr>
+          <th class="empty-header">&nbsp;</th>
+          <ng-template ngFor let-date [ngForOf]="tableDates" let-i="index">
+            <td><b>{{date.tableDate}}</b></td>
+          </ng-template>
+        </tr>
+        <ng-template ngFor let-serie [ngForOf]="series" let-i="index">
+          <tr>
+            <th title="{{serie.title}}">
+              <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
+                  {{serie.tablePrefix + serie.title + serie.tablePostfix}}
+                </a>
+            </th>
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+              <td>{{item.value}}</td>
+            </ng-template>
+          </tr>
+          <tr *ngIf="yoyChecked">
+            <th>
+              {{(serie.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
+            </th>
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+              <td>{{item.yoy}}</td>
+            </ng-template>
+          </tr>
+          <tr *ngIf="c5maChecked">
+            <th>
+              C5MA
+            </th>
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+              <td>{{item.c5ma}}</td>
+            </ng-template>
+          </tr>
+          <tr *ngIf="ytdChecked">
+            <th>
+              {{(serie.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
+            </th>
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+              <td>{{item.ytd}}</td>
+            </ng-template>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+</div>

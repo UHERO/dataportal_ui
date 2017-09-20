@@ -115,9 +115,9 @@ export class HelperService {
       categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
     });
     seriesTableData.forEach((data) => {
-      const tableObs = categoryTableData.find(obs => obs.date === data.date);
+      const tableObs = categoryTableData.find(obs => obs.tableDate === data.tableDate);
       if (tableObs) {
-        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
+        tableObs.value = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
         tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
         tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
         tableObs.c5ma = data.c5ma === null ? ' ' : this.formatNum(+data.c5ma, decimals);

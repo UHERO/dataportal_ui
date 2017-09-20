@@ -2,7 +2,7 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-    <i [class.fa-plus-square]="!data.seriesDetail.analyze" [class.fa-minus-square]="data.seriesDetail.analyze" class="fa analyze-button" aria-hidden="true" (click)="updateAnalyze(data.seriesDetail)"></i>
+    <i [class.fa-plus-square]="!data.seriesDetail.analyze" [class.fa-minus-square]="data.seriesDetail.analyze" class="fa analyze-button" aria-hidden="true" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData)"></i>
     <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)" class="geo-selector"></app-geo-selector>
     <app-freq-selector *ngIf="portal !== 'nta'" [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
     <div class="form-check" *ngIf="data.saPairAvail">

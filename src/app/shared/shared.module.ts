@@ -21,6 +21,7 @@ import { CategoryDatatablesComponent } from '../category-datatables/category-dat
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
 import { AnalyzerComponent } from '../analyzer/analyzer.component';
+import { AnalyzerTableComponent } from '../analyzer-table/analyzer-table.component';
 import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 
@@ -40,6 +41,7 @@ import { HelpDirective } from '../help.directive';
     DateSliderComponent,
     GeoSelectorComponent,
     AnalyzerComponent,
+    AnalyzerTableComponent,
     HelpComponent,
     HelpDirective
   ],
