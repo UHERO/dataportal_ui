@@ -18,6 +18,8 @@
         <ng-template ngFor let-serie [ngForOf]="series" let-i="index">
           <tr>
             <th title="{{serie.title}}">
+              <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
+              <i class="material-icons md-18 analyze-chart" (click)="updateChart(serie)">show_chart</i>
               <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
                   {{serie.tablePrefix + serie.title + serie.tablePostfix}}
                 </a>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 import { DateWrapper } from '../date-wrapper';
@@ -8,11 +8,12 @@ import { DateWrapper } from '../date-wrapper';
   templateUrl: './analyzer.component.html',
   styleUrls: ['./analyzer.component.scss']
 })
-export class AnalyzerComponent implements OnInit {
+export class AnalyzerComponent implements OnInit, OnChanges {
   private frequencies;
   private currentFreq;
   private analyzerSeries;
   private analyzerTableDates;
+  private analyzerChartSeries;
   private yoyChecked;
   private ytdChecked;
 
@@ -36,8 +37,12 @@ export class AnalyzerComponent implements OnInit {
       this.analyzerSeries.forEach((series) => {
         series.analyzerTable = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
-      console.log('analyzer table dates', this.analyzerTableDates);
+      this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
     }
+  }
+
+  ngOnChanges() {
+    console.log(this.analyzerSeries);
   }
 
   setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
@@ -55,6 +60,32 @@ export class AnalyzerComponent implements OnInit {
 
   ytdActive(e) {
     this.ytdChecked = e.target.checked;
+  }
+
+  updateAnalyzerChart(event) {
+    const seriesExist = this.analyzerChartSeries.find(series => series.id === event.id);
+    if (seriesExist) {
+      const chartSeriesCopy = [];
+      const index = this.analyzerChartSeries.indexOf(seriesExist);
+      this.analyzerChartSeries.splice(index, 1);
+      this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
+      console.log('update', this.analyzerChartSeries);
+      return
+    }
+    if (!seriesExist) {
+      const chartSeriesCopy = [];
+      this.analyzerChartSeries.push(event);
+      this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
+      console.log('update', this.analyzerChartSeries)
+    }
+  }
+
+  copyChartSeries(analyzerChartSeries) {
+    const chartSeriesCopy = [];
+    analyzerChartSeries.forEach((series) => {
+      chartSeriesCopy.push(Object.assign({}, series));
+    });
+    return chartSeriesCopy;
   }
 
 }

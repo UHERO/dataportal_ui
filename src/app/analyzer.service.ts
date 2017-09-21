@@ -10,7 +10,7 @@ export class AnalyzerService {
     return analyzeSeries ? true : false;
   }
 
-  updateAnalyzer(seriesInfo, tableData, chartData) {
+  updateAnalyzer(seriesInfo, tableData?, chartData?) {
     if (seriesInfo.analyze) {
       const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
       const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);

@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { AnalyzerService } from '../analyzer.service';
 
 @Component({
   selector: 'app-analyzer-table',
@@ -8,10 +9,11 @@ import { Component, OnInit, Input } from '@angular/core';
 export class AnalyzerTableComponent implements OnInit {
   @Input() series;
   @Input() tableDates;
+  @Output() updateChartSeries = new EventEmitter();
   private yoyChecked;
   private ytdChecked;
 
-  constructor() { }
+  constructor(private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
   }
@@ -22,6 +24,15 @@ export class AnalyzerTableComponent implements OnInit {
 
   ytdActive(e) {
     this.ytdChecked = e.target.checked;
+  }
+
+  updateAnalyze(series) {
+    this._analyzer.updateAnalyzer(series);
+    this.updateChartSeries.emit(series);
+  }
+
+  updateChart(series) {
+    this.updateChartSeries.emit(series)
   }
 
 }

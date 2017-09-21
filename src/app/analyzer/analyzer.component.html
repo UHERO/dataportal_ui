@@ -1,5 +1,5 @@
 <div class="analyzer-view col-xs-12 col-xl-11">
   <h3>Analyzer</h3>
-  <app-analyzer-highstock *ngIf="analyzerSeries && analyzerSeries.length" [series]="analyzerSeries"></app-analyzer-highstock>
-  <app-analyzer-table [series]="analyzerSeries" [tableDates]="analyzerTableDates"></app-analyzer-table>
+  <app-analyzer-highstock *ngIf="analyzerChartSeries" [series]="analyzerChartSeries"></app-analyzer-highstock>
+  <app-analyzer-table [series]="analyzerSeries" [tableDates]="analyzerTableDates" (updateChartSeries)="updateAnalyzerChart($event)"></app-analyzer-table>
 </div>

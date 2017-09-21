@@ -19,16 +19,16 @@
     </div>
     <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">
-        <p>Min:<br>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}</p>
+        <p>Min:<br><b>{{summaryStats.minValue}}</b><br>{{summaryStats.minValueDate}}</p>
       </div>
       <div class="stat">
-        <p>Max:<br>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}</p>
+        <p>Max:<br><b>{{summaryStats.maxValue}}</b><br>{{summaryStats.maxValueDate}}</p>
       </div>
       <div class="stat" *ngIf="!data.seriesDetail.percent">
-        <p>% Change over Selected Range:<br>{{summaryStats.percChange}}</p>
+        <p>% Change over Selected Range:<br><b>{{summaryStats.percChange}}</b></p>
       </div>
       <div class="stat">
-        <p>Change over Selected Range:<br>{{summaryStats.levelChange}}</p>
+        <p>Change over Selected Range:<br><b>{{summaryStats.levelChange}}</b></p>
       </div>
     </div>
     <div class="series-table">

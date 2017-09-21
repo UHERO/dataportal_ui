@@ -1,20 +1,68 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
   styleUrls: ['./analyzer-highstock.component.scss']
 })
-export class AnalyzerHighstockComponent implements OnInit {
+export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
   private options;
+  private chart;
 
   constructor() { }
 
   ngOnInit() {
-    const testSeries = this.series[0];
-    this.drawChart(testSeries);
-    console.log(testSeries)
+    //const chartSeries = this.formatSeriesData(this.series);
+    // this.drawChart(this.series);
+    //console.log(chartSeries)
+  }
+
+  ngOnChanges() {
+    // Series in the analyzer that have been selected to be displayed in the chart
+    const selectedAnalyzerSeries = this.formatSeriesData(this.series);
+    if (this.chart) {
+      // If a chart has been generated:
+      // Check if series in the chart are selected in the analyzer, if not, remove series from the chart
+      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries);
+      // Check if the selected series have been drawn in the chart, if not, add series to the chart
+      this.checkAnalyzerSeries(selectedAnalyzerSeries, this.chart.series, this.chart);
+      return;
+    }
+    // Draw chart if no chart exists
+    this.drawChart(selectedAnalyzerSeries);
+  }
+
+  checkChartSeries(chartSeries, analyzerSeries) {
+    chartSeries.forEach((series, i) => {
+      const findSeries = analyzerSeries.find(aSeries => aSeries.name === series.name);
+      if (!findSeries && series.name !== 'Navigator 1') {
+        chartSeries[i].remove();
+      }
+    });
+  }
+
+  checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
+    analyzerSeries.forEach((series) => {
+      const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
+      if (!findSeries) {
+        chart.addSeries(series);
+      }
+    });
+  }
+
+  formatSeriesData(series) {
+    const chartSeries = [];
+    series.forEach((serie) => {
+      chartSeries.push({
+        name: serie.title,
+        data: serie.chartData.level,
+        dataGrouping: {
+          enabled: false
+        }
+      });
+    });
+    return chartSeries;
   }
 
   drawChart(series) {
@@ -245,17 +293,12 @@ export class AnalyzerHighstockComponent implements OnInit {
           cropThreshold: 0,
         }
       },
-      series: [{
-        name: series.title,
-        // type: portalSettings.highstock.series0Type,
-        // data: series0,
-        data: series.chartData.level,
-        // showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }]
+      series: series
     };
+  }
+
+  saveInstance(chartInstance) {
+    this.chart = chartInstance;
   }
 
 }

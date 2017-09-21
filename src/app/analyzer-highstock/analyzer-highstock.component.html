@@ -1,2 +1,2 @@
-<chart id="chart" type="StockChart" [options]="options">
+<chart type="StockChart" [options]="options" (load)="saveInstance($event.context)">
 </chart>

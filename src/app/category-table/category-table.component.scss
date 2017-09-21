@@ -64,16 +64,36 @@
           font-size: 0.8em;
           font-weight: normal;
           border-bottom: 0;
+
+          .th-buttons {
+            display: inline-block;
+            float: right;
+
+            .info {
+              cursor: pointer;
+              width: initial;
+
+              &:focus {
+                outline: 0;
+              }
+
+              .info-icon {
+                font-size: 1.2em;
+                vertical-align: middle;
+              }
+            }
+
+            .analyze-button {
+              color: $primary;
+              cursor: pointer;
+              vertical-align: middle;
+            }
+          }
         }
 
         .empty-header {
           border: none;
           border-right: 1px solid $border;
-        }
-
-        .info-icon {
-          font-size: 1.2em;
-          vertical-align: middle;
         }
 
         tr:last-child {
@@ -133,26 +153,6 @@
           text-overflow: ellipsis;
           color: $primary-text;
           vertical-align: top;
-        }
-
-        .analyze-button {
-          color: $primary;
-          cursor: pointer;
-        }
-        
-        .info {
-          cursor: pointer;
-          width: initial;
-          right: 5px;
-          position: absolute;
-
-          &:focus {
-            outline: 0;
-          }
-        }
-
-        .badge-primary {
-          background-color: $primary;
         }
       }
     }
