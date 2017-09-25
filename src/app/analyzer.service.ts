@@ -35,11 +35,20 @@ export class AnalyzerService {
     const endMonth = +dateEnd.substr(5, 2);
     const m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
     const q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
+    // Annual frequency
     const aSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'A')) > -1;
-    const qSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'Q')) > -1;    
+    // Quarterly frequency
+    const qSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'Q')) > -1;
+    // Semi-annual frequency
+    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;    
+    // Monthly frequency
     const mSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'M')) > -1;
     while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
       if (mSelected) {
+        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+      }
+      // If series with a semi-annual frequency have been selected but not monthly, add months '01' & '07' to the date array
+      if (sSelected && !mSelected && (startMonth === 1 || startMonth === 7)) {
         dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
       }
       if (qSelected) {

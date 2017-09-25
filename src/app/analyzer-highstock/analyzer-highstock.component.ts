@@ -1,5 +1,18 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
 
+// import * as highcharts from 'highcharts';
+declare var require: any;
+const Highcharts = require('highcharts/js/highstock');
+const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
+const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
+const exportCSV = require('../csv-export');
+
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  }
+});
+
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
@@ -13,14 +26,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit() {
-    //const chartSeries = this.formatSeriesData(this.series);
-    // this.drawChart(this.series);
-    //console.log(chartSeries)
   }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
     const selectedAnalyzerSeries = this.formatSeriesData(this.series);
+    const freq = this.checkFrequencies(this.series);
     if (this.chart) {
       // If a chart has been generated:
       // Check if series in the chart are selected in the analyzer, if not, remove series from the chart
@@ -30,7 +41,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return;
     }
     // Draw chart if no chart exists
-    this.drawChart(selectedAnalyzerSeries);
+    this.drawChart(selectedAnalyzerSeries, freq);
   }
 
   checkChartSeries(chartSeries, analyzerSeries) {
@@ -55,17 +66,36 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const chartSeries = [];
     series.forEach((serie) => {
       chartSeries.push({
-        name: serie.title,
+        name: serie.title + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')',
         data: serie.chartData.level,
+        displayName: serie.title,
+        decimals: serie.decimals,
+        frequency: serie.frequencyShort,
+        geography: serie.geography.name,
+        units: serie.unitsLabelShort,
         dataGrouping: {
           enabled: false
-        }
+        },
+        zones: serie.chartData.pseudoZones
       });
     });
     return chartSeries;
   }
 
-  drawChart(series) {
+  checkFrequencies(series) {
+    const qExist = series.find(serie => serie.frequencyShort === 'Q');
+    const mExist = series.find(serie => serie.frequencyShort === 'M');
+    const sExist = series.find(serie => serie.frequencyShort === 'S');
+    if (mExist || sExist) {
+      return 'M';
+    }
+    if (qExist) {
+       return 'Q';
+    }
+    return 'A';
+  }
+
+  drawChart(series, freq) {
     this.options = {
       chart: {
         alignTicks: false,
@@ -137,7 +167,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           exportButton: {
             text: 'Download',
             _titleKey: 'exportKey',
-            // menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
+            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
           },
           printButton: {
             text: 'Print',
@@ -177,54 +207,59 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       tooltip: {
         borderWidth: 0,
         shadow: false,
+        shared: true,
         formatter: function () {
-          /* const getFreqLabel = function(frequency, date) {
+          const getFreqLabel = function(frequency, date) {
             if (frequency === 'A') {
               return '';
             }
             if (frequency === 'Q') {
               if (Highcharts.dateFormat('%b', date) === 'Jan') {
-                return 'Q1 ';
+                return ' Q1';
               }
               if (Highcharts.dateFormat('%b', date) === 'Apr') {
-                return 'Q2 ';
+                return ' Q2';
               }
               if (Highcharts.dateFormat('%b', date) === 'Jul') {
-                return 'Q3 ';
+                return ' Q3';
               }
               if (Highcharts.dateFormat('%b', date) === 'Oct') {
-                return 'Q4 ';
+                return ' Q4';
               }
             }
             if (frequency === 'M' || frequency === 'S') {
-              return Highcharts.dateFormat('%b', date);
+              return ' ' + Highcharts.dateFormat('%b', date);
             }
-          }; */
+          };
           const pseudo = 'Pseudo History ';
-          let s = '<b>';
-          // s = s + getFreqLabel(freq.freq, this.x);
-          // s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
-          /* this.points.forEach((point) => {
-            const displayValue = Highcharts.numberFormat(point.y, decimals);
+          let s = '';
+          this.points.forEach((point) => {
+            const seriesColor = '<span class="series-' + point.colorIndex + '">\u25CF</span> ';
+            const seriesLabel = seriesColor + point.series.userOptions.displayName;
+            const pseudoSeriesLabel = seriesColor + pseudo + point.series.userOptions.displayName;
+            const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
+            const displayValue = Highcharts.numberFormat(point.y, point.series.userOptions.decimals);
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
-            const seriesNameValue = point.series.name + ': ' + formattedValue;
-            const label = seriesColor + seriesNameValue;
-            if (pseudoZones.length) {
+            const unitsLabel = point.series.userOptions.units;
+            const geoLabel = point.series.userOptions.geography;
+            const label = seriesLabel + ' ' + dateLabel + ': ' + formattedValue + ' (' + unitsLabel + ')';
+            const pseudoLabel = pseudoSeriesLabel + ' ' + dateLabel + ': ' + formattedValue + ' (' + unitsLabel + ')';
+            const pseudoZones = point.series.userOptions.pseudoZones;
+            if (pseudoZones) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  return s += seriesColor + pseudo + seriesNameValue + '<br>';
+                  return s += pseudoLabel + '<br>' + geoLabel + '<br>';
                 }
                 if (point.x > zone.value) {
-                  return s += label;
+                  return s += label + '<br>' + geoLabel + '<br>';
                 }
               });
             }
-            if (!pseudoZones.length) {
-              s += label;
+            if (!pseudoZones) {
+              s += label + '<br>' + geoLabel + '<br>';
             }
           });
-          return s; */
+          return s;
         }
       },
       credits: {
@@ -252,13 +287,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
               }
             };
             let s = '';
-            /* const month = Highcharts.dateFormat('%b', this.value);
-            const frequency = this.chart.options.chart.description;
+            const month = Highcharts.dateFormat('%b', this.value);
+            const frequency = freq;
             const first = Highcharts.dateFormat('%Y', this.axis.userMin);
             const last = Highcharts.dateFormat('%Y', this.axis.userMax);
             s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
             s = s + Highcharts.dateFormat('%Y', this.value);
-            return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this); */
+            return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
           }
         }
       },
@@ -274,20 +309,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         minPadding: 0,
         maxPadding: 0,
         minTickInterval: 0.01
-      }/* , {
-        className: 'series2',
-        title: {
-          // text: units
-        },
-        labels: {
-          format: '{value:,.2f}'
-        },
-        gridLineWidth: 0,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01,
-        showLastLabel: true
-      } */],
+      }],
       plotOptions: {
         series: {
           cropThreshold: 0,

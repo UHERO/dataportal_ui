@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 import { DateWrapper } from '../date-wrapper';
@@ -8,7 +8,7 @@ import { DateWrapper } from '../date-wrapper';
   templateUrl: './analyzer.component.html',
   styleUrls: ['./analyzer.component.scss']
 })
-export class AnalyzerComponent implements OnInit, OnChanges {
+export class AnalyzerComponent implements OnInit {
   private frequencies;
   private currentFreq;
   private analyzerSeries;
@@ -21,7 +21,6 @@ export class AnalyzerComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.analyzerSeries = this._analyzer.analyzerSeries;
-    console.log(this.analyzerSeries)
     this.frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
     this.analyzerSeries.forEach((series) => {
@@ -39,10 +38,6 @@ export class AnalyzerComponent implements OnInit, OnChanges {
       });
       this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
     }
-  }
-
-  ngOnChanges() {
-    console.log(this.analyzerSeries);
   }
 
   setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
@@ -69,14 +64,12 @@ export class AnalyzerComponent implements OnInit, OnChanges {
       const index = this.analyzerChartSeries.indexOf(seriesExist);
       this.analyzerChartSeries.splice(index, 1);
       this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
-      console.log('update', this.analyzerChartSeries);
       return
     }
     if (!seriesExist) {
       const chartSeriesCopy = [];
       this.analyzerChartSeries.push(event);
       this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
-      console.log('update', this.analyzerChartSeries)
     }
   }
 
