@@ -36,6 +36,7 @@ export class AnalyzerComponent implements OnInit {
       this.analyzerSeries.forEach((series) => {
         series.analyzerTable = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
+      this.analyzerSeries[0].showInChart = true;
       this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
     }
   }

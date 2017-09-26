@@ -20,12 +20,6 @@
     @media (max-width: 767px) {
       margin-top: 50px;
     }
-  
-    .material-icons.md-18 {
-      font-size: 18px;
-      color: $secondary;
-      vertical-align: middle;
-    }
 
     .table-row {
       position: relative;
@@ -71,6 +65,19 @@
 
             .analyze-button {
               color: #B5B5B5;
+              cursor: pointer;
+              vertical-align: middle;
+            }
+            
+            .analyze-chart {
+              color: $primary-text;
+              cursor: pointer;
+              vertical-align: middle;
+              font-size: 18px;
+            }
+
+            .analyze-chart.active {
+              color: $secondary;
             }
 
             a {

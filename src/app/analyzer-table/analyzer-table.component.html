@@ -7,7 +7,7 @@
 
 <div class="analyzer-table">
   <div class="table-row">
-    <div class="table">
+    <div class="table" #tableScroll>
       <table *ngIf="series && series.length">
         <tr>
           <th class="empty-header">&nbsp;</th>
@@ -19,7 +19,7 @@
           <tr>
             <th title="{{serie.title}}">
               <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
-              <i class="material-icons md-18 analyze-chart" (click)="updateChart(serie)">show_chart</i>
+              <i [class.active]="serie.showInChart" class="material-icons md-18 analyze-chart" (click)="updateChart(serie)">show_chart</i>
               <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
                   {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')' }}
                 </a>
