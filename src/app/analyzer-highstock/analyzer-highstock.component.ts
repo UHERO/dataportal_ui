@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
@@ -6,6 +6,7 @@ const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
 const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
+declare var $: any;
 
 Highcharts.setOptions({
   lang: {
@@ -16,10 +17,12 @@ Highcharts.setOptions({
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
-  styleUrls: ['./analyzer-highstock.component.scss']
+  styleUrls: ['./analyzer-highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
+  @Output() tableExtremes = new EventEmitter(true);  
   private options;
   private chart;
 
@@ -66,7 +69,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const chartSeries = [];
     series.forEach((serie) => {
       chartSeries.push({
-        name: serie.title + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')',
+        name: serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
         data: serie.chartData.level,
         displayName: serie.title,
         decimals: serie.decimals,
@@ -234,7 +237,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           const pseudo = 'Pseudo History ';
           let s = '';
           this.points.forEach((point) => {
-            const seriesColor = '<span class="series-' + point.colorIndex + '">\u25CF</span> ';
+            const lineColor = $('.highcharts-markers.highcharts-color-' + point.colorIndex + ' path').css('fill');
+            const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
             const seriesLabel = seriesColor + point.series.userOptions.displayName;
             const pseudoSeriesLabel = seriesColor + pseudo + point.series.userOptions.displayName;
             const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
@@ -323,4 +327,36 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     this.chart = chartInstance;
   }
 
+  setTableExtremes(e) {
+    // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
+    // Exporting calls load event and creates empty e.context object, emitting wrong values to series table
+    const extremes = this.getChartExtremes(e);
+    if (extremes) {
+      this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+    }
+  }
+
+  getChartExtremes(chartObject) {
+    // Gets range of x values to emit
+    // Used to redraw table in the single series view
+    let xMin, xMax;
+    // Selected level data
+    let selectedRange = null;
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
+    }
+    if (!chartObject.series[0].points.length) {
+      return { min: null, max: null };
+    }
+    if (selectedRange.length) {
+      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+      return { min: xMin, max: xMax };
+    }
+  }
+
+  updateExtremes(e) {
+    e.context._hasSetExtremes = true;
+    e.context._extremes = this.getChartExtremes(e.context);
+  }
 }

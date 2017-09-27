@@ -1,5 +1,19 @@
 @import 'colors';
 
+.form-check-inline {
+  padding-left: 0;
+  vertical-align: middle;
+  font-size: 0.85em;
+  margin-bottom: 0;
+  margin-top: 1rem;
+
+  input {
+    margin-right: 0.25rem;
+    margin-left: 0rem;
+    vertical-align: middle;
+  }
+}
+
 .analyzer-table {
     vertical-align: top;
     display: inline-block;
@@ -8,9 +22,6 @@
     overflow-y: hidden;
     width: 100%;
     position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
     margin-bottom: 40px;
   
     @media (min-width: 768px) {
@@ -41,9 +52,8 @@
             width: 125px;
             text-align: right;
             font-size: 0.8em;
-            padding: 0.5em;
-            border-right: 1px solid $border;
-            border-top: 0;
+            padding: 0.4em;
+            border: 1px solid $border;
             &:empty:after {
               content: "\00a0";
             }
@@ -102,7 +112,7 @@
     
           tr:last-child {
             th {
-              // border: 1px solid $border;
+              border: 1px solid $border;
             }
           }
     

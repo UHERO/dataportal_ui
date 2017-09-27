@@ -35,7 +35,7 @@
   }
 
   .analyze-button {
-    color: $primary;
+    color: #B5B5B5;
     cursor: pointer;
     margin-right: 10px;
     vertical-align: middle;
@@ -92,9 +92,9 @@
   }
 
   .series-table {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.15);
   
     th, td {
       text-align: right;
