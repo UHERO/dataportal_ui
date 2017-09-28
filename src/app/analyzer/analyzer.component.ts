@@ -13,9 +13,13 @@ export class AnalyzerComponent implements OnInit {
   private currentFreq;
   private analyzerSeries;
   private analyzerTableDates;
+  private tableDates;
   private analyzerChartSeries;
   private yoyChecked;
   private ytdChecked;
+  private chartStart;
+  private chartEnd;
+  private newTableData;
 
   constructor(private _analyzer: AnalyzerService, private _helper: HelperService) { }
 
@@ -33,8 +37,10 @@ export class AnalyzerComponent implements OnInit {
 
     if (this.analyzerSeries.length) {
       this.analyzerTableDates = this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, this.frequencies, []);
+      this.tableDates = this.analyzerTableDates;
       this.analyzerSeries.forEach((series) => {
         series.analyzerTable = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
+        series.analyzerTableData = series.analyzerTable;
       });
       this.analyzerSeries[0].showInChart = true;
       this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
@@ -80,6 +86,34 @@ export class AnalyzerComponent implements OnInit {
       chartSeriesCopy.push(Object.assign({}, series));
     });
     return chartSeriesCopy;
+  }
+
+  updateChartExtremes(e) {
+    this.chartStart = e.minDate;
+    this.chartEnd = e.maxDate;
+  }
+
+  // Update table when selecting new ranges in the chart
+  redrawTable(e, tableData, tableDates) {
+    console.log(tableData);
+    console.log('e', e)
+    // const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
+    let minDate, maxDate, tableStart, tableEnd;
+    minDate = e.minDate;
+    maxDate = e.maxDate;
+    for (let i = 0; i < tableDates.length; i++) {
+      if (tableDates[i].date === maxDate) {
+        tableStart = i;
+      }
+      if (tableDates[i].date === minDate) {
+        tableEnd = i;
+      }
+    }
+    tableData.forEach((series) => {
+      series.analyzerTableData = series.analyzerTable.slice(tableEnd, tableStart + 1);
+    });
+    this.tableDates = tableDates.slice(tableEnd, tableStart + 1);
+    console.log('tableDates', this.analyzerTableDates)
   }
 
 }

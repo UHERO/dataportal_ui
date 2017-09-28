@@ -79,7 +79,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         dataGrouping: {
           enabled: false
         },
-        zones: serie.chartData.pseudoZones
+        pseudoZones: serie.chartData.pseudoZones
       });
     });
     return chartSeries;
@@ -211,7 +211,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         borderWidth: 0,
         shadow: false,
         shared: true,
-        formatter: function () {
+        formatter: function (args) {
           const getFreqLabel = function(frequency, date) {
             if (frequency === 'A') {
               return '';
@@ -234,36 +234,71 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
               return ' ' + Highcharts.dateFormat('%b', date);
             }
           };
-          const pseudo = 'Pseudo History ';
-          let s = '';
-          this.points.forEach((point) => {
-            const lineColor = $('.highcharts-markers.highcharts-color-' + point.colorIndex + ' path').css('fill');
+          const getSeriesColor = function(seriesIndex) {
+            // Get color of the line for a series
+            // Use color for tooltip label
+            const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
             const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
-            const seriesLabel = seriesColor + point.series.userOptions.displayName;
-            const pseudoSeriesLabel = seriesColor + pseudo + point.series.userOptions.displayName;
-            const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
-            const displayValue = Highcharts.numberFormat(point.y, point.series.userOptions.decimals);
+            return seriesColor;
+          }
+          const formatObsValue = function(value, decimals) {
+            // Round observation to specified decimal place
+            const displayValue = Highcharts.numberFormat(value, decimals);
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const unitsLabel = point.series.userOptions.units;
-            const geoLabel = point.series.userOptions.geography;
-            const label = seriesLabel + ' ' + dateLabel + ': ' + formattedValue + ' (' + unitsLabel + ')';
-            const pseudoLabel = pseudoSeriesLabel + ' ' + dateLabel + ': ' + formattedValue + ' (' + unitsLabel + ')';
-            const pseudoZones = point.series.userOptions.pseudoZones;
-            if (pseudoZones) {
+            return formattedValue
+          }
+          const formatSeriesLabel = function(colorIndex, point, seriesValue, date, pointX, s) {
+            const seriesColor = getSeriesColor(colorIndex);
+            const displayName = point.userOptions.displayName;
+            const value = formatObsValue(seriesValue, point.userOptions.decimals);
+            const unitsLabel = point.userOptions.units;
+            const geoLabel = point.userOptions.geography;
+            const label = displayName + ' ' + date + ': ' + value + ' (' + unitsLabel + ') <br>';
+            const pseudoZones = point.userOptions.pseudoZones;
+            if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
-                if (point.x < zone.value) {
-                  return s += pseudoLabel + '<br>' + geoLabel + '<br>';
+                if (pointX < zone.value) {
+                  return s += seriesColor + 'Pseudo History ' + label + geoLabel + '<br>';
                 }
-                if (point.x > zone.value) {
-                  return s += label + '<br>' + geoLabel + '<br>';
+                if (pointX > zone.value) {
+                  return s += seriesColor + label + geoLabel + '<br>';
                 }
               });
             }
-            if (!pseudoZones) {
-              s += label + '<br>' + geoLabel + '<br>';
+            if (!pseudoZones.length) {
+              s += seriesColor + label + geoLabel + '<br>';
             }
+            return s;
+          }
+          const getAnnualObs = function(annualSeries, point, year) {
+            let annualLabel = '', label = '';
+            annualSeries.forEach((serie) => {
+              const seriesLabel = getSeriesColor(serie.colorIndex) + serie.userOptions.displayName;
+              // Check if current point's year is available in the annual series' data
+              const yearObs = serie.data.find(obs => Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x));
+              if (yearObs) {
+                const geoLabel = serie.userOptions.geography;
+                label += formatSeriesLabel(serie.colorIndex, serie, yearObs.y, year, yearObs.x, annualLabel);
+              }
+            });
+            // Return string of annual series with their values formatted for the tooltip
+            return label;
+          }
+          let s = '', tooltip = '';
+          const chartSeries = args.chart.series;
+          // Series in chart with an annual frequency
+          const annualSeries = chartSeries.filter(series => series.userOptions.frequency === 'A' && series.name !== 'Navigator 1');
+          // Points in the shared tooltip
+          this.points.forEach((point, index) => {
+            if (annualSeries && Highcharts.dateFormat('%b', point.x) !== 'Jan' && index === 0) {
+              const year = Highcharts.dateFormat('%Y', point.x);
+              // Get annual series to display when other frequencies are selected
+              tooltip += getAnnualObs(annualSeries, point, year);
+            }
+            const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
+            tooltip += formatSeriesLabel(point.colorIndex, point.series, point.y, dateLabel, point.x, s);
           });
-          return s;
+          return tooltip;
         }
       },
       credits: {
@@ -325,6 +360,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   saveInstance(chartInstance) {
     this.chart = chartInstance;
+    this.setTableExtremes(chartInstance);
   }
 
   setTableExtremes(e) {
@@ -358,5 +394,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   updateExtremes(e) {
     e.context._hasSetExtremes = true;
     e.context._extremes = this.getChartExtremes(e.context);
+    this.setTableExtremes(e.context);
   }
 }

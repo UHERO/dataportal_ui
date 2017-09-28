@@ -24,7 +24,7 @@
                   {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')' }}
                 </a>
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableData">
               <td>{{item.value}}</td>
             </ng-template>
           </tr>
@@ -32,7 +32,7 @@
             <th>
               {{(serie.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableData">
               <td>{{item.yoy}}</td>
             </ng-template>
           </tr>
@@ -40,7 +40,7 @@
             <th>
               C5MA
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableData">
               <td>{{item.c5ma}}</td>
             </ng-template>
           </tr>
@@ -48,7 +48,7 @@
             <th>
               {{(serie.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTable">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableData">
               <td>{{item.ytd}}</td>
             </ng-template>
           </tr>
