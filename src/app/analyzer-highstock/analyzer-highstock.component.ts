@@ -22,7 +22,7 @@ Highcharts.setOptions({
 })
 export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
-  @Output() tableExtremes = new EventEmitter(true);  
+  @Output() tableExtremes = new EventEmitter(true);
   private options;
   private chart;
 
@@ -93,7 +93,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return 'M';
     }
     if (qExist) {
-       return 'Q';
+      return 'Q';
     }
     return 'A';
   }
@@ -212,7 +212,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         shadow: false,
         shared: true,
         formatter: function (args) {
-          const getFreqLabel = function(frequency, date) {
+          const getFreqLabel = function (frequency, date) {
             if (frequency === 'A') {
               return '';
             }
@@ -234,20 +234,23 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
               return ' ' + Highcharts.dateFormat('%b', date);
             }
           };
-          const getSeriesColor = function(seriesIndex) {
+          const filterFrequency = function (chartSeries: Array<any>, freq: string) {
+            return chartSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
+          }
+          const getSeriesColor = function (seriesIndex: number) {
             // Get color of the line for a series
             // Use color for tooltip label
             const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
             const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
             return seriesColor;
           }
-          const formatObsValue = function(value, decimals) {
+          const formatObsValue = function (value: number, decimals: number) {
             // Round observation to specified decimal place
             const displayValue = Highcharts.numberFormat(value, decimals);
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             return formattedValue
           }
-          const formatSeriesLabel = function(colorIndex, point, seriesValue, date, pointX, s) {
+          const formatSeriesLabel = function (colorIndex: number, point, seriesValue: number, date: string, pointX, s: string) {
             const seriesColor = getSeriesColor(colorIndex);
             const displayName = point.userOptions.displayName;
             const value = formatObsValue(seriesValue, point.userOptions.decimals);
@@ -270,7 +273,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             }
             return s;
           }
-          const getAnnualObs = function(annualSeries, point, year) {
+          const getAnnualObs = function (annualSeries: Array<any>, point, year: string) {
             let annualLabel = '', label = '';
             annualSeries.forEach((serie) => {
               const seriesLabel = getSeriesColor(serie.colorIndex) + serie.userOptions.displayName;
@@ -284,16 +287,49 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             // Return string of annual series with their values formatted for the tooltip
             return label;
           }
+          const getQuarterObs = function (quarterSeries: Array<any>, date: string, pointQuarter: string) {
+            let quarterLabel = '', label = '';
+            quarterSeries.forEach((serie) => {
+              const seriesLabel = getSeriesColor(serie.colorIndex) + serie.userOptions.displayName;
+              // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
+              const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
+              if (obsDate) {
+                const geoLabel = serie.userOptions.geography;
+                label += formatSeriesLabel(serie.colorIndex, serie, obsDate.y, Highcharts.dateFormat('%Y', obsDate.x) + ' ' + pointQuarter, obsDate.x, quarterLabel);
+              }
+            });
+            // Return string of quarterly series with their values formatted for the tooltip
+            return label;
+          }
           let s = '', tooltip = '';
           const chartSeries = args.chart.series;
           // Series in chart with an annual frequency
-          const annualSeries = chartSeries.filter(series => series.userOptions.frequency === 'A' && series.name !== 'Navigator 1');
+          const annualSeries = filterFrequency(chartSeries, 'A');
+          // Series in chart with a quarterly frequency
+          const quarterSeries = filterFrequency(chartSeries, 'Q');
+          // Series in chart with a monthly frequency
+          const monthSeries = filterFrequency(chartSeries, 'M');
           // Points in the shared tooltip
           this.points.forEach((point, index) => {
             if (annualSeries && Highcharts.dateFormat('%b', point.x) !== 'Jan' && index === 0) {
               const year = Highcharts.dateFormat('%Y', point.x);
-              // Get annual series to display when other frequencies are selected
+              // Add annual observations when other frequencies are selected
               tooltip += getAnnualObs(annualSeries, point, year);
+            }
+            if (quarterSeries && monthSeries) {
+              if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
+                const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
+                const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
+                // Month of hovered point
+                const pointMonth = Highcharts.dateFormat('%b', point.x);
+                // Quarter that hovered point falls into 
+                const pointQuarter = months[pointMonth];
+                // Month for which there is quarterly data
+                const quarterMonth = quarters[pointQuarter];
+                const date = Highcharts.dateFormat('%Y', point.x) + ' ' + quarterMonth;
+                // Add quarterly observations when monthly series are selected
+                tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
+              }
             }
             const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
             tooltip += formatSeriesLabel(point.colorIndex, point.series, point.y, dateLabel, point.x, s);
@@ -310,8 +346,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         // max: Date.parse(endDate),
         ordinal: false,
         labels: {
-          formatter: function() {
-            const getQLabel = function(month) {
+          /* formatter: function () {
+            const getQLabel = function (month) {
               if (month === 'Jan') {
                 return 'Q1 ';
               }
@@ -333,7 +369,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
             s = s + Highcharts.dateFormat('%Y', this.value);
             return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
-          }
+          } */
         }
       },
       yAxis: [{
