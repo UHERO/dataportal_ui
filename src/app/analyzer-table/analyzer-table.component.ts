@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 
 @Component({
@@ -9,16 +9,37 @@ import { AnalyzerService } from '../analyzer.service';
 export class AnalyzerTableComponent implements OnInit {
   @ViewChildren('tableScroll') private tableEl;  
   @Input() series;
-  @Input() tableDates;
+  @Input() minDate;
+  @Input() maxDate;
+  @Input() allTableDates;
   @Output() updateChartSeries = new EventEmitter();
   private yoyChecked;
   private ytdChecked;
   private previousHeight;
   private tableWidths = [];
+  private tableDates;
 
   constructor(private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
+  }
+
+  ngOnChanges() {
+    // Update table as minDate & maxDate changee
+    let tableStart, tableEnd;
+    for (let i = 0; i < this.allTableDates.length; i++) {
+      if (this.allTableDates[i].date === this.maxDate) {
+        tableEnd = i;
+      }
+      if (this.allTableDates[i].date === this.minDate) {
+        tableStart = i;
+      }
+    }
+    // Display values in the range of dates selected
+    this.series.forEach((series) => {
+      series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
+    });
+    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1)
   }
 
   ngAfterViewChecked() {

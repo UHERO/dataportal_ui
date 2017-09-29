@@ -13,13 +13,11 @@ export class AnalyzerComponent implements OnInit {
   private currentFreq;
   private analyzerSeries;
   private analyzerTableDates;
-  private tableDates;
   private analyzerChartSeries;
-  private yoyChecked;
-  private ytdChecked;
   private chartStart;
   private chartEnd;
-  private newTableData;
+  private minDate;
+  private maxDate;
 
   constructor(private _analyzer: AnalyzerService, private _helper: HelperService) { }
 
@@ -32,15 +30,16 @@ export class AnalyzerComponent implements OnInit {
       if (!freqExist) {
         this.frequencies.push({ freq: series.frequencyShort, label: series.frequency });
       }
+      // Get earliest start date and latest end date
       this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
     });
 
     if (this.analyzerSeries.length) {
+      // Array of full range of dates for series selected in analyzer
       this.analyzerTableDates = this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, this.frequencies, []);
-      this.tableDates = this.analyzerTableDates;
       this.analyzerSeries.forEach((series) => {
-        series.analyzerTable = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
-        series.analyzerTableData = series.analyzerTable;
+        // Array of observations using full range of dates
+        series.analyzerTableData = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
       this.analyzerSeries[0].showInChart = true;
       this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
@@ -54,14 +53,6 @@ export class AnalyzerComponent implements OnInit {
     if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
       dateWrapper.endDate = seriesEnd;
     }
-  }
-
-  yoyActive(e) {
-    this.yoyChecked = e.target.checked;
-  }
-
-  ytdActive(e) {
-    this.ytdChecked = e.target.checked;
   }
 
   updateAnalyzerChart(event) {
@@ -94,26 +85,9 @@ export class AnalyzerComponent implements OnInit {
   }
 
   // Update table when selecting new ranges in the chart
-  redrawTable(e, tableData, tableDates) {
-    console.log(tableData);
-    console.log('e', e)
-    // const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
-    let minDate, maxDate, tableStart, tableEnd;
-    minDate = e.minDate;
-    maxDate = e.maxDate;
-    for (let i = 0; i < tableDates.length; i++) {
-      if (tableDates[i].date === maxDate) {
-        tableStart = i;
-      }
-      if (tableDates[i].date === minDate) {
-        tableEnd = i;
-      }
-    }
-    tableData.forEach((series) => {
-      series.analyzerTableData = series.analyzerTable.slice(tableEnd, tableStart + 1);
-    });
-    this.tableDates = tableDates.slice(tableEnd, tableStart + 1);
-    console.log('tableDates', this.analyzerTableDates)
+  setTableDates(e) {
+    this.minDate = e.minDate;
+    this.maxDate = e.maxDate;
   }
 
 }
