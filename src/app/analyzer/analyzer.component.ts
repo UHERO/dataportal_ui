@@ -22,7 +22,8 @@ export class AnalyzerComponent implements OnInit {
   constructor(private _analyzer: AnalyzerService, private _helper: HelperService) { }
 
   ngOnInit() {
-    this.analyzerSeries = this._analyzer.analyzerSeries;
+    this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
+    this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     this.frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
     this.analyzerSeries.forEach((series) => {
@@ -41,8 +42,7 @@ export class AnalyzerComponent implements OnInit {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
-      this.analyzerSeries[0].showInChart = true;
-      this.analyzerChartSeries = [Object.assign({}, this.analyzerSeries[0])];
+      this.analyzerChartSeries.push(this.analyzerSeries[0]);
     }
   }
 

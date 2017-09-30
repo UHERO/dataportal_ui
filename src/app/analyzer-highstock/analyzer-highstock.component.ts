@@ -57,10 +57,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
+    console.log('analyzerseries', analyzerSeries);
     analyzerSeries.forEach((series) => {
       const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
       if (!findSeries) {
         chart.addSeries(series);
+        console.log(chartSeries);
       }
     });
   }

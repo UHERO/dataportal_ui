@@ -12,6 +12,7 @@ export class AnalyzerTableComponent implements OnInit {
   @Input() minDate;
   @Input() maxDate;
   @Input() allTableDates;
+  @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
   private yoyChecked;
   private ytdChecked;
@@ -39,7 +40,17 @@ export class AnalyzerTableComponent implements OnInit {
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
     });
-    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1)
+    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
+
+    this.series.forEach((series) => {
+      const inChart = this.chartSeries.find(cSeries => cSeries.name === series.name);
+      if (inChart) {
+        series.showInChart = true;
+      }
+      if (!inChart) {
+        series.showInChart = false;
+      }
+    });
   }
 
   ngAfterViewChecked() {
@@ -89,7 +100,6 @@ export class AnalyzerTableComponent implements OnInit {
 
   updateChart(series) {
     this.updateChartSeries.emit(series)
-    series.showInChart = !series.showInChart;
   }
 
   // On load, table scrollbars should start at the right -- showing most recent data

@@ -16,7 +16,7 @@
     </li>
     <hr>
     <li class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"><a routerLink="/help">&nbsp; About</a></li>
-    <li class="list-item"><a routerLink="/analyzer" *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a></li>
+    <li class="list-item"><a routerLink="/analyzer" *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.allSeries.length}})</a></li>
   </ul>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>
