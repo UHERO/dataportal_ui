@@ -1,5 +1,7 @@
 import { Component, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import 'jquery';
+declare var $: any;
 
 @Component({
   selector: 'app-analyzer-table',
@@ -7,7 +9,7 @@ import { AnalyzerService } from '../analyzer.service';
   styleUrls: ['./analyzer-table.component.scss']
 })
 export class AnalyzerTableComponent implements OnInit {
-  @ViewChildren('tableScroll') private tableEl;  
+  @ViewChildren('tableScroll') private tableEl;
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
@@ -39,10 +41,6 @@ export class AnalyzerTableComponent implements OnInit {
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
-    });
-    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
-
-    this.series.forEach((series) => {
       const inChart = this.chartSeries.find(cSeries => cSeries.name === series.name);
       if (inChart) {
         series.showInChart = true;
@@ -51,6 +49,7 @@ export class AnalyzerTableComponent implements OnInit {
         series.showInChart = false;
       }
     });
+    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
 
   ngAfterViewChecked() {
@@ -84,6 +83,61 @@ export class AnalyzerTableComponent implements OnInit {
       });
     }
   }
+
+  showPopover(seriesInfo) {
+    $('[data-toggle="tooltip"]').tooltip('hide');
+    const popover = $('#' + seriesInfo.id).popover({
+      trigger: 'manual',
+      placement: function (popoverEl, el) {
+        // popoverEl = popover DOM element
+        // el = DOM element that triggers popover
+        let position = 'top';
+        const elOffset = $(el).offset().top;
+        if (elOffset <= 150) {
+          position = 'bottom';
+        }
+        return position;
+      },
+      html: true,
+      title: function () {
+        let title = seriesInfo.title;
+        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
+        return title;
+      },
+      content: function () {
+        let info = '';
+        if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
+          info += 'Seasonally Adjusted<br>';
+        }
+        if (seriesInfo.sourceDescription) {
+          info += 'Source: ' + seriesInfo.sourceDescription + '<br>';
+        }
+        if (seriesInfo.sourceLink) {
+          info += '<a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a><br>';
+        }
+        if (seriesInfo.sourceDetails) {
+          info += seriesInfo.sourceDetails;
+        }
+        return info;
+      }
+    }).on('show.bs.popover', function (e) {
+      // Display only one popover at a time
+      $('.popover').not(e.target).popover('dispose');
+      setTimeout(() => {
+        // Close popover on next click (source link in popover is still clickable)
+        $('body').one('click', function () {
+          popover.popover('dispose');
+        });
+      }, 1);
+    });
+    popover.popover('toggle');
+  }
+
+  hideInfo(seriesId) {
+    $('[data-toggle="tooltip"]').tooltip('hide');
+    $('.popover').popover('dispose');
+  }
+
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;

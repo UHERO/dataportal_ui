@@ -37,14 +37,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const freq = this.checkFrequencies(this.series);
     if (this.chart) {
       // If a chart has been generated:
-      // Check if series in the chart are selected in the analyzer, if not, remove series from the chart
-      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries);
+      // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
+      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries.series);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.checkAnalyzerSeries(selectedAnalyzerSeries, this.chart.series, this.chart);
+      this.checkAnalyzerSeries(selectedAnalyzerSeries.series, this.chart.series, this.chart);
       return;
     }
     // Draw chart if no chart exists
-    this.drawChart(selectedAnalyzerSeries, freq);
+    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, freq);
   }
 
   checkChartSeries(chartSeries, analyzerSeries) {
@@ -57,34 +57,87 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
-    console.log('analyzerseries', analyzerSeries);
+    let unitsCount = 0, units = '';
     analyzerSeries.forEach((series) => {
       const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
       if (!findSeries) {
+        console.log('series', series)
+        console.log('chart series', chartSeries)
+        console.log('axes', chart.yAxis)
+        chartSeries.forEach((cSeries) => {
+          if (cSeries.name !== 'Navigator 1' && (units === '' || units !== cSeries.userOptions.units)) {
+            units = cSeries.userOptions.units;
+            unitsCount++;
+          }
+        });
+        console.log(unitsCount)
+        if (unitsCount === 1 && series.units !== units) {
+          series.yAxis = 2;
+          console.log('add axis')
+          chart.addAxis({
+            className: 'series2',
+            title: {
+              // text: units
+            },
+            labels: {
+              format: '{value:,.2f}'
+            },
+            gridLineWidth: 0,
+            minPadding: 0,
+            maxPadding: 0,
+            // minTickInterval: 0.01,
+            opposite: true,
+            showLastLabel: true
+          })
+        }
         chart.addSeries(series);
-        console.log(chartSeries);
+                console.log('axes', chart.yAxis)
       }
     });
   }
 
   formatSeriesData(series) {
     const chartSeries = [];
+    const yAxes = [];
+    let unitsCount = 0, units = '';
     series.forEach((serie) => {
+      if (units === '' || serie.unitsLabelShort !== units) {
+        units = serie.unitsLabelShort;
+        unitsCount++;
+      }
       chartSeries.push({
-        name: serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
+        name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
         data: serie.chartData.level,
+        // yAxis: unitsCount === 2 ? 2 : 0,
         displayName: serie.title,
         decimals: serie.decimals,
         frequency: serie.frequencyShort,
         geography: serie.geography.name,
         units: serie.unitsLabelShort,
+        seasonallyAdjusted: serie.seasonallyAdjusted,
         dataGrouping: {
           enabled: false
         },
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    return chartSeries;
+    if (unitsCount === 1) {
+      yAxes.push({
+        className: 'series1',
+        labels: {
+          format: '{value:,.2f}'
+        },
+        title: {
+          // text: change
+        },
+        opposite: false,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01
+      });
+    }
+
+    return { series: chartSeries, yAxis: yAxes };
   }
 
   checkFrequencies(series) {
@@ -100,7 +153,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return 'A';
   }
 
-  drawChart(series, freq) {
+  drawChart(series, yAxis, freq) {
     this.options = {
       chart: {
         alignTicks: false,
@@ -258,6 +311,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             const value = formatObsValue(seriesValue, point.userOptions.decimals);
             const unitsLabel = point.userOptions.units;
             const geoLabel = point.userOptions.geography;
+            const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted' : '';
             const label = displayName + ' ' + date + ': ' + value + ' (' + unitsLabel + ') <br>';
             const pseudoZones = point.userOptions.pseudoZones;
             if (pseudoZones.length) {
@@ -271,7 +325,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
               });
             }
             if (!pseudoZones.length) {
-              s += seriesColor + label + geoLabel + '<br>';
+              s += seriesColor + label + geoLabel + '<br>' + seasonal + '<br>';
             }
             return s;
           }
@@ -374,19 +428,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           } */
         }
       },
-      yAxis: [{
-        className: 'series1',
-        labels: {
-          format: '{value:,.2f}'
-        },
-        title: {
-          // text: change
-        },
-        opposite: false,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01
-      }],
+      yAxis: yAxis,
       plotOptions: {
         series: {
           cropThreshold: 0,

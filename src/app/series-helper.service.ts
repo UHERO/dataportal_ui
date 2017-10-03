@@ -41,6 +41,7 @@ export class SeriesHelperService {
       // Check if series is in the analyzer
       const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === series.id);
       this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
+      this.seriesData.seriesDetail.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
       decimals = series.decimals ? series.decimals : 1;

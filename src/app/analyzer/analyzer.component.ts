@@ -23,6 +23,7 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
+    console.log(this.analyzerSeries)
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     this.frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
@@ -42,7 +43,9 @@ export class AnalyzerComponent implements OnInit {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
-      this.analyzerChartSeries.push(this.analyzerSeries[0]);
+      if (!this.analyzerChartSeries.length) {
+        this.analyzerChartSeries.push(this.analyzerSeries[0]);
+      }
     }
   }
 
@@ -57,6 +60,14 @@ export class AnalyzerComponent implements OnInit {
 
   updateAnalyzerChart(event) {
     const seriesExist = this.analyzerChartSeries.find(series => series.id === event.id);
+    let unitsCount = 0, units = '';
+    console.log(this.analyzerChartSeries)
+    this.analyzerChartSeries.forEach((cSeries) => {
+      if (units === '' || cSeries.unitsLabelShort !== units) {
+        units = cSeries.units;
+        unitsCount++;
+      }
+    });
     if (seriesExist) {
       const chartSeriesCopy = [];
       const index = this.analyzerChartSeries.indexOf(seriesExist);
@@ -64,7 +75,8 @@ export class AnalyzerComponent implements OnInit {
       this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
       return
     }
-    if (!seriesExist) {
+    if (!seriesExist && unitsCount < 2) {
+      console.log(unitsCount)
       const chartSeriesCopy = [];
       this.analyzerChartSeries.push(event);
       this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
