@@ -64,13 +64,18 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
     let unitsCount = 0, units = '';
     analyzerSeries.forEach((series) => {
+      console.log('series', series)
       const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
       if (units === '' || units !== series.unitsLabelShort) {
+        console.log('units', units)
+        console.log('units short', series.unitsLabelShort)
         units = series.unitsLabelShort;
         unitsCount++;
       }
       if (!findSeries) {
         series.yAxis = 'yAxis' + unitsCount;
+        console.log('chart y axes', chart.yAxis)
+        console.log('chart get', chart.get('yAxis' + unitsCount))
         if (!chart.get('yAxis' + unitsCount)) {
           const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
           chart.addAxis({
@@ -99,6 +104,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         units = serie.unitsLabelShort;
         unitsCount++;
         if (!this.chart) {
+          console.log('no chart')
           yAxes.push({
             labels: {
               format: '{value:,.2f}'
@@ -115,6 +121,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         }
       }
       chartSeries.push({
+        className: serie.id,
         name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
         data: serie.chartData.level,
         yAxis: unitsCount === 1 ? 'yAxis1' : 'yAxis2',

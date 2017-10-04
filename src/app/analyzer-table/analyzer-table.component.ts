@@ -41,6 +41,15 @@ export class AnalyzerTableComponent implements OnInit {
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
+      const seriesInChart = $('.' + series.id + ' > .highcharts-graph');
+      if (seriesInChart) {
+        // Match color of show_chart icon for a series with its respective color in the graph
+        $('#color' + series.id).css('color', seriesInChart.css('color'));
+      }
+      if (!seriesInChart.length) {
+        // If series is not selected for the chart, reset color of show_chart icon
+        $('#color' + series.id).css('color', '#000');
+      }
     });
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
