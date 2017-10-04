@@ -38,7 +38,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (this.chart) {
       // If a chart has been generated:
       // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
-      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries.series);
+      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries.series, this.chart);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
       this.checkAnalyzerSeries(selectedAnalyzerSeries.series, this.chart.series, this.chart);
       return;
@@ -47,11 +47,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, freq);
   }
 
-  checkChartSeries(chartSeries, analyzerSeries) {
+  checkChartSeries(chartSeries, analyzerSeries, chart) {
     chartSeries.forEach((series, i) => {
       const findSeries = analyzerSeries.find(aSeries => aSeries.name === series.name);
       if (!findSeries && series.name !== 'Navigator 1') {
         chartSeries[i].remove();
+        // Remove axis if it has no series
+        const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
+        if (noSeriesAxis) {
+          noSeriesAxis.remove();          
+        }
       }
     });
   }
@@ -60,38 +65,27 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     let unitsCount = 0, units = '';
     analyzerSeries.forEach((series) => {
       const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
+      if (units === '' || units !== series.unitsLabelShort) {
+        units = series.unitsLabelShort;
+        unitsCount++;
+      }
       if (!findSeries) {
-        console.log('series', series)
-        console.log('chart series', chartSeries)
-        console.log('axes', chart.yAxis)
-        chartSeries.forEach((cSeries) => {
-          if (cSeries.name !== 'Navigator 1' && (units === '' || units !== cSeries.userOptions.units)) {
-            units = cSeries.userOptions.units;
-            unitsCount++;
-          }
-        });
-        console.log(unitsCount)
-        if (unitsCount === 1 && series.units !== units) {
-          series.yAxis = 2;
-          console.log('add axis')
+        series.yAxis = 'yAxis' + unitsCount;
+        if (!chart.get('yAxis' + unitsCount)) {
+          const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
           chart.addAxis({
-            className: 'series2',
-            title: {
-              // text: units
-            },
             labels: {
               format: '{value:,.2f}'
             },
-            gridLineWidth: 0,
-            minPadding: 0,
-            maxPadding: 0,
-            // minTickInterval: 0.01,
-            opposite: true,
+            title: {
+              text: units
+            },
+            id: 'yAxis' + unitsCount,
+            opposite: oppositeExist ? false: true,
             showLastLabel: true
-          })
+          });
         }
         chart.addSeries(series);
-                console.log('axes', chart.yAxis)
       }
     });
   }
@@ -101,19 +95,34 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const yAxes = [];
     let unitsCount = 0, units = '';
     series.forEach((serie) => {
-      if (units === '' || serie.unitsLabelShort !== units) {
+      if (units === '' || units !== serie.unitsLabelShort) {
         units = serie.unitsLabelShort;
         unitsCount++;
+        if (!this.chart) {
+          yAxes.push({
+            labels: {
+              format: '{value:,.2f}'
+            },
+            id: 'yAxis' + unitsCount,
+            title: {
+              text: units
+            },
+            opposite: unitsCount === 1 ? false : true,
+            minPadding: 0,
+            maxPadding: 0,
+            minTickInterval: 0.01
+          });
+        }
       }
       chartSeries.push({
         name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
         data: serie.chartData.level,
-        // yAxis: unitsCount === 2 ? 2 : 0,
+        yAxis: unitsCount === 1 ? 'yAxis1' : 'yAxis2',
         displayName: serie.title,
         decimals: serie.decimals,
         frequency: serie.frequencyShort,
         geography: serie.geography.name,
-        units: serie.unitsLabelShort,
+        unitsLabelShort: serie.unitsLabelShort,
         seasonallyAdjusted: serie.seasonallyAdjusted,
         dataGrouping: {
           enabled: false
@@ -121,21 +130,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    if (unitsCount === 1) {
-      yAxes.push({
-        className: 'series1',
-        labels: {
-          format: '{value:,.2f}'
-        },
-        title: {
-          // text: change
-        },
-        opposite: false,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01
-      });
-    }
 
     return { series: chartSeries, yAxis: yAxes };
   }
@@ -309,7 +303,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             const seriesColor = getSeriesColor(colorIndex);
             const displayName = point.userOptions.displayName;
             const value = formatObsValue(seriesValue, point.userOptions.decimals);
-            const unitsLabel = point.userOptions.units;
+            const unitsLabel = point.userOptions.unitsLabelShort;
             const geoLabel = point.userOptions.geography;
             const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted' : '';
             const label = displayName + ' ' + date + ': ' + value + ' (' + unitsLabel + ') <br>';
@@ -400,33 +394,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         minRange: 1000 * 3600 * 24 * 30 * 12,
         // min: Date.parse(startDate),
         // max: Date.parse(endDate),
-        ordinal: false,
-        labels: {
-          /* formatter: function () {
-            const getQLabel = function (month) {
-              if (month === 'Jan') {
-                return 'Q1 ';
-              }
-              if (month === 'Apr') {
-                return 'Q2 ';
-              }
-              if (month === 'Jul') {
-                return 'Q3 ';
-              }
-              if (month === 'Oct') {
-                return 'Q4 ';
-              }
-            };
-            let s = '';
-            const month = Highcharts.dateFormat('%b', this.value);
-            const frequency = freq;
-            const first = Highcharts.dateFormat('%Y', this.axis.userMin);
-            const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
-            s = s + Highcharts.dateFormat('%Y', this.value);
-            return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
-          } */
-        }
+        ordinal: false
       },
       yAxis: yAxis,
       plotOptions: {

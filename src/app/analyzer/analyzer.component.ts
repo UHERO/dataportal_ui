@@ -23,7 +23,6 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
-    console.log(this.analyzerSeries)
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     this.frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
@@ -44,7 +43,8 @@ export class AnalyzerComponent implements OnInit {
         series.analyzerTableData = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
       if (!this.analyzerChartSeries.length) {
-        this.analyzerChartSeries.push(this.analyzerSeries[0]);
+        this.analyzerSeries[0].showInChart = true;
+        this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }
   }
@@ -58,37 +58,36 @@ export class AnalyzerComponent implements OnInit {
     }
   }
 
-  updateAnalyzerChart(event) {
-    const seriesExist = this.analyzerChartSeries.find(series => series.id === event.id);
+  updateAnalyzerChart(event, chartSeries) {
+    // Allow series with up to 2 different units to be displayed in chart
+    const unitsCount = this.checkSeriesUnits(chartSeries, event);
+    if (chartSeries.length === 1) {
+      console.log(chartSeries);
+      console.log('event', event)
+      const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
+      if (seriesExist) {
+        return;
+      }
+    }
+    if (unitsCount) {
+      event.showInChart = !event.showInChart;
+    }
+    this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+  }
+
+  checkSeriesUnits(chartSeries, currentSeries) {
     let unitsCount = 0, units = '';
-    console.log(this.analyzerChartSeries)
-    this.analyzerChartSeries.forEach((cSeries) => {
-      if (units === '' || cSeries.unitsLabelShort !== units) {
-        units = cSeries.units;
+    chartSeries.forEach((series) => {
+      if (units === '' || series.unitsLabelShort !== units) {
+        units = series.unitsLabelShort;
         unitsCount++;
       }
     });
-    if (seriesExist) {
-      const chartSeriesCopy = [];
-      const index = this.analyzerChartSeries.indexOf(seriesExist);
-      this.analyzerChartSeries.splice(index, 1);
-      this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
-      return
+    if (unitsCount === 2) {
+      const unitsExist = chartSeries.find(cSeries => cSeries.unitsLabelShort === currentSeries.unitsLabelShort);
+      return unitsExist ? true : false;
     }
-    if (!seriesExist && unitsCount < 2) {
-      console.log(unitsCount)
-      const chartSeriesCopy = [];
-      this.analyzerChartSeries.push(event);
-      this.analyzerChartSeries = this.copyChartSeries(this.analyzerChartSeries);
-    }
-  }
-
-  copyChartSeries(analyzerChartSeries) {
-    const chartSeriesCopy = [];
-    analyzerChartSeries.forEach((series) => {
-      chartSeriesCopy.push(Object.assign({}, series));
-    });
-    return chartSeriesCopy;
+    return unitsCount < 2 ? true : false;
   }
 
   updateChartExtremes(e) {

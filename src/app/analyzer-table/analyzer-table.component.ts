@@ -41,13 +41,6 @@ export class AnalyzerTableComponent implements OnInit {
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
-      const inChart = this.chartSeries.find(cSeries => cSeries.name === series.name);
-      if (inChart) {
-        series.showInChart = true;
-      }
-      if (!inChart) {
-        series.showInChart = false;
-      }
     });
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
