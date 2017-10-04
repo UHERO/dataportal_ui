@@ -62,8 +62,6 @@ export class AnalyzerComponent implements OnInit {
     // Allow series with up to 2 different units to be displayed in chart
     const unitsCount = this.checkSeriesUnits(chartSeries, event);
     if (chartSeries.length === 1) {
-      console.log(chartSeries);
-      console.log('event', event)
       const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
       if (seriesExist) {
         return;
@@ -76,6 +74,7 @@ export class AnalyzerComponent implements OnInit {
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
+    // TO DO: Fix unit counting logic
     let unitsCount = 0, units = '';
     chartSeries.forEach((series) => {
       if (units === '' || series.unitsLabelShort !== units) {

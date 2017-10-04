@@ -62,34 +62,27 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
-    let unitsCount = 0, units = '';
     analyzerSeries.forEach((series) => {
-      console.log('series', series)
       const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
-      if (units === '' || units !== series.unitsLabelShort) {
-        console.log('units', units)
-        console.log('units short', series.unitsLabelShort)
-        units = series.unitsLabelShort;
-        unitsCount++;
-      }
       if (!findSeries) {
-        series.yAxis = 'yAxis' + unitsCount;
-        console.log('chart y axes', chart.yAxis)
-        console.log('chart get', chart.get('yAxis' + unitsCount))
-        if (!chart.get('yAxis' + unitsCount)) {
+        const seriesUnits = series.unitsLabelShort;
+        const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
+        const y1Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis1');
+        if (!yAxis) {
           const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
           chart.addAxis({
             labels: {
               format: '{value:,.2f}'
             },
             title: {
-              text: units
+              text: seriesUnits
             },
-            id: 'yAxis' + unitsCount,
+            id: y1Exist ? 'yAxis2' : 'yAxis1',
             opposite: oppositeExist ? false: true,
             showLastLabel: true
           });
         }
+        series.yAxis = yAxis ? yAxis.userOptions.id : y1Exist ? 'yAxis2' : 'yAxis1';        
         chart.addSeries(series);
       }
     });
@@ -104,7 +97,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         units = serie.unitsLabelShort;
         unitsCount++;
         if (!this.chart) {
-          console.log('no chart')
           yAxes.push({
             labels: {
               format: '{value:,.2f}'
