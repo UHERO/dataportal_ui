@@ -20,6 +20,8 @@ export class AnalyzerComponent implements OnInit {
   private minDate;
   private maxDate;
   private portalSettings;
+  private alertUser;
+  private alertMessage;
 
   constructor(
     @Inject('portal') private portal,
@@ -71,11 +73,15 @@ export class AnalyzerComponent implements OnInit {
     const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
     // At least one series must be selected
     if (chartSeries.length === 1 && seriesExist) {
+      this.alertUser = true;
+      this.alertMessage = 'At least one series must be selected.'
       return;
     }
     // Allow up to 2 different units to be displayed in chart
     const toggleChartDisplay = this.checkSeriesUnits(chartSeries, event);
     if (toggleChartDisplay) {
+      this.alertUser = false;
+      this.alertMessage = '';
       event.showInChart = !event.showInChart;
     }
     this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
@@ -88,6 +94,8 @@ export class AnalyzerComponent implements OnInit {
     if (uniqueUnits.length === 2) {
       /// If two different units are already in use, check if the current series unit is in the list
       const unitsExist = chartSeries.find(cSeries => cSeries.unitsLabelShort === currentSeries.unitsLabelShort);
+      this.alertUser = unitsExist ? false : true;
+      this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
       return unitsExist ? true : false;
     }
     return uniqueUnits.length < 2 ? true : false;

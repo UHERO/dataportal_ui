@@ -36,6 +36,7 @@ import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelpService } from '../help.service';
+import { AnalyzerService } from '../analyzer.service';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
@@ -69,6 +70,7 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     NtaHelperService,
     SeriesHelperService,
     HelperService,
+    AnalyzerService,
     GoogleAnalyticsEventsService,
     HelpService,
     Title,

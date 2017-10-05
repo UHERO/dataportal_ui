@@ -1,6 +1,8 @@
 @import 'colors';
 
 .customize-tooltip {
+  display: inline-block;
+  
   p {
     display:  inline-block;
     font-size: 0.85em;
