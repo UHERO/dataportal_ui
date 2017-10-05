@@ -31,6 +31,7 @@ export class AnalyzerComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    // TO DO: Fix chart data, make sure series data for each chart contains all date available in analyzer date range
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;

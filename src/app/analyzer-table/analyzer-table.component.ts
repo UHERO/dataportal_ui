@@ -1,5 +1,6 @@
 import { Component, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { SeriesHelperService } from '../series-helper.service';
 import 'jquery';
 declare var $: any;
 
@@ -22,7 +23,7 @@ export class AnalyzerTableComponent implements OnInit {
   private tableWidths = [];
   private tableDates;
 
-  constructor(private _analyzer: AnalyzerService) { }
+  constructor(private _analyzer: AnalyzerService, private _series: SeriesHelperService) { }
 
   ngOnInit() {
   }
@@ -41,6 +42,9 @@ export class AnalyzerTableComponent implements OnInit {
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
+      let seriesFreq = { freq: series.frequencyShort, label: series.frequency };
+      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals);
+      console.log(series)
       const seriesInChart = $('.' + series.id + ' > .highcharts-graph');
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
