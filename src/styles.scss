@@ -111,6 +111,19 @@ body {
   }
 }
 
+.form-check-inline {
+  padding-left: 0;
+  vertical-align: middle;
+  font-size: 0.85em;
+  margin-bottom: 0;
+
+  input {
+    margin-right: 0.25rem;
+    margin-left: 0rem;
+    vertical-align: middle;
+  }
+}
+
 chart {
     display: block;
     margin-top: 2%;

@@ -22,9 +22,13 @@ Highcharts.setOptions({
 })
 export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
+  @Input() portalSettings;
   @Output() tableExtremes = new EventEmitter(true);
   private options;
   private chart;
+  private nameChecked;
+  private unitsChecked;
+  private geoChecked;
 
   constructor() { }
 
@@ -33,90 +37,99 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
-    const selectedAnalyzerSeries = this.formatSeriesData(this.series);
-    const freq = this.checkFrequencies(this.series);
+    const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart);
     if (this.chart) {
       // If a chart has been generated:
       // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
-      this.checkChartSeries(this.chart.series, selectedAnalyzerSeries.series, this.chart);
+      this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.checkAnalyzerSeries(selectedAnalyzerSeries.series, this.chart.series, this.chart);
+      this.addToChart(selectedAnalyzerSeries.series, this.chart);
       return;
     }
     // Draw chart if no chart exists
-    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, freq);
+    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings);
   }
 
-  checkChartSeries(chartSeries, analyzerSeries, chart) {
-    chartSeries.forEach((series, i) => {
-      const findSeries = analyzerSeries.find(aSeries => aSeries.name === series.name);
-      if (!findSeries && series.name !== 'Navigator 1') {
-        chartSeries[i].remove();
-        // Remove axis if it has no series
-        const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
-        if (noSeriesAxis) {
-          noSeriesAxis.remove();          
-        }
+  removeFromChart(analyzerSeries, chart) {
+    // Filter out series from chart that are not in analayzerSeries
+    const removeSeries = chart.series.filter(cSeries => !analyzerSeries.some(aSeries => aSeries.name === cSeries.name) && cSeries.name !== 'Navigator 1');
+    removeSeries.forEach((series) => {
+      series.remove();
+    });
+    // Remove y-axis if it has no series
+    const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
+    if (noSeriesAxis) {
+      noSeriesAxis.remove();
+    }
+  }
+
+  addToChart(analyzerSeries, chart) {
+    // Filter out series that have been selected in the analyzer but are not currently in the chart
+    const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
+    addSeries.forEach((series) => {
+      const seriesUnits = series.unitsLabelShort;
+      // Find y-axis that corressponds with a series' units
+      const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
+      // Find if 'yAxis0' exists, i.e. if the left y-axis exists
+      const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+      if (!yAxis) {
+        this.addYAxis(chart, seriesUnits, y0Exist);
       }
+      series.yAxis = yAxis ? yAxis.userOptions.id : (y0Exist ? 'yAxis1' : 'yAxis0');
+      chart.addSeries(series);
     });
   }
 
-  checkAnalyzerSeries(analyzerSeries, chartSeries, chart) {
-    analyzerSeries.forEach((series) => {
-      const findSeries = chartSeries.find(cSeries => cSeries.name === series.name);
-      if (!findSeries) {
-        const seriesUnits = series.unitsLabelShort;
-        const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
-        const y1Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis1');
-        if (!yAxis) {
-          const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
-          chart.addAxis({
-            labels: {
-              format: '{value:,.2f}'
-            },
-            title: {
-              text: seriesUnits
-            },
-            id: y1Exist ? 'yAxis2' : 'yAxis1',
-            opposite: oppositeExist ? false: true,
-            showLastLabel: true
-          });
-        }
-        series.yAxis = yAxis ? yAxis.userOptions.id : y1Exist ? 'yAxis2' : 'yAxis1';        
-        chart.addSeries(series);
-      }
+  addYAxis(chart, seriesUnits, y0Exist) {
+    const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
+    chart.addAxis({
+      labels: {
+        format: '{value:,.2f}'
+      },
+      title: {
+        text: seriesUnits
+      },
+      id: y0Exist ? 'yAxis1' : 'yAxis0',
+      opposite: oppositeExist ? false : true,
+      showLastLabel: true
     });
   }
 
-  formatSeriesData(series) {
+  createYAxes(series, yAxes) {
+    const allUnits = series.map(serie => serie.unitsLabelShort)
+    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+    uniqueUnits.forEach((unit, index) => {
+      yAxes.push({
+        labels: {
+          format: '{value:,.2f}'
+        },
+        id: 'yAxis' + index,
+        title: {
+          text: unit
+        },
+        opposite: index === 0 ? false : true,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01
+      });
+    });
+    return yAxes;
+  }
+
+  formatSeriesData(series, chartInstance) {
     const chartSeries = [];
-    const yAxes = [];
-    let unitsCount = 0, units = '';
+    let yAxes;
+    if (!chartInstance) {
+      yAxes = this.createYAxes(series, []);
+    }
     series.forEach((serie) => {
-      if (units === '' || units !== serie.unitsLabelShort) {
-        units = serie.unitsLabelShort;
-        unitsCount++;
-        if (!this.chart) {
-          yAxes.push({
-            labels: {
-              format: '{value:,.2f}'
-            },
-            id: 'yAxis' + unitsCount,
-            title: {
-              text: units
-            },
-            opposite: unitsCount === 1 ? false : true,
-            minPadding: 0,
-            maxPadding: 0,
-            minTickInterval: 0.01
-          });
-        }
-      }
+      // Find corresponding y-axis on initial display (i.e. no chartInstance)
+      const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
       chartSeries.push({
         className: serie.id,
         name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
         data: serie.chartData.level,
-        yAxis: unitsCount === 1 ? 'yAxis1' : 'yAxis2',
+        yAxis: axis ? axis.id : null,
         displayName: serie.title,
         decimals: serie.decimals,
         frequency: serie.frequencyShort,
@@ -133,20 +146,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return { series: chartSeries, yAxis: yAxes };
   }
 
-  checkFrequencies(series) {
-    const qExist = series.find(serie => serie.frequencyShort === 'Q');
-    const mExist = series.find(serie => serie.frequencyShort === 'M');
-    const sExist = series.find(serie => serie.frequencyShort === 'S');
-    if (mExist || sExist) {
-      return 'M';
-    }
-    if (qExist) {
-      return 'Q';
-    }
-    return 'A';
-  }
-
-  drawChart(series, yAxis, freq) {
+  drawChart(series, yAxis, tooltipFormatter, portalSettings) {
     this.options = {
       chart: {
         alignTicks: false,
@@ -242,7 +242,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           },
           credits: {
             enabled: true,
-            // text: portalSettings.highstock.credits,
+            text: portalSettings.highstock.credits,
             position: {
               align: 'right',
               x: -115,
@@ -260,130 +260,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         shadow: false,
         shared: true,
         formatter: function (args) {
-          const getFreqLabel = function (frequency, date) {
-            if (frequency === 'A') {
-              return '';
-            }
-            if (frequency === 'Q') {
-              if (Highcharts.dateFormat('%b', date) === 'Jan') {
-                return ' Q1';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Apr') {
-                return ' Q2';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Jul') {
-                return ' Q3';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Oct') {
-                return ' Q4';
-              }
-            }
-            if (frequency === 'M' || frequency === 'S') {
-              return ' ' + Highcharts.dateFormat('%b', date);
-            }
-          };
-          const filterFrequency = function (chartSeries: Array<any>, freq: string) {
-            return chartSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
-          }
-          const getSeriesColor = function (seriesIndex: number) {
-            // Get color of the line for a series
-            // Use color for tooltip label
-            const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
-            const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
-            return seriesColor;
-          }
-          const formatObsValue = function (value: number, decimals: number) {
-            // Round observation to specified decimal place
-            const displayValue = Highcharts.numberFormat(value, decimals);
-            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            return formattedValue
-          }
-          const formatSeriesLabel = function (colorIndex: number, point, seriesValue: number, date: string, pointX, s: string) {
-            const seriesColor = getSeriesColor(colorIndex);
-            const displayName = point.userOptions.displayName;
-            const value = formatObsValue(seriesValue, point.userOptions.decimals);
-            const unitsLabel = point.userOptions.unitsLabelShort;
-            const geoLabel = point.userOptions.geography;
-            const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted' : '';
-            const label = displayName + ' ' + date + ': ' + value + ' (' + unitsLabel + ') <br>';
-            const pseudoZones = point.userOptions.pseudoZones;
-            if (pseudoZones.length) {
-              pseudoZones.forEach((zone) => {
-                if (pointX < zone.value) {
-                  return s += seriesColor + 'Pseudo History ' + label + geoLabel + '<br>';
-                }
-                if (pointX > zone.value) {
-                  return s += seriesColor + label + geoLabel + '<br>';
-                }
-              });
-            }
-            if (!pseudoZones.length) {
-              s += seriesColor + label + geoLabel + '<br>' + seasonal + '<br>';
-            }
-            return s;
-          }
-          const getAnnualObs = function (annualSeries: Array<any>, point, year: string) {
-            let annualLabel = '', label = '';
-            annualSeries.forEach((serie) => {
-              const seriesLabel = getSeriesColor(serie.colorIndex) + serie.userOptions.displayName;
-              // Check if current point's year is available in the annual series' data
-              const yearObs = serie.data.find(obs => Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x));
-              if (yearObs) {
-                const geoLabel = serie.userOptions.geography;
-                label += formatSeriesLabel(serie.colorIndex, serie, yearObs.y, year, yearObs.x, annualLabel);
-              }
-            });
-            // Return string of annual series with their values formatted for the tooltip
-            return label;
-          }
-          const getQuarterObs = function (quarterSeries: Array<any>, date: string, pointQuarter: string) {
-            let quarterLabel = '', label = '';
-            quarterSeries.forEach((serie) => {
-              const seriesLabel = getSeriesColor(serie.colorIndex) + serie.userOptions.displayName;
-              // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
-              const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
-              if (obsDate) {
-                const geoLabel = serie.userOptions.geography;
-                label += formatSeriesLabel(serie.colorIndex, serie, obsDate.y, Highcharts.dateFormat('%Y', obsDate.x) + ' ' + pointQuarter, obsDate.x, quarterLabel);
-              }
-            });
-            // Return string of quarterly series with their values formatted for the tooltip
-            return label;
-          }
-          let s = '', tooltip = '';
-          const chartSeries = args.chart.series;
-          // Series in chart with an annual frequency
-          const annualSeries = filterFrequency(chartSeries, 'A');
-          // Series in chart with a quarterly frequency
-          const quarterSeries = filterFrequency(chartSeries, 'Q');
-          // Series in chart with a monthly frequency
-          const monthSeries = filterFrequency(chartSeries, 'M');
-          // Points in the shared tooltip
-          this.points.forEach((point, index) => {
-            if (annualSeries && Highcharts.dateFormat('%b', point.x) !== 'Jan' && index === 0) {
-              const year = Highcharts.dateFormat('%Y', point.x);
-              // Add annual observations when other frequencies are selected
-              tooltip += getAnnualObs(annualSeries, point, year);
-            }
-            if (quarterSeries && monthSeries) {
-              if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
-                const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
-                const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
-                // Month of hovered point
-                const pointMonth = Highcharts.dateFormat('%b', point.x);
-                // Quarter that hovered point falls into 
-                const pointQuarter = months[pointMonth];
-                // Month for which there is quarterly data
-                const quarterMonth = quarters[pointQuarter];
-                const date = Highcharts.dateFormat('%Y', point.x) + ' ' + quarterMonth;
-                // Add quarterly observations when monthly series are selected
-                tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
-              }
-            }
-            const dateLabel = Highcharts.dateFormat('%Y', this.x) + getFreqLabel(point.series.userOptions.frequency, point.x);
-            tooltip += formatSeriesLabel(point.colorIndex, point.series, point.y, dateLabel, point.x, s);
-          });
-          return tooltip;
+          return tooltipFormatter(args, this.points, this.x)
         }
       },
       credits: {
@@ -408,6 +285,153 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   saveInstance(chartInstance) {
     this.chart = chartInstance;
     this.setTableExtremes(chartInstance);
+  }
+
+  formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
+    const getFreqLabel = function (frequency, date) {
+      if (frequency === 'A') {
+        return '';
+      }
+      if (frequency === 'Q') {
+        if (Highcharts.dateFormat('%b', date) === 'Jan') {
+          return ' Q1';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Apr') {
+          return ' Q2';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Jul') {
+          return ' Q3';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Oct') {
+          return ' Q4';
+        }
+      }
+      if (frequency === 'M' || frequency === 'S') {
+        return ' ' + Highcharts.dateFormat('%b', date);
+      }
+    };
+    const filterFrequency = function (chartSeries: Array<any>, freq: string) {
+      return chartSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
+    }
+    const getSeriesColor = function (seriesIndex: number) {
+      // Get color of the line for a series
+      // Use color for tooltip label
+      const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
+      const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
+      return seriesColor;
+    }
+    const formatObsValue = function (value: number, decimals: number) {
+      // Round observation to specified decimal place
+      const displayValue = Highcharts.numberFormat(value, decimals);
+      const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+      return formattedValue
+    }
+    const formatSeriesLabel = function (name, units, geo, colorIndex: number, point, seriesValue: number, date: string, pointX, s: string) {
+      const seriesColor = getSeriesColor(colorIndex);
+      const displayName = name ? point.userOptions.displayName : '';
+      const value = formatObsValue(seriesValue, point.userOptions.decimals);
+      const unitsLabel = units ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
+      const geoLabel = geo ? point.userOptions.geography + '<br>' : '<br>';
+      const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted <br>' : '<br>';
+      const label = displayName + ' ' + date + ': ' + value + unitsLabel;
+      const pseudoZones = point.userOptions.pseudoZones;
+      if (pseudoZones.length) {
+        pseudoZones.forEach((zone) => {
+          if (pointX < zone.value) {
+            return s += seriesColor + 'Pseudo History ' + label + geoLabel;
+          }
+          if (pointX > zone.value) {
+            return s += seriesColor + label + geoLabel;
+          }
+        });
+      }
+      if (!pseudoZones.length) {
+        s += seriesColor + label + geoLabel + seasonal + '<br>';
+      }
+      return s;
+    }
+    const getAnnualObs = function (annualSeries: Array<any>, point, year: string) {
+      let annualLabel = '', label = '';
+      annualSeries.forEach((serie) => {
+        // Check if current point's year is available in the annual series' data
+        const yearObs = serie.data.find(obs => Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x));
+        if (yearObs) {
+          label += formatSeriesLabel(name, units, geo, serie.colorIndex, serie, yearObs.y, year, yearObs.x, annualLabel);
+        }
+      });
+      // Return string of annual series with their values formatted for the tooltip
+      return label;
+    }
+    const getQuarterObs = function (quarterSeries: Array<any>, date: string, pointQuarter: string) {
+      let quarterLabel = '', label = '';
+      quarterSeries.forEach((serie) => {
+        // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
+        const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
+        if (obsDate) {
+          label += formatSeriesLabel(name, units, geo, serie.colorIndex, serie, obsDate.y, Highcharts.dateFormat('%Y', obsDate.x) + ' ' + pointQuarter, obsDate.x, quarterLabel);
+        }
+      });
+      // Return string of quarterly series with their values formatted for the tooltip
+      return label;
+    }
+    let s = '', tooltip = '';
+    const chartSeries = args.chart.series;
+    // Series in chart with an annual frequency
+    const annualSeries = filterFrequency(chartSeries, 'A');
+    // Series in chart with a quarterly frequency
+    const quarterSeries = filterFrequency(chartSeries, 'Q');
+    // Series in chart with a monthly frequency
+    const monthSeries = filterFrequency(chartSeries, 'M');
+    // Points in the shared tooltip
+    points.forEach((point, index) => {
+      if (annualSeries && Highcharts.dateFormat('%b', point.x) !== 'Jan' && index === 0) {
+        const year = Highcharts.dateFormat('%Y', point.x);
+        // Add annual observations when other frequencies are selected
+        tooltip += getAnnualObs(annualSeries, point, year);
+      }
+      if (quarterSeries && monthSeries) {
+        if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
+          const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
+          const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
+          // Month of hovered point
+          const pointMonth = Highcharts.dateFormat('%b', point.x);
+          // Quarter that hovered point falls into 
+          const pointQuarter = months[pointMonth];
+          // Month for which there is quarterly data
+          const quarterMonth = quarters[pointQuarter];
+          const date = Highcharts.dateFormat('%Y', point.x) + ' ' + quarterMonth;
+          // Add quarterly observations when monthly series are selected
+          tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
+        }
+      }
+      const dateLabel = Highcharts.dateFormat('%Y', x) + getFreqLabel(point.series.userOptions.frequency, point.x);
+      tooltip += formatSeriesLabel(name, units, geo, point.colorIndex, point.series, point.y, dateLabel, point.x, s);
+    });
+    return tooltip;
+  }
+
+  reformatTooltip(chart, tooltipFormatter) {
+    const name = this.nameChecked;
+    const units = this.unitsChecked;
+    const geo = this.geoChecked;
+    chart.tooltip.options.formatter = function (args) {
+      return tooltipFormatter(args, this.points, this.x, name, units, geo);
+    }
+  }
+
+  nameActive(e, chart, tooltipFormatter) {
+    this.nameChecked = e.target.checked;
+    return this.reformatTooltip(chart, tooltipFormatter);
+  }
+
+  unitsActive(e, chart, tooltipFormatter) {
+    this.unitsChecked = e.target.checked;
+    return this.reformatTooltip(chart, tooltipFormatter);
+  }
+
+  geoActive(e, chart, tooltipFormatter) {
+    this.geoChecked = e.target.checked;
+    return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   setTableExtremes(e) {

@@ -1,3 +1,15 @@
 <chart id="analyzer-chart" type="StockChart" [options]="options" (load)="saveInstance($event.context)">
-    <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>        
+    <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
 </chart>
+<div class="customize-tooltip">
+    <p>Tooltip Display:</p>
+    <label class="form-check-inline">
+        <input type="checkbox" (change)="nameActive($event, chart, formatTooltip)">Series Name
+    </label>
+    <label class="form-check-inline">
+        <input type="checkbox" (change)="unitsActive($event, chart, formatTooltip)">Units
+    </label>
+    <label class="form-check-inline">
+        <input type="checkbox" (change)="geoActive($event, chart, formatTooltip)">Geography
+    </label>
+</div>

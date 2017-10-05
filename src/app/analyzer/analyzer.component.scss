@@ -1,5 +1,9 @@
 @import 'colors';
 
+h3 {
+  color: $primary;
+}
+
 .analyzer-view {
   @media (min-width: 768px) {
     margin-top: 70px;

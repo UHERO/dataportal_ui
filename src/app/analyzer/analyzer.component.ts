@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 import { DateWrapper } from '../date-wrapper';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 
 @Component({
   selector: 'app-analyzer',
@@ -18,10 +19,17 @@ export class AnalyzerComponent implements OnInit {
   private chartEnd;
   private minDate;
   private maxDate;
+  private portalSettings;
 
-  constructor(private _analyzer: AnalyzerService, private _helper: HelperService) { }
+  constructor(
+    @Inject('portal') private portal,
+    private _analyzer: AnalyzerService,
+    private _dataPortalSettings: DataPortalSettingsService,
+    private _helper: HelperService
+  ) { }
 
   ngOnInit() {
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     this.frequencies = [];
@@ -59,34 +67,30 @@ export class AnalyzerComponent implements OnInit {
   }
 
   updateAnalyzerChart(event, chartSeries) {
-    // Allow series with up to 2 different units to be displayed in chart
-    const unitsCount = this.checkSeriesUnits(chartSeries, event);
-    if (chartSeries.length === 1) {
-      const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
-      if (seriesExist) {
-        return;
-      }
+    // Check if series is in the chart
+    const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
+    // At least one series must be selected
+    if (chartSeries.length === 1 && seriesExist) {
+      return;
     }
-    if (unitsCount) {
+    // Allow up to 2 different units to be displayed in chart
+    const toggleChartDisplay = this.checkSeriesUnits(chartSeries, event);
+    if (toggleChartDisplay) {
       event.showInChart = !event.showInChart;
     }
     this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
-    // TO DO: Fix unit counting logic
-    let unitsCount = 0, units = '';
-    chartSeries.forEach((series) => {
-      if (units === '' || series.unitsLabelShort !== units) {
-        units = series.unitsLabelShort;
-        unitsCount++;
-      }
-    });
-    if (unitsCount === 2) {
+    // List of units for series in analyzer chart
+    const allUnits = chartSeries.map(series => series.unitsLabelShort)
+    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+    if (uniqueUnits.length === 2) {
+      /// If two different units are already in use, check if the current series unit is in the list
       const unitsExist = chartSeries.find(cSeries => cSeries.unitsLabelShort === currentSeries.unitsLabelShort);
       return unitsExist ? true : false;
     }
-    return unitsCount < 2 ? true : false;
+    return uniqueUnits.length < 2 ? true : false;
   }
 
   updateChartExtremes(e) {
