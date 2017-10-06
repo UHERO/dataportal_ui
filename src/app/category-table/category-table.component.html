@@ -21,7 +21,7 @@
 								<div class="th-buttons">
 									<i [class.fa-plus-square]="!serie.seriesInfo.analyze" [class.fa-minus-square]="serie.seriesInfo.analyze" class="fa analyze-button"
 									 aria-hidden="true" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)"></i>
-									<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(subcatIndex, serie.seriesInfo)"
+									<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(serie.seriesInfo, subcatIndex)"
 									 role="button" data-animation='false' data-toggle="popover">
 										<i class="material-icons info-icon">&#xE88F;</i>
 									</a>
