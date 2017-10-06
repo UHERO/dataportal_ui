@@ -31,15 +31,8 @@ export class AnalyzerTableComponent implements OnInit {
 
   ngOnChanges() {
     // Update table as minDate & maxDate changee
-    let tableStart, tableEnd;
-    for (let i = 0; i < this.allTableDates.length; i++) {
-      if (this.allTableDates[i].date === this.maxDate) {
-        tableEnd = i;
-      }
-      if (this.allTableDates[i].date === this.minDate) {
-        tableStart = i;
-      }
-    }
+    const tableEnd = this.allTableDates.findIndex(item => item.date === this.maxDate);
+    const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
@@ -61,8 +54,9 @@ export class AnalyzerTableComponent implements OnInit {
   ngAfterViewChecked() {
     // Check height of content and scroll tables to the right
     // If true, height is changing, i.e. content still loading
-    const heightChange = this._table.checkContainerHeight(this.previousHeight);
-    if (heightChange) {
+    const container = this._table.checkContainerHeight(this.previousHeight);
+    this.previousHeight = container.previousHeight;
+    if (container.scroll) {
       // On load, table scrollbars should start at the right -- showing most recent data
       return this._table.tableScroll(this.tableEl);
     }

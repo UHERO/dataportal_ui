@@ -24,8 +24,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() portalSettings;
   @Output() tableExtremes = new EventEmitter(true);
-  private options;
-  private chart;
+  options;
+  chart;
   private nameChecked;
   private unitsChecked;
   private geoChecked;

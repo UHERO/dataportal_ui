@@ -23,7 +23,6 @@ export class CategoryChartsComponent implements OnInit {
   constructor(private googleAES: GoogleAnalyticsEventsService, private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
-    console.log(this.data)
     this.data.forEach((chartSeries) => {
       chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
     });

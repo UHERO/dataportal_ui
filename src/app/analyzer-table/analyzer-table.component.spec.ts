@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AnalyzerService } from '../analyzer.service';
 import { HelperService } from '../helper.service';
 import { SeriesHelperService } from '../series-helper.service';
+import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { TableHelperService } from '../table-helper.service';
 import { UheroApiService } from '../uhero-api.service';
 import { AnalyzerTableComponent } from './analyzer-table.component';
@@ -17,6 +18,7 @@ describe('AnalyzerTableComponent', () => {
       declarations: [ AnalyzerTableComponent ],
       providers: [
         AnalyzerService,
+        GoogleAnalyticsEventsService,
         HelperService,
         SeriesHelperService,
         TableHelperService,

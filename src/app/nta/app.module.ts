@@ -35,6 +35,7 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+import { TableHelperService } from '../table-helper.service';
 import { HelpService } from '../help.service';
 import { AnalyzerService } from '../analyzer.service';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
@@ -71,6 +72,7 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     SeriesHelperService,
     HelperService,
     AnalyzerService,
+    TableHelperService,
     GoogleAnalyticsEventsService,
     HelpService,
     Title,

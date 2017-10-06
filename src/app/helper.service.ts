@@ -72,8 +72,8 @@ export class HelperService {
       table.push({ date: date.date, tableDate: date.tableDate, value: Infinity, yoy: Infinity, ytd: Infinity, c5ma: Infinity });
     });
     seriesData.forEach((data) => {
-      const seriesDate = data.date;
-      const tableEntry = table.find(date => date.date === seriesDate);
+      const seriesDate = data.tableDate ? data.tableDate : data.date;
+      const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
       tableEntry.value = data.value;
       tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
       tableEntry.yoy = data.yoyValue;

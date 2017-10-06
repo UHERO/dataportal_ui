@@ -11,7 +11,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 })
 export class AnalyzerComponent implements OnInit {
   private frequencies;
-  private analyzerSeries;
   private analyzerTableDates;
   private analyzerChartSeries;
   private minDate;
@@ -19,6 +18,7 @@ export class AnalyzerComponent implements OnInit {
   private portalSettings;
   private alertUser;
   private alertMessage;
+  analyzerSeries;
 
   constructor(
     @Inject('portal') private portal,

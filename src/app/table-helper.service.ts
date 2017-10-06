@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
+import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import 'jquery';
 declare var $: any;
 
 @Injectable()
 export class TableHelperService {
 
-  constructor() { }
+  constructor(private googleAES: GoogleAnalyticsEventsService) { }
 
   checkContainerHeight(previousHeight) {
-    const contianer = $('.multi-series-container');
-    const heightDiff = (previousHeight !== contianer.height());
-    previousHeight = contianer.height();
-    return heightDiff;
+    const container = $('.multi-series-container');
+    const heightDiff = (previousHeight !== container.height());
+    previousHeight = container.height();
+    return { scroll: heightDiff, previousHeight: previousHeight };
   }
 
   checkTableWidth(tableWidths) {
@@ -89,8 +90,14 @@ export class TableHelperService {
   }
 
   hideInfo(seriesId) {
+    this.submitGAEvent(seriesId);
     $('[data-toggle="tooltip"]').tooltip('hide');
     $('.popover').popover('dispose');
   }
 
+  // Google Analytics: Track clicking on series
+  submitGAEvent(seriesId) {
+    const id = seriesId.toString();
+    this.googleAES.emitEvent('series', 'click', id);
+  }
 }

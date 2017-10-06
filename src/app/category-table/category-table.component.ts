@@ -2,7 +2,6 @@ import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnInit, OnCh
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
-import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
 import { TableHelperService } from '../table-helper.service';
 import { Frequency } from '../frequency';
@@ -42,8 +41,7 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
     private _helper: HelperService,
     private route: ActivatedRoute,
     private _router: Router,
-    private _analyzer: AnalyzerService,
-    private googleAES: GoogleAnalyticsEventsService
+    private _analyzer: AnalyzerService
   ) { }
 
   ngOnInit() {
@@ -81,10 +79,11 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
   ngAfterViewChecked() {
     // Check height of content and scroll tables to the right
     // If true, height is changing, i.e. content still loading
-    const heightChange = this._table.checkContainerHeight(this.previousHeight);    
-    if (heightChange) {
+    const container = this._table.checkContainerHeight(this.previousHeight);
+    this.previousHeight = container.previousHeight;
+    if (container.scroll) {
       // On load, table scrollbars should start at the right -- showing most recent data
-      return this._table.tableScroll(this.tableEl);
+      this._table.tableScroll(this.tableEl);
     }
 
     // Scroll tables to the right when table widths changes, i.e. changing frequency from A to Q | M
@@ -96,7 +95,7 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
   }
 
   hideInfo(seriesId) {
-    this.submitGAEvent(seriesId);
+    // this.submitGAEvent(seriesId);
     return this._table.hideInfo(seriesId);
   }
 
@@ -106,11 +105,5 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
 
   updateAnalyze(seriesInfo, tableData, chartData) {
     this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
-  }
-
-  // Google Analytics: Track clicking on series
-  submitGAEvent(seriesId) {
-    const id = seriesId.toString();
-    this.googleAES.emitEvent('series', 'click', id);
   }
 }

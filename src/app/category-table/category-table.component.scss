@@ -66,10 +66,11 @@
           border-bottom: 0;
 
           .th-buttons {
-            display: inline-block;
+            // display: inline-block;
             float: right;
 
             .info {
+              float: right;
               cursor: pointer;
               width: initial;
 
@@ -80,6 +81,7 @@
               .info-icon {
                 font-size: 1.2em;
                 vertical-align: middle;
+                margin-left: 5px;
               }
             }
 
@@ -106,7 +108,7 @@
           padding-left: 30px;
           
           a {
-            width: 79%;
+            width: 70%;
           }
           
           .info {
@@ -118,7 +120,7 @@
           padding-left: 50px;
 
           a {
-            width: 77%;
+            width: 60%;
           }
           
           .info {
@@ -130,7 +132,7 @@
           padding-left: 70px;
 
           a {
-            width: 75%;
+            width: 50%;
           }
         
           .info {
@@ -147,12 +149,13 @@
         }
 
         a {
-          display: inline-block;
-          width: 80%;
+          // display: inline-block;
+          width: 75%;
           overflow: hidden;
           text-overflow: ellipsis;
           color: $primary-text;
           vertical-align: top;
+          float: left;
         }
       }
     }

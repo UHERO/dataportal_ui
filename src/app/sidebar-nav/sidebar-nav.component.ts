@@ -21,7 +21,7 @@ export class SidebarNavComponent implements OnInit {
   private ytd: string;
   private loading;
   public headerLogo;
-  private analyzerSeries;
+  analyzerSeries;
 
   constructor(
     @Inject('defaultCategory') private defaultCategory,
@@ -45,7 +45,9 @@ export class SidebarNavComponent implements OnInit {
     });
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.selectedCategory = event.url === '/help' ? 'help' : this.selectedCategory;
+        const helpUrl = event.url === '/help';
+        const analyzerUrl = event.url === '/analyzer';
+        this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
       }
     });
     this.analyzerSeries = this._analyzerService.analyzerSeries;
@@ -62,6 +64,16 @@ export class SidebarNavComponent implements OnInit {
     if (id && +id) {
       return +id;
     }
+  }
+
+  checkRoute(id, help, analyzer) {
+    if (help) {
+      return 'help';
+    }
+    if (analyzer) {
+      return 'analyzer';
+    }
+    return this.findSelectedCategory(id);
   }
 
   navigate(catId) {
