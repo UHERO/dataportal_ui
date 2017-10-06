@@ -1,6 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, Input } from '@angular/core';
 
 import { AnalyzerHighstockComponent } from './analyzer-highstock.component';
+
+// Create stub for chart component
+@Component({selector: 'chart', template: ''})
+class ChartStubComponent {
+  @Input() options;
+}
+
+// Create stub for xAxis component
+@Component({selector: 'xAxis', template: ''})
+class xAxisStubComponent {}
 
 describe('AnalyzerHighstockComponent', () => {
   let component: AnalyzerHighstockComponent;
@@ -8,7 +19,7 @@ describe('AnalyzerHighstockComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerHighstockComponent ]
+      declarations: [ AnalyzerHighstockComponent, xAxisStubComponent, ChartStubComponent ]
     })
     .compileComponents();
   }));

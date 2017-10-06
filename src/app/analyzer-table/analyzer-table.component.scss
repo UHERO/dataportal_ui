@@ -124,6 +124,7 @@
 .analyzer-summary-stats {
   font-size: 0.8em;
   text-align: right;
+  margin-bottom: 40px;
 
   table {
     width: 100%;
@@ -140,7 +141,6 @@
       }
 
       td {
-        white-space: nowrap;
         padding: 0.4em;
 
         a {

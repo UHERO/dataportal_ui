@@ -4,6 +4,7 @@ import { TestBed, async, inject } from '@angular/core/testing';
 import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
+import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 
 // TO DO: Write unit test for series-helper.service
@@ -15,6 +16,7 @@ describe('Service: SeriesHelper', () => {
         SeriesHelperService,
         HelperService,
         UheroApiService,
+        AnalyzerService,
         { provide: 'rootCategory', useValue: 59 },
         { provide: 'portal', useValue: 'test' }
       ]

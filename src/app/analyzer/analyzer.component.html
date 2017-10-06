@@ -1,6 +1,6 @@
 <div class="analyzer-view col-xs-12 col-xl-11">
   <h3>Analyzer</h3>
-  <app-analyzer-highstock *ngIf="analyzerSeries.length" [portalSettings]="portalSettings" [series]="analyzerChartSeries"  (chartExtremes)="updateChartExtremes($event)" (tableExtremes)="setTableDates($event)"></app-analyzer-highstock>
+  <app-analyzer-highstock *ngIf="analyzerSeries.length" [portalSettings]="portalSettings" [series]="analyzerChartSeries"  (tableExtremes)="setTableDates($event)"></app-analyzer-highstock>
   <div *ngIf="analyzerSeries.length" class="chart-warning">
     <p class="alert-danger"><i *ngIf="alertUser" class="material-icons warning-icon">error_outline</i> {{alertMessage}}</p>
   </div>

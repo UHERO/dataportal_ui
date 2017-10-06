@@ -156,26 +156,25 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       labels: {
         items: [{
-          // html: sourceDescription
+          html: ''
         }, {
-          // html: sourceLink
+          html: ''
         }, {
-          // html: sourceDetails
+          html: ''
         }, {
-          // html: name + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
+          html: ''
         }, {
-          // html: portalSettings.highstock.labels.portal,
+          html: portalSettings.highstock.labels.portal,
         }, {
-          // html: portalSettings.highstock.labels.portalLink
+          html: portalSettings.highstock.labels.portalLink
         }, {
-          // html: name + ' (' + geo.name + ', ' + freq.label + ')'
+          html: ''
         }],
         style: {
           display: 'none'
         }
       },
       rangeSelector: {
-        // selected: !startDate && !endDate ? 2 : null,
         buttons: [{
           type: 'year',
           count: 1,
@@ -228,7 +227,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             }
           }
         },
-        // filename: name + '_' + geo.name + '_' + freq.label,
         chartOptions: {
           events: null,
           navigator: {
@@ -250,7 +248,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             }
           },
           title: {
-            // text: name + ' (' + geo.name + ', ' + freq.label + ')',
             align: 'left'
           }
         }
@@ -268,8 +265,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       xAxis: {
         minRange: 1000 * 3600 * 24 * 30 * 12,
-        // min: Date.parse(startDate),
-        // max: Date.parse(endDate),
         ordinal: false
       },
       yAxis: yAxis,
@@ -454,26 +449,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
     if (chartObject.userMax) {
       xMax = new Date(chartObject.userMax).toISOString().split('T')[0];
-      return { min: xMin, max: xMax };
     }
     if (!chartObject.userMin && chartObject.navigator) {
       xMin = new Date(chartObject.navigator.xAxis.dataMin).toISOString().split('T')[0];
     }
     if (!chartObject.userMax && chartObject.navigator) {
       xMax = new Date(chartObject.navigator.xAxis.dataMax).toISOString().split('T')[0];
+    }
+    if (xMin && xMax) {
       return { min: xMin, max: xMax };
     }
-    /* if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
-    }
-    if (!chartObject.series[0].points.length) {
-      return { min: null, max: null };
-    }
-    if (selectedRange.length) {
-      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-      return { min: xMin, max: xMax };
-    } */
   }
 
   updateExtremes(e) {

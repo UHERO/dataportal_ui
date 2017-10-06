@@ -11,12 +11,9 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 })
 export class AnalyzerComponent implements OnInit {
   private frequencies;
-  private currentFreq;
   private analyzerSeries;
   private analyzerTableDates;
   private analyzerChartSeries;
-  private chartStart;
-  private chartEnd;
   private minDate;
   private maxDate;
   private portalSettings;
@@ -31,7 +28,6 @@ export class AnalyzerComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // TO DO: Fix chart data, make sure series data for each chart contains all date available in analyzer date range
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
@@ -106,18 +102,13 @@ export class AnalyzerComponent implements OnInit {
     const allUnits = chartSeries.map(series => series.unitsLabelShort)
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
     if (uniqueUnits.length === 2) {
-      /// If two different units are already in use, check if the current series unit is in the list
+      // If two different units are already in use, check if the current series unit is in the list
       const unitsExist = chartSeries.find(cSeries => cSeries.unitsLabelShort === currentSeries.unitsLabelShort);
       this.alertUser = unitsExist ? false : true;
       this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
       return unitsExist ? true : false;
     }
     return uniqueUnits.length < 2 ? true : false;
-  }
-
-  updateChartExtremes(e) {
-    this.chartStart = e.minDate;
-    this.chartEnd = e.maxDate;
   }
 
   // Update table when selecting new ranges in the chart
