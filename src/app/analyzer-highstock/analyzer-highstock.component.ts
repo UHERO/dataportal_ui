@@ -446,10 +446,24 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   getChartExtremes(chartObject) {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
-    let xMin, xMax;
+    let xMin = null, xMax = null;
     // Selected level data
     let selectedRange = null;
-    if (chartObject.series[0].points) {
+    if (chartObject.userMin) {
+      xMin = new Date(chartObject.userMin).toISOString().split('T')[0];
+    }
+    if (chartObject.userMax) {
+      xMax = new Date(chartObject.userMax).toISOString().split('T')[0];
+      return { min: xMin, max: xMax };
+    }
+    if (!chartObject.userMin && chartObject.navigator) {
+      xMin = new Date(chartObject.navigator.xAxis.dataMin).toISOString().split('T')[0];
+    }
+    if (!chartObject.userMax && chartObject.navigator) {
+      xMax = new Date(chartObject.navigator.xAxis.dataMax).toISOString().split('T')[0];
+      return { min: xMin, max: xMax };
+    }
+    /* if (chartObject.series[0].points) {
       selectedRange = chartObject.series[0].points;
     }
     if (!chartObject.series[0].points.length) {
@@ -459,7 +473,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
-    }
+    } */
   }
 
   updateExtremes(e) {

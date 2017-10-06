@@ -21,7 +21,7 @@
           <tr>
             <th title="{{serie.title}}">
               <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
-              <i id="color{{serie.id}}" class="material-icons md-18 analyze-chart" (click)="updateChart(serie)">show_chart</i>
+              <i class="material-icons md-18 analyze-chart color{{serie.id}}" (click)="updateChart(serie)">show_chart</i>
               <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
                   {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
               </a>
@@ -31,7 +31,7 @@
 							</a>
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
-              <td>{{item.value}}</td>
+              <td>{{item.formattedValue}}</td>
             </ng-template>
           </tr>
           <tr *ngIf="yoyChecked">
@@ -39,7 +39,7 @@
               {{(serie.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
-              <td>{{item.yoy}}</td>
+              <td>{{item.formattedYoy}}</td>
             </ng-template>
           </tr>
           <tr *ngIf="c5maChecked">
@@ -47,7 +47,7 @@
               C5MA
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
-              <td>{{item.c5ma}}</td>
+              <td>{{item.formattedC5ma}}</td>
             </ng-template>
           </tr>
           <tr *ngIf="ytdChecked">
@@ -55,7 +55,7 @@
               {{(serie.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
-              <td>{{item.ytd}}</td>
+              <td>{{item.formattedYtd}}</td>
             </ng-template>
           </tr>
         </ng-template>
@@ -64,11 +64,28 @@
   </div>
 </div>
 <div class="analyzer-summary-stats">
-  <ng-template ngFor let-serie [ngForOf]="series">
-    <p>{{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}</p>
-    <p>{{serie.summaryStats.minValue + ' (' + serie.summaryStats.minValueDate + ')'}}</p>
-    <p>{{serie.summaryStats.maxValue + ' (' + serie.summaryStats.maxValueDate + ')'}}</p>
-    <p *ngIf="!serie.percent">{{'% Change over Selected Range: ' + serie.summaryStats.percChange}}</p>
-    <p>{{'Change over Selected Range: ' + serie.summaryStats.levelChange}}</p>
-  </ng-template>
+  <table>
+    <tr>
+      <th class="empty-header">&nbsp;</th>
+      <th>Minimum Value</th>
+      <th>Maximum Value</th>
+      <th>% Change over Selected Range</th>
+      <th>Change over Selected Range</th>
+    </tr>
+    <ng-template ngFor let-serie [ngForOf]="series">
+      <tr>
+        <td class="series-title" title="{{serie.title}}">
+          <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
+          <i class="material-icons md-18 analyze-chart color{{serie.id}}" (click)="updateChart(serie)">show_chart</i>
+          <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge'>
+            {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
+          </a>
+        </td>
+        <td>{{serie.summaryStats.minValue + ' (' + serie.summaryStats.minValueDate + ')'}}</td>
+        <td>{{serie.summaryStats.maxValue + ' (' + serie.summaryStats.maxValueDate + ')'}}</td>
+        <td>{{!serie.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
+        <td>{{serie.summaryStats.levelChange}}</td>
+      </tr>
+    </ng-template>
+  </table>
 </div>

@@ -69,7 +69,7 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
+      table.push({ date: date.date, tableDate: date.tableDate, value: Infinity, yoy: Infinity, ytd: Infinity, c5ma: Infinity });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.date;
@@ -106,24 +106,6 @@ export class HelperService {
       }
     });
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
-  }
-
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, decimals: number) {
-    // Format series data for the category table
-    const categoryTableData = [];
-    dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
-    });
-    seriesTableData.forEach((data) => {
-      const tableObs = categoryTableData.find(obs => obs.tableDate === data.tableDate);
-      if (tableObs) {
-        tableObs.value = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
-        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
-        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
-        tableObs.c5ma = data.c5ma === null ? ' ' : this.formatNum(+data.c5ma, decimals);
-      }
-    });
-    return categoryTableData;
   }
 
   setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
@@ -198,6 +180,9 @@ export class HelperService {
 
   formatNum(num: number, decimal: number) {
     let fixedNum: any;
+    if (!isFinite(num)) {
+      return 'N/A';
+    }
     fixedNum = num.toFixed(decimal);
     // remove decimals
     const int = fixedNum | 0;

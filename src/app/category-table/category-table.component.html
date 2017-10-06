@@ -28,7 +28,7 @@
 								</div>
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
-								<td>{{item.value}}</td>
+								<td>{{item.formattedValue}}</td>
 							</ng-template>
 						</tr>
 						<tr *ngIf="yoyActive">
@@ -36,7 +36,7 @@
 								{{(serie.seriesInfo.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
-								<td>{{item.yoy}}</td>
+								<td>{{item.formattedYoy}}</td>
 							</ng-template>
 						</tr>
 						<tr *ngIf="c5maActive">
@@ -44,7 +44,7 @@
 								C5MA
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
-								<td>{{item.c5ma}}</td>
+								<td>{{item.formattedC5ma}}</td>
 							</ng-template>
 						</tr>
 						<tr *ngIf="ytdActive && serie.seriesInfo.frequencyShort !== 'A'">
@@ -52,7 +52,7 @@
 								{{(serie.seriesInfo.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
-								<td>{{item.ytd}}</td>
+								<td>{{item.formattedYtd}}</td>
 							</ng-template>
 						</tr>
 					</ng-template>

@@ -1,5 +1,18 @@
 @import 'colors';
 
+.analyze-button {
+  color: #B5B5B5;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.analyze-chart {
+  // color: $primary-text;
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 18px;
+}
+
 .analyzer-table {
     vertical-align: top;
     display: inline-block;
@@ -59,23 +72,6 @@
             font-weight: normal;
             border-bottom: 0;
 
-            .analyze-button {
-              color: #B5B5B5;
-              cursor: pointer;
-              vertical-align: middle;
-            }
-            
-            .analyze-chart {
-              // color: $primary-text;
-              cursor: pointer;
-              vertical-align: middle;
-              font-size: 18px;
-            }
-
-            .analyze-chart.active {
-              color: $secondary;
-            }
-
             a {
               display: inline-block;
               max-width: 80%;
@@ -123,4 +119,43 @@
         }
       }
     }
+}
+
+.analyzer-summary-stats {
+  font-size: 0.8em;
+  text-align: right;
+
+  table {
+    width: 100%;
+
+    th {
+      text-align: right;
+      color: $primary;
+      padding: 0.4em;
+    }
+
+    tr {
+      .series-title {
+        text-align: left;
+      }
+
+      td {
+        white-space: nowrap;
+        padding: 0.4em;
+
+        a {
+          display: inline-block;
+          max-width: 80%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: $primary-text;
+          vertical-align: top;
+        }
+      }
+    }
+
+    tr:nth-child(even) {
+      background-color: $table-gray;
+    }
+  }
 }

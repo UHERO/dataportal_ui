@@ -44,15 +44,14 @@ export class AnalyzerTableComponent implements OnInit {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
       let seriesFreq = { freq: series.frequencyShort, label: series.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals);
-      console.log(series)
       const seriesInChart = $('.' + series.id + ' > .highcharts-graph');
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
-        $('#color' + series.id).css('color', seriesInChart.css('color'));
+        $('.color' + series.id).css('color', seriesInChart.css('color'));
       }
       if (!seriesInChart.length) {
         // If series is not selected for the chart, reset color of show_chart icon
-        $('#color' + series.id).css('color', '#000');
+        $('.color' + series.id).css('color', '#000');
       }
     });
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);

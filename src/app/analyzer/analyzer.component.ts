@@ -49,15 +49,28 @@ export class AnalyzerComponent implements OnInit {
     if (this.analyzerSeries.length) {
       // Array of full range of dates for series selected in analyzer
       this.analyzerTableDates = this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, this.frequencies, []);
+      // The default series displayed in the chart on load should be the series with the longest range of data
+      const longestSeries = this.findLongestSeries(this.analyzerSeries);
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
-        series.analyzerTableData = this._helper.catTable(series.tableData, this.analyzerTableDates, series.decimals);
+        series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
+        longestSeries.showInChart = true;
       });
       if (!this.analyzerChartSeries.length) {
-        this.analyzerSeries[0].showInChart = true;
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }
+  }
+
+  findLongestSeries(series) {
+    let longestSeries, seriesLength = 0;
+    series.forEach((serie) => {
+      if (!longestSeries || seriesLength < serie.chartData.level.length) {
+        seriesLength = serie.chartData.level.length;
+        longestSeries = serie;
+      }
+    });
+    return longestSeries;
   }
 
   setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
