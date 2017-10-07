@@ -44,26 +44,68 @@ export class HelperService {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl').observations;
-    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1').observations;
-    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd').observations;
-    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma').observations;
+    const levelResults = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoyResults = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytdResults = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5maResults = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
     const pseudoZones = [];
-
-    if (level) {
-      level.forEach((entry, i) => {
-        // Get last pseudoHistory date if available
-        if (entry.pseudoHistory && !level[i + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
-        }
-      });
-      const combineData = this.combineObsData(level, yoy, ytd, c5ma);
-      const tableData = this.seriesTable(combineData, dates, decimals);
-      const chart = this.seriesChart(combineData, dates);
-      const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
-      results = { chartData: chartData, tableData: tableData, start: start, end: end };
+    let level, yoy, ytd, c5ma, combinedObservations;
+    // Method for old API observation response
+    if (levelResults.observations) {
+      if (levelResults) {
+        levelResults.observations.forEach((entry, i) => {
+          // Get last pseudoHistory date if available
+          if (entry.pseudoHistory && !levelResults.observations[i + 1].pseudoHistory) {
+            pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
+          }
+        });
+        combinedObservations = this.combineObsData(levelResults.observations, yoyResults.observations, ytdResults.observations, c5maResults.observations);
+      }
     }
+    if (!levelResults.observations) {
+      // Method for new API observation responses
+      if (levelResults.dates) {
+        level = this.formatObservations(levelResults);
+      }
+      if (yoyResults.dates) {
+        yoy = this.formatObservations(yoyResults);
+      }
+      if (ytdResults.dates) {
+        ytd = this.formatObservations(ytdResults);
+      }
+      if (c5maResults.dates) {
+        c5ma = this.formatObservations(c5maResults);
+      }
+      combinedObservations = level.map((entry, index) => {
+        const obj = { date: '', value: null, yoyValue: null, ytdValue: null, c5maValue: null };
+        const yoyDateIndex = yoy.findIndex(y => y.date === entry.date);
+        const ytdDateIndex = ytd.findIndex(y => y.date === entry.date);
+        const c5maDateIndex = c5ma.findIndex(c => c.date === entry.date);
+        obj.date = entry.date;
+        obj.value = entry.value;
+        obj.yoyValue = yoyDateIndex > -1 ? yoy[yoyDateIndex].value : null;
+        obj.ytdValue = ytdDateIndex > -1 ? ytd[ytdDateIndex].value : null;
+        obj.c5maValue = c5maDateIndex > -1 ? c5ma[c5maDateIndex].value : null;
+        return obj;
+      });
+    }
+    const tableData = this.seriesTable(combinedObservations, dates, decimals);
+    const chart = this.seriesChart(combinedObservations, dates);
+    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
+    results = { chartData: chartData, tableData: tableData, start: start, end: end };
     return results;
+  }
+
+  formatObservations(results) {
+    const dates = results.dates;
+    const values = results.values;
+    const formattedResults = dates.map((d, index) => {
+      const entry = { date: '', value: Infinity };
+      entry.date = d;
+      entry.value = +values[index];
+      return entry;
+    });
+    return formattedResults;
   }
 
   seriesTable(seriesData, dateRange, decimals) {
