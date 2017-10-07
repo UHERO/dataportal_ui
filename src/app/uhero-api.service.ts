@@ -30,8 +30,8 @@ export class UheroApiService {
   private cachedMeasureSeries =  [];
 
   constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
-     this.baseUrl = 'http://localhost:8080/v1';
-     // this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
+     // this.baseUrl = 'http://localhost:8080/v1';
+     this.baseUrl = 'http://api.uhero.hawaii.edu/v1';
      this.headers = new Headers();
      this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
      this.requestOptionsArgs = {headers: this.headers};
