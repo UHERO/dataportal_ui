@@ -89,7 +89,7 @@ export class HighchartComponent implements OnInit, OnChanges {
               return ': ';
             }
             if (seriesName === 'c5ma') {
-              return percent ? 'Centered 5 Year Moving Avg Chg: ' : 'Centered 5 Year Moving Avg % Chg: ';
+              return percent ? 'Annual Chg: ' : 'Annual % Chg: ';
             }
             if (seriesName === 'ytd' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';

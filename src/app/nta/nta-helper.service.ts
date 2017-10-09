@@ -261,6 +261,7 @@ export class NtaHelperService {
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
+        series.seriesInfo.title += ' (' + series.seriesInfo.geography.name + ')';
         filtered.push(series);
       }
     });

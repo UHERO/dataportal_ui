@@ -36,7 +36,7 @@
 						</tr>
 						<tr *ngIf="c5maActive">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-								C5MA
+								{{(serie.seriesInfo.percent) ? '&emsp; Annual (ch.)' : '&emsp; Annual (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
 								<td>{{item.c5ma}}</td>
