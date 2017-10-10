@@ -60,7 +60,6 @@ export class CategoryTableComponent implements AfterViewChecked, OnChanges {
       const end = endIndex;
       this.tableHeader = this.dates.slice(start, end + 1);
       if (this.data) {
-        console.log('data', this.data)
         this.data.forEach((series) => {
           if (series.seriesInfo !== 'No data available') {
             series.trimCatTable = series.categoryTable.slice(start, end + 1);
