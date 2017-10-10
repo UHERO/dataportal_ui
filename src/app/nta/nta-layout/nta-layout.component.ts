@@ -61,7 +61,6 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       this.categoryData = this._ntaHelper.initContent(this.id, this.selectedMeasure);
-      console.log('category data', this.categoryData)
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });

@@ -56,3 +56,40 @@
 		</div>
 	</div>
 </div>
+
+<!-- <table class="category-table">
+	<thead>
+		<tr>
+			<th class="empty-header">&nbsp;</th>
+			<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
+				<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.title}}" data-animation='false'
+				 data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
+					<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam, category: subCats.name }"
+					 queryParamsHandling='merge' (click)="hideInfo(serie.seriesInfo.id)">
+                  		{{serie.seriesInfo.tablePrefix + serie.seriesInfo.title + serie.seriesInfo.tablePostfix}}
+                	</a>
+					<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(subcatIndex, serie.seriesInfo)"
+					 role="button" data-animation='false' data-toggle="popover">
+						<i class="material-icons info-icon">&#xE88F;</i>
+					</a>
+				</th>
+				<th *ngIf="yoyActive">{{(serie.seriesInfo.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}</th>
+				<th *ngIf="c5maActive">{{(serie.seriesInfo.percent) ? '&emsp; Annual (ch.)' : '&emsp; Annual (%)'}}</th>
+				<th *ngIf="ytdActive">{{(serie.seriesInfo.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}</th>
+			</ng-template>
+		</tr>
+	</thead>
+	<tbody>
+		<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
+			<tr>
+			<ng-template ngFor let-item [ngForOf]="serie.trimCatTable" let-ind="index">
+				<td *ngIf="ind === 0">{{item.tableDate}}</td>
+				<td>{{item.level}}</td>
+				<td *ngIf="yoyActive">{{item.yoy}}</td>
+				<td *ngIf="c5maActive">{{item.c5ma}}</td>
+				<td *ngIf="ytdActive">{{item.ytd}}</td>
+			</ng-template>
+			</tr>
+		</ng-template>
+	</tbody>
+</table> -->

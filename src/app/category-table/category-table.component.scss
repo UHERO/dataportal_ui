@@ -34,6 +34,14 @@
       margin-left: 32%;
       margin-bottom: 40px;
 
+      background-image: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to left, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to right, #c3c3c5, rgba(195, 195, 197, 0)), linear-gradient(to left, #c3c3c5, rgba(195, 195, 197, 0));
+      background-position: 0 0, 100% 0, 0 0, 100% 0;
+      background-repeat: no-repeat;
+      background-color: white;
+      background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;
+      background-attachment: local, local, scroll, scroll;
+
+
       .category-table {
         table-layout: fixed;
         width: 100%;
