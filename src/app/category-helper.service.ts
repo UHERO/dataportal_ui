@@ -369,7 +369,9 @@ export class CategoryHelperService {
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
+        console.log('call cat table', series.tableData);
         series['categoryTable'] = this._helper.seriesTable(series.tableData, dateArray, decimals);
+        console.log('cat table', series['categoryTable'])
         series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
