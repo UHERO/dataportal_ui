@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
+import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
@@ -14,7 +14,11 @@ export class SeriesHelperService {
   private change;
   private seriesData;
 
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
+  constructor(
+    private _uheroAPIService: UheroApiService,
+    private _analyzer: AnalyzerService,
+    private _helper: HelperService
+  ) { }
 
   getSeriesData(id: number): Observable<any> {
     let currentFreq, currentGeo, decimals;
@@ -31,40 +35,46 @@ export class SeriesHelperService {
       error: null,
       noData: ''
     };
+    const analyzerSeries = this._analyzer.analyzerSeries.allSeries;
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesData.seriesDetail = series;
+      // Check if series is in the analyzer
+      const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === series.id);
+      this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
+      this.seriesData.seriesDetail.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
       decimals = series.decimals ? series.decimals : 1;
       currentGeo = series.geography;
-      currentFreq = {freq: series.frequencyShort, label: series.frequency};
+      currentFreq = { freq: series.frequencyShort, label: series.frequency };
       this.seriesData.currentGeo = currentGeo;
-      this.seriesData.regions = freqGeos.find(freq => freq.freq === currentFreq.freq).geos;
-      this.seriesData.frequencies = geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs;
+      this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [series.geography];
+      this.seriesData.frequencies = geoFreqs.length ? geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs : [{ freq: series.frequencyShort, label: series.frequency }];
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
     },
-    (error) => {
-      error = this.errorMessage = error;
-      this.seriesData.error = true;
-    },
-    () => {
-      this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
-        this.seriesData.siblings = siblings;
-        const geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
-        // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
-        this.seriesData.saPairAvail = this.checkSaPairs(geoFreqPair);
+      (error) => {
+        error = this.errorMessage = error;
+        this.seriesData.error = true;
+      },
+      () => {
+        this._uheroAPIService.fetchSeriesSiblings(id).subscribe((siblings) => {
+          this.seriesData.siblings = siblings;
+          const geoFreqPair = this.findGeoFreqSibling(siblings, currentGeo.handle, currentFreq.freq);
+          // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
+          this.seriesData.saPairAvail = this.checkSaPairs(geoFreqPair);
+        });
+        this.getSeriesObservations(this.seriesData.seriesDetail, decimals);
       });
-      this.getSeriesObservations(id, decimals);
-    });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
-  getSeriesObservations(id: number, decimals: number) {
+  getSeriesObservations(seriesDetail, decimals: number) {
     const dateArray = [];
-    this._uheroAPIService.fetchObservations(id).subscribe((observations) => {
+    this._uheroAPIService.fetchObservations(seriesDetail.id).subscribe((observations) => {
       const obs = observations;
+      seriesDetail.seriesObservations = obs;
       const levelData = obs.transformationResults[0].observations;
       const obsStart = obs.observationStart;
       const obsEnd = obs.observationEnd;
@@ -83,19 +93,24 @@ export class SeriesHelperService {
   // Find series siblings for a particular geo-frequency combination
   findGeoFreqSibling(seriesSiblings, geo, freq) {
     const saSiblings = [];
-    seriesSiblings.forEach((sibling) => {
-      if (geo === sibling.geography.handle && freq === sibling.frequencyShort) {
-        saSiblings.push(sibling);
-      }
-    });
-    return saSiblings;
+    if (seriesSiblings) {
+      seriesSiblings.forEach((sibling) => {
+        if (geo === sibling.geography.handle && freq === sibling.frequencyShort) {
+          saSiblings.push(sibling);
+        }
+      });
+      return saSiblings;
+    }
   }
 
   checkSaPairs(seriesSiblings) {
-    const saSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
-    const nsaSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
-    if (saSeries && nsaSeries) {
-      return true;
+    if (seriesSiblings) {
+      const saSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
+      const nsaSeries = seriesSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
+      if (saSeries && nsaSeries) {
+        return true;
+      }
+      return false;
     }
     return false;
   }

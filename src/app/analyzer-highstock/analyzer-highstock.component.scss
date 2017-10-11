@@ -1,6 +1,17 @@
 @import 'colors';
 
-#chart {
+.customize-tooltip {
+  display: inline-block;
+  
+  p {
+    display:  inline-block;
+    font-size: 0.85em;
+    margin-top: 1rem;
+    vertical-align: middle;
+  }
+}
+
+#analyzer-chart {
     box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
     -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
@@ -28,19 +39,31 @@
 
     .highcharts-markers.highcharts-series-0 {
         path {
-            fill: $highstock-series0;
+            fill: $analyzer-series0;
         }
     }
 
     .highcharts-markers.highcharts-series-1 {
         path {
-            fill: $highstock-series1;
+            fill: $analyzer-series1;
         }
     }
 
-    .highcharts-navigator-series {
-        .highcharts-area {
-            fill: $highstock-series1;
+    .highcharts-markers.highcharts-series-2 {
+        path {
+            fill: $analyzer-series2;
+        }
+    }
+
+    .highcharts-markers.highcharts-series-3 {
+        path {
+            fill: $analyzer-series3;
+        }
+    }
+
+    .highcharts-markers.highcharts-series-4 {
+        path {
+            fill: $analyzer-series4;
         }
     }
 
@@ -50,19 +73,47 @@
 
     .highcharts-series-0 {
         .highcharts-graph {
-            stroke: $highstock-series0;
-        }
-        
-        rect.highcharts-point {
-            stroke: none;
-            fill: $highstock-series0;
+            stroke: $analyzer-series0;
+            color: $analyzer-series0
         }
     }
 
     .highcharts-series-1 {
         .highcharts-graph {
-            stroke: $highstock-series1;
-            color: $highstock-series1;
+            stroke: $analyzer-series1;
+            color: $analyzer-series1;
+        }
+    }
+
+    .highcharts-series-2 {
+        .highcharts-graph {
+            stroke: $analyzer-series2;
+            color: $analyzer-series2;
+        }
+    }
+
+    .highcharts-series-3 {
+        .highcharts-graph {
+            stroke: $analyzer-series3;
+            color: $analyzer-series3;
+        }
+    }
+
+    .highcharts-series-4 {
+        .highcharts-graph {
+            stroke: $analyzer-series4;
+            color: $analyzer-series4;
+        }
+    }
+
+    .highcharts-navigator-series {
+        .highcharts-graph {
+            color: #505050;
+            stroke: #505050;            
+        }
+
+        .highcharts-area {
+            fill: $highstock-series1;
         }
     }
 
@@ -75,11 +126,27 @@
         filter: none !important;
 
         .series-0 {
-            fill: $highstock-series0;
+            fill: $analyzer-series0;
         }
         
         .series-1 {
-            fill: $highstock-series1;
+            fill: $analyzer-series1;
+        }
+        
+        .series-2 {
+            fill: $analyzer-series2;
+        }
+
+        .series-3 {
+            fill: $analyzer-series3;
+        }
+
+        .series-4 {
+            fill: $analyzer-series4;
+        }
+
+        .highcharts-tooltip-box {
+            stroke-width: 0;
         }
     }
 
@@ -90,7 +157,7 @@
         }
     }
 
-    .highcharts-yaxis-grid.series2 {
+    .highcharts-yaxis-grid {
         .highcharts-grid-line {
             display: none;
         }

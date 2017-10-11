@@ -64,7 +64,7 @@
         var seriesLink = [chartLabels[3].html];
         var uhero = [chartLabels[4].html];
         var dpLink = [chartLabels[5].html];
-        var seriesInfo = ['Series: ' + chartLabels[6].html];
+        var seriesInfo = [chartLabels[6].html];
 
         // Loop the series and index values
         i = 0;

@@ -2,8 +2,9 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
-    <app-geo-selector [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)" class="geo-selector"></app-geo-selector>
-    <app-freq-selector *ngIf="portal !== 'nta'" [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
+    <i [class.fa-plus-square]="!data.seriesDetail.analyze" [class.fa-minus-square]="data.seriesDetail.analyze" class="fa analyze-button" aria-hidden="true" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData, data.chartData)"></i>
+    <app-geo-selector *ngIf="data.regions" [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)" class="geo-selector"></app-geo-selector>
+    <app-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq" (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [(ngModel)]="seasonallyAdjusted"  (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally Adjusted
@@ -18,16 +19,16 @@
     </div>
     <div class="summary-stats" *ngIf="!noSelection && !data.noData && summaryStats">
       <div class="stat">
-        <p>Min:<br>{{summaryStats.minValue}}<br>{{summaryStats.minValueDate}}</p>
+        <p>Min ({{summaryStats.minValueDate}}):<br><b>{{summaryStats.minValue}}</b> ({{data.seriesDetail.unitsLabelShort}})</p>
       </div>
       <div class="stat">
-        <p>Max:<br>{{summaryStats.maxValue}}<br>{{summaryStats.maxValueDate}}</p>
+        <p>Max ({{summaryStats.maxValueDate}}):<br><b>{{summaryStats.maxValue}}</b> ({{data.seriesDetail.unitsLabelShort}})</p>
       </div>
       <div class="stat" *ngIf="!data.seriesDetail.percent">
-        <p>% Change over Selected Range:<br>{{summaryStats.percChange}}</p>
+        <p>% Change over Selected Range:<br><b>{{summaryStats.percChange}}</b></p>
       </div>
       <div class="stat">
-        <p>Change over Selected Range:<br>{{summaryStats.levelChange}}</p>
+        <p>Change over Selected Range:<br><b>{{summaryStats.levelChange}}</b></p>
       </div>
     </div>
     <div class="series-table">

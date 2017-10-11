@@ -369,7 +369,7 @@ export class CategoryHelperService {
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
-        series['categoryTable'] = this._helper.catTable(series.tableData, dateArray, decimals);
+        series['categoryTable'] = this._helper.seriesTable(series.tableData, dateArray, decimals);
         series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });

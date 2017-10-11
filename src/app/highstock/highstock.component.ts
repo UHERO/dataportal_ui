@@ -103,7 +103,7 @@ export class HighstockComponent implements OnChanges {
         }, {
           html: portalSettings.highstock.labels.portalLink
         }, {
-          html: name + ' (' + geo.name + ', ' + freq.label + ')'
+          html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
         style: {
           display: 'none'
@@ -377,6 +377,8 @@ export class HighstockComponent implements OnChanges {
     if (selectedRange.length) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+      console.log('xMin', xMin);
+      console.log('xMax', xMax)
       return { min: xMin, max: xMax };
     }
   }
@@ -389,6 +391,7 @@ export class HighstockComponent implements OnChanges {
     const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
     const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
     const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
+    console.log(new Date(levelData[counter][0]).toISOString().substr(4, 6))
     return { start: start , end: end };
   }
 
