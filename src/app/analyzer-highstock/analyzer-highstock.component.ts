@@ -22,6 +22,7 @@ Highcharts.setOptions({
 })
 export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
+  @Input() allDates;
   @Input() portalSettings;
   @Output() tableExtremes = new EventEmitter(true);
   options;
@@ -37,7 +38,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
-    const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart);
+    const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);
     if (this.chart) {
       // If a chart has been generated:
       // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
@@ -116,7 +117,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return yAxes;
   }
 
-  formatSeriesData(series, chartInstance) {
+  formatSeriesData(series, chartInstance, dates) {
+    const navigatorDates = dates.map((date) => {
+      const obs = [];
+      obs[0] = Date.parse(date.date);
+      obs[1] = null;
+      return obs;
+    });
+    console.log(navigatorDates)
     const chartSeries = [];
     let yAxes;
     if (!chartInstance) {
@@ -134,6 +142,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         decimals: serie.decimals,
         frequency: serie.frequencyShort,
         geography: serie.geography.name,
+        showInNavigator: false,
         unitsLabelShort: serie.unitsLabelShort,
         seasonallyAdjusted: serie.seasonallyAdjusted,
         dataGrouping: {
@@ -142,6 +151,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
+    chartSeries.push({
+      data: navigatorDates,
+      showInNavigator: true,
+      name: 'Navigator'
+    })
 
     return { series: chartSeries, yAxis: yAxes };
   }
@@ -443,14 +457,37 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Used to redraw table in the single series view
     let xMin = null, xMax = null;
     // Selected level data
+    console.log('chart object', chartObject);
     let selectedRange = null;
-    if (chartObject.userMin) {
+    if (chartObject && chartObject.series) {
+      let series, seriesLength = 0;
+      const nav = chartObject.series.find(serie => serie.name === 'Navigator');
+      chartObject.series.forEach((serie) => {
+        if (!series || seriesLength < serie.points.length) {
+          seriesLength = serie.points.length;
+          series = serie;
+        }
+      });
+      selectedRange = nav ? nav.points : series.points;
+    }
+    if (!selectedRange) {
+      return { min: null, max: null };
+    }
+    if (selectedRange) {
+      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+      console.log('xMin', xMin);
+      console.log('xMax', xMax)
+      return { min: xMin, max: xMax };
+    }
+    /* if (chartObject.userMin) {
       xMin = new Date(chartObject.userMin).toISOString().split('T')[0];
     }
     if (chartObject.userMax) {
       xMax = new Date(chartObject.userMax).toISOString().split('T')[0];
     }
     if (!chartObject.userMin && chartObject.navigator) {
+      console.log('chart object', chartObject)
       xMin = new Date(chartObject.navigator.xAxis.dataMin).toISOString().split('T')[0];
     }
     if (!chartObject.userMax && chartObject.navigator) {
@@ -458,7 +495,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
     if (xMin && xMax) {
       return { min: xMin, max: xMax };
-    }
+    } */
   }
 
   updateExtremes(e) {

@@ -59,6 +59,7 @@ export class HelperService {
       });
       const combineData = this.combineObsData(level, yoy, ytd, c5ma);
       const tableData = this.seriesTable(combineData, dates, decimals);
+      console.log('table data', tableData)
       const chart = this.seriesChart(combineData, dates);
       const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
       results = { chartData: chartData, tableData: tableData, start: start, end: end };
@@ -158,6 +159,7 @@ export class HelperService {
         }
       }
     }
+    console.log('combine', data)
     return data;
   }
 
@@ -180,9 +182,6 @@ export class HelperService {
 
   formatNum(num: number, decimal: number) {
     let fixedNum: any;
-    if (!isFinite(num)) {
-      return 'N/A';
-    }
     fixedNum = num.toFixed(decimal);
     // remove decimals
     const int = fixedNum | 0;

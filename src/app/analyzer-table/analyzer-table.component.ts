@@ -30,9 +30,13 @@ export class AnalyzerTableComponent implements OnInit {
   }
 
   ngOnChanges() {
-    // Update table as minDate & maxDate changee
+    // Update table as minDate & maxDate change
+    console.log('max date', this.maxDate);
+    console.log('min date', this.minDate)
     const tableEnd = this.allTableDates.findIndex(item => item.date === this.maxDate);
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
+    console.log('table end', tableEnd);
+    console.log('table start', tableStart)
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
