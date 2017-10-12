@@ -89,6 +89,7 @@
               color: #B5B5B5;
               cursor: pointer;
               vertical-align: middle;
+              font-size: inherit;
             }
           }
         }
@@ -108,7 +109,7 @@
           padding-left: 30px;
           
           a {
-            width: 70%;
+            width: 68%;
           }
           
           .info {
@@ -150,7 +151,7 @@
 
         a {
           // display: inline-block;
-          width: 75%;
+          width: 74%;
           overflow: hidden;
           text-overflow: ellipsis;
           color: $primary-text;

@@ -10,7 +10,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
   styleUrls: ['./analyzer.component.scss']
 })
 export class AnalyzerComponent implements OnInit {
-  private frequencies;
   private analyzerTableDates;
   private analyzerChartSeries;
   private minDate;
@@ -31,31 +30,34 @@ export class AnalyzerComponent implements OnInit {
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
     this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
-    this.frequencies = [];
-    const dateWrapper = { firstDate: '', endDate: '' };
-    this.analyzerSeries.forEach((series) => {
-      const freqExist = this.frequencies.find(freq => freq.freq === series.frequencyShort);
-      if (!freqExist) {
-        this.frequencies.push({ freq: series.frequencyShort, label: series.frequency });
-      }
-      // Get earliest start date and latest end date
-      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
-    });
-
     if (this.analyzerSeries.length) {
-      // Array of full range of dates for series selected in analyzer
-      this.analyzerTableDates = this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, this.frequencies, []);
+      this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
       // The default series displayed in the chart on load should be the series with the longest range of data
       const longestSeries = this.findLongestSeries(this.analyzerSeries);
+      longestSeries.showInChart = true;
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
-        longestSeries.showInChart = true;
       });
       if (!this.analyzerChartSeries.length) {
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }
+  }
+
+  setAnalyzerDates(analyzerSeries) {
+    const frequencies = [];
+    const dateWrapper = { firstDate: '', endDate: '' };
+    analyzerSeries.forEach((series) => {
+      const freqExist = frequencies.find(freq => freq.freq === series.frequencyShort);
+      if (!freqExist) {
+        frequencies.push({ freq: series.frequencyShort, label: series.frequency });
+      }
+      // Get earliest start date and latest end date
+      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
+    });
+    // Array of full range of dates for series selected in analyzer
+    return this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
   }
 
   findLongestSeries(series) {
@@ -94,6 +96,12 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
     }
+    // Update table dates when removing series from analyzer
+    this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
+    this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
+    this.analyzerSeries.forEach((series) => {
+      series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
+    });
     this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
   }
 

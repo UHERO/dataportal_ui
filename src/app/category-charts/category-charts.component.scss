@@ -33,22 +33,27 @@
     cursor: pointer;
     position: relative;
     top: -25px;
+    vertical-align: middle;
     left: 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
-  .fa-plus-square {
+  .add-button {
     &:hover::after {
       content: ' Add to Analyzer';
-      font-size: 0.8em;
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.75em;
       font-family: 'Lucida Sans', sans-serif;
     }
   }
 
-  .fa-minus-square {
+  .remove-button {
     &:hover::after {
       content: ' Remove from Analyzer';
-      font-size: 0.8em;
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.75em;
       font-family: 'Lucida Sans', sans-serif;
     }
   }

@@ -136,7 +136,7 @@ export class SeriesHelperService {
       percChange: '',
       levelChange: '',
     };
-
+    
     // Find first non-empty value as the table end value
     stats.tableEndValue = this.getTableEnd(seriesData);
     // Find last non-empty value as the table start value
@@ -154,8 +154,8 @@ export class SeriesHelperService {
     formatStats.minValueDate = this._helper.formatDate(stats.minValueDate, freq.freq);
     formatStats.maxValue = this._helper.formatNum(stats.maxValue, decimals);
     formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.percChange = this._helper.formatNum(stats.percChange, decimals);
-    formatStats.levelChange = this._helper.formatNum(stats.levelChange, decimals);
+    formatStats.percChange = stats.percChange === Infinity ? ' ' : this._helper.formatNum(stats.percChange, decimals);
+    formatStats.levelChange = stats.levelChange === Infinity ? ' ' : this._helper.formatNum(stats.levelChange, decimals);
     return formatStats;
   }
 
@@ -163,7 +163,7 @@ export class SeriesHelperService {
     let counter;
     if (seriesData.length) {
       counter = 0;
-      while (seriesData[counter].value === ' ') {
+      while (seriesData[counter].value === ' ' || seriesData[counter].value === Infinity) {
         counter++;
       }
       return seriesData[counter].value;
@@ -174,7 +174,7 @@ export class SeriesHelperService {
     let counter;
     if (seriesData.length) {
       counter = seriesData.length - 1;
-      while (seriesData[counter].value === ' ') {
+      while (seriesData[counter].value === ' ' || seriesData[counter].value === Infinity) {
         counter--;
       }
       return seriesData[counter].value;
@@ -188,7 +188,7 @@ export class SeriesHelperService {
         minValue = item.value;
         minValueDate = item.date;
       }
-      if (maxValue === Infinity || item.value > maxValue) {
+      if (maxValue === Infinity || item.value > maxValue && item.value !== Infinity) {
         maxValue = item.value;
         maxValueDate = item.date;
       }

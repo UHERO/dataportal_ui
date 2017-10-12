@@ -40,11 +40,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Series in the analyzer that have been selected to be displayed in the chart
     const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);
     if (this.chart) {
+      const navDates = this.createNavigatorDates(this.allDates);
       // If a chart has been generated:
       // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
       this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.addToChart(selectedAnalyzerSeries.series, this.chart);
+      this.addToChart(selectedAnalyzerSeries.series, this.chart, navDates);
       return;
     }
     // Draw chart if no chart exists
@@ -64,7 +65,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
   }
 
-  addToChart(analyzerSeries, chart) {
+  addToChart(analyzerSeries, chart, navDates) {
     // Filter out series that have been selected in the analyzer but are not currently in the chart
     const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
     addSeries.forEach((series) => {
@@ -79,6 +80,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       series.yAxis = yAxis ? yAxis.userOptions.id : (y0Exist ? 'yAxis1' : 'yAxis0');
       chart.addSeries(series);
     });
+    chart.addSeries({
+      data: navDates,
+      showInNavigator: true,
+      index: 10,
+      colorIndex: 10,
+      name: 'Navigator'
+    })
   }
 
   addYAxis(chart, seriesUnits, y0Exist) {
@@ -117,14 +125,21 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return yAxes;
   }
 
-  formatSeriesData(series, chartInstance, dates) {
-    const navigatorDates = dates.map((date) => {
+  createNavigatorDates(dates) {
+    // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
+    const uniqueDates = dates.filter((date, index, self) =>
+      self.findIndex(d => d.date === date.date) === index
+    );
+    const navigatorDates = uniqueDates.map((date) => {
       const obs = [];
       obs[0] = Date.parse(date.date);
       obs[1] = null;
       return obs;
     });
-    console.log(navigatorDates)
+    return navigatorDates;
+  }
+
+  formatSeriesData(series, chartInstance, dates) {
     const chartSeries = [];
     let yAxes;
     if (!chartInstance) {
@@ -151,11 +166,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    chartSeries.push({
-      data: navigatorDates,
-      showInNavigator: true,
-      name: 'Navigator'
-    })
+    if (!chartInstance) {
+      const navDates = this.createNavigatorDates(dates);
+      chartSeries.push({
+        data: navDates,
+        showInNavigator: true,
+        index: 10,
+        colorIndex: 10,
+        name: 'Navigator'
+      });
+    }
 
     return { series: chartSeries, yAxis: yAxes };
   }
@@ -220,7 +240,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       navigator: {
         series: {
-          includeInCSVExport: false
+          includeInCSVExport: false,
         }
       },
       exporting: {
@@ -457,7 +477,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Used to redraw table in the single series view
     let xMin = null, xMax = null;
     // Selected level data
-    console.log('chart object', chartObject);
     let selectedRange = null;
     if (chartObject && chartObject.series) {
       let series, seriesLength = 0;
@@ -476,26 +495,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (selectedRange) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-      console.log('xMin', xMin);
-      console.log('xMax', xMax)
       return { min: xMin, max: xMax };
     }
-    /* if (chartObject.userMin) {
-      xMin = new Date(chartObject.userMin).toISOString().split('T')[0];
-    }
-    if (chartObject.userMax) {
-      xMax = new Date(chartObject.userMax).toISOString().split('T')[0];
-    }
-    if (!chartObject.userMin && chartObject.navigator) {
-      console.log('chart object', chartObject)
-      xMin = new Date(chartObject.navigator.xAxis.dataMin).toISOString().split('T')[0];
-    }
-    if (!chartObject.userMax && chartObject.navigator) {
-      xMax = new Date(chartObject.navigator.xAxis.dataMax).toISOString().split('T')[0];
-    }
-    if (xMin && xMax) {
-      return { min: xMin, max: xMax };
-    } */
   }
 
   updateExtremes(e) {

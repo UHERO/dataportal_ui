@@ -4,13 +4,14 @@
   color: #B5B5B5;
   cursor: pointer;
   vertical-align: middle;
+  font-size: 20px;
+  visibility: hidden;
 }
 
 .analyze-chart {
-  // color: $primary-text;
   cursor: pointer;
   vertical-align: middle;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .analyzer-table {
@@ -80,6 +81,12 @@
               color: $primary-text;
               vertical-align: top;
             }
+
+            &:hover {
+              .analyze-button {
+                visibility: visible;
+              }
+            }
           }
     
           .empty-header {
@@ -142,6 +149,12 @@
 
       td {
         padding: 0.4em;
+
+        &:hover {
+          .analyze-button {
+            visibility: visible;
+          }
+        }
 
         a {
           display: inline-block;

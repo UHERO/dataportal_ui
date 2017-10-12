@@ -31,21 +31,23 @@ export class AnalyzerTableComponent implements OnInit {
 
   ngOnChanges() {
     // Update table as minDate & maxDate change
-    console.log('max date', this.maxDate);
-    console.log('min date', this.minDate)
-    const tableEnd = this.allTableDates.findIndex(item => item.date === this.maxDate);
+    let tableEnd;
+    for (let i = this.allTableDates.length - 1; i > 0; i--) {
+      if (this.maxDate === this.allTableDates[i].date) {
+        tableEnd = i;
+        break;
+      }
+    }
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
-    console.log('table end', tableEnd);
-    console.log('table start', tableStart)
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
       let seriesFreq = { freq: series.frequencyShort, label: series.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals);
-      const seriesInChart = $('.' + series.id + ' > .highcharts-graph');
+      const seriesInChart = $('.highcharts-series.' + series.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
-        $('.color' + series.id).css('color', seriesInChart.css('color'));
+        $('.color' + series.id).css('color', seriesInChart.css('stroke'));
       }
       if (!seriesInChart.length) {
         // If series is not selected for the chart, reset color of show_chart icon

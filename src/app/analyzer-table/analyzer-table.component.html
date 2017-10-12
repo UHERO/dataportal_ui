@@ -20,13 +20,12 @@
         <ng-template ngFor let-serie [ngForOf]="series" let-i="index">
           <tr>
             <th title="{{serie.title}}">
-              <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
-              <i class="material-icons md-18 analyze-chart color{{serie.id}}" (click)="updateChart(serie)">show_chart</i>
+              <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
+              <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
               <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
                   {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
               </a>
-              <a tabindex="0" id="{{serie.id}}" class="info" (click)="showPopover(serie)"
-								role="button" data-animation='false' data-toggle="popover">
+              <a tabindex="0" id="{{serie.id}}" class="info" (click)="showPopover(serie)" role="button" data-animation='false' data-toggle="popover">
 								<i class="material-icons info-icon">&#xE88F;</i>
 							</a>
             </th>
@@ -75,8 +74,8 @@
     <ng-template ngFor let-serie [ngForOf]="series">
       <tr>
         <td class="series-title" title="{{serie.title}}">
-          <i class="fa fa-minus-square analyze-button" aria-hidden="true" (click)="updateAnalyze(serie)"></i>
-          <i class="material-icons md-18 analyze-chart color{{serie.id}}" (click)="updateChart(serie)">show_chart</i>
+          <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
+          <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
           <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge'>
             {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
           </a>
