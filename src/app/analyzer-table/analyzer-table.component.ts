@@ -43,7 +43,7 @@ export class AnalyzerTableComponent implements OnInit {
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
       let seriesFreq = { freq: series.frequencyShort, label: series.frequency };
-      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals);
+      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals, this.minDate, this.maxDate);
       const seriesInChart = $('.highcharts-series.' + series.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph

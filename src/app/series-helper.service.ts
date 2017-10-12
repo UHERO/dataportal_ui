@@ -117,7 +117,7 @@ export class SeriesHelperService {
 
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
-  summaryStats(seriesData, freq, decimals) {
+  summaryStats(seriesData, freq, decimals, minDate, maxDate) {
     const stats = {
       minValue: Infinity,
       minValueDate: '',
@@ -136,18 +136,23 @@ export class SeriesHelperService {
       percChange: '',
       levelChange: '',
     };
+    // Find observations in seriesData that match the selected minimum and maximum dates (duplicate dates may show up in analyzer table data)
+    const minDateObs = seriesData.filter(obs => obs.date === minDate);
+    const maxDateObs = seriesData.filter(obs => obs.date === maxDate);
+    // Select observation where value is not Infinity
+    const minDateData = minDateObs.find(obs => obs.value !== Infinity);
+    const maxDateData = maxDateObs.find(obs => obs.value !== Infinity);
+    stats.tableStartValue = minDateData ? minDateData.value : Infinity;
+    stats.tableEndValue = maxDateData ? maxDateData.value : Infinity;
     
-    // Find first non-empty value as the table end value
-    stats.tableEndValue = this.getTableEnd(seriesData);
-    // Find last non-empty value as the table start value
-    stats.tableStartValue = this.getTableStart(seriesData);
-
     stats.minValue = this.getMinMax(seriesData).minValue;
     stats.minValueDate = this.getMinMax(seriesData).minValueDate;
     stats.maxValue = this.getMinMax(seriesData).maxValue;
     stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
-    stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
-    stats.levelChange = stats.tableEndValue - stats.tableStartValue;
+    if (stats.tableEndValue !== Infinity && stats.tableStartValue !== Infinity) {
+      stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
+      stats.levelChange = stats.tableEndValue - stats.tableStartValue;
+    }
 
     // Format numbers
     formatStats.minValue = this._helper.formatNum(stats.minValue, decimals);
@@ -157,28 +162,6 @@ export class SeriesHelperService {
     formatStats.percChange = stats.percChange === Infinity ? ' ' : this._helper.formatNum(stats.percChange, decimals);
     formatStats.levelChange = stats.levelChange === Infinity ? ' ' : this._helper.formatNum(stats.levelChange, decimals);
     return formatStats;
-  }
-
-  getTableEnd(seriesData) {
-    let counter;
-    if (seriesData.length) {
-      counter = 0;
-      while (seriesData[counter].value === ' ' || seriesData[counter].value === Infinity) {
-        counter++;
-      }
-      return seriesData[counter].value;
-    }
-  }
-
-  getTableStart(seriesData) {
-    let counter;
-    if (seriesData.length) {
-      counter = seriesData.length - 1;
-      while (seriesData[counter].value === ' ' || seriesData[counter].value === Infinity) {
-        counter--;
-      }
-      return seriesData[counter].value;
-    }
   }
 
   getMinMax(seriesData) {

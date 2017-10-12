@@ -19,8 +19,7 @@
                   					{{serie.seriesInfo.tablePrefix + serie.seriesInfo.title + serie.seriesInfo.tablePostfix}}
 								</a>
 								<div class="th-buttons">
-									<i *ngIf="serie.seriesInfo.analyze" class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
-									<i *ngIf="!serie.seriesInfo.analyze" class="material-icons analyze-button add-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE83A;</i>
+									<i class="material-icons analyze-button remove-button" [title]="serie.seriesInfo.analyze ? 'Remove from Analyzer' : 'Add to Analyzer'" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">{{serie.seriesInfo.analyze ? '&#xE838;' : '&#xE83A;'}}</i>
 									<a tabindex="0" id="{{subcatIndex + serie.seriesInfo.id}}" class="info" (click)="showPopover(serie.seriesInfo, subcatIndex)"
 									 role="button" data-animation='false' data-toggle="popover">
 										<i class="material-icons info-icon">&#xE88F;</i>

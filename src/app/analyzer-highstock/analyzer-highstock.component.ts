@@ -62,6 +62,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
     if (noSeriesAxis) {
       noSeriesAxis.remove();
+      console.log(chart.options)
+      console.log(chart.yAxis)
     }
   }
 
@@ -83,8 +85,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     chart.addSeries({
       data: navDates,
       showInNavigator: true,
-      index: 10,
-      colorIndex: 10,
+      index: -1,
+      colorIndex: -1,
       name: 'Navigator'
     })
   }
@@ -145,7 +147,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (!chartInstance) {
       yAxes = this.createYAxes(series, []);
     }
-    series.forEach((serie) => {
+    series.forEach((serie, index) => {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
       const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
       chartSeries.push({
@@ -176,7 +178,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         name: 'Navigator'
       });
     }
-
     return { series: chartSeries, yAxis: yAxes };
   }
 

@@ -138,6 +138,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls);
+    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
   }
 }
