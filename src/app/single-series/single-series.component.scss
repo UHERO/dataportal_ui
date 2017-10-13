@@ -35,7 +35,7 @@
   }
 
   .analyze-button {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(240, 240, 240, 0.65);
     cursor: pointer;
     vertical-align: middle;
     left: 10px;
@@ -45,30 +45,10 @@
 
   .add-button {
     text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
-
-    &:hover::after {
-      color: $series-gray;
-      content: ' Add to Analyzer';
-      vertical-align: text-bottom;
-      font-weight: bold;
-      font-size: 0.8em;
-      font-family: 'Lucida Sans', sans-serif;
-      text-shadow: none;
-    }
   }
 
   .remove-button {
     color: $secondary;
-
-    &:hover::after {
-      color: $series-gray;
-      content: ' Remove from Analyzer';
-      vertical-align: text-bottom;
-      font-weight: bold;
-      font-size: 0.8em;
-      font-family: 'Lucida Sans', sans-serif;
-      text-shadow: none;
-    }
   }
 
   .source {

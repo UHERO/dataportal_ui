@@ -10,6 +10,8 @@ import { HelperService } from '../helper.service';
 class AnalyzerHighstockStubComponent {
   @Input() portalSettings;
   @Input() series;
+  @Input() alertMessage;
+  @Input() allDates;
 }
 
 // Create stub for analyzer-table

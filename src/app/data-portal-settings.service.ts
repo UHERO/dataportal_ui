@@ -1,3 +1,5 @@
+// Settings for each data portal
+// Defines series types for charts and columns available in single series tables
 import { Injectable } from '@angular/core';
 
 @Injectable()

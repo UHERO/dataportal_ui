@@ -7,6 +7,7 @@ import { SeriesHelperService } from '../series-helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { TableHelperService } from '../table-helper.service';
 import { UheroApiService } from '../uhero-api.service';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableComponent } from './analyzer-table.component';
 
 describe('AnalyzerTableComponent', () => {
@@ -18,13 +19,14 @@ describe('AnalyzerTableComponent', () => {
       declarations: [ AnalyzerTableComponent ],
       providers: [
         AnalyzerService,
+        DataPortalSettingsService,
         GoogleAnalyticsEventsService,
         HelperService,
         SeriesHelperService,
         TableHelperService,
         UheroApiService,
         { provide: 'rootCategory', useValue: 59 },
-        { provide: 'portal', useValue: 'test' }
+        { provide: 'portal', useValue: 'uhero' }
       ],
       imports: [ RouterTestingModule, HttpModule ]
     })

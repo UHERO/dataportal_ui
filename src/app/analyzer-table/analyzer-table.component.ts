@@ -19,7 +19,7 @@ export class AnalyzerTableComponent implements OnInit {
   @Input() allTableDates;
   @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
-  private portalSettings;
+  portalSettings;
   private yoyChecked;
   private ytdChecked;
   private c5maChecked;

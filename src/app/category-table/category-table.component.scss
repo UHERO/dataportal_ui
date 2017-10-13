@@ -86,11 +86,19 @@
             }
 
             .analyze-button {
-              color: #B5B5B5;
+              color: rgba(240, 240, 240, 0.65);
               cursor: pointer;
               vertical-align: middle;
               font-size: inherit;
               font-weight: bold;
+            }
+
+            .add-button {
+              text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
+            }
+
+            .remove-button {
+              color: $secondary;
             }
           }
         }
@@ -147,6 +155,20 @@
 
           td:first-child, th:first-child {
             background: $table-gray;
+          }
+
+          .th-buttons {
+            .analyze-button {
+              color: rgba(240, 240, 240, 0.65);
+            }
+            
+            .add-button {
+              text-shadow: 1px 2px 6px $table-gray, 0 0 0 $black, 1px 2px 6px $table-gray;
+            }
+
+            .remove-button {
+              color: $secondary;
+            }
           }
         }
 
