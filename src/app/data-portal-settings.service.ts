@@ -36,6 +36,11 @@ export class DataPortalSettingsService {
         series2Label: 'Centered 5 Year Moving Avg % Chg',
         series2PercLabel: 'Centered 5 Year Moving Avg Chg'
       },
+      transformations: {
+        yoy: false,
+        ytd: false,
+        c5ma: true
+      },
       sliderInteraction: false
     },
     uhero: {
@@ -73,6 +78,11 @@ export class DataPortalSettingsService {
         series3: 'formattedYtd',
         series3Label: 'Year-to-Date % Chg',
         series3PercLabel: 'Year-to-Date Chg'
+      },
+      transformations: {
+        yoy: true,
+        ytd: true,
+        c5ma: false
       },
       sliderInteraction: true
     }

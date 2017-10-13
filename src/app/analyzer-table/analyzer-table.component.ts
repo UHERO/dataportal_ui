@@ -1,7 +1,8 @@
-import { Component, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 import 'jquery';
 declare var $: any;
 
@@ -18,15 +19,24 @@ export class AnalyzerTableComponent implements OnInit {
   @Input() allTableDates;
   @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
+  private portalSettings;
   private yoyChecked;
   private ytdChecked;
+  private c5maChecked;
   private previousHeight;
   private tableWidths = [];
   private tableDates;
 
-  constructor(private _analyzer: AnalyzerService, private _series: SeriesHelperService, private _table: TableHelperService) { }
+  constructor(
+    @Inject('portal') private portal,
+    private _dataPortalSettings: DataPortalSettingsService,
+    private _analyzer: AnalyzerService,
+    private _series: SeriesHelperService,
+    private _table: TableHelperService
+  ) { }
 
   ngOnInit() {
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
   ngOnChanges() {
@@ -87,6 +97,11 @@ export class AnalyzerTableComponent implements OnInit {
   ytdActive(e) {
     this.ytdChecked = e.target.checked;
   }
+
+  c5maActive(e) {
+    this.c5maChecked = e.target.checked;
+  }
+
 
   updateAnalyze(series) {
     this._analyzer.updateAnalyzer(series);

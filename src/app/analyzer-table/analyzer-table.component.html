@@ -1,9 +1,12 @@
 <div>
-  <label class="form-check-inline">
+  <label *ngIf="portalSettings.transformations.yoy" class="form-check-inline">
     <input type="checkbox" (change)="yoyActive($event)">Year/Year
   </label>
-  <label class="form-check-inline">
+  <label *ngIf="portalSettings.transformations.ytd" class="form-check-inline">
     <input type="checkbox" (change)="ytdActive($event)">Year-to-Date
+  </label>
+  <label *ngIf="portalSettings.transformations.c5ma" class="form-check-inline">
+      <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
 
@@ -43,7 +46,7 @@
           </tr>
           <tr *ngIf="c5maChecked">
             <th>
-              C5MA
+              {{(serie.percent)? '&emsp; Annual (ch.)' : '&emsp; Annual (%)'}}
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
               <td>{{item.formattedC5ma}}</td>
