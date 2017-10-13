@@ -3,19 +3,19 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class AnalyzerService {
 
-  public analyzerSeries = { allSeries: [], analyzerChart: [] };
+  public analyzerSeries = [];
 
   checkAnalyzer(seriesInfo) {
-    const analyzeSeries = this.analyzerSeries.allSeries.find(series => series.id === seriesInfo.id);
+    const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
   updateAnalyzer(seriesInfo, tableData?, chartData?) {
     if (seriesInfo.analyze) {
-      const analyzeSeries = this.analyzerSeries.allSeries.find(series => series.id === seriesInfo.id);
-      const seriesIndex = this.analyzerSeries.allSeries.indexOf(analyzeSeries);
+      const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
+      const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);
       if (seriesIndex > -1) {
-        this.analyzerSeries.allSeries.splice(seriesIndex, 1);
+        this.analyzerSeries.splice(seriesIndex, 1);
       }
       seriesInfo.analyze = false;
       return;
@@ -23,7 +23,7 @@ export class AnalyzerService {
     if (!seriesInfo.analyze) {
       seriesInfo.tableData = tableData;
       seriesInfo.chartData = chartData;
-      this.analyzerSeries.allSeries.push(seriesInfo);
+      this.analyzerSeries.push(seriesInfo);
       seriesInfo.analyze = true;
     }
   }

@@ -24,18 +24,18 @@
         stroke: none;
     }
 
-  .highcharts-button.highcharts-button-pressed {
-    fill: $highstock-series1;
+   .highcharts-button.highcharts-button-pressed {
+       fill: $highstock-series1;
 
         text {
             fill: $white;
         }
     }
 
-    /* .highcharts-color-0, .highcharts-color-1 {
-        fill: none;
-        stroke: none;
-    } */
+    .highcharts-subtitle {
+        fill: #B71625;
+        font-weight: bold;
+    }
 
     .highcharts-markers.highcharts-color-0 {
         path {

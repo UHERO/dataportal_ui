@@ -35,7 +35,7 @@ export class SeriesHelperService {
       error: null,
       noData: ''
     };
-    const analyzerSeries = this._analyzer.analyzerSeries.allSeries;
+    const analyzerSeries = this._analyzer.analyzerSeries;
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesData.seriesDetail = series;
       // Check if series is in the analyzer

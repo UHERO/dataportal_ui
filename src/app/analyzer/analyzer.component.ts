@@ -16,7 +16,7 @@ export class AnalyzerComponent implements OnInit {
   private maxDate;
   private portalSettings;
   private alertUser;
-  private alertMessage;
+  private alertMessage = '';
   analyzerSeries;
 
   constructor(
@@ -28,18 +28,19 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
-    this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
-    this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
+    this.analyzerSeries = this._analyzer.analyzerSeries;
+    // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     if (this.analyzerSeries.length) {
       this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
-      // The default series displayed in the chart on load should be the series with the longest range of data
-      const longestSeries = this.findLongestSeries(this.analyzerSeries);
-      longestSeries.showInChart = true;
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
+      this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       if (!this.analyzerChartSeries.length) {
+        // The default series displayed in the chart on load should be the series with the longest range of data
+        const longestSeries = this.findLongestSeries(this.analyzerSeries);
+        longestSeries.showInChart = true;
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }
@@ -97,7 +98,7 @@ export class AnalyzerComponent implements OnInit {
       event.showInChart = !event.showInChart;
     }
     // Update table dates when removing series from analyzer
-    this.analyzerSeries = this._analyzer.analyzerSeries.allSeries;
+    this.analyzerSeries = this._analyzer.analyzerSeries;
     this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
     this.analyzerSeries.forEach((series) => {
       series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);

@@ -24,6 +24,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() allDates;
   @Input() portalSettings;
+  @Input() alertMessage;
   @Output() tableExtremes = new EventEmitter(true);
   options;
   chart;
@@ -46,6 +47,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
       this.addToChart(selectedAnalyzerSeries.series, this.chart, navDates);
+      // Add a chart subtitle to alert user of a warning
+      this.chart.setSubtitle({
+        text: this.alertMessage,
+        floating: true
+      });
+      if (this.chart.subtitle) {
+        setTimeout(() => {
+          this.chart.subtitle.fadeOut('slow')
+        }, 3000)
+      }
       return;
     }
     // Draw chart if no chart exists
@@ -62,8 +73,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
     if (noSeriesAxis) {
       noSeriesAxis.remove();
-      console.log(chart.options)
-      console.log(chart.yAxis)
+      // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
+      const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
+      if (opposite) {
+        opposite.update({
+          opposite: false,
+        });
+      }
     }
   }
 
@@ -74,7 +90,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       const seriesUnits = series.unitsLabelShort;
       // Find y-axis that corressponds with a series' units
       const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
-      // Find if 'yAxis0' exists, i.e. if the left y-axis exists
+      // Find if 'yAxis0' exists
       const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
       if (!yAxis) {
         this.addYAxis(chart, seriesUnits, y0Exist);
@@ -88,7 +104,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       index: -1,
       colorIndex: -1,
       name: 'Navigator'
-    })
+    });
   }
 
   addYAxis(chart, seriesUnits, y0Exist) {
