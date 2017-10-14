@@ -12,7 +12,8 @@ export class DataPortalSettingsService {
         series0Name: 'level',
         series0Type: 'line',
         series1Name: 'c5ma',
-        series1Type: 'column'
+        series1Type: 'column',
+        setYAxes: true
       },
       highstock: {
         credits: 'data.uhero.hawaii.edu/nta',
@@ -47,7 +48,8 @@ export class DataPortalSettingsService {
         series0Name: 'level',
         series0Type: 'line',
         series1Name: 'ytd',
-        series1Type: 'column'
+        series1Type: 'column',
+        setYAxes: false
       },
       highstock: {
         credits: 'data.uhero.hawaii.edu',

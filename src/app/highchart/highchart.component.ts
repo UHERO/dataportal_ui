@@ -20,6 +20,8 @@ export class HighchartComponent implements OnInit, OnChanges {
   @Input() currentFreq;
   @Input() chartStart;
   @Input() chartEnd;
+  @Input() minValue;
+  @Input() maxValue;
   public options: Object;
   private chart;
 
@@ -34,25 +36,27 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
+  constructor( @Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
     }
   }
 
   ngOnChanges() {
-    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
+    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
   }
 
-  drawChart(seriesData, currentFreq, portalSettings, start?, end?) {
+  drawChart(seriesData, currentFreq, portalSettings, min, max, start?, end?) {
     let series0 = seriesData.categoryChart.chartData[portalSettings.highcharts.series0Name];
     let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
     series0 = this.trimData(series0, start, end);
     series1 = this.trimData(series1, start, end);
+    const minValue = min;
+    const maxValue = max;
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
@@ -77,8 +81,8 @@ export class HighchartComponent implements OnInit, OnChanges {
         }
       },
       tooltip: {
-        positioner: function() {
-          return {x: 0, y: -5};
+        positioner: function () {
+          return { x: 0, y: -5 };
         },
         shadow: false,
         borderWidth: 0,
@@ -137,7 +141,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  const otherSeriesLabel =  pseudo + name + formattedValue;
+                  const otherSeriesLabel = pseudo + name + formattedValue;
                   const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
                   s += point.series.name === 'Level' ? levelLabel : otherSeriesLabel;
                   s += pseudo + name + formattedValue;
@@ -176,7 +180,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         title: {
           text: ''
         },
-        minTickInterval: 0.01
+        minTickInterval: 0.01,
       }, {
         title: {
           text: ''
@@ -184,6 +188,8 @@ export class HighchartComponent implements OnInit, OnChanges {
         labels: {
           enabled: false
         },
+        min: minValue,
+        max: maxValue,
         minTickInterval: 0.01,
         opposite: true
       }],
@@ -267,7 +273,7 @@ export class HighchartComponent implements OnInit, OnChanges {
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
-    this.chart.tooltip.hide = function() {
+    this.chart.tooltip.hide = function () {
       if (latestSeries0 > 0 && latestSeries1 > 0) {
         this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
         series0.points[latestSeries0].setState('hover');
