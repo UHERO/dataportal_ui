@@ -103,7 +103,7 @@ export class HighstockComponent implements OnChanges {
         }, {
           html: portalSettings.highstock.labels.portalLink
         }, {
-          html: name + ' (' + geo.name + ', ' + freq.label + ')'
+          html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
         }],
         style: {
           display: 'none'

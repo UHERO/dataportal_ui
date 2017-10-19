@@ -1,6 +1,6 @@
 import { Inject, Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
@@ -38,7 +38,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   static selectSibling(geoFreqSiblings: Array<any>, sa: boolean, freq: string) {
     const saSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'seasonally_adjusted');
     const nsaSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_seasonally_adjusted');
-    const naSeries =  geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
+    const naSeries = geoFreqSiblings.find(series => series.seasonalAdjustment === 'not_applicable');
     // If more than one sibling exists (i.e. seasonal & non-seasonal)
     // Select series where seasonalAdjustment matches sa setting
     if (freq === 'A') {
@@ -66,14 +66,15 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     private _uheroAPIService: UheroApiService,
     private _dataPortalSettings: DataPortalSettingsService,
     private _series: SeriesHelperService,
+    private _analyzer: AnalyzerService,
     private route: ActivatedRoute,
     private _router: Router,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.currentGeo = {fips: null, handle: null, name: null};
-    this.currentFreq = {freq: null, label: null};
+    this.currentGeo = { fips: null, handle: null, name: null };
+    this.currentFreq = { freq: null, label: null };
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
 
@@ -107,10 +108,14 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       };
       this.startDate = this.chartStart;
       this.endDate = this.chartEnd;
-      this._router.navigate(['/series/'], {queryParams: queryParams, queryParamsHandling: 'merge'});
+      this._router.navigate(['/series/'], { queryParams: queryParams, queryParamsHandling: 'merge' });
     } else {
       this.noSelection = 'Selection Not Available';
     }
+  }
+
+  updateAnalyze(seriesInfo, tableData, chartData) {
+    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
   }
 
   updateChartExtremes(e) {
@@ -133,6 +138,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls);
+    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
   }
 }

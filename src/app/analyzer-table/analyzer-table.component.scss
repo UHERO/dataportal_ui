@@ -1,0 +1,174 @@
+@import 'colors';
+
+.analyze-button {
+  color: #B5B5B5;
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 20px;
+  visibility: hidden;
+}
+
+.analyze-chart {
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 15px;
+}
+
+.analyzer-table {
+    vertical-align: top;
+    display: inline-block;
+    min-height: 100%;
+    overflow: auto;
+    overflow-y: hidden;
+    width: 100%;
+    position: relative;
+    margin-bottom: 40px;
+  
+    @media (min-width: 768px) {
+      margin-top: 10px;
+    }
+  
+    @media (max-width: 767px) {
+      margin-top: 50px;
+    }
+
+    .table-row {
+      position: relative;
+
+      .table {
+        overflow-x: scroll;
+        overflow-y: visible;
+        width: 68%;
+        margin-left: 32%;
+        margin-bottom: 0;
+      
+        table {
+          table-layout: fixed;
+          width: 100%;
+          *margin-left: -32%;
+    
+          td, th {
+            vertical-align: top;
+            width: 125px;
+            text-align: right;
+            font-size: 0.8em;
+            padding: 0.4em;
+            border: 1px solid $border;
+            &:empty:after {
+              content: "\00a0";
+            }
+          }
+    
+          th {
+            position: absolute;
+            *position: relative;
+            left: 0;
+            width: 32%;
+            white-space: nowrap;
+            border-right: 1px solid $border;
+            text-align: left;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 0.8em;
+            font-weight: normal;
+            border-bottom: 0;
+
+            a {
+              display: inline-block;
+              max-width: 80%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              color: $primary-text;
+              vertical-align: top;
+            }
+
+            &:hover {
+              .analyze-button {
+                visibility: visible;
+              }
+            }
+          }
+    
+          .empty-header {
+            border: none;
+            border-right: 1px solid $border;
+          }
+    
+          .info-icon {
+            font-size: 1.2em;
+            vertical-align: middle;
+          }
+    
+          tr:last-child {
+            th {
+              border: 1px solid $border;
+            }
+          }
+    
+          tr:nth-child(even) {
+            background-color: $table-gray;
+    
+            td:first-child, th:first-child {
+              background: $table-gray;
+            }
+          }
+                
+          .info {
+            cursor: pointer;
+            width: initial;
+            right: 5px;
+            position: absolute;
+    
+            &:focus {
+              outline: 0;
+            }
+          }
+        }
+      }
+    }
+}
+
+.analyzer-summary-stats {
+  font-size: 0.8em;
+  text-align: right;
+  margin-bottom: 40px;
+
+  table {
+    width: 100%;
+
+    th {
+      text-align: right;
+      color: $primary;
+      padding: 0.4em;
+    }
+
+    tr {
+      .series-title {
+        text-align: left;
+      }
+
+      td {
+        padding: 0.4em;
+
+        &:hover {
+          .analyze-button {
+            visibility: visible;
+          }
+        }
+
+        a {
+          display: inline-block;
+          max-width: 80%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: $primary-text;
+          vertical-align: top;
+        }
+      }
+    }
+
+    tr:nth-child(even) {
+      background-color: $table-gray;
+    }
+  }
+}

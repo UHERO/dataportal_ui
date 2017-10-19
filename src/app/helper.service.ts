@@ -69,18 +69,18 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
+      table.push({ date: date.date, tableDate: date.tableDate, value: Infinity, yoyValue: Infinity, ytdValue: Infinity, c5maValue: Infinity });
     });
     seriesData.forEach((data) => {
-      const seriesDate = data.date;
-      const tableEntry = table.find(date => date.date === seriesDate);
+      const seriesDate = data.tableDate ? data.tableDate : data.date;
+      const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
       tableEntry.value = data.value;
       tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
-      tableEntry.yoy = data.yoyValue;
+      tableEntry.yoyValue = data.yoyValue;
       tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, decimals);
-      tableEntry.ytd = data.ytdValue;
+      tableEntry.ytdValue = data.ytdValue;
       tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, decimals);
-      tableEntry.c5ma = data.c5maValue;
+      tableEntry.c5maValue = data.c5maValue;
       tableEntry.formattedC5ma = data.c5maValue === null ? ' ' : this.formatNum(+data.c5maValue, decimals);
     });
     return table;
@@ -108,24 +108,6 @@ export class HelperService {
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
 
-  catTable(seriesTableData: Array<any>, dateRange: Array<any>, decimals: number) {
-    // Format series data for the category table
-    const categoryTableData = [];
-    dateRange.forEach((date) => {
-      categoryTableData.push({ date: date.date, tableDate: date.tableDate, value: ' ', yoy: ' ', ytd: ' ', c5ma: ' ' });
-    });
-    seriesTableData.forEach((data) => {
-      const tableObs = categoryTableData.find(obs => obs.date === data.date);
-      if (tableObs) {
-        tableObs.level = data.value === ' ' ? ' ' : this.formatNum(+data.value, decimals);
-        tableObs.yoy = data.yoy === null ? ' ' : this.formatNum(+data.yoy, decimals);
-        tableObs.ytd = data.ytd === null ? ' ' : this.formatNum(+data.ytd, decimals);
-        tableObs.c5ma = data.c5ma === null ? ' ' : this.formatNum(+data.c5ma, decimals);
-      }
-    });
-    return categoryTableData;
-  }
-
   setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
     dateWrapper.firstDate = '';
     dateWrapper.endDate = '';
@@ -143,39 +125,22 @@ export class HelperService {
   // Used to construct table data for single series view
   combineObsData(level, yoy, ytd, c5ma) {
     let data;
-    if (level) {
-      data = level;
-      for (let i = 0; i < level.length; i++) {
-        data[i].yoyValue = null;
-        data[i].ytdValue = null;
-        data[i].c5maValue = null;
-        data[i].value = +level[i].value;
+    data = level.map((obs) => {
+      const obsObject = { date: obs.date, yoyValue: null, ytdValue: null, c5maValue: null, value: +obs.value };
+      if (yoy) {
+        const yoyObs = yoy.find(y => y.date === obs.date);
+        obsObject.yoyValue = yoyObs ? +yoyObs.value : null;
       }
-    }
-    if (yoy) {
-      for (let i = 0; i < yoy.length; i++) {
-        const seriesObs = data.find(obs => obs.date === yoy[i].date);
-        if (seriesObs) {
-          seriesObs.yoyValue = +yoy[i].value;
-        }
+      if (ytd) {
+        const ytdObs = ytd.find(y => y.date === obs.date);
+        obsObject.ytdValue = ytdObs ? +ytdObs.value : null;
       }
-    }
-    if (ytd) {
-      for (let i = 0; i < ytd.length; i++) {
-        const seriesObs = data.find(obs => obs.date === ytd[i].date);
-        if (seriesObs) {
-          seriesObs.ytdValue = +ytd[i].value;
-        }
+      if (c5ma) {
+        const c5maObs = c5ma.find(c => c.date === obs.date);
+        obsObject.c5maValue = c5maObs ? +c5maObs.value : null;
       }
-    }
-    if (c5ma) {
-      for (let i = 0; i < c5ma.length; i++) {
-        const seriesObs = data.find(obs => obs.date === c5ma[i].date);
-        if (seriesObs) {
-          seriesObs.c5maValue = +c5ma[i].value;
-        }
-      }
-    }
+      return obsObject;
+    });
     return data;
   }
 
