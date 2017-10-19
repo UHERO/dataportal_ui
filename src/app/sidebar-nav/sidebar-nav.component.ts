@@ -1,5 +1,6 @@
-import { Component, Inject, OnInit, OnChanges } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 
 @Component({
@@ -20,11 +21,13 @@ export class SidebarNavComponent implements OnInit {
   private ytd: string;
   private loading;
   public headerLogo;
+  analyzerSeries;
 
   constructor(
     @Inject('defaultCategory') private defaultCategory,
     @Inject('logo') private logo,
     private _uheroAPIService: UheroApiService,
+    private _analyzerService: AnalyzerService,
     private route: ActivatedRoute,
     private _router: Router
   ) { }
@@ -42,9 +45,12 @@ export class SidebarNavComponent implements OnInit {
     });
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.selectedCategory = event.url === '/help' ? 'help' : this.selectedCategory;
+        const helpUrl = event.url === '/help';
+        const analyzerUrl = event.url === '/analyzer';
+        this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
       }
     });
+    this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
   }
 
@@ -58,6 +64,16 @@ export class SidebarNavComponent implements OnInit {
     if (id && +id) {
       return +id;
     }
+  }
+
+  checkRoute(id, help, analyzer) {
+    if (help) {
+      return 'help';
+    }
+    if (analyzer) {
+      return 'analyzer';
+    }
+    return this.findSelectedCategory(id);
   }
 
   navigate(catId) {

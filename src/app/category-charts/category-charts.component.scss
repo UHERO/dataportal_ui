@@ -1,29 +1,68 @@
 @import 'colors';
 
-  .multi-charts-row {
-    display: block;
-    margin-bottom: 40px;
+.multi-charts-row {
+  display: block;
+  margin-bottom: 40px;
+}
+
+.no-data {
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+.multi-charts {
+  display: inline-block;
+  padding: 0 3px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  margin: 10px 10px 10px 3px;
+  background: $chart-background;
+  max-height: 206px;
+
+  a {
+    color: $black;
   }
 
-  .no-data {
-    margin-top: 10px;
-    font-size: 0.9em;
+  a:hover {
+    text-decoration: none;
+  }
+    
+  .analyze-button {
+    color: rgba(240, 240, 240, 0.65);
+    cursor: pointer;
+    position: relative;
+    top: -25px;
+    vertical-align: middle;
+    left: 10px;
+    font-size: 1em;
   }
 
-  .multi-charts {
-    display: inline-block;
-    padding: 0 3px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    margin: 10px 10px 10px 3px;
-    background: $chart-background;
+  .add-button {
+    text-shadow: 1px 2px 6px $chart-background, 0 0 0 $black, 1px 2px 6px $chart-background;
 
-    a {
-      color: $black;
+    &:hover::after {
+      color: $series-gray;
+      content: ' Add to Analyzer';
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.8em;
+      font-family: 'Lucida Sans', sans-serif;
+      text-shadow: none;
     }
+  }
 
-    a:hover {
-      text-decoration: none;
+  .remove-button {
+    color: $secondary;
+
+    &:hover::after {
+      color: $series-gray;
+      content: ' Remove from Analyzer';
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.8em;
+      font-family: 'Lucida Sans', sans-serif;
+      text-shadow: none;
     }
   }
+}

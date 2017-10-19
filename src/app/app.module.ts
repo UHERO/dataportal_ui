@@ -33,6 +33,8 @@ import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import { HelpService } from './help.service';
+import { AnalyzerService } from './analyzer.service';
+import { TableHelperService } from './table-helper.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 
@@ -61,7 +63,9 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
     SeriesHelperService,
     HelperService,
     HelpService,
+    TableHelperService,
     GoogleAnalyticsEventsService,
+    AnalyzerService,
     Title,
     {
       provide: HighchartsStatic,
