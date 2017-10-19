@@ -30,7 +30,7 @@
     .table {
       overflow-x: scroll;
       overflow-y: visible;
-      width: 58%;
+      width: 68%;
       margin-left: 32%;
       margin-bottom: 40px;
 
@@ -64,16 +64,48 @@
           font-size: 0.8em;
           font-weight: normal;
           border-bottom: 0;
+
+          .th-buttons {
+            // display: inline-block;
+            float: right;
+
+            .info {
+              float: right;
+              cursor: pointer;
+              width: initial;
+
+              &:focus {
+                outline: 0;
+              }
+
+              .info-icon {
+                font-size: 1.2em;
+                vertical-align: middle;
+                margin-left: 5px;
+              }
+            }
+
+            .analyze-button {
+              color: rgba(240, 240, 240, 0.65);
+              cursor: pointer;
+              vertical-align: middle;
+              font-size: inherit;
+              font-weight: bold;
+            }
+
+            .add-button {
+              text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
+            }
+
+            .remove-button {
+              color: $secondary;
+            }
+          }
         }
 
         .empty-header {
           border: none;
           border-right: 1px solid $border;
-        }
-
-        .info-icon {
-          font-size: 1.2em;
-          vertical-align: middle;
         }
 
         tr:last-child {
@@ -86,7 +118,7 @@
           padding-left: 30px;
           
           a {
-            width: 79%;
+            width: 68%;
           }
           
           .info {
@@ -98,7 +130,7 @@
           padding-left: 50px;
 
           a {
-            width: 77%;
+            width: 60%;
           }
           
           .info {
@@ -110,7 +142,7 @@
           padding-left: 70px;
 
           a {
-            width: 75%;
+            width: 50%;
           }
         
           .info {
@@ -119,34 +151,35 @@
         }
 
         tr:nth-child(even) {
-          background-color: rgba(0, 0, 0, 0.05);
+          background-color: $table-gray;
 
           td:first-child, th:first-child {
-            background: rgba(0, 0, 0, 0.05);
+            background: $table-gray;
+          }
+
+          .th-buttons {
+            .analyze-button {
+              color: rgba(240, 240, 240, 0.65);
+            }
+            
+            .add-button {
+              text-shadow: 1px 2px 6px $table-gray, 0 0 0 $black, 1px 2px 6px $table-gray;
+            }
+
+            .remove-button {
+              color: $secondary;
+            }
           }
         }
 
         a {
-          display: inline-block;
-          width: 80%;
+          // display: inline-block;
+          width: 74%;
           overflow: hidden;
           text-overflow: ellipsis;
           color: $primary-text;
           vertical-align: top;
-        }
-        
-        .info {
-          width: initial;
-          right: 5px;
-          position: absolute;
-
-          &:focus {
-            outline: 0;
-          }
-        }
-
-        .badge-primary {
-          background-color: $primary;
+          float: left;
         }
       }
     }
@@ -162,11 +195,13 @@
     }
   }
 
-  &.tooltip-left,
+  &.bs-tooltip-left,
+  &.bs-tooltip-right,
   &.bs-tether-element-attached-right {
 
-    .tooltip-inner::before {
+    .arrow::before {
       border-left-color: $tooltip;
+      border-right-color: $tooltip;
     }
   }
 }

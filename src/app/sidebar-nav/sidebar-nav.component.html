@@ -10,12 +10,14 @@
   </div>
   <ul id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
-    <hr>
+    <hr class="mobile-divider">
     <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category.id === selectedCategory">
       <a (click)="navigate(category.id)">&nbsp; {{category.name}} <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fa fa-spinner fa-pulse fa-fw"></i></a>
     </li>
-    <hr>
+    <hr class="mobile-divider">
     <li class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"><a routerLink="/help">&nbsp; About</a></li>
+    <hr>
+    <li class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'"><a routerLink="/analyzer" *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a></li>
   </ul>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>

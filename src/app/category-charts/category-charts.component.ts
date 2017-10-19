@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { AnalyzerService } from '../analyzer.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 
 @Component({
@@ -19,9 +20,12 @@ export class CategoryChartsComponent implements OnInit {
   @Input() chartStart;
   @Input() chartEnd;
 
-  constructor(private googleAES: GoogleAnalyticsEventsService) { }
+  constructor(private googleAES: GoogleAnalyticsEventsService, private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
+    this.data.forEach((chartSeries) => {
+      chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+    });
   }
 
   // Google Analytics: Track clicking on series
@@ -30,4 +34,7 @@ export class CategoryChartsComponent implements OnInit {
     this.googleAES.emitEvent('series', 'click', id);
   }
 
+  updateAnalyze(seriesInfo, tableData, chartData) {
+    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
+  }
 }
