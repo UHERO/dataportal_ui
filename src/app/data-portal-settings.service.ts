@@ -29,6 +29,7 @@ export class DataPortalSettingsService {
         series1Type: 'line',
         series2Name: 'none',
         series2Type: '',
+        buttons: [10, 25, 50, 'all']
       },
       seriesTable: {
         columns: 3,
@@ -69,6 +70,7 @@ export class DataPortalSettingsService {
         series1Type: 'line',
         series2Name: 'ytd',
         series2Type: 'column',
+        buttons: [1, 5, 10, 'all']
       },
       seriesTable: {
         columns: 4,
