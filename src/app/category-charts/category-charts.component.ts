@@ -19,6 +19,7 @@ export class CategoryChartsComponent implements OnInit {
   @Input() params;
   @Input() chartStart;
   @Input() chartEnd;
+  @Input() search;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -34,7 +35,8 @@ export class CategoryChartsComponent implements OnInit {
 
   ngOnChanges() {
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
-    if (this.portalSettings.highcharts.setYAxes) {
+    // Allow y-axes to vary for search results
+    if (this.portalSettings.highcharts.setYAxes && !this.search) {
       const start = this.chartStart ? this.chartStart : Date.parse(this.defaultRange.start);
       const end = this.chartEnd ? this.chartEnd : Date.parse(this.defaultRange.end);
       if (this.sublist) {
@@ -51,7 +53,7 @@ export class CategoryChartsComponent implements OnInit {
       const values = this.getSeriesValues(serie, start, end);
       const min = values.reduce(function (a, b) {
         return Math.min(a, b);
-      })
+      });
       if (minValue === null || min < minValue) {
         minValue = min;
       }

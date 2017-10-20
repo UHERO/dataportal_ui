@@ -106,7 +106,7 @@ export class NtaHelperService {
       this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
         if (series) {
           sub.series = series;
-          this.formatCategoryData(category, sub, sublistDateArray);
+          this.formatCategoryData(category, sub, sublistDateArray, false);
         }
         sub.id = sub.id.toString();
         if (!series) {
@@ -178,7 +178,7 @@ export class NtaHelperService {
               id: 'search',
               series: searchSeries
             };
-            this.formatCategoryData(category, sublist, []);
+            this.formatCategoryData(category, sublist, [], true);
             category.sublist = [sublist];
           }
         });
@@ -205,9 +205,9 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category, subcategory, subcategoryDateArray) {
+  formatCategoryData(category, subcategory, subcategoryDateArray: Array<any>, search: Boolean) {
     const dateWrapper = subcategory.dateWrapper;
-    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory);
+    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory, search);
     subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
     subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
     // At most, display 12 series at a time in the multiple chart view
@@ -245,7 +245,7 @@ export class NtaHelperService {
       });
   }
 
-  filterSeries(seriesArray: Array<any>, sublist) {
+  filterSeries(seriesArray: Array<any>, sublist, search: Boolean) {
     const filtered = [];
     seriesArray.forEach((res) => {
       let seriesDates = [], series;
@@ -261,7 +261,7 @@ export class NtaHelperService {
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
-        series.seriesInfo.title += ' (' + series.seriesInfo.geography.name + ')';
+        series.seriesInfo.title = search ? series.seriesInfo.title + ' (' + series.seriesInfo.geography.name + ')' : series.seriesInfo.geography.name;
         filtered.push(series);
       }
     });
