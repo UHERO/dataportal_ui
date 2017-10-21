@@ -334,6 +334,7 @@ export class CategoryHelperService {
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
+        series.seriesInfo.displayName = res.title;
         filtered.push(series);
       }
     });
