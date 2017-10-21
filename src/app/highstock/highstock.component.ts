@@ -23,7 +23,8 @@ Highcharts.setOptions({
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
-  styleUrls: ['./highstock.component.scss'],
+  // Use styles defined in analyzer-highstock component
+  styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
@@ -388,10 +389,10 @@ export class HighstockComponent implements OnChanges {
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
+    if (chartObject.series[1].points) {
+      selectedRange = chartObject.series[1].points;
     }
-    if (!chartObject.series[0].points.length) {
+    if (!chartObject.series[1].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {
