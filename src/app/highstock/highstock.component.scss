@@ -14,10 +14,10 @@
     }
 
   .highcharts-button.highcharts-button-pressed {
-    fill: $highstock-series1;
+    fill: $highstock-series0;
 
         text {
-            fill: $white !important;
+            fill: $white;
         }
     }
 
@@ -51,18 +51,18 @@
     .highcharts-series-0 {
         .highcharts-graph {
             stroke: $highstock-series0;
-        }
-        
-        rect.highcharts-point {
-            stroke: none;
-            fill: $highstock-series0;
+            color: $highstock-series0;
         }
     }
 
     .highcharts-series-1 {
         .highcharts-graph {
             stroke: $highstock-series1;
-            color: $highstock-series1;
+        }
+        
+        rect.highcharts-point {
+            stroke: none;
+            fill: $highstock-series1;
         }
     }
 
@@ -85,12 +85,12 @@
 
     .highcharts-xaxis-labels {
         text {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
+            color: $highstock-series0;
+            fill: $highstock-series0;
         }
     }
 
-    .highcharts-yaxis-grid.series2 {
+    .highcharts-yaxis-grid.series1 {
         .highcharts-grid-line {
             display: none;
         }
@@ -98,29 +98,29 @@
 
     .highcharts-yaxis-labels.series1 {
         text {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
+            color: $highstock-series0;
+            fill: $highstock-series0;
         }
     }
 
     .highcharts-yaxis-labels.series2 {
         text {
-            color: $highstock-series1 !important;
-            fill: $highstock-series1 !important;
+            color: $highstock-series1;
+            fill: $highstock-series1;
         }
     }
 
     .highcharts-yaxis.series1 {
         .highcharts-axis-title {
-            color: $highstock-series0 !important;
-            fill: $highstock-series0 !important;
+            color: $highstock-series0;
+            fill: $highstock-series0;
         }
     }
 
     .highcharts-yaxis.series2 {
         .highcharts-axis-title {
-            color: $highstock-series1 !important;
-            fill: $highstock-series1 !important;
+            color: $highstock-series1;
+            fill: $highstock-series1;
         }
     }
 }

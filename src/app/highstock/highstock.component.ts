@@ -84,7 +84,8 @@ export class HighstockComponent implements OnChanges {
     return chartButtons;
   }
 
-  formatChartLabels(seriesDetail, portalSettings, geo, freq) {
+  // Labels used for metadata in CSV download
+  formatChartLabels(seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) {
     const labelItems = [{
       html: seriesDetail.sourceDescription
     }, {
@@ -103,10 +104,52 @@ export class HighstockComponent implements OnChanges {
     return labelItems
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
+  formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) {
     const series0 = chartData[portalSettings.highstock.series0Name];
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
+    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const series = [{
+      name: 'Level',
+      type: 'line',
+      yAxis: 1,
+      data: series0,
+      states: {
+        hover: {
+          lineWidth: 2
+        }
+      },
+      showInNavigator: true,
+      dataGrouping: {
+        enabled: false
+      },
+      zoneAxis: 'x',
+      zones: chartData.pseudoZones,
+      zIndex: 1
+    }, {
+      name: seriesLabels[portalSettings.highstock.series1Name],
+      type: portalSettings.highstock.series1Type,
+      data: series1,
+      showInNavigator: false,
+      dataGrouping: {
+        enabled: false
+      }
+    }, {
+      name: seriesLabels[portalSettings.highstock.series2Name],
+      data: series2,
+      includeInCSVExport: freq.freq === 'A' ? false : true,
+      visible: false,
+      dataGrouping: {
+        enabled: false
+      }
+    }];
+    return series;
+  }
+
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
@@ -115,16 +158,10 @@ export class HighstockComponent implements OnChanges {
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
-    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
-    const sourceDescription = seriesDetail.sourceDescription;
-    const sourceLink = seriesDetail.sourceLink;
-    const sourceDetails = seriesDetail.sourceDetails;
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
-    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
 
     this.options = {
       chart: {
@@ -294,7 +331,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       yAxis: [{
-        className: 'series1',
+        className: 'series2',
         labels: {
           format: '{value:,.2f}'
         },
@@ -306,7 +343,7 @@ export class HighstockComponent implements OnChanges {
         maxPadding: 0,
         minTickInterval: 0.01
       }, {
-        className: 'series2',
+        className: 'series1',
         title: {
           text: units
         },
@@ -324,39 +361,7 @@ export class HighstockComponent implements OnChanges {
           cropThreshold: 0,
         }
       },
-      series: [{
-        name: seriesLabels[portalSettings.highstock.series0Name],
-        type: portalSettings.highstock.series0Type,
-        data: series0,
-        showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }, {
-        name: 'Level',
-        type: 'line',
-        yAxis: 1,
-        data: series1,
-        states: {
-          hover: {
-            lineWidth: 2
-          }
-        },
-        showInNavigator: true,
-        dataGrouping: {
-          enabled: false
-        },
-        zoneAxis: 'x',
-        zones: pseudoZones
-      }, {
-        name: seriesLabels[portalSettings.highstock.series2Name],
-        data: series2,
-        includeInCSVExport: freq.freq === 'A' ? false : true,
-        visible: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }]
+      series: series
     };
   }
 
@@ -405,14 +410,5 @@ export class HighstockComponent implements OnChanges {
     const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
     const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
     return { start: start , end: end };
-  }
-
-  checkDates(date, levelArray) {
-    levelArray.forEach((item) => {
-      if (Date.parse(date) === item[0]) {
-        return true;
-      }
-      return false;
-    });
   }
 }
