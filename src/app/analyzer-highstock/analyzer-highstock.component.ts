@@ -50,7 +50,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // Add a chart subtitle to alert user of a warning
       this.chart.setSubtitle({
         text: this.alertMessage,
-        floating: true
+        align: 'center',
+        verticalAlign: 'bottom',
       });
       if (this.chart.subtitle) {
         setTimeout(() => {
@@ -269,6 +270,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             text: 'Download',
             _titleKey: 'exportKey',
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
+            onclick: function(this) {
+              this.exportChart(null, { subtitle: { text:'' } });
+            }
           },
           printButton: {
             text: 'Print',
