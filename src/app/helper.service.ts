@@ -56,7 +56,7 @@ export class HelperService {
         levelResults.observations.forEach((entry, i) => {
           // Get last pseudoHistory date if available
           if (entry.pseudoHistory && !levelResults.observations[i + 1].pseudoHistory) {
-            pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC' });
+            pseudoZones.push({ value: Date.parse(entry.date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
           }
         });
         combinedObservations = this.combineObsData(levelResults.observations, yoyResults.observations, ytdResults.observations, c5maResults.observations);
