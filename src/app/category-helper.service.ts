@@ -8,7 +8,6 @@ import { CategoryData } from './category-data';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { DateWrapper } from './date-wrapper';
-import { DisplaySeries } from './display-series';
 
 @Injectable()
 export class CategoryHelperService {

@@ -88,26 +88,26 @@ describe('Service: Helper', () => {
     const tableData = [{
       date: '1960-01-01',
       tableDate: '1960',
-      value: ' ',
-      yoy: ' ',
-      ytd: ' ',
-      c5ma: ' '
+      value: Infinity,
+      yoyValue: Infinity,
+      ytdValue: Infinity,
+      c5maValue: Infinity
     },
     {
       date: '1961-01-01',
       tableDate: '1961',
-      value: ' ',
-      yoy: ' ',
-      ytd: ' ',
-      c5ma: ' '
+      value: Infinity,
+      yoyValue: Infinity,
+      ytdValue: Infinity,
+      c5maValue: Infinity
     },
     {
       date: '1962-01-01',
       tableDate: '1962',
       value: 195.2833,
-      yoy: null,
-      ytd: null,
-      c5ma: null,
+      yoyValue: null,
+      ytdValue: null,
+      c5maValue: null,
       formattedValue: '195.28',
       formattedYoy: ' ',
       formattedYtd: ' ',
@@ -119,7 +119,7 @@ describe('Service: Helper', () => {
       start: '1960-01-01',
       end: '1962-01-01'
     };
-    // expect(service.dataTransform(seriesObservations, dates, decimals)).toEqual(expected);
+    expect(service.dataTransform(seriesObservations, dates, decimals)).toEqual(expected);
   }));
 
   it('formatDate should return a formatted date string', inject([HelperService], (service: HelperService) => {

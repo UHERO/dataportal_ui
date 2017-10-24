@@ -6,7 +6,6 @@ import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
 import { Frequency } from '../frequency';
 import { DateWrapper } from '../date-wrapper';
-import { DisplaySeries } from '../display-series';
 
 @Injectable()
 export class NtaHelperService {
