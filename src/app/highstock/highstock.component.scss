@@ -32,6 +32,12 @@
         }
     }
 
+    .highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
+        stroke: #7CB5EC;
+        color: #7CB5EC;
+        stroke-dasharray: 5;
+    }
+
     .highcharts-markers.highcharts-series-1 {
         path {
             fill: $highstock-series1;

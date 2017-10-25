@@ -294,11 +294,11 @@ export class HighchartComponent implements OnInit, OnChanges {
     if (latestSeries0 > 0 && latestSeries1 > 0) {
       this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
     }
-    // Tooltip for charts that only displays 1 series (ex. NTA portal)
-    if (latestSeries0 > 0 && !latestSeries1) {
+    // If there are no YTD values
+    if (latestSeries0 && !latestSeries1) {
       this.chart.tooltip.refresh([series0.points[latestSeries0]]);
     }
-}
+  }
 
   trimData(dataArray, start, end) {
     const defaultRanges = this._helper.setDefaultChartRange(this.currentFreq, dataArray, this.defaultRange);

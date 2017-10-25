@@ -29,7 +29,9 @@ export class CategoryChartsComponent implements OnInit {
 
   ngOnInit() {
     this.data.forEach((chartSeries) => {
-      chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+      if (chartSeries.seriesInfo !== 'No data available') {
+        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);        
+      }
     });
   }
 
