@@ -33,6 +33,14 @@
       width: 68%;
       margin-left: 32%;
       margin-bottom: 40px;
+      /* Add gradient to scrollable content, based on: http://www.the-haystack.com/2013/09/24/responsive-scrollable-tables/ */
+      background-image: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to left, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to right, #E4E4E4, rgba(195, 195, 197, 0)), linear-gradient(to left, #E4E4E4, rgba(195, 195, 197, 0));
+      background-position: 0 0, 100% 0, 0 0, 100% 0;
+      background-repeat: no-repeat;
+      background-color: white;
+      background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;
+      background-attachment: local, local, scroll, scroll;
+
 
       .category-table {
         table-layout: fixed;

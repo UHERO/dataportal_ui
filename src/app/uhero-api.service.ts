@@ -28,7 +28,6 @@ export class UheroApiService {
   private cachedSearch = [];
   private cachedCatMeasures = [];
   private cachedMeasureSeries =  [];
-  private cachedCatSeries = [];
 
   constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
      // this.baseUrl = 'http://localhost:8080/v1';
@@ -81,21 +80,6 @@ export class UheroApiService {
           expanded$ = null;
         });
       return expanded$;
-    }
-  }
-
-  fetchCategorySeries(id: number, geo: string, freq: string): Observable<any> {
-    if (this.cachedCatSeries[id + geo + freq]) {
-      return Observable.of(this.cachedCatSeries[id + geo + freq]);
-    } else {
-      let catSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` +
-        id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
-        .map(mapData)
-        .do(val => {
-          this.cachedCatSeries[id + geo + freq] = val;
-          catSeries$ = null;
-        });
-      return catSeries$;
     }
   }
 

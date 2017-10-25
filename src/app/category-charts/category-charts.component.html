@@ -6,7 +6,7 @@
 	<ng-template ngFor let-serie [ngForOf]="data">
 		<div *ngIf="!noSeries" class="multi-charts">
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" queryParamsHandling='merge' *ngIf="serie.seriesInfo.id" (click)="submitGAEvent(serie.seriesInfo.id)">
-				<app-highchart [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [currentFreq]="freq"></app-highchart>
+				<app-highchart [minValue]="sublist.minValue" [maxValue]="sublist.maxValue" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [currentFreq]="freq"></app-highchart>
 			</a>
 			<i [class.add-button]="!serie.seriesInfo.analyze" [class.remove-button]="serie.seriesInfo.analyze" class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
 		</div>

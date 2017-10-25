@@ -86,7 +86,7 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     },
     {
       provide: 'defaultCategory',
-      useValue: 2597
+      useValue: 3502
     },
     {
       provide: 'logo',
