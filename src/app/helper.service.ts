@@ -66,6 +66,11 @@ export class HelperService {
       // Method for new API observation responses
       if (levelResults.dates) {
         level = this.formatObservations(levelResults);
+        level.forEach((l, index) => {
+          if (l.pseudoHistory && !level[index + 1].pseudoHistory) {
+            pseudoZones.push({ value: Date.parse(l.date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+          }
+        });
       }
       if (yoyResults.dates) {
         yoy = this.formatObservations(yoyResults);
@@ -78,9 +83,9 @@ export class HelperService {
       }
       combinedObservations = level.map((entry, index) => {
         const obj = { date: '', value: null, yoyValue: null, ytdValue: null, c5maValue: null };
-        const yoyDateIndex = yoy.findIndex(y => y.date === entry.date);
-        const ytdDateIndex = ytd.findIndex(y => y.date === entry.date);
-        const c5maDateIndex = c5ma.findIndex(c => c.date === entry.date);
+        const yoyDateIndex = yoy ? yoy.findIndex(y => y.date === entry.date) : -1;
+        const ytdDateIndex = ytd ? ytd.findIndex(y => y.date === entry.date) : -1;
+        const c5maDateIndex = c5ma ? c5ma.findIndex(c => c.date === entry.date) : -1;
         obj.date = entry.date;
         obj.value = entry.value;
         obj.yoyValue = yoyDateIndex > -1 ? yoy[yoyDateIndex].value : null;
@@ -99,10 +104,12 @@ export class HelperService {
   formatObservations(results) {
     const dates = results.dates;
     const values = results.values;
+    const pseudoHistory = results.pseudoHistory;
     const formattedResults = dates.map((d, index) => {
-      const entry = { date: '', value: Infinity };
+      const entry = { date: '', value: Infinity, pseudoHistory: false };
       entry.date = d;
       entry.value = +values[index];
+      entry.pseudoHistory = pseudoHistory[index]
       return entry;
     });
     return formattedResults;

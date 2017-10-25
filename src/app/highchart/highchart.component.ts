@@ -278,6 +278,10 @@ export class HighchartComponent implements OnInit, OnChanges {
     if (latestSeries0 > 0 && latestSeries1 > 0) {
       this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
     }
+    // If there are no YTD values
+    if (latestSeries0 && !latestSeries1) {
+      this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+    }
   }
 
   trimData(dataArray, start, end) {

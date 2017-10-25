@@ -68,7 +68,6 @@ export class HighstockComponent implements OnChanges {
     const series2 = chartData[portalSettings.highstock.series2Name];
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const pseudoZones = chartData.pseudoZones;
-    console.log('pseudoZones', pseudoZones)
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
