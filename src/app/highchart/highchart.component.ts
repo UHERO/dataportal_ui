@@ -20,6 +20,8 @@ export class HighchartComponent implements OnInit, OnChanges {
   @Input() currentFreq;
   @Input() chartStart;
   @Input() chartEnd;
+  @Input() minValue;
+  @Input() maxValue;
   public options: Object;
   private chart;
 
@@ -34,31 +36,61 @@ export class HighchartComponent implements OnInit, OnChanges {
     return counter;
   }
 
-  constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
+  constructor( @Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngOnInit() {
     if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
     }
   }
 
   ngOnChanges() {
-    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.chartStart, this.chartEnd);
+    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
   }
 
-  drawChart(seriesData, currentFreq, portalSettings, start?, end?) {
+  drawChart(seriesData, currentFreq, portalSettings, min, max, start?, end?) {
     let series0 = seriesData.categoryChart.chartData[portalSettings.highcharts.series0Name];
     let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
-    series0 = this.trimData(series0, start, end);
-    series1 = this.trimData(series1, start, end);
+    series0 = series0 ? this.trimData(series0, start, end) : null;
+    series1 = series1 ? this.trimData(series1, start, end) : null;
+    const chartSeries = [];
+    const minValue = min;
+    const maxValue = max;
     const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
-    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+    const title = seriesData.seriesInfo.displayName;
     const dataFreq = currentFreq;
     const unitsShort = seriesData.seriesInfo.unitsLabelShort;
+    chartSeries.push({
+      name: portalSettings.highcharts.series0Name,
+      type: portalSettings.highcharts.series0Type,
+      yAxis: 1,
+      data: series0,
+      states: {
+        hover: {
+          lineWidth: 2
+        }
+      },
+      dataGrouping: {
+        enabled: false
+      },
+      zoneAxis: 'x',
+      zones: pseudoZones,
+      zIndex: 1
+    });
+    if (series1) {
+      chartSeries.push({
+        name: portalSettings.highcharts.series1Name,
+        type: portalSettings.highcharts.series1Type,
+        data: series1,
+        dataGrouping: {
+          enabled: false
+        },
+      });
+    }
 
     this.options = {
       chart: {
@@ -77,19 +109,19 @@ export class HighchartComponent implements OnInit, OnChanges {
         }
       },
       tooltip: {
-        positioner: function() {
-          return {x: 0, y: -5};
+        positioner: function () {
+          return { x: 0, y: -5 };
         },
         shadow: false,
         borderWidth: 0,
         shared: true,
         formatter: function () {
           const getLabelName = function (seriesName, freq, precent) {
-            if (seriesName === 'Level') {
+            if (seriesName === 'level') {
               return ': ';
             }
             if (seriesName === 'c5ma') {
-              return percent ? 'Centered 5 Year Moving Avg Chg: ' : 'Centered 5 Year Moving Avg % Chg: ';
+              return percent ? 'Annual Chg: ' : 'Annual % Chg: ';
             }
             if (seriesName === 'ytd' && freq === 'A') {
               return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
@@ -131,15 +163,15 @@ export class HighchartComponent implements OnInit, OnChanges {
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             const name = getLabelName(point.series.name, dataFreq, percent);
             let label = name + formattedValue;
-            if (point.series.name === 'Level') {
+            if (point.series.name === 'level') {
               label += ' (' + unitsShort + ') <br>';
             }
             if (pseudoZones.length > 0) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
-                  const otherSeriesLabel =  pseudo + name + formattedValue;
+                  const otherSeriesLabel = pseudo + name + formattedValue;
                   const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
-                  s += point.series.name === 'Level' ? levelLabel : otherSeriesLabel;
+                  s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
                   s += pseudo + name + formattedValue;
                 }
                 if (point.x >= zone.value) {
@@ -176,7 +208,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         title: {
           text: ''
         },
-        minTickInterval: 0.01
+        minTickInterval: 0.01,
       }, {
         title: {
           text: ''
@@ -184,6 +216,8 @@ export class HighchartComponent implements OnInit, OnChanges {
         labels: {
           enabled: false
         },
+        min: minValue,
+        max: maxValue,
         minTickInterval: 0.01,
         opposite: true
       }],
@@ -194,30 +228,7 @@ export class HighchartComponent implements OnInit, OnChanges {
           }
         }
       },
-      series: [{
-        name: 'Level',
-        type: 'line',
-        yAxis: 1,
-        data: series0,
-        states: {
-          hover: {
-            lineWidth: 2
-          }
-        },
-        dataGrouping: {
-          enabled: false
-        },
-        zoneAxis: 'x',
-        zones: pseudoZones,
-        zIndex: 1
-      }, {
-        name: portalSettings.highcharts.series1Name,
-        type: portalSettings.highcharts.series1Type,
-        data: series1,
-        dataGrouping: {
-          enabled: false
-        },
-      }],
+      series: chartSeries,
     };
   }
 
@@ -272,13 +283,22 @@ export class HighchartComponent implements OnInit, OnChanges {
         this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
         series0.points[latestSeries0].setState('hover');
       }
+      // Tooltip for charts that only displays 1 series (ex. NTA portal)
+      if (latestSeries0 > 0 && !latestSeries1) {
+        this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+        series0.points[latestSeries0].setState('hover');
+      }
     };
 
     // Display tooltip when chart loads
     if (latestSeries0 > 0 && latestSeries1 > 0) {
       this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
     }
-  }
+    // Tooltip for charts that only displays 1 series (ex. NTA portal)
+    if (latestSeries0 > 0 && !latestSeries1) {
+      this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+    }
+}
 
   trimData(dataArray, start, end) {
     const defaultRanges = this._helper.setDefaultChartRange(this.currentFreq, dataArray, this.defaultRange);

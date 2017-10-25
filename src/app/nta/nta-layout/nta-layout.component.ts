@@ -26,6 +26,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private tableEnd;
   private chartStart;
   private chartEnd;
+  private chartRange;
 
   // Variables for geo and freq selectors
   public categoryData;

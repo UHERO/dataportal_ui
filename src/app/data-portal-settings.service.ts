@@ -11,10 +11,14 @@ export class DataPortalSettingsService {
         portalLink: 'http://data.uhero.hawaii.edu/nta/#/category?id='
       },
       highcharts: {
+        seriesTotal: 1,
         series0Name: 'level',
         series0Type: 'line',
-        series1Name: 'c5ma',
-        series1Type: 'column'
+        series0Data: true,
+        series1Name: '',
+        series1Type: '',
+        series1Data: false,
+        setYAxes: true
       },
       highstock: {
         credits: 'data.uhero.hawaii.edu/nta',
@@ -51,10 +55,14 @@ export class DataPortalSettingsService {
         portalLink: 'http://data.uhero.hawaii.edu/#/category?id='
       },
       highcharts: {
+        seriesTotal: 2,
         series0Name: 'level',
         series0Type: 'line',
+        series0Data: true,
         series1Name: 'ytd',
-        series1Type: 'column'
+        series1Type: 'column',
+        series1Data: true,
+        setYAxes: false
       },
       highstock: {
         credits: 'data.uhero.hawaii.edu',

@@ -16,7 +16,7 @@
 							 data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
 								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge'
 								 (click)="hideInfo(serie.seriesInfo.id)">
-                  					{{serie.seriesInfo.tablePrefix + serie.seriesInfo.title + serie.seriesInfo.tablePostfix}}
+                  					{{serie.seriesInfo.tablePrefix + serie.seriesInfo.displayName + serie.seriesInfo.tablePostfix}}
 								</a>
 								<div class="th-buttons">
 									<i [title]="serie.seriesInfo.analyze ? 'Remove from Analyzer' : 'Add to Analyzer'" [class.add-button]="!serie.seriesInfo.analyze" [class.remove-button]="serie.seriesInfo.analyze" class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
@@ -40,7 +40,7 @@
 						</tr>
 						<tr *ngIf="c5maActive">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-								C5MA
+								{{(serie.seriesInfo.percent) ? '&emsp; Annual (ch.)' : '&emsp; Annual (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
 								<td>{{item.formattedC5ma}}</td>

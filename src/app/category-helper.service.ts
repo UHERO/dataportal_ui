@@ -8,7 +8,6 @@ import { CategoryData } from './category-data';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { DateWrapper } from './date-wrapper';
-import { DisplaySeries } from './display-series';
 
 @Injectable()
 export class CategoryHelperService {
@@ -334,6 +333,7 @@ export class CategoryHelperService {
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
+        series.seriesInfo.displayName = res.title;
         filtered.push(series);
       }
     });
