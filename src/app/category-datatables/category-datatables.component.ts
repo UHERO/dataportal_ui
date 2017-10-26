@@ -103,9 +103,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const observations = {};
-        const title = series.seriesInfo.title;
+        const title = series.seriesInfo.displayName;
         series.categoryTable.forEach((obs) => {
-          observations[obs.tableDate] = obs.level;
+          observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
         });
         tableData.push({
           series: title,
@@ -128,9 +128,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         const yoy = {};
         const percent = series.seriesInfo.percent;
         const yoyLabel = percent ? ' (ch)' : ' (%)';
-        const title = series.seriesInfo.title;
+        const title = series.seriesInfo.displayName;
         series.categoryTable.forEach((obs) => {
-          yoy[obs.tableDate] = obs.yoy;
+          yoy[obs.tableDate] = obs.yoyValue === Infinity ? null : obs.yoyValue;
         });
         tableData.push({
           series: title + yoyLabel,
@@ -153,9 +153,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         const ytd = {};
         const percent = series.seriesInfo.percent;
         const ytdLabel = percent ? ' (ch)' : ' (%)';
-        const title = series.seriesInfo.title;
+        const title = series.seriesInfo.displayName;
         series.categoryTable.forEach((obs) => {
-          ytd[obs.tableDate] = obs.ytd;
+          ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
         });
         tableData.push({
           series: title + ytdLabel,
@@ -171,18 +171,19 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         series: '',
         observations: ''
       }, {
-        series: 'Centered 5 Year Moving Avg',
+        series: 'Annual Change',
         observations: ''
       });
       displaySeries.forEach((series) => {
         const c5ma = {};
         const percent = series.seriesInfo.percent;
-        const title = series.seriesInfo.title;
+        const c5maLabel = percent ? ' (ch)' : ' (%)';
+        const title = series.seriesInfo.displayName;
         series.categoryTable.forEach((obs) => {
-          c5ma[obs.tableDate] = obs.c5ma;
+          c5ma[obs.tableDate] = obs.c5maValue === Infinity ? null : obs.c5maValue;
         });
         tableData.push({
-          series: title,
+          series: title + c5maLabel,
           observations: c5ma
         });
       });

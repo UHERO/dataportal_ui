@@ -6,7 +6,6 @@ import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
 import { Frequency } from '../frequency';
 import { DateWrapper } from '../date-wrapper';
-import { DisplaySeries } from '../display-series';
 
 @Injectable()
 export class NtaHelperService {
@@ -106,7 +105,7 @@ export class NtaHelperService {
       this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
         if (series) {
           sub.series = series;
-          this.formatCategoryData(category, sub, sublistDateArray);
+          this.formatCategoryData(category, sub, sublistDateArray, false);
         }
         sub.id = sub.id.toString();
         if (!series) {
@@ -178,7 +177,7 @@ export class NtaHelperService {
               id: 'search',
               series: searchSeries
             };
-            this.formatCategoryData(category, sublist, []);
+            this.formatCategoryData(category, sublist, [], true);
             category.sublist = [sublist];
           }
         });
@@ -205,9 +204,9 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category, subcategory, subcategoryDateArray) {
+  formatCategoryData(category, subcategory, subcategoryDateArray: Array<any>, search: Boolean) {
     const dateWrapper = subcategory.dateWrapper;
-    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory);
+    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory, search);
     subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
     subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
     // At most, display 12 series at a time in the multiple chart view
@@ -245,14 +244,15 @@ export class NtaHelperService {
       });
   }
 
-  filterSeries(seriesArray: Array<any>, sublist) {
+  filterSeries(seriesArray: Array<any>, sublist, search: Boolean) {
     const filtered = [];
     seriesArray.forEach((res) => {
       let seriesDates = [], series;
       const levelData = res.seriesObservations.transformationResults[0].observations;
+      const newLevelData = res.seriesObservations.transformationResults[0].dates;
       const decimals = res.decimals ? res.decimals : 1;
       // Add series if level data is available
-      if (levelData) {
+      if (levelData || newLevelData) {
         const seriesObsStart = res.seriesObservations.observationStart;
         const seriesObsEnd = res.seriesObservations.observationEnd;
         sublist.dateWrapper.firstDate = this.setStartDate(sublist.dateWrapper, seriesObsStart);
@@ -261,6 +261,8 @@ export class NtaHelperService {
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
+        series.seriesInfo.title
+        series.seriesInfo.displayName = search ? series.seriesInfo.title + ' (' + series.seriesInfo.geography.name + ')' : series.seriesInfo.geography.name;
         filtered.push(series);
       }
     });
