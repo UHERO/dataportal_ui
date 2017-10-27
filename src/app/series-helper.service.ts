@@ -127,7 +127,10 @@ export class SeriesHelperService {
       tableStartValue: Infinity,
       tableEndValue: Infinity,
       percChange: Infinity,
-      levelChange: Infinity
+      levelChange: Infinity,
+      total: Infinity,
+      avg: Infinity,
+      cagr: Infinity
     };
     const formatStats = {
       minValue: '',
@@ -136,6 +139,9 @@ export class SeriesHelperService {
       maxValueDate: '',
       percChange: '',
       levelChange: '',
+      total: '',
+      avg: '',
+      cagr: ''
     };
     // Find observations in seriesData that match the selected minimum and maximum dates (duplicate dates may show up in analyzer table data)
     const minDateObs = seriesData.filter(obs => obs.date === minDate);
@@ -145,7 +151,25 @@ export class SeriesHelperService {
     const maxDateData = maxDateObs.find(obs => obs.value !== Infinity);
     stats.tableStartValue = minDateData ? minDateData.value : Infinity;
     stats.tableEndValue = maxDateData ? maxDateData.value : Infinity;
-    
+    const minDateIndex = seriesData.findIndex(obs => obs.date === minDate && obs.value === stats.tableStartValue);
+    const maxDateIndex = seriesData.findIndex(obs => obs.date === maxDate && obs.value === stats.tableEndValue);
+    let selectedRangeData;
+    if (minDateIndex > maxDateIndex) {
+      selectedRangeData = seriesData.slice(maxDateIndex, minDateIndex + 1);
+    }
+    if (maxDateIndex > minDateIndex) {
+      selectedRangeData = seriesData.slice(minDateIndex, maxDateIndex + 1);
+    }
+    if (selectedRangeData) {
+      console.log(selectedRangeData)
+      console.log(maxDateData);
+      console.log(minDateData)
+      stats.total = selectedRangeData.reduce((sum, value) => value.value !== Infinity ? sum + value.value : sum + 0, 0);
+      stats.avg = stats.total / selectedRangeData.length;
+      // To do: add conditionals for different frequencies
+      stats.cagr = (Math.pow((maxDateData.value/minDateData.value), 1/(selectedRangeData.length - 1)) - 1) * 100;
+    }
+
     stats.minValue = this.getMinMax(seriesData).minValue;
     stats.minValueDate = this.getMinMax(seriesData).minValueDate;
     stats.maxValue = this.getMinMax(seriesData).maxValue;
@@ -162,6 +186,11 @@ export class SeriesHelperService {
     formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
     formatStats.percChange = stats.percChange === Infinity ? ' ' : this._helper.formatNum(stats.percChange, decimals);
     formatStats.levelChange = stats.levelChange === Infinity ? ' ' : this._helper.formatNum(stats.levelChange, decimals);
+    formatStats.total = stats.total === Infinity ? ' ' : this._helper.formatNum(stats.total, decimals);
+    formatStats.avg = stats.avg === Infinity ? ' ' : this._helper.formatNum(stats.avg, decimals);
+    formatStats.cagr = stats.cagr === Infinity ? ' ' : this._helper.formatNum(stats.cagr, decimals);
+    console.log('stats', stats);
+    console.log('formatted', formatStats);
     return formatStats;
   }
 
