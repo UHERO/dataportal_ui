@@ -61,7 +61,22 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return;
     }
     // Draw chart if no chart exists
-    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings);
+    // Get buttons for chart
+    const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+  }
+
+  formatChartButtons(buttons: Array<any>) {
+    const chartButtons = buttons.reduce((allButtons, button) => {
+      if (button !== 'all') {
+        allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+      }
+      if (button === 'all') {
+        allButtons.push({ type: 'all', text: 'All' });
+      }
+      return allButtons;
+    }, []);
+    return chartButtons;
   }
 
   removeFromChart(analyzerSeries, chart) {
@@ -198,7 +213,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return { series: chartSeries, yAxis: yAxes };
   }
 
-  drawChart(series, yAxis, tooltipFormatter, portalSettings) {
+  drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
     this.options = {
       chart: {
         alignTicks: false,
@@ -227,22 +242,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         }
       },
       rangeSelector: {
-        buttons: [{
-          type: 'year',
-          count: 1,
-          text: '1Y'
-        }, {
-          type: 'year',
-          count: 5,
-          text: '5Y'
-        }, {
-          type: 'year',
-          count: 10,
-          text: '10Y'
-        }, {
-          type: 'all',
-          text: 'All'
-        }],
+        buttons: buttons,
         buttonPosition: {
           x: 10,
           y: 10
@@ -270,8 +270,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             text: 'Download',
             _titleKey: 'exportKey',
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-            onclick: function(this) {
-              this.exportChart(null, { subtitle: { text:'' } });
+            onclick: function (this) {
+              this.exportChart(null, { subtitle: { text: '' } });
             }
           },
           printButton: {
