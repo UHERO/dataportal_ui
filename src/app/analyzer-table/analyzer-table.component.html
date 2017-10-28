@@ -6,7 +6,7 @@
     <input type="checkbox" (change)="ytdActive($event)">Year-to-Date
   </label>
   <label *ngIf="portalSettings.transformations.c5ma" class="form-check-inline">
-      <input type="checkbox" (change)="c5maActive($event)">Annual Change
+    <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
 
@@ -17,7 +17,9 @@
         <tr>
           <th class="empty-header">&nbsp;</th>
           <ng-template ngFor let-date [ngForOf]="tableDates" let-i="index">
-            <td><b>{{date.tableDate}}</b></td>
+            <td>
+              <b>{{date.tableDate}}</b>
+            </td>
           </ng-template>
         </tr>
         <ng-template ngFor let-serie [ngForOf]="series" let-i="index">
@@ -26,11 +28,11 @@
               <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
               <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
               <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
-                  {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
+                {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
               </a>
               <a tabindex="0" id="{{serie.id}}" class="info" (click)="showPopover(serie)" role="button" data-animation='false' data-toggle="popover">
-								<i class="material-icons info-icon">&#xE88F;</i>
-							</a>
+                <i class="material-icons info-icon">&#xE88F;</i>
+              </a>
             </th>
             <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
               <td>{{item.formattedValue}}</td>
@@ -65,29 +67,39 @@
     </div>
   </div>
 </div>
-<div class="analyzer-summary-stats">
-  <table>
-    <tr>
-      <th class="empty-header">&nbsp;</th>
-      <th>Minimum Value</th>
-      <th>Maximum Value</th>
-      <th>% Change over Selected Range</th>
-      <th>Change over Selected Range</th>
-    </tr>
-    <ng-template ngFor let-serie [ngForOf]="series">
-      <tr>
-        <td class="series-title" title="{{serie.title}}">
-          <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
-          <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
-          <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge'>
-            {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
-          </a>
-        </td>
-        <td>{{serie.summaryStats.minValue + ' (' + serie.summaryStats.minValueDate + ')'}}</td>
-        <td>{{serie.summaryStats.maxValue + ' (' + serie.summaryStats.maxValueDate + ')'}}</td>
-        <td>{{!serie.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
-        <td>{{serie.summaryStats.levelChange}}</td>
-      </tr>
-    </ng-template>
-  </table>
+<div class="analyzer-table">
+  <div class="table-row">
+    <div class="table">
+      <table>
+        <tr>
+          <th class="empty-header">&nbsp;</th>
+          <td>Minimum Value</td>
+          <td>Maximum Value</td>
+          <td>% Change Over Selected Range</td>
+          <td>Change Over Selected Range</td>
+          <td>Total Over Selected</td>
+          <td>Avg Over Selected</td>
+          <td>Compound Annual Growth Rate Over Selected</td>
+        </tr>
+        <ng-template ngFor let-serie [ngForOf]="series">
+          <tr>
+            <th class="series-title" title="{{serie.title}}">
+              <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
+              <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
+              <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge'>
+                {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
+              </a>
+            </th>
+            <td>{{serie.summaryStats.minValue + ' (' + serie.summaryStats.minValueDate + ')'}}</td>
+            <td>{{serie.summaryStats.maxValue + ' (' + serie.summaryStats.maxValueDate + ')'}}</td>
+            <td>{{!serie.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
+            <td>{{serie.summaryStats.levelChange}}</td>
+            <td>{{serie.summaryStats.total}}</td>
+            <td>{{serie.summaryStats.avg}}</td>
+            <td>{{serie.summaryStats.cagr}}</td>            
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
 </div>
