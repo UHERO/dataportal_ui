@@ -47,6 +47,7 @@
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
+        "staging": "environments/environment.staging.ts",
         "prod": "environments/environment.prod.ts"
       }
     }, {
@@ -90,6 +91,7 @@
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
+        "staging": "environments/environment.staging.ts",
         "prod": "environments/environment.prod.ts"        
       }
     }
