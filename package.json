@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start-uhero-staging": "ng serve --app=uhero --env=staging",
-    "start-nta-staging": "ng serve --app=nta --env=staging",
+    "start-uhero-staging": "ng serve --app=uhero --env=staging --port=4201",
+    "start-nta-staging": "ng serve --app=nta --env=staging --port=4201",
     "start-uhero-dev": "ng serve --app=uhero --env=dev",
     "start-nta-dev": "ng serve --app=nta --env=dev",
     "build-uhero": "ng build --app=uhero --prod",
