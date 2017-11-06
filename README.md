@@ -24,8 +24,12 @@ Run `ng generate component component-name` to generate a new component. You can 
 ### UHERO Data Portal
 Run `npm run build-uhero` for the production build of the UHERO Data Portal. The build artifacts will be stored in the `dist/` directory.
 
+For the staging server build, run `npm run  build-uhero-staging`.
+
 ### NTA Data Portal
 Run `npm run build-nta` for the production build of the UHERO Data Portal. The build artifacts will be stored in the `ntaDist/` directory.
+
+For the staging server build, run `npm run build-nta-staging`.
 
 ## Running unit tests
 
