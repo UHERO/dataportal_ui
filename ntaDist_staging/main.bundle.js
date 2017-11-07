@@ -6355,7 +6355,7 @@ UheroHelpComponent = __decorate([
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return environment; });
 var environment = {
     production: false,
-    apiUrl: 'http://uhero-bamboo.colo.hawaii.edu:3030/v1/'
+    apiUrl: 'http://uhero-bamboo.colo.hawaii.edu:3030/v1'
 };
 //# sourceMappingURL=environment.js.map
 
