@@ -32,7 +32,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "/* Highcharts */\n/* Analyzer Chart */\n/* Loading Screen */\n.customize-tooltip {\n  display: inline-block; }\n  .customize-tooltip p {\n    display: inline-block;\n    font-size: 0.85em;\n    margin-top: 1rem;\n    vertical-align: middle; }\n\n#analyzer-chart {\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15); }\n  #analyzer-chart .highcharts-background {\n    fill: #FAFAFB; }\n  #analyzer-chart .highcharts-button, #analyzer-chart .highcharts-button-hover {\n    stroke: none; }\n  #analyzer-chart .highcharts-button.highcharts-button-pressed {\n    fill: #0068B3; }\n    #analyzer-chart .highcharts-button.highcharts-button-pressed text {\n      fill: #FFF; }\n  #analyzer-chart .highcharts-subtitle {\n    fill: #B71625;\n    font-weight: bold; }\n  #analyzer-chart .highcharts-markers.highcharts-color-0 path {\n    fill: #0068B3; }\n  #analyzer-chart .highcharts-markers.highcharts-color-1 path {\n    fill: #F6A01B; }\n  #analyzer-chart .highcharts-markers.highcharts-color-2 path {\n    fill: #9E9E9E; }\n  #analyzer-chart .highcharts-markers.highcharts-color-3 path {\n    fill: #008b78; }\n  #analyzer-chart .highcharts-markers.highcharts-color-4 path {\n    fill: #8064A2; }\n  #analyzer-chart .highcharts-navigator-handle {\n    stroke: #999999; }\n  #analyzer-chart .highcharts-color-0 {\n    fill: #0068B3;\n    stroke: #0068B3; }\n  #analyzer-chart .highcharts-color-1 {\n    fill: #F6A01B;\n    stroke: #F6A01B; }\n  #analyzer-chart .highcharts-color-2 {\n    fill: #9E9E9E;\n    stroke: #9E9E9E; }\n  #analyzer-chart .highcharts-color-3 {\n    fill: #008b78;\n    stroke: #008b78; }\n  #analyzer-chart .highcharts-color-4 {\n    fill: #8064A2;\n    stroke: #8064A2; }\n  #analyzer-chart .highcharts-navigator-series .highcharts-graph {\n    color: #505050;\n    stroke: #505050; }\n  #analyzer-chart .highcharts-navigator-series .highcharts-area {\n    fill: #0068B3; }\n  #analyzer-chart .highcharts-title {\n    fill: #505050;\n    font-family: 'sans-serif'; }\n  #analyzer-chart .highcharts-tooltip {\n    -webkit-filter: none;\n            filter: none; }\n    #analyzer-chart .highcharts-tooltip .series-0 {\n      fill: #0068B3; }\n    #analyzer-chart .highcharts-tooltip .series-1 {\n      fill: #F6A01B; }\n    #analyzer-chart .highcharts-tooltip .series-2 {\n      fill: #9E9E9E; }\n    #analyzer-chart .highcharts-tooltip .series-3 {\n      fill: #008b78; }\n    #analyzer-chart .highcharts-tooltip .series-4 {\n      fill: #8064A2; }\n    #analyzer-chart .highcharts-tooltip .highcharts-tooltip-box {\n      stroke-width: 0; }\n  #analyzer-chart .highcharts-xaxis-labels text {\n    color: #9E9E9E;\n    fill: #9E9E9E; }\n  #analyzer-chart .highcharts-yaxis-grid .highcharts-grid-line {\n    display: none; }\n  #analyzer-chart .highcharts-yaxis-labels.series1 text {\n    color: #9E9E9E;\n    fill: #9E9E9E; }\n  #analyzer-chart .highcharts-yaxis-labels.series2 text {\n    color: #0068B3;\n    fill: #0068B3; }\n  #analyzer-chart .highcharts-yaxis.series1 .highcharts-axis-title {\n    color: #9E9E9E;\n    fill: #9E9E9E; }\n  #analyzer-chart .highcharts-yaxis.series2 .highcharts-axis-title {\n    color: #0068B3;\n    fill: #0068B3; }\n", ""]);
+exports.push([module.i, "/* Highcharts */\n/* Analyzer Chart */\n/* Loading Screen */\n.customize-tooltip {\n  display: inline-block; }\n  .customize-tooltip p {\n    display: inline-block;\n    font-size: 0.85em;\n    margin-top: 1rem;\n    vertical-align: middle; }\n\n#analyzer-chart, #chart {\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15); }\n\n.highcharts-background {\n  fill: #FAFAFB; }\n\n.highcharts-button, .highcharts-button-hover {\n  stroke: none; }\n\n.highcharts-button.highcharts-button-pressed {\n  fill: #0068B3; }\n  .highcharts-button.highcharts-button-pressed text {\n    fill: #FFF; }\n\n.highcharts-subtitle {\n  fill: #B71625;\n  font-weight: bold; }\n\n.highcharts-markers.highcharts-color-0 path {\n  fill: #0068B3; }\n\n.highcharts-markers.highcharts-color-1 path {\n  fill: #9E9E9E; }\n\n.highcharts-markers.highcharts-color-2 path {\n  fill: #F6A01B; }\n\n.highcharts-markers.highcharts-color-3 path {\n  fill: #008b78; }\n\n.highcharts-markers.highcharts-color-4 path {\n  fill: #8064A2; }\n\n.highcharts-navigator-handle {\n  stroke: #999999; }\n\n.highcharts-color-0 {\n  fill: #0068B3;\n  stroke: #0068B3; }\n\n.highcharts-color-1 {\n  fill: #9E9E9E;\n  stroke: #9E9E9E; }\n\n.highcharts-color-2 {\n  fill: #F6A01B;\n  stroke: #F6A01B; }\n\n.highcharts-color-3 {\n  fill: #008b78;\n  stroke: #008b78; }\n\n.highcharts-color-4 {\n  fill: #8064A2;\n  stroke: #8064A2; }\n\n.highcharts-navigator-series .highcharts-graph {\n  color: #505050;\n  stroke: #505050; }\n\n.highcharts-navigator-series .highcharts-area {\n  fill: #9E9E9E; }\n\n.highcharts-title {\n  fill: #505050;\n  font-family: 'sans-serif'; }\n\n.highcharts-tooltip {\n  -webkit-filter: none;\n          filter: none; }\n  .highcharts-tooltip .series-0 {\n    fill: #0068B3; }\n  .highcharts-tooltip .series-1 {\n    fill: #9E9E9E; }\n  .highcharts-tooltip .series-2 {\n    fill: #F6A01B; }\n  .highcharts-tooltip .series-3 {\n    fill: #008b78; }\n  .highcharts-tooltip .series-4 {\n    fill: #8064A2; }\n  .highcharts-tooltip .highcharts-tooltip-box {\n    stroke-width: 0; }\n\n.highcharts-xaxis-labels text {\n  color: #0068B3;\n  fill: #0068B3; }\n\n.highcharts-yaxis-grid .highcharts-grid-line {\n  display: none; }\n\n.highcharts-yaxis-labels.series1 text {\n  color: #0068B3;\n  fill: #0068B3; }\n\n.highcharts-yaxis-labels.series2 text {\n  color: #9E9E9E;\n  fill: #9E9E9E; }\n\n.highcharts-yaxis.series1 .highcharts-axis-title {\n  color: #0068B3;\n  fill: #0068B3; }\n\n.highcharts-yaxis.series2 .highcharts-axis-title {\n  color: #9E9E9E;\n  fill: #9E9E9E; }\n", ""]);
 
 // exports
 
@@ -87,7 +87,8 @@ var AnalyzerHighstockComponent = (function () {
             // Add a chart subtitle to alert user of a warning
             this.chart.setSubtitle({
                 text: this.alertMessage,
-                floating: true
+                align: 'center',
+                verticalAlign: 'bottom',
             });
             if (this.chart.subtitle) {
                 setTimeout(function () {
@@ -97,7 +98,21 @@ var AnalyzerHighstockComponent = (function () {
             return;
         }
         // Draw chart if no chart exists
-        this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings);
+        // Get buttons for chart
+        var chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+        this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+    };
+    AnalyzerHighstockComponent.prototype.formatChartButtons = function (buttons) {
+        var chartButtons = buttons.reduce(function (allButtons, button) {
+            if (button !== 'all') {
+                allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+            }
+            if (button === 'all') {
+                allButtons.push({ type: 'all', text: 'All' });
+            }
+            return allButtons;
+        }, []);
+        return chartButtons;
     };
     AnalyzerHighstockComponent.prototype.removeFromChart = function (analyzerSeries, chart) {
         // Filter out series from chart that are not in analayzerSeries
@@ -228,7 +243,7 @@ var AnalyzerHighstockComponent = (function () {
         }
         return { series: chartSeries, yAxis: yAxes };
     };
-    AnalyzerHighstockComponent.prototype.drawChart = function (series, yAxis, tooltipFormatter, portalSettings) {
+    AnalyzerHighstockComponent.prototype.drawChart = function (series, yAxis, tooltipFormatter, portalSettings, buttons) {
         this.options = {
             chart: {
                 alignTicks: false,
@@ -255,22 +270,7 @@ var AnalyzerHighstockComponent = (function () {
                 }
             },
             rangeSelector: {
-                buttons: [{
-                        type: 'year',
-                        count: 1,
-                        text: '1Y'
-                    }, {
-                        type: 'year',
-                        count: 5,
-                        text: '5Y'
-                    }, {
-                        type: 'year',
-                        count: 10,
-                        text: '10Y'
-                    }, {
-                        type: 'all',
-                        text: 'All'
-                    }],
+                buttons: buttons,
                 buttonPosition: {
                     x: 10,
                     y: 10
@@ -298,6 +298,9 @@ var AnalyzerHighstockComponent = (function () {
                         text: 'Download',
                         _titleKey: 'exportKey',
                         menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
+                        onclick: function () {
+                            this.exportChart(null, { subtitle: { text: '' } });
+                        }
                     },
                     printButton: {
                         text: 'Print',
@@ -1511,7 +1514,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "/* Highcharts */\n/* Analyzer Chart */\n/* Loading Screen */\n.category-tables {\n  vertical-align: top;\n  display: inline-block;\n  min-height: 100%;\n  overflow: auto;\n  width: 100%; }\n  @media (min-width: 768px) {\n    .category-tables {\n      margin-top: 10px; } }\n  @media (max-width: 767px) {\n    .category-tables {\n      margin-top: 50px; } }\n  .category-tables .material-icons.md-18 {\n    font-size: 18px;\n    color: #008b78;\n    vertical-align: middle; }\n  .category-tables .table-row {\n    position: relative;\n    margin-bottom: 20px; }\n    .category-tables .table-row .table {\n      overflow-x: scroll;\n      overflow-y: visible;\n      width: 68%;\n      margin-left: 32%;\n      margin-bottom: 40px;\n      /* Add gradient to scrollable content, based on: http://www.the-haystack.com/2013/09/24/responsive-scrollable-tables/ */\n      background-image: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to left, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to right, #E4E4E4, rgba(195, 195, 197, 0)), linear-gradient(to left, #E4E4E4, rgba(195, 195, 197, 0));\n      background-position: 0 0, 100% 0, 0 0, 100% 0;\n      background-repeat: no-repeat;\n      background-color: white;\n      background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;\n      background-attachment: local, local, scroll, scroll; }\n      .category-tables .table-row .table .category-table {\n        table-layout: fixed;\n        width: 100%;\n        *margin-left: -32%; }\n        .category-tables .table-row .table .category-table td, .category-tables .table-row .table .category-table th {\n          vertical-align: top;\n          width: 125px;\n          text-align: right;\n          font-size: 0.8em;\n          padding: 0.4em;\n          border: 1px solid #E5E5E5; }\n          .category-tables .table-row .table .category-table td:empty:after, .category-tables .table-row .table .category-table th:empty:after {\n            content: \"\\A0\"; }\n        .category-tables .table-row .table .category-table th {\n          position: absolute;\n          *position: relative;\n          left: 0;\n          width: 32%;\n          white-space: nowrap;\n          border-right: 1px solid #E5E5E5;\n          text-align: left;\n          text-overflow: ellipsis;\n          overflow: hidden;\n          font-size: 0.8em;\n          font-weight: normal;\n          border-bottom: 0; }\n          .category-tables .table-row .table .category-table th .th-buttons {\n            float: right; }\n            .category-tables .table-row .table .category-table th .th-buttons .info {\n              float: right;\n              cursor: pointer;\n              width: initial; }\n              .category-tables .table-row .table .category-table th .th-buttons .info:focus {\n                outline: 0; }\n              .category-tables .table-row .table .category-table th .th-buttons .info .info-icon {\n                font-size: 1.2em;\n                vertical-align: middle;\n                margin-left: 5px; }\n            .category-tables .table-row .table .category-table th .th-buttons .analyze-button {\n              color: rgba(240, 240, 240, 0.65);\n              cursor: pointer;\n              vertical-align: middle;\n              font-size: inherit;\n              font-weight: bold; }\n            .category-tables .table-row .table .category-table th .th-buttons .add-button {\n              text-shadow: 1px 2px 6px #FFF, 0 0 0 #000, 1px 2px 6px #FFF; }\n            .category-tables .table-row .table .category-table th .th-buttons .remove-button {\n              color: #008b78; }\n        .category-tables .table-row .table .category-table .empty-header {\n          border: none;\n          border-right: 1px solid #E5E5E5; }\n        .category-tables .table-row .table .category-table tr:last-child th {\n          border: 1px solid #E5E5E5; }\n        .category-tables .table-row .table .category-table .indent1 {\n          padding-left: 30px; }\n          .category-tables .table-row .table .category-table .indent1 a {\n            width: 68%; }\n          .category-tables .table-row .table .category-table .indent1 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table .indent2 {\n          padding-left: 50px; }\n          .category-tables .table-row .table .category-table .indent2 a {\n            width: 60%; }\n          .category-tables .table-row .table .category-table .indent2 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table .indent3 {\n          padding-left: 70px; }\n          .category-tables .table-row .table .category-table .indent3 a {\n            width: 50%; }\n          .category-tables .table-row .table .category-table .indent3 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table tr:nth-child(even) {\n          background-color: rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) td:first-child, .category-tables .table-row .table .category-table tr:nth-child(even) th:first-child {\n            background: rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .analyze-button {\n            color: rgba(240, 240, 240, 0.65); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .add-button {\n            text-shadow: 1px 2px 6px rgba(212, 212, 212, 0.2), 0 0 0 #000, 1px 2px 6px rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .remove-button {\n            color: #008b78; }\n        .category-tables .table-row .table .category-table a {\n          width: 74%;\n          overflow: hidden;\n          text-overflow: ellipsis;\n          color: #505050;\n          vertical-align: top;\n          float: left; }\n\n.tooltip.tooltip-bottom .tooltip-inner::before, .tooltip.bs-tether-element-attached-top .tooltip-inner::before {\n  border-bottom-color: #FAFAFB; }\n\n.tooltip.bs-tooltip-left .arrow::before, .tooltip.bs-tooltip-right .arrow::before, .tooltip.bs-tether-element-attached-right .arrow::before {\n  border-left-color: #FAFAFB;\n  border-right-color: #FAFAFB; }\n\n.tooltip-inner {\n  max-width: 225px;\n  text-align: left;\n  background-color: #FAFAFB;\n  color: #000;\n  box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23);\n  -moz-box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23);\n  -webkit-box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23); }\n  .tooltip-inner b {\n    font-weight: 600; }\n", ""]);
+exports.push([module.i, "/* Highcharts */\n/* Analyzer Chart */\n/* Loading Screen */\n.category-tables {\n  vertical-align: top;\n  display: inline-block;\n  min-height: 100%;\n  overflow: auto;\n  width: 100%; }\n  @media (min-width: 768px) {\n    .category-tables {\n      margin-top: 10px; } }\n  @media (max-width: 767px) {\n    .category-tables {\n      margin-top: 50px; } }\n  .category-tables .material-icons.md-18 {\n    font-size: 18px;\n    color: #008b78;\n    vertical-align: middle; }\n  .category-tables .table-row {\n    position: relative;\n    margin-bottom: 20px; }\n    .category-tables .table-row .table {\n      overflow-x: scroll;\n      overflow-y: visible;\n      width: 68%;\n      margin-left: 32%;\n      margin-bottom: 40px;\n      /* Add gradient to scrollable content, based on: http://www.the-haystack.com/2013/09/24/responsive-scrollable-tables/ */\n      background-image: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to left, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to right, #E4E4E4, rgba(195, 195, 197, 0)), linear-gradient(to left, #E4E4E4, rgba(195, 195, 197, 0));\n      background-position: 0 0, 100% 0, 0 0, 100% 0;\n      background-repeat: no-repeat;\n      background-color: white;\n      background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;\n      background-attachment: local, local, scroll, scroll; }\n      .category-tables .table-row .table .category-table {\n        table-layout: fixed;\n        width: 100%;\n        *margin-left: -32%; }\n        .category-tables .table-row .table .category-table td, .category-tables .table-row .table .category-table th {\n          vertical-align: top;\n          width: 125px;\n          text-align: right;\n          font-size: 0.8em;\n          padding: 0.4em;\n          border: 1px solid #E5E5E5; }\n          .category-tables .table-row .table .category-table td:empty:after, .category-tables .table-row .table .category-table th:empty:after {\n            content: \"\\A0\"; }\n        .category-tables .table-row .table .category-table th {\n          position: absolute;\n          *position: relative;\n          left: 0;\n          width: 32%;\n          white-space: nowrap;\n          border-right: 1px solid #E5E5E5;\n          text-align: left;\n          text-overflow: ellipsis;\n          overflow: hidden;\n          font-size: 0.8em;\n          font-weight: normal;\n          border-bottom: 0; }\n          .category-tables .table-row .table .category-table th .th-buttons {\n            float: right;\n            display: -webkit-box;\n            display: -ms-flexbox;\n            display: flex;\n            -ms-flex-line-pack: center;\n                align-content: center;\n            -webkit-box-pack: center;\n                -ms-flex-pack: center;\n                    justify-content: center; }\n            .category-tables .table-row .table .category-table th .th-buttons .info {\n              float: right;\n              cursor: pointer;\n              width: initial;\n              margin: auto; }\n              .category-tables .table-row .table .category-table th .th-buttons .info:focus {\n                outline: 0; }\n              .category-tables .table-row .table .category-table th .th-buttons .info .info-icon {\n                font-size: 1.2em;\n                vertical-align: middle;\n                margin-left: 5px; }\n            .category-tables .table-row .table .category-table th .th-buttons .analyze-button {\n              color: rgba(240, 240, 240, 0.65);\n              cursor: pointer;\n              vertical-align: middle;\n              font-size: inherit;\n              font-weight: bold;\n              float: left;\n              margin: auto; }\n            .category-tables .table-row .table .category-table th .th-buttons .add-button {\n              text-shadow: 1px 2px 6px #FFF, 0 0 0 #000, 1px 2px 6px #FFF; }\n            .category-tables .table-row .table .category-table th .th-buttons .remove-button {\n              color: #008b78; }\n        .category-tables .table-row .table .category-table .empty-header {\n          border: none;\n          border-right: 1px solid #E5E5E5; }\n        .category-tables .table-row .table .category-table tr:last-child th {\n          border: 1px solid #E5E5E5; }\n        .category-tables .table-row .table .category-table .indent1 {\n          padding-left: 30px; }\n          .category-tables .table-row .table .category-table .indent1 a {\n            width: 68%; }\n          .category-tables .table-row .table .category-table .indent1 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table .indent2 {\n          padding-left: 50px; }\n          .category-tables .table-row .table .category-table .indent2 a {\n            width: 60%; }\n          .category-tables .table-row .table .category-table .indent2 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table .indent3 {\n          padding-left: 70px; }\n          .category-tables .table-row .table .category-table .indent3 a {\n            width: 50%; }\n          .category-tables .table-row .table .category-table .indent3 .info {\n            width: initial; }\n        .category-tables .table-row .table .category-table tr:nth-child(even) {\n          background-color: rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) td:first-child, .category-tables .table-row .table .category-table tr:nth-child(even) th:first-child {\n            background: rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .analyze-button {\n            color: rgba(240, 240, 240, 0.65); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .add-button {\n            text-shadow: 1px 2px 6px rgba(212, 212, 212, 0.2), 0 0 0 #000, 1px 2px 6px rgba(212, 212, 212, 0.2); }\n          .category-tables .table-row .table .category-table tr:nth-child(even) .th-buttons .remove-button {\n            color: #008b78; }\n        .category-tables .table-row .table .category-table a {\n          width: 74%;\n          overflow: hidden;\n          text-overflow: ellipsis;\n          color: #505050;\n          vertical-align: top;\n          float: left; }\n\n.tooltip.tooltip-bottom .tooltip-inner::before, .tooltip.bs-tether-element-attached-top .tooltip-inner::before {\n  border-bottom-color: #FAFAFB; }\n\n.tooltip.bs-tooltip-left .arrow::before, .tooltip.bs-tooltip-right .arrow::before, .tooltip.bs-tether-element-attached-right .arrow::before {\n  border-left-color: #FAFAFB;\n  border-right-color: #FAFAFB; }\n\n.tooltip-inner {\n  max-width: 225px;\n  text-align: left;\n  background-color: #FAFAFB;\n  color: #000;\n  box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23);\n  -moz-box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23);\n  -webkit-box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.16), 3px 3px 6px rgba(0, 0, 0, 0.23); }\n  .tooltip-inner b {\n    font-weight: 600; }\n", ""]);
 
 // exports
 
@@ -2065,12 +2068,13 @@ var DataPortalSettingsService = (function () {
                         portal: 'National Transfer Accounts (NTA)',
                         portalLink: 'NTA Dataportal: http://data.uhero.hawaii.edu/nta'
                     },
-                    series0Name: 'c5ma',
-                    series0Type: 'column',
-                    series1Name: 'level',
-                    series1Type: 'line',
+                    series0Name: 'level',
+                    series0Type: 'line',
+                    series1Name: 'c5ma',
+                    series1Type: 'column',
                     series2Name: 'none',
                     series2Type: '',
+                    buttons: [10, 25, 50, 'all']
                 },
                 seriesTable: {
                     columns: 3,
@@ -2109,12 +2113,13 @@ var DataPortalSettingsService = (function () {
                         portal: 'The University of Hawaii Economic Research Organization (UHERO)',
                         portalLink: 'Data Portal: http://data.uhero.hawaii.edu/'
                     },
-                    series0Name: 'yoy',
-                    series0Type: 'column',
-                    series1Name: 'level',
-                    series1Type: 'line',
+                    series0Name: 'level',
+                    series0Type: 'line',
+                    series1Name: 'yoy',
+                    series1Type: 'column',
                     series2Name: 'ytd',
                     series2Type: 'column',
+                    buttons: [1, 5, 10, 'all']
                 },
                 seriesTable: {
                     columns: 4,
@@ -3643,24 +3648,6 @@ module.exports = "<chart id=\"chart\" type=\"StockChart\" [options]=\"options\" 
 
 /***/ }),
 
-/***/ "../../../../../src/app/highstock/highstock.component.scss":
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "/* Highcharts */\n/* Analyzer Chart */\n/* Loading Screen */\n#chart {\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15);\n  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.15); }\n  #chart .highcharts-background {\n    fill: #FAFAFB; }\n  #chart .highcharts-button, #chart .highcharts-button-hover {\n    stroke: none; }\n  #chart .highcharts-button.highcharts-button-pressed {\n    fill: #0068B3; }\n    #chart .highcharts-button.highcharts-button-pressed text {\n      fill: #FFF !important; }\n  #chart .highcharts-color-0, #chart .highcharts-color-1 {\n    fill: none;\n    stroke: none; }\n  #chart .highcharts-markers.highcharts-series-0 path {\n    fill: #9E9E9E; }\n  #chart .highcharts-graph.highcharts-zone-graph-0.pseudoHistory {\n    stroke: #7CB5EC;\n    color: #7CB5EC;\n    stroke-dasharray: 5; }\n  #chart .highcharts-markers.highcharts-series-1 path {\n    fill: #0068B3; }\n  #chart .highcharts-navigator-series .highcharts-area {\n    fill: #0068B3; }\n  #chart .highcharts-navigator-handle {\n    stroke: #999999; }\n  #chart .highcharts-series-0 .highcharts-graph {\n    stroke: #9E9E9E; }\n  #chart .highcharts-series-0 rect.highcharts-point {\n    stroke: none;\n    fill: #9E9E9E; }\n  #chart .highcharts-series-1 .highcharts-graph {\n    stroke: #0068B3;\n    color: #0068B3; }\n  #chart .highcharts-title {\n    fill: #505050;\n    font-family: 'sans-serif'; }\n  #chart .highcharts-tooltip {\n    -webkit-filter: none !important;\n            filter: none !important; }\n    #chart .highcharts-tooltip .series-0 {\n      fill: #9E9E9E; }\n    #chart .highcharts-tooltip .series-1 {\n      fill: #0068B3; }\n  #chart .highcharts-xaxis-labels text {\n    color: #9E9E9E !important;\n    fill: #9E9E9E !important; }\n  #chart .highcharts-yaxis-grid.series2 .highcharts-grid-line {\n    display: none; }\n  #chart .highcharts-yaxis-labels.series1 text {\n    color: #9E9E9E !important;\n    fill: #9E9E9E !important; }\n  #chart .highcharts-yaxis-labels.series2 text {\n    color: #0068B3 !important;\n    fill: #0068B3 !important; }\n  #chart .highcharts-yaxis.series1 .highcharts-axis-title {\n    color: #9E9E9E !important;\n    fill: #9E9E9E !important; }\n  #chart .highcharts-yaxis.series2 .highcharts-axis-title {\n    color: #0068B3 !important;\n    fill: #0068B3 !important; }\n", ""]);
-
-// exports
-
-
-/*** EXPORTS FROM exports-loader ***/
-module.exports = module.exports.toString();
-
-/***/ }),
-
 /***/ "../../../../../src/app/highstock/highstock.component.ts":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3717,25 +3704,103 @@ var HighstockComponent = (function () {
             xAxis._hasSetExtremes = false;
         });
     };
-    HighstockComponent.prototype.drawChart = function (chartData, seriesDetail, geo, freq, portalSettings) {
+    // Gets buttons used in Highstock Chart
+    HighstockComponent.prototype.formatChartButtons = function (freq, buttons) {
+        var chartButtons = buttons.reduce(function (allButtons, button) {
+            if (freq === 'A') {
+                // Do not display 1Year button for series with an annual frequency
+                if (button !== 1 && button !== 'all') {
+                    allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+                }
+            }
+            if (freq !== 'A') {
+                if (button !== 'all') {
+                    allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+                }
+            }
+            if (button === 'all') {
+                allButtons.push({ type: 'all', text: 'All' });
+            }
+            return allButtons;
+        }, []);
+        return chartButtons;
+    };
+    // Labels used for metadata in CSV download
+    HighstockComponent.prototype.formatChartLabels = function (seriesDetail, portalSettings, geo, freq) {
+        var labelItems = [{
+                html: seriesDetail.sourceDescription
+            }, {
+                html: seriesDetail.sourceLink
+            }, {
+                html: seriesDetail.sourceDetails
+            }, {
+                html: seriesDetail.title + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
+            }, {
+                html: portalSettings.highstock.labels.portal
+            }, {
+                html: portalSettings.highstock.labels.portalLink
+            }, {
+                html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
+            }];
+        return labelItems;
+    };
+    HighstockComponent.prototype.formatChartSeries = function (chartData, portalSettings, seriesDetail, freq) {
         var series0 = chartData[portalSettings.highstock.series0Name];
         var series1 = chartData[portalSettings.highstock.series1Name];
         var series2 = chartData[portalSettings.highstock.series2Name];
+        var yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+        var ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+        var c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
+        var seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+        var series = [{
+                name: 'Level',
+                type: 'line',
+                yAxis: 1,
+                data: series0,
+                states: {
+                    hover: {
+                        lineWidth: 2
+                    }
+                },
+                showInNavigator: true,
+                dataGrouping: {
+                    enabled: false
+                },
+                zoneAxis: 'x',
+                zones: chartData.pseudoZones,
+                zIndex: 1
+            }, {
+                name: seriesLabels[portalSettings.highstock.series1Name],
+                type: portalSettings.highstock.series1Type,
+                data: series1,
+                showInNavigator: false,
+                dataGrouping: {
+                    enabled: false
+                }
+            }, {
+                name: seriesLabels[portalSettings.highstock.series2Name],
+                data: series2,
+                includeInCSVExport: freq.freq === 'A' ? false : true,
+                visible: false,
+                dataGrouping: {
+                    enabled: false
+                }
+            }];
+        return series;
+    };
+    HighstockComponent.prototype.drawChart = function (chartData, seriesDetail, geo, freq, portalSettings) {
         var decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
+        var buttons = portalSettings.highstock.buttons;
+        var chartButtons = this.formatChartButtons(freq.freq, buttons);
+        var labelItems = this.formatChartLabels(seriesDetail, portalSettings, geo, freq);
         var pseudoZones = chartData.pseudoZones;
         var name = seriesDetail.title;
         var units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
         var change = seriesDetail.percent ? 'Change' : '% Change';
-        var yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-        var ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-        var c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
-        var sourceDescription = seriesDetail.sourceDescription;
-        var sourceLink = seriesDetail.sourceLink;
-        var sourceDetails = seriesDetail.sourceDetails;
         var chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
         var startDate = this.start ? this.start : chartRange ? chartRange.start : null;
         var endDate = this.end ? this.end : chartRange ? chartRange.end : null;
-        var seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+        var series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
         this.options = {
             chart: {
                 alignTicks: false,
@@ -3744,43 +3809,14 @@ var HighstockComponent = (function () {
                 description: freq.freq
             },
             labels: {
-                items: [{
-                        html: sourceDescription
-                    }, {
-                        html: sourceLink
-                    }, {
-                        html: sourceDetails
-                    }, {
-                        html: name + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
-                    }, {
-                        html: portalSettings.highstock.labels.portal,
-                    }, {
-                        html: portalSettings.highstock.labels.portalLink
-                    }, {
-                        html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
-                    }],
+                items: labelItems,
                 style: {
                     display: 'none'
                 }
             },
             rangeSelector: {
                 selected: !startDate && !endDate ? 2 : null,
-                buttons: [{
-                        type: 'year',
-                        count: 1,
-                        text: '1Y'
-                    }, {
-                        type: 'year',
-                        count: 5,
-                        text: '5Y'
-                    }, {
-                        type: 'year',
-                        count: 10,
-                        text: '10Y'
-                    }, {
-                        type: 'all',
-                        text: 'All'
-                    }],
+                buttons: chartButtons,
                 buttonPosition: {
                     x: 10,
                     y: 10
@@ -3933,7 +3969,7 @@ var HighstockComponent = (function () {
                 }
             },
             yAxis: [{
-                    className: 'series1',
+                    className: 'series2',
                     labels: {
                         format: '{value:,.2f}'
                     },
@@ -3945,7 +3981,7 @@ var HighstockComponent = (function () {
                     maxPadding: 0,
                     minTickInterval: 0.01
                 }, {
-                    className: 'series2',
+                    className: 'series1',
                     title: {
                         text: units
                     },
@@ -3963,39 +3999,7 @@ var HighstockComponent = (function () {
                     cropThreshold: 0,
                 }
             },
-            series: [{
-                    name: seriesLabels[portalSettings.highstock.series0Name],
-                    type: portalSettings.highstock.series0Type,
-                    data: series0,
-                    showInNavigator: false,
-                    dataGrouping: {
-                        enabled: false
-                    }
-                }, {
-                    name: 'Level',
-                    type: 'line',
-                    yAxis: 1,
-                    data: series1,
-                    states: {
-                        hover: {
-                            lineWidth: 2
-                        }
-                    },
-                    showInNavigator: true,
-                    dataGrouping: {
-                        enabled: false
-                    },
-                    zoneAxis: 'x',
-                    zones: pseudoZones
-                }, {
-                    name: seriesLabels[portalSettings.highstock.series2Name],
-                    data: series2,
-                    includeInCSVExport: freq.freq === 'A' ? false : true,
-                    visible: false,
-                    dataGrouping: {
-                        enabled: false
-                    }
-                }]
+            series: series
         };
     };
     HighstockComponent.prototype.setTableExtremes = function (e) {
@@ -4019,10 +4023,10 @@ var HighstockComponent = (function () {
         var xMin, xMax;
         // Selected level data
         var selectedRange = null;
-        if (chartObject.series[0].points) {
-            selectedRange = chartObject.series[0].points;
+        if (chartObject.series[1].points) {
+            selectedRange = chartObject.series[1].points;
         }
-        if (!chartObject.series[0].points.length) {
+        if (!chartObject.series[1].points.length) {
             return { min: null, max: null };
         }
         if (selectedRange.length) {
@@ -4040,14 +4044,6 @@ var HighstockComponent = (function () {
         var defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
         var start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
         return { start: start, end: end };
-    };
-    HighstockComponent.prototype.checkDates = function (date, levelArray) {
-        levelArray.forEach(function (item) {
-            if (Date.parse(date) === item[0]) {
-                return true;
-            }
-            return false;
-        });
     };
     return HighstockComponent;
 }());
@@ -4091,7 +4087,8 @@ HighstockComponent = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
         selector: 'app-highstock',
         template: __webpack_require__("../../../../../src/app/highstock/highstock.component.html"),
-        styles: [__webpack_require__("../../../../../src/app/highstock/highstock.component.scss")],
+        // Use styles defined in analyzer-highstock component
+        styles: [__webpack_require__("../../../../../src/app/analyzer-highstock/analyzer-highstock.component.scss")],
         encapsulation: __WEBPACK_IMPORTED_MODULE_0__angular_core__["ViewEncapsulation"].None
     }),
     __param(0, Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Inject"])('defaultRange')),
