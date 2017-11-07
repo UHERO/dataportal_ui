@@ -9,7 +9,7 @@
     <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
-
+<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates" [analyzerSeries]="series" [tableId]="analyzer-datatable" [analyzer]="true"></app-category-datatables>  
 <div class="analyzer-table">
   <div class="table-row">
     <div class="table" #tableScroll>

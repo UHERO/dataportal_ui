@@ -3,15 +3,15 @@
 .analyze-button {
   color: #B5B5B5;
   cursor: pointer;
-  vertical-align: middle;
-  font-size: 20px;
+  vertical-align: text-top;
+  font-size: 1.2em;
   visibility: hidden;
 }
 
 .analyze-chart {
   cursor: pointer;
-  vertical-align: middle;
-  font-size: 15px;
+  vertical-align: text-top;
+  font-size: 1.2em;
 }
 
 .analyzer-table {
@@ -34,6 +34,7 @@
 
     .table-row {
       position: relative;
+      margin-bottom: 20px;
 
       .table {
         overflow-x: scroll;
@@ -72,7 +73,7 @@
             left: 0;
             width: 32%;
             white-space: nowrap;
-            border-right: 1px solid $border;
+            // border-right: 1px solid $border;
             text-align: left;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -98,12 +99,12 @@
     
           .empty-header {
             border: none;
-            border-right: 1px solid $border;
+            // border-right: 1px solid $border;
           }
     
           .info-icon {
             font-size: 1.2em;
-            vertical-align: middle;
+            vertical-align: text-top;
           }
     
           tr:last-child {
