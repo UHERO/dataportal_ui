@@ -76,11 +76,15 @@
           .th-buttons {
             // display: inline-block;
             float: right;
+            display: flex;
+            align-content: center;
+            justify-content: center;
 
             .info {
               float: right;
               cursor: pointer;
               width: initial;
+              margin: auto;
 
               &:focus {
                 outline: 0;
@@ -99,6 +103,8 @@
               vertical-align: middle;
               font-size: inherit;
               font-weight: bold;
+              float: left;
+              margin: auto;
             }
 
             .add-button {
