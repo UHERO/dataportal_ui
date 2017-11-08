@@ -27,12 +27,13 @@ export class DataPortalSettingsService {
           portal: 'National Transfer Accounts (NTA)',
           portalLink: 'NTA Dataportal: http://data.uhero.hawaii.edu/nta'
         },
-        series0Name: 'c5ma',
-        series0Type: 'column',
-        series1Name: 'level',
-        series1Type: 'line',
+        series0Name: 'level',
+        series0Type: 'line',
+        series1Name: 'c5ma',
+        series1Type: 'column',
         series2Name: 'none',
         series2Type: '',
+        buttons: [10, 25, 50, 'all']
       },
       seriesTable: {
         columns: 3,
@@ -71,12 +72,13 @@ export class DataPortalSettingsService {
           portal: 'The University of Hawaii Economic Research Organization (UHERO)',
           portalLink: 'Data Portal: http://data.uhero.hawaii.edu/'
         },
-        series0Name: 'yoy',
-        series0Type: 'column',
-        series1Name: 'level',
-        series1Type: 'line',
+        series0Name: 'level',
+        series0Type: 'line',
+        series1Name: 'yoy',
+        series1Type: 'column',
         series2Name: 'ytd',
         series2Type: 'column',
+        buttons: [1, 5, 10, 'all']
       },
       seriesTable: {
         columns: 4,

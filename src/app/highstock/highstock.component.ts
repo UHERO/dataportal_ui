@@ -23,7 +23,8 @@ Highcharts.setOptions({
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
-  styleUrls: ['./highstock.component.scss'],
+  // Use styles defined in analyzer-highstock component
+  styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
@@ -62,25 +63,106 @@ export class HighstockComponent implements OnChanges {
     });
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
+  // Gets buttons used in Highstock Chart
+  formatChartButtons(freq: string, buttons: Array<any>) {
+    const chartButtons = buttons.reduce((allButtons, button) => {
+      if (freq === 'A') {
+        // Do not display 1Year button for series with an annual frequency
+        if (button !== 1 && button !== 'all') {
+          allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+        }
+      }
+      if (freq !== 'A') {
+        if (button !== 'all') {
+          allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+        }
+      }
+      if (button === 'all') {
+        allButtons.push({ type: 'all', text: 'All' });
+      }
+      return allButtons;
+    }, []);
+    return chartButtons;
+  }
+
+  // Labels used for metadata in CSV download
+  formatChartLabels(seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) {
+    const labelItems = [{
+      html: seriesDetail.sourceDescription
+    }, {
+      html: seriesDetail.sourceLink
+    }, {
+      html: seriesDetail.sourceDetails
+    }, {
+      html: seriesDetail.title + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
+    }, {
+      html: portalSettings.highstock.labels.portal
+    }, {
+      html: portalSettings.highstock.labels.portalLink
+    }, {
+      html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
+    }];
+    return labelItems
+  }
+
+  formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) {
     const series0 = chartData[portalSettings.highstock.series0Name];
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
+    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
+    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
+    const c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
+    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const series = [{
+      name: 'Level',
+      type: 'line',
+      yAxis: 1,
+      data: series0,
+      states: {
+        hover: {
+          lineWidth: 2
+        }
+      },
+      showInNavigator: true,
+      dataGrouping: {
+        enabled: false
+      },
+      zoneAxis: 'x',
+      zones: chartData.pseudoZones,
+      zIndex: 1
+    }, {
+      name: seriesLabels[portalSettings.highstock.series1Name],
+      type: portalSettings.highstock.series1Type,
+      data: series1,
+      showInNavigator: false,
+      dataGrouping: {
+        enabled: false
+      }
+    }, {
+      name: seriesLabels[portalSettings.highstock.series2Name],
+      data: series2,
+      includeInCSVExport: freq.freq === 'A' ? false : true,
+      visible: false,
+      dataGrouping: {
+        enabled: false
+      }
+    }];
+    return series;
+  }
+
+  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
+    const buttons = portalSettings.highstock.buttons;
+    const chartButtons = this.formatChartButtons(freq.freq, buttons);
+    const labelItems = this.formatChartLabels(seriesDetail, portalSettings, geo, freq);
     const pseudoZones = chartData.pseudoZones;
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
-    const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
-    const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
-    const sourceDescription = seriesDetail.sourceDescription;
-    const sourceLink = seriesDetail.sourceLink;
-    const sourceDetails = seriesDetail. sourceDetails;
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
-    const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
 
     this.options = {
       chart: {
@@ -90,43 +172,14 @@ export class HighstockComponent implements OnChanges {
         description: freq.freq
       },
       labels: {
-        items: [{
-          html: sourceDescription
-        }, {
-          html: sourceLink
-        }, {
-          html: sourceDetails
-        }, {
-          html: name + ': ' + portalSettings.highstock.labels.seriesLink + seriesDetail.id
-        }, {
-          html: portalSettings.highstock.labels.portal,
-        }, {
-          html: portalSettings.highstock.labels.portalLink
-        }, {
-          html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
-        }],
+        items: labelItems,
         style: {
           display: 'none'
         }
       },
       rangeSelector: {
         selected: !startDate && !endDate ? 2 : null,
-        buttons: [{
-          type: 'year',
-          count: 1,
-          text: '1Y'
-        }, {
-          type: 'year',
-          count: 5,
-          text: '5Y'
-        }, {
-          type: 'year',
-          count: 10,
-          text: '10Y'
-        }, {
-          type: 'all',
-          text: 'All'
-        }],
+        buttons: chartButtons,
         buttonPosition: {
           x: 10,
           y: 10
@@ -279,7 +332,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       yAxis: [{
-        className: 'series1',
+        className: 'series2',
         labels: {
           format: '{value:,.2f}'
         },
@@ -291,7 +344,7 @@ export class HighstockComponent implements OnChanges {
         maxPadding: 0,
         minTickInterval: 0.01
       }, {
-        className: 'series2',
+        className: 'series1',
         title: {
           text: units
         },
@@ -309,39 +362,7 @@ export class HighstockComponent implements OnChanges {
           cropThreshold: 0,
         }
       },
-      series: [{
-        name: seriesLabels[portalSettings.highstock.series0Name],
-        type: portalSettings.highstock.series0Type,
-        data: series0,
-        showInNavigator: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }, {
-        name: 'Level',
-        type: 'line',
-        yAxis: 1,
-        data: series1,
-        states: {
-          hover: {
-            lineWidth: 2
-          }
-        },
-        showInNavigator: true,
-        dataGrouping: {
-          enabled: false
-        },
-        zoneAxis: 'x',
-        zones: pseudoZones
-      }, {
-        name: seriesLabels[portalSettings.highstock.series2Name],
-        data: series2,
-        includeInCSVExport: freq.freq === 'A' ? false : true,
-        visible: false,
-        dataGrouping: {
-          enabled: false
-        }
-      }]
+      series: series
     };
   }
 
@@ -368,10 +389,10 @@ export class HighstockComponent implements OnChanges {
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
+    if (chartObject.series[1].points) {
+      selectedRange = chartObject.series[1].points;
     }
-    if (!chartObject.series[0].points.length) {
+    if (!chartObject.series[1].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {
@@ -390,14 +411,5 @@ export class HighstockComponent implements OnChanges {
     const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
     const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
     return { start: start , end: end };
-  }
-
-  checkDates(date, levelArray) {
-    levelArray.forEach((item) => {
-      if (Date.parse(date) === item[0]) {
-        return true;
-      }
-      return false;
-    });
   }
 }
