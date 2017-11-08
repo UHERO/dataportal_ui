@@ -3,15 +3,19 @@
 .analyze-button {
   color: #B5B5B5;
   cursor: pointer;
-  vertical-align: text-top;
+  vertical-align: middle;
   font-size: 1.2em;
   visibility: hidden;
 }
 
 .analyze-chart {
   cursor: pointer;
-  vertical-align: text-top;
+  vertical-align: middle;
   font-size: 1.2em;
+}
+
+.transform-checks {
+  display: inline-block;
 }
 
 .analyzer-table {
@@ -49,6 +53,7 @@
         background-color: white;
         background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;
         background-attachment: local, local, scroll, scroll;
+        border-left: 1px solid $gray;
 
         table {
           table-layout: fixed;
@@ -73,7 +78,7 @@
             left: 0;
             width: 32%;
             white-space: nowrap;
-            // border-right: 1px solid $border;
+            border-right: 0;
             text-align: left;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -99,17 +104,24 @@
     
           .empty-header {
             border: none;
-            // border-right: 1px solid $border;
           }
     
           .info-icon {
             font-size: 1.2em;
             vertical-align: text-top;
           }
+
+          tr:first-child {
+            td {
+              vertical-align: middle;
+              font-weight: bold;
+            }
+          }
     
           tr:last-child {
             th {
               border: 1px solid $border;
+              border-right: 0;
             }
           }
     
@@ -134,49 +146,4 @@
         }
       }
     }
-}
-
-.analyzer-summary-stats {
-  font-size: 0.8em;
-  text-align: right;
-  margin-bottom: 40px;
-
-  table {
-    width: 100%;
-
-    th {
-      text-align: right;
-      color: $primary;
-      padding: 0.4em;
-    }
-
-    tr {
-      .series-title {
-        text-align: left;
-      }
-
-      td {
-        padding: 0.4em;
-
-        &:hover {
-          .analyze-button {
-            visibility: visible;
-          }
-        }
-
-        a {
-          display: inline-block;
-          max-width: 80%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          color: $primary-text;
-          vertical-align: top;
-        }
-      }
-    }
-
-    tr:nth-child(even) {
-      background-color: $table-gray;
-    }
-  }
 }

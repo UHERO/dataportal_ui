@@ -1,4 +1,4 @@
-<div>
+<div class="transform-checks">
   <label *ngIf="portalSettings.transformations.yoy" class="form-check-inline">
     <input type="checkbox" (change)="yoyActive($event)">Year/Year
   </label>
@@ -9,7 +9,7 @@
     <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
-<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates" [analyzerSeries]="series" [tableId]="analyzer-datatable" [analyzer]="true"></app-category-datatables>  
+<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates" [analyzerSeries]="series" [analyzer]="true" [tableId]="analyzer-table"></app-category-datatables>
 <div class="analyzer-table">
   <div class="table-row">
     <div class="table" #tableScroll>
@@ -75,11 +75,11 @@
           <th class="empty-header">&nbsp;</th>
           <td>Minimum Value</td>
           <td>Maximum Value</td>
-          <td>% Change Over Selected Range</td>
-          <td>Change Over Selected Range</td>
-          <td>Total Over Selected</td>
-          <td>Avg Over Selected</td>
-          <td>Compound Annual Growth Rate Over Selected</td>
+          <td>% Change</td>
+          <td>Change</td>
+          <td>Total</td>
+          <td>Avg</td>
+          <td>Compound Annual Growth Rate</td>
         </tr>
         <ng-template ngFor let-serie [ngForOf]="series">
           <tr>
@@ -90,8 +90,8 @@
                 {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
               </a>
             </th>
-            <td>{{serie.summaryStats.minValue + ' (' + serie.summaryStats.minValueDate + ')'}}</td>
-            <td>{{serie.summaryStats.maxValue + ' (' + serie.summaryStats.maxValueDate + ')'}}</td>
+            <td>{{serie.summaryStats.minValue + ' ' + serie.summaryStats.minValueDate }}</td>
+            <td>{{serie.summaryStats.maxValue + ' ' + serie.summaryStats.maxValueDate }}</td>
             <td>{{!serie.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
             <td>{{serie.summaryStats.levelChange}}</td>
             <td>{{serie.summaryStats.total}}</td>

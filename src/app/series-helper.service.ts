@@ -146,36 +146,49 @@ export class SeriesHelperService {
     // Values of the selected starting and ending dates
     stats.tableStartValue = this.getStartValue(seriesData, startDate);
     stats.tableEndValue = this.getEndValue(seriesData, endDate);
-    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, stats.tableStartValue, stats.tableEndValue);
-    if (selectedRangeData.length) {
-      const firstValue = stats.tableStartValue;
-      const lastValue = stats.tableEndValue;
+    const firstValue = stats.tableStartValue;
+    const lastValue = stats.tableEndValue;
+    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);    
+    if (selectedRangeData.length && firstValue !== Infinity && lastValue !== Infinity) {
       const periods = selectedRangeData.length - 1;
-      stats.total = selectedRangeData.reduce((sum, value) => value.value !== Infinity ? sum + value.value : sum + 0, 0);
-      stats.avg = stats.total / selectedRangeData.length;
-      stats.cagr = firstValue !== Infinity && lastValue !== Infinity ? this.calculateCAGR(firstValue, lastValue, freq.freq, periods) : Infinity;
+      stats.minValue = this.getMinMax(seriesData).minValue;
+      stats.minValueDate = this.getMinMax(seriesData).minValueDate;
+      stats.maxValue = this.getMinMax(seriesData).maxValue;
+      stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
+      stats.total = this.getTotalValue(selectedRangeData);
+      stats.avg = stats.total !== Infinity ? stats.total / selectedRangeData.length : Infinity;
+      stats.cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, periods);
     }
 
-    stats.minValue = this.getMinMax(seriesData).minValue;
-    stats.minValueDate = this.getMinMax(seriesData).minValueDate;
-    stats.maxValue = this.getMinMax(seriesData).maxValue;
-    stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
-    if (stats.tableEndValue !== Infinity && stats.tableStartValue !== Infinity) {
-      stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
-      stats.levelChange = stats.tableEndValue - stats.tableStartValue;
+    if (firstValue !== Infinity && lastValue !== Infinity) {
+      stats.percChange = ((lastValue - firstValue) / firstValue) * 100;
+      stats.levelChange = lastValue - firstValue;
     }
 
     // Format numbers
-    formatStats.minValue = this._helper.formatNum(stats.minValue, decimals);
-    formatStats.minValueDate = this._helper.formatDate(stats.minValueDate, freq.freq);
-    formatStats.maxValue = this._helper.formatNum(stats.maxValue, decimals);
-    formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.percChange = stats.percChange === Infinity ? ' ' : this._helper.formatNum(stats.percChange, decimals);
-    formatStats.levelChange = stats.levelChange === Infinity ? ' ' : this._helper.formatNum(stats.levelChange, decimals);
-    formatStats.total = stats.total === Infinity ? ' ' : this._helper.formatNum(stats.total, decimals);
-    formatStats.avg = stats.avg === Infinity ? ' ' : this._helper.formatNum(stats.avg, decimals);
-    formatStats.cagr = stats.cagr === Infinity ? ' ' : this._helper.formatNum(stats.cagr, decimals);
+    formatStats.minValue = stats.minValue === Infinity ? 'N/A' : this._helper.formatNum(stats.minValue, decimals);
+    formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + this._helper.formatDate(stats.minValueDate, freq.freq) + ')';
+    formatStats.maxValue = stats.maxValue === Infinity ? 'N/A' : this._helper.formatNum(stats.maxValue, decimals);
+    formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + this._helper.formatDate(stats.maxValueDate, freq.freq) + ')';
+    formatStats.percChange = stats.percChange === Infinity ? 'N/A' : this._helper.formatNum(stats.percChange, decimals);
+    formatStats.levelChange = stats.levelChange === Infinity ? 'N/A' : this._helper.formatNum(stats.levelChange, decimals);
+    formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
+    formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
+    formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
     return formatStats;
+  }
+
+  getTotalValue(selectedRangeData) {
+    let total = 0;
+    selectedRangeData.forEach((data) => {
+      if (data.value !== Infinity) {
+        total += +data.value;
+      }
+      if (data.value === Infinity) {
+        return Infinity;
+      }
+    });
+    return total;
   }
 
   getStartValue(seriesData: Array<any>, startDate: string) {
@@ -204,16 +217,16 @@ export class SeriesHelperService {
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {
     // Calculate compound annual growth rate
     if (freq === 'A') {
-      return (Math.pow((lastValue/firstValue), 1/periods) - 1) * 100;
+      return (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100;
     }
     if (freq === 'S') {
-      return (Math.pow((lastValue/firstValue), 2/periods) - 1) * 100;
+      return (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100;
     }
     if (freq === 'Q') {
-      return (Math.pow((lastValue/firstValue), 4/periods) - 1) * 100;
+      return (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100;
     }
     if (freq === 'M') {
-      return (Math.pow((lastValue/firstValue), 12/periods) - 1) * 100;
+      return (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100;
     }
   }
 
