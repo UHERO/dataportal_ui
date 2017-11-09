@@ -14,8 +14,8 @@ export class CategoryHelperService {
   private errorMessage: string;
   // Variables for geo and freq selectors
   private defaults;
-  private defaultFreq: string;
-  private defaultGeo: string;
+  private defaultFreq;
+  private defaultGeo;
   private categoryData = {};
   private categoryDates = [];
   private seriesDates = [];
@@ -75,6 +75,8 @@ export class CategoryHelperService {
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
         sub.freqGeos = category.freqGeos;
         sub.geoFreqs = category.geoFreqs;
+        sub.geographies = category.geographies;
+        sub.frequencies = category.frequencies;
       },
         (error) => {
           this.errorMessage = error;
@@ -90,28 +92,50 @@ export class CategoryHelperService {
 
   setRegionsFreqs(sublist: Array<any>, cacheId: string, catName: string, routeGeo?: string, routeFreq?: string) {
     const geoArray = [], freqArray = [];
+    console.log('sublist', sublist);
     // Get a unique list of regions and frequencies
     sublist.forEach((sub, index) => {
-      sub.geoFreqs.forEach((geo) => {
-        this._helper.uniqueGeos(geo, geoArray);
-      });
-      sub.freqGeos.forEach((freq) => {
-        this._helper.uniqueFreqs(freq, freqArray);
-      });
+      // TO BE DEPRECATED
+      if (sub.geoFreqs && sub.freqGeos) {
+        sub.geoFreqs.forEach((geo) => {
+          this._helper.uniqueGeos(geo, geoArray);
+        });
+        sub.freqGeos.forEach((freq) => {
+          this._helper.uniqueFreqs(freq, freqArray);
+        });
+      }
+      // NEW GEO/FREQ RESPONSES
+      if (sub.geographies && sub.frequencies) {
+        sub.geographies.forEach((geo) => {
+          const geoExist = geoArray.find(g => g.handle === geo.handle);
+          if (!geoExist) {
+            geoArray.push(geo);
+          }
+        });
+        sub.frequencies.forEach((freq) => {
+          const freqExist = freqArray.find(f => f.freq === freq.freq);
+          if (!freqExist) {
+            freqArray.push(freq);
+          }
+        })
+      }
     });
+    console.log(geoArray);
+    console.log(freqArray)
     const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
     const selectedFreq = selected.freq;
     const selectedGeo = selected.geo;
+    console.log('selected', selected)
     let freqs, regions, currentGeo, currentFreq;
     // Get frequencies available for a selected region
     freqs = geoArray.find(geo => geo.handle === selectedGeo).freqs;
     // Get regions available for a selected frequency
     regions = freqArray.find(freq => freq.freq === selectedFreq).geos;
-    currentGeo = regions.find(region => region.handle === selectedGeo);
-    currentFreq = freqs.find(freq => freq.freq === selectedFreq);
+    currentGeo = regions ? regions.find(region => region.handle === selectedGeo) : geoArray.find(geo => geo.handle === selectedGeo);
+    currentFreq = freqs ? freqs.find(freq => freq.freq === selectedFreq) : freqArray.find(freq => freq.freq === selectedFreq);
     const dates = this.setCategoryDates(sublist, currentGeo, currentFreq);
-    this.categoryData[cacheId].regions = regions;
-    this.categoryData[cacheId].frequencies = freqs;
+    this.categoryData[cacheId].regions = regions ? regions : geoArray;
+    this.categoryData[cacheId].frequencies = freqs ? freqs : freqArray;
     this.categoryData[cacheId].currentGeo = currentGeo;
     this.categoryData[cacheId].currentFreq = currentFreq;
     this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
@@ -136,15 +160,44 @@ export class CategoryHelperService {
     const categoryDateArray = [];
     // Check subcategories for the earliest/latest start and end dates
     // Used to create array of dates for enitre category
+    // TO BE DEPRECATED
     sublist.forEach((sub) => {
-      const geo = sub.geoFreqs.find(geoFreq => geoFreq.handle === currentGeo.handle);
-      const freq = geo ? geo.freqs.find(f => f.freq === currentFreq.freq) : null;
-      if (freq) {
-        if (freq.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-          categoryDateWrapper.firstDate = freq.observationStart.substr(0, 10);
+      if (sub.geoFreqs) {
+        const geo = sub.geoFreqs.find(geoFreq => geoFreq.handle === currentGeo.handle);
+        const freq = geo ? geo.freqs.find(f => f.freq === currentFreq.freq) : null;
+        if (freq) {
+          if (freq.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+            categoryDateWrapper.firstDate = freq.observationStart.substr(0, 10);
+          }
+          if (freq.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+            categoryDateWrapper.endDate = freq.observationEnd.substr(0, 10);
+          }
         }
-        if (freq.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-          categoryDateWrapper.endDate = freq.observationEnd.substr(0, 10);
+      }
+      // NEW GEO/FREQ RESPONSES
+      if (!sub.geoFreqs) {
+        const freq = sub.frequencies.find(freq => freq.freq === currentFreq.freq);
+        const geo = sub.geographies.find(geo => geo.handle === currentGeo.handle);
+        if (geo) {
+          const geoStartDate = geo.observationStart.substr(0, 10);
+          const geoEndDate = geo.observationEnd.substr(0, 10);
+          const freqStartDate = freq.observationStart.substr(0, 10);
+          const freqEndDate = freq.observationEnd.substr(0, 10);
+          let startDate = freqStartDate, endDate = freqEndDate;
+          if (geoStartDate !== freqStartDate) {
+            if (geoStartDate > freqStartDate) {
+              startDate = geoStartDate;
+            }
+            if (geoEndDate < freqEndDate) {
+              endDate = geoEndDate;
+            }
+          }
+          if (startDate < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+            categoryDateWrapper.firstDate = startDate
+          }
+          if (endDate > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+            categoryDateWrapper.endDate = endDate;
+          }
         }
       }
     });
@@ -304,15 +357,22 @@ export class CategoryHelperService {
 
   checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray) {
     let selectedFreq, selectedGeo;
-    selectedFreq = this.defaultFreq ? this.defaultFreq : freqArray[0].freq;
-    selectedGeo = this.defaultGeo ? this.defaultGeo : geoArray[0].handle;
+    let defaultFreq, defaultGeo;
+    if (this.defaultFreq) {
+      defaultFreq = this.defaultFreq.freq ? this.defaultFreq.freq : this.defaultFreq;
+    }
+    if (this.defaultGeo) {
+      defaultGeo = this.defaultGeo.handle ? this.defaultGeo.handle : this.defaultGeo;
+    }
+    selectedFreq = this.defaultFreq ? defaultFreq : freqArray[0].freq;
+    selectedGeo = this.defaultGeo ? defaultGeo : geoArray[0].handle;
     // If a frequency/region is specified in the route, check if the frequency/region exists in a category
     // If not display default freq/region for a given category
     if (routeFreq || routeGeo) {
       const freqExist = freqArray.find(freq => freq.freq === routeFreq);
       const geoExist = geoArray.find(geo => geo.handle === routeGeo);
       if (!freqExist || !geoExist) {
-        return { freq: this.defaultFreq ? this.defaultFreq : freqArray[0].freq, geo: this.defaultGeo ? this.defaultGeo : geoArray[0].handle };
+        return { freq: this.defaultFreq ? defaultFreq : freqArray[0].freq, geo: this.defaultGeo ? defaultGeo : geoArray[0].handle };
       }
       return { freq: routeFreq, geo: routeGeo };
     }
