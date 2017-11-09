@@ -44,12 +44,26 @@ export class SeriesHelperService {
       this.seriesData.seriesDetail.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
+      const geos = series.geographies;
+      const freqs = series.frequencies;
       decimals = series.decimals ? series.decimals : 1;
       currentGeo = series.geography;
-      currentFreq = { freq: series.frequencyShort, label: series.frequency };
+      currentFreq = { freq: series.frequencyShort, label: series.frequency, observationStart: '', observationEnd: '' };
       this.seriesData.currentGeo = currentGeo;
-      this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [series.geography];
-      this.seriesData.frequencies = geoFreqs.length ? geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs : [{ freq: series.frequencyShort, label: series.frequency }];
+      // TO BE DEPRECATED
+      if (freqGeos) {
+        this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [currentGeo];
+      }
+      if (geoFreqs) {
+        this.seriesData.frequencies = geoFreqs.length ? geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs : [currentFreq];
+      }
+      // NEW GEO/FREQ RESPONSES
+      if (geos) {
+        this.seriesData.regions = geos.length ? geos : [currentGeo];
+      }
+      if (freqs) {
+        this.seriesData.frequencies = freqs.length ? freqs : [currentFreq];        
+      }
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
