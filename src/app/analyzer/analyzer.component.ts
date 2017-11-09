@@ -32,15 +32,19 @@ export class AnalyzerComponent implements OnInit {
     // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     if (this.analyzerSeries.length) {
       this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
+      // Sort series by length of level data
+      // The default series displayed in the chart on load should be the series with the longest range of data
+      this.analyzerSeries.sort((a, b) => {
+        return b.chartData.level.length - a.chartData.level.length;
+      });
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
       this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
-      if (!this.analyzerChartSeries.length) {
-        // The default series displayed in the chart on load should be the series with the longest range of data
-        const longestSeries = this.findLongestSeries(this.analyzerSeries);
-        longestSeries.showInChart = true;
+      if (this.analyzerChartSeries.length < 2) {
+        this.analyzerSeries[0].showInChart = true;
+        this.analyzerSeries[1].showInChart = true;
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }

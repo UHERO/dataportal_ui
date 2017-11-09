@@ -50,8 +50,6 @@ export class AnalyzerTableComponent implements OnInit {
     }
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
-    console.log('series', this.series);
-    this.series.displaySeries = this.series;
     this.series.forEach((series) => {
       series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
       let seriesFreq = { freq: series.frequencyShort, label: series.frequency };
