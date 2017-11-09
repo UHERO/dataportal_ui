@@ -43,7 +43,7 @@ export class UheroApiService {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
-      let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
+      let categories$ = this.http.get(`${this.baseUrl}/category?u=` + this.portal, this.requestOptionsArgs)
         .map(mapCategories, this)
         .do(val => {
           this.cachedCategories = val;

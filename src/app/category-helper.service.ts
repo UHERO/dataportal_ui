@@ -92,7 +92,6 @@ export class CategoryHelperService {
 
   setRegionsFreqs(sublist: Array<any>, cacheId: string, catName: string, routeGeo?: string, routeFreq?: string) {
     const geoArray = [], freqArray = [];
-    console.log('sublist', sublist);
     // Get a unique list of regions and frequencies
     sublist.forEach((sub, index) => {
       // TO BE DEPRECATED
@@ -120,12 +119,9 @@ export class CategoryHelperService {
         })
       }
     });
-    console.log(geoArray);
-    console.log(freqArray)
     const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
     const selectedFreq = selected.freq;
     const selectedGeo = selected.geo;
-    console.log('selected', selected)
     let freqs, regions, currentGeo, currentFreq;
     // Get frequencies available for a selected region
     freqs = geoArray.find(geo => geo.handle === selectedGeo).freqs;
@@ -183,7 +179,9 @@ export class CategoryHelperService {
           const geoEndDate = geo.observationEnd.substr(0, 10);
           const freqStartDate = freq.observationStart.substr(0, 10);
           const freqEndDate = freq.observationEnd.substr(0, 10);
+          // Use observation dates associated with the selected frequency
           let startDate = freqStartDate, endDate = freqEndDate;
+          // Check if observations dates for a selected region differ from the dates for a selected frequency
           if (geoStartDate !== freqStartDate) {
             if (geoStartDate > freqStartDate) {
               startDate = geoStartDate;
@@ -260,12 +258,14 @@ export class CategoryHelperService {
     if (this.categoryData[cacheId]) {
       return Observable.of([this.categoryData[cacheId]]);
     } else {
-      let obsEnd, obsStart, freqGeos, geoFreqs;
+      let obsEnd, obsStart, freqGeos, geoFreqs, freqs, geos;
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchSearch(search).subscribe((results) => {
         this.defaults = results.defaults;
         freqGeos = results.freqGeos;
         geoFreqs = results.geoFreqs;
+        freqs = results.frequencies;
+        geos = results.geographies;
         obsEnd = results.observationEnd;
         obsStart = results.observationStart;
       },
@@ -275,7 +275,7 @@ export class CategoryHelperService {
         () => {
           if (obsEnd && obsStart) {
             const dateWrapper = <DateWrapper>{};
-            this.searchSettings(search, cacheId, dateWrapper, geoFreqs, freqGeos, routeGeo, routeFreq);
+            this.searchSettings(search, cacheId, dateWrapper, geoFreqs, freqGeos, freqs, geos, routeGeo, routeFreq);
             this.categoryData[cacheId].selectedCategory = 'Search: ' + search;
           } else {
             this.categoryData[cacheId].invalid = search;
@@ -285,16 +285,24 @@ export class CategoryHelperService {
     }
   }
 
-  searchSettings(search: string, cacheId, dateWrapper: DateWrapper, geoFreqs, freqGeos, routeGeo?: string, routeFreq?: string) {
-    const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
+  searchSettings(search: string, cacheId, dateWrapper: DateWrapper, geoFreqs, freqGeos, frequencies, geographies, routeGeo?: string, routeFreq?: string) {
+    let selected
+    // TO BE DEPRECATED
+    if (freqGeos && geoFreqs) {
+      selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);
+    }
+    // NEW FREQ/GEO RESPONSES
+    if (frequencies && geographies) {
+      selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, frequencies, geographies);
+    }
     let selectedGeo = selected.geo;
     let selectedFreq = selected.freq;
     let freqs, regions, currentFreq, currentGeo;
-    freqs = geoFreqs.find(geo => geo.handle === selectedGeo).freqs;
+    freqs = geoFreqs ? geoFreqs.find(geo => geo.handle === selectedGeo).freqs : frequencies;
     const selectedFreqExists = freqs.find(freq => freq.freq === selectedFreq);
     // Check if the selected frequency exists in the list of freqs for a selected geo
     selectedFreq = selectedFreqExists ? selectedFreq : freqs[0].freq;
-    regions = freqGeos.find(freq => freq.freq === selectedFreq).geos;
+    regions = freqGeos ? freqGeos.find(freq => freq.freq === selectedFreq).geos : geographies;
     const selectedGeoExists = regions.find(region => region.handle === selectedGeo);
     // Check if the selected geo exists in the list of regions for a selected frequency
     selectedGeo = selectedGeoExists ? selectedGeo : regions[0].handle;
