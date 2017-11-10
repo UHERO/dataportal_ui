@@ -110,7 +110,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.scrollToFragment();
   }
 
-  updatePageCounter(event, subcategory){
+  updatePageCounter(event, subcategory) {
     subcategory.scrollIndex = event;
   }
 

@@ -109,7 +109,7 @@ export class HelperService {
       const entry = { date: '', value: Infinity, pseudoHistory: false };
       entry.date = d;
       entry.value = +values[index];
-      entry.pseudoHistory = pseudoHistory[index]
+      entry.pseudoHistory = pseudoHistory[index];
       return entry;
     });
     return formattedResults;
@@ -118,7 +118,14 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({ date: date.date, tableDate: date.tableDate, value: Infinity, yoyValue: Infinity, ytdValue: Infinity, c5maValue: Infinity });
+      table.push({
+        date: date.date,
+        tableDate: date.tableDate,
+        value: Infinity,
+        yoyValue: Infinity,
+        ytdValue: Infinity,
+        c5maValue: Infinity
+      });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.tableDate ? data.tableDate : data.date;

@@ -40,31 +40,43 @@ export class AnalyzerService {
     // Quarterly frequency
     const qSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'Q')) > -1;
     // Semi-annual frequency
-    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;    
+    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;
     // Monthly frequency
     const mSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'M')) > -1;
     while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
       if (mSelected) {
-        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        dateArray.push({
+          date: startYear.toString() + '-' + m[startMonth] + '-01',
+          tableDate: startYear.toString() + '-' + m[startMonth]
+        });
       }
       // If series with a semi-annual frequency have been selected but not monthly, add months '01' & '07' to the date array
       if (sSelected && !mSelected && (startMonth === 1 || startMonth === 7)) {
-        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
+        dateArray.push({
+          date: startYear.toString() + '-' + m[startMonth] + '-01',
+          tableDate: startYear.toString() + '-' + m[startMonth]
+        });
       }
       if (qSelected) {
         const addQuarter = this.addQuarterObs(startMonth, mSelected);
         if (addQuarter) {
-          dateArray.push({ date: startYear.toString() + '-' + m[addQuarter] + '-01', tableDate: startYear.toString() + ' ' + q[addQuarter] });
+          dateArray.push({
+            date: startYear.toString() + '-' + m[addQuarter] + '-01',
+            tableDate: startYear.toString() + ' ' + q[addQuarter]
+          });
         }
       }
       if (aSelected) {
         const addAnnual = this.addAnnualObs(startMonth, mSelected, qSelected);
         if (addAnnual) {
-          dateArray.push({date: startYear.toString() + '-01-01', tableDate: startYear.toString()});
+          dateArray.push({
+            date: startYear.toString() + '-01-01',
+            tableDate: startYear.toString()
+          });
         }
       }
-      startYear = startMonth === 12 ? startYear += 1 : startYear;     
-      startMonth = startMonth === 12 ? 1 : startMonth += 1; 
+      startYear = startMonth === 12 ? startYear += 1 : startYear;
+      startMonth = startMonth === 12 ? 1 : startMonth += 1;
     }
     return dateArray;
   }

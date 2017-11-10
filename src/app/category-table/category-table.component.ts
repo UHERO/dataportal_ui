@@ -15,7 +15,7 @@ declare var $: any;
   styleUrls: ['./category-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableComponent implements AfterViewChecked, OnChanges {
+export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
   @Input() subCats;

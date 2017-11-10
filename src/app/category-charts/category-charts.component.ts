@@ -7,7 +7,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
   templateUrl: './category-charts.component.html',
   styleUrls: ['./category-charts.component.scss']
 })
-export class CategoryChartsComponent implements OnInit {
+export class CategoryChartsComponent implements OnInit, OnChanges {
   @Input() portalSettings;
   @Input() sublist;
   @Input() data;
@@ -30,7 +30,7 @@ export class CategoryChartsComponent implements OnInit {
   ngOnInit() {
     this.data.forEach((chartSeries) => {
       if (chartSeries.seriesInfo !== 'No data available') {
-        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);        
+        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
       }
     });
   }

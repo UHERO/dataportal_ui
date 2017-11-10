@@ -102,7 +102,7 @@ export class HighstockComponent implements OnChanges {
     }, {
       html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
     }];
-    return labelItems
+    return labelItems;
   }
 
   formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) {

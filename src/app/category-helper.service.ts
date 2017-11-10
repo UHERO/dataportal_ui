@@ -116,7 +116,7 @@ export class CategoryHelperService {
           if (!freqExist) {
             freqArray.push(freq);
           }
-        })
+        });
       }
     });
     const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
@@ -172,8 +172,8 @@ export class CategoryHelperService {
       }
       // NEW GEO/FREQ RESPONSES
       if (!sub.geoFreqs) {
-        const freq = sub.frequencies.find(freq => freq.freq === currentFreq.freq);
-        const geo = sub.geographies.find(geo => geo.handle === currentGeo.handle);
+        const freq = sub.frequencies.find(f => f.freq === currentFreq.freq);
+        const geo = sub.geographies.find(g => g.handle === currentGeo.handle);
         if (geo) {
           const geoStartDate = geo.observationStart.substr(0, 10);
           const geoEndDate = geo.observationEnd.substr(0, 10);
@@ -191,7 +191,7 @@ export class CategoryHelperService {
             }
           }
           if (startDate < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-            categoryDateWrapper.firstDate = startDate
+            categoryDateWrapper.firstDate = startDate;
           }
           if (endDate > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
             categoryDateWrapper.endDate = endDate;
@@ -262,8 +262,10 @@ export class CategoryHelperService {
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchSearch(search).subscribe((results) => {
         this.defaults = results.defaults;
+        // TO BE DEPRECATED
         freqGeos = results.freqGeos;
         geoFreqs = results.geoFreqs;
+        // NEW GEO/FREQ RESPONSES
         freqs = results.frequencies;
         geos = results.geographies;
         obsEnd = results.observationEnd;
@@ -285,8 +287,9 @@ export class CategoryHelperService {
     }
   }
 
+  // UPDATE FUNCTION ARGUMENTS WHEN DEPRECATING geoFreqs/freqGeos
   searchSettings(search: string, cacheId, dateWrapper: DateWrapper, geoFreqs, freqGeos, frequencies, geographies, routeGeo?: string, routeFreq?: string) {
-    let selected
+    let selected;
     // TO BE DEPRECATED
     if (freqGeos && geoFreqs) {
       selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqGeos, geoFreqs);

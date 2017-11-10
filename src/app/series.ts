@@ -10,7 +10,7 @@ export interface Series {
   frequency: string;
   frequencyShort: string;
   freqGeos: Array<any>;
-  frequencies?: Array<any>; 
+  frequencies?: Array<any>;
   unitsLabel: string;
   unitsLabelShort: string;
   geography: Geography;

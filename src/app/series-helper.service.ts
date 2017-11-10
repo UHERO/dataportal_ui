@@ -62,7 +62,7 @@ export class SeriesHelperService {
         this.seriesData.regions = geos.length ? geos : [currentGeo];
       }
       if (freqs) {
-        this.seriesData.frequencies = freqs.length ? freqs : [currentFreq];        
+        this.seriesData.frequencies = freqs.length ? freqs : [currentFreq];
       }
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
@@ -151,7 +151,8 @@ export class SeriesHelperService {
       percChange: '',
       levelChange: '',
     };
-    // Find observations in seriesData that match the selected minimum and maximum dates (duplicate dates may show up in analyzer table data)
+    // Find observations in seriesData that match the selected minimum and maximum dates
+    // (duplicate dates may show up in analyzer table data)
     const minDateObs = seriesData.filter(obs => obs.date === minDate);
     const maxDateObs = seriesData.filter(obs => obs.date === maxDate);
     // Select observation where value is not Infinity
@@ -159,7 +160,7 @@ export class SeriesHelperService {
     const maxDateData = maxDateObs.find(obs => obs.value !== Infinity);
     stats.tableStartValue = minDateData ? minDateData.value : Infinity;
     stats.tableEndValue = maxDateData ? maxDateData.value : Infinity;
-    
+
     stats.minValue = this.getMinMax(seriesData).minValue;
     stats.minValueDate = this.getMinMax(seriesData).minValueDate;
     stats.maxValue = this.getMinMax(seriesData).maxValue;

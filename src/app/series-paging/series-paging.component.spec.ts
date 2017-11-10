@@ -6,7 +6,7 @@ import { SeriesPagingComponent } from './series-paging.component';
  selector  : 'test-cmp',
  template  : '<app-series-paging [data]="mockScrollSeries"></app-series-paging>',
 })
-class TestCmpWrapper { 
+class TestCmpWrapper {
     mockScrollSeries = [
       [{
         categoryChart: {},

@@ -11,7 +11,7 @@ class ChartStubComponent {
 
 // Create stub for xAxis component
 @Component({selector: 'xAxis', template: ''})
-class xAxisStubComponent {}
+class XAxisStubComponent {}
 
 describe('AnalyzerHighstockComponent', () => {
   let component: AnalyzerHighstockComponent;
@@ -19,7 +19,7 @@ describe('AnalyzerHighstockComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerHighstockComponent, xAxisStubComponent, ChartStubComponent ]
+      declarations: [ AnalyzerHighstockComponent, XAxisStubComponent, ChartStubComponent ]
     })
     .compileComponents();
   }));
