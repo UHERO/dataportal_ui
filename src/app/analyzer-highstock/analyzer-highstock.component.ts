@@ -79,9 +79,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return chartButtons;
   }
 
-  removeFromChart(analyzerSeries, chart) {
+  removeFromChart(aSeries, chart) {
     // Filter out series from chart that are not in analayzerSeries
-    const removeSeries = chart.series.filter(cSeries => !analyzerSeries.some(aSeries => aSeries.name === cSeries.name) && cSeries.name !== 'Navigator 1');
+    const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
     removeSeries.forEach((series) => {
       series.remove();
     });
@@ -182,9 +182,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     series.forEach((serie, index) => {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
       const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
+      const saTitle = serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)';
+      const nsaTitle = serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')';
       chartSeries.push({
         className: serie.id,
-        name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
+        name: serie.seasonallyAdjusted ? saTitle : nsaTitle,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         displayName: serie.title,
@@ -412,13 +414,18 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // Return string of annual series with their values formatted for the tooltip
       return label;
     }
-    const getQuarterObs = function (quarterSeries: Array<any>, date: string, pointQuarter: string) {
-      let quarterLabel = '', label = '';
+    const getQuarterObs = function (quarterSeries: Array<any>, date: string, pointQ: string) {
+      let qLabel = '', label = '';
       quarterSeries.forEach((serie) => {
         // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
-        const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
+        const obsDate = serie.data.find((obs) => {(
+          Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date
+        });
         if (obsDate) {
-          label += formatSeriesLabel(name, units, geo, serie.colorIndex, serie, obsDate.y, Highcharts.dateFormat('%Y', obsDate.x) + ' ' + pointQuarter, obsDate.x, quarterLabel);
+          const year = Highcharts.dateFormat('%Y', obsDate.x);
+          const value = obsDate.y;
+          const color = serie.colorIndex;
+          label += formatSeriesLabel(name, units, geo, color, serie, value, year + ' ' + pointQ, obsDate.x, qLabel);
         }
       });
       // Return string of quarterly series with their values formatted for the tooltip
