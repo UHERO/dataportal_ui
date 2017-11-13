@@ -40,8 +40,8 @@ export class DataPortalSettingsService {
         series1: 'formattedValue',
         series1Label: 'Level',
         series2: 'formattedC5ma',
-        series2Label: 'Centered 5 Year Moving Avg % Chg',
-        series2PercLabel: 'Centered 5 Year Moving Avg Chg'
+        series2Label: 'Annual % Chg',
+        series2PercLabel: 'Annual Chg'
       },
       transformations: {
         yoy: false,
