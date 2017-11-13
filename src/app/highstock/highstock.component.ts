@@ -111,7 +111,7 @@ export class HighstockComponent implements OnChanges {
     const series2 = chartData[portalSettings.highstock.series2Name];
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
+    const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
     const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
     const series = [{
       name: 'Level',
