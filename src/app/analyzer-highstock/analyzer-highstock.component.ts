@@ -295,8 +295,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         inputEnabled: false
       },
       lang: {
-        exportKey: 'Download Chart',
-        printKey: 'Print Chart'
+        exportKey: 'Download Chart'
       },
       navigator: {
         series: {
@@ -314,13 +313,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
             onclick: function (this) {
               this.exportChart(null, { subtitle: { text: '' } });
-            }
-          },
-          printButton: {
-            text: 'Print',
-            _titleKey: 'printKey',
-            onclick: function () {
-              this.print();
             }
           }
         },

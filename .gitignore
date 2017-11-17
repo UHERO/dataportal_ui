@@ -2,6 +2,10 @@
 
 # compiled output
 /tmp
+/dist
+/ntaDist
+/dist_staging
+/ntaDist_staging
 
 # dependencies
 /node_modules

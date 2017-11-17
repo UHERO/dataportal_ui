@@ -190,8 +190,7 @@ export class HighstockComponent implements OnChanges {
         inputEnabled: false
       },
       lang: {
-        exportKey: 'Download Chart',
-        printKey: 'Print Chart'
+        exportKey: 'Download Chart'
       },
       navigator: {
         series: {
@@ -207,13 +206,6 @@ export class HighstockComponent implements OnChanges {
             text: 'Download',
             _titleKey: 'exportKey',
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-          },
-          printButton: {
-            text: 'Print',
-            _titleKey: 'printKey',
-            onclick: function () {
-              this.print();
-            }
           }
         },
         filename: name + '_' + geo.name + '_' + freq.label,
