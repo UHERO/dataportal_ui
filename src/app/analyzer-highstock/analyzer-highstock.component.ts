@@ -41,12 +41,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Series in the analyzer that have been selected to be displayed in the chart
     const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);
     if (this.chart) {
-      const navDates = this.createNavigatorDates(this.allDates);
+      // const navDates = this.createNavigatorDates(this.allDates);
       // If a chart has been generated:
       // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
       this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
       // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.addToChart(selectedAnalyzerSeries.series, this.chart, navDates);
+      this.addToChart(selectedAnalyzerSeries.series, this.chart, selectedAnalyzerSeries.navDates);
       // Add a chart subtitle to alert user of a warning
       this.chart.setSubtitle({
         text: this.alertMessage,
@@ -92,6 +92,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
       const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
       if (opposite) {
+        console.log('opposite', opposite);
+        console.log('chart', chart)
         opposite.update({
           opposite: false,
         });
@@ -102,26 +104,35 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   addToChart(analyzerSeries, chart, navDates) {
     // Filter out series that have been selected in the analyzer but are not currently in the chart
     const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
-    addSeries.forEach((series) => {
-      const seriesUnits = series.unitsLabelShort;
-      // Find y-axis that corressponds with a series' units
-      const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
-      // Find if 'yAxis0' exists
-      const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-      if (!yAxis) {
-        this.addYAxis(chart, seriesUnits, y0Exist);
-      }
-      series.yAxis = yAxis ? yAxis.userOptions.id : (y0Exist ? 'yAxis1' : 'yAxis0');
-      chart.addSeries(series);
-    });
-    chart.addSeries({
-      data: navDates,
-      showInNavigator: true,
-      index: -1,
-      colorIndex: -1,
-      name: 'Navigator'
-    });
+    console.log('addSeries', addSeries);
+    if (addSeries.length) {
+      addSeries.forEach((series) => {
+        const seriesUnits = series.unitsLabelShort;
+        // Find y-axis that corressponds with a series' units
+        const axes = this.checkYAxes(chart);
+        const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
+        // Find if 'yAxis0' exists
+        const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+        if (!yAxis) {
+          this.addYAxis(chart, seriesUnits, y0Exist);
+        }
+        series.yAxis = yAxis ? yAxis.userOptions.id : (y0Exist ? 'yAxis1' : 'yAxis0');
+        chart.addSeries(series);
+      });
+      chart.addSeries({
+        data: navDates,
+        showInNavigator: true,
+        index: -1,
+        colorIndex: -1,
+        name: 'Navigator'
+      });
+    }
   }
+
+  checkYAxes(chart) {
+    const yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
+    console.log('yAxes', yAxes);
+  } 
 
   addYAxis(chart, seriesUnits, y0Exist) {
     const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
@@ -142,21 +153,21 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const allUnits = series.map(serie => serie.unitsLabelShort);
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
     const unitGroups = this.groupByUnits(series);
-    const yAxesGroups =  this.setYAxesGroups(unitGroups)
-    unitGroups.forEach((unit, index) => {
+    const yAxesGroups = this.setYAxesGroups(unitGroups);
+    yAxesGroups.forEach((axis, index) => {
       yAxes.push({
         labels: {
           format: '{value:,.2f}'
         },
-        id: 'yAxis' + index,
+        id: axis.axisId,
         title: {
-          text: unit.units
+          text: axis.units
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
         maxPadding: 0,
         minTickInterval: 0.01,
-        series: unit.series
+        series: axis.series
       });
     });
     return yAxes;
@@ -168,14 +179,24 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // Compare series to check if values differ by order of magnitude
       unitGroups.forEach((unit) => {
         const maxValue = Math.max(...unit.series[0].chartData.level.map(l => l[1]));
+        yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [unit.series[0]] });
         unit.series.forEach((serie) => {
           const currentMaxValue = Math.max(...serie.chartData.level.map(l => l[1]));
           const diff = maxValue - currentMaxValue;
           if (Math.abs(diff) >= 10000) {
-            console.log('true');
+            const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
+            if (!yAxis1) {
+              yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+              return;
+            }
+            if (yAxis1) {
+              yAxis1.series.push(serie);
+              return;
+            }
           }
         });
       });
+      return yAxesGroups;
     }
     if (unitGroups.length > 1) {
       unitGroups.forEach((unit, unitIndex) => {
@@ -199,6 +220,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   createNavigatorDates(dates) {
+    console.log('nav dates')
     // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
     const uniqueDates = dates.filter((date, index, self) =>
       self.findIndex(d => d.date === date.date) === index
@@ -214,16 +236,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   formatSeriesData(series, chartInstance, dates) {
     const chartSeries = [];
-    let yAxes;
+    let yAxes, navDates;
     // Check if chartInstance exists, i.e. if chart is already drawn
     // False when navigating to analyzer
     if (!chartInstance) {
       yAxes = this.createYAxes(series, []);
     }
     series.forEach((serie, index) => {
+      console.log('chart instance', chartInstance)
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
-      console.log('yAxes', yAxes);
-      const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
+      const axis = yAxes ? yAxes.find(axis => axis.series.some(s => s.id === serie.id)) : null;
       chartSeries.push({
         className: serie.id,
         name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
@@ -243,7 +265,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       });
     });
     if (!chartInstance) {
-      const navDates = this.createNavigatorDates(dates);
+      console.log('!chartInstance')
+      navDates = this.createNavigatorDates(dates);
       chartSeries.push({
         data: navDates,
         showInNavigator: true,
@@ -252,7 +275,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         name: 'Navigator'
       });
     }
-    return { series: chartSeries, yAxis: yAxes };
+    return { series: chartSeries, yAxis: yAxes, navDates: navDates };
   }
 
   drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
@@ -295,7 +318,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         inputEnabled: false
       },
       lang: {
-        exportKey: 'Download Chart'
+        exportKey: 'Download Chart',
+        printKey: 'Print Chart'
       },
       navigator: {
         series: {
@@ -313,6 +337,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
             onclick: function (this) {
               this.exportChart(null, { subtitle: { text: '' } });
+            }
+          },
+          printButton: {
+            text: 'Print',
+            _titleKey: 'printKey',
+            onclick: function () {
+              this.print();
             }
           }
         },
