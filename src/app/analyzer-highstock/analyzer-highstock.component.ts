@@ -139,24 +139,63 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   createYAxes(series, yAxes) {
-    const allUnits = series.map(serie => serie.unitsLabelShort)
+    const allUnits = series.map(serie => serie.unitsLabelShort);
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
-    uniqueUnits.forEach((unit, index) => {
+    const unitGroups = this.groupByUnits(series);
+    const yAxesGroups =  this.setYAxesGroups(unitGroups)
+    unitGroups.forEach((unit, index) => {
       yAxes.push({
         labels: {
           format: '{value:,.2f}'
         },
         id: 'yAxis' + index,
         title: {
-          text: unit
+          text: unit.units
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
         maxPadding: 0,
-        minTickInterval: 0.01
+        minTickInterval: 0.01,
+        series: unit.series
       });
     });
     return yAxes;
+  }
+
+  setYAxesGroups(unitGroups) {
+    const yAxesGroups = [];
+    if (unitGroups.length === 1) {
+      // Compare series to check if values differ by order of magnitude
+      unitGroups.forEach((unit) => {
+        const maxValue = Math.max(...unit.series[0].chartData.level.map(l => l[1]));
+        unit.series.forEach((serie) => {
+          const currentMaxValue = Math.max(...serie.chartData.level.map(l => l[1]));
+          const diff = maxValue - currentMaxValue;
+          if (Math.abs(diff) >= 10000) {
+            console.log('true');
+          }
+        });
+      });
+    }
+    if (unitGroups.length > 1) {
+      unitGroups.forEach((unit, unitIndex) => {
+        yAxesGroups.push({ axis: 'yAxis' + unitIndex, series: unit.series });
+      });
+      return yAxesGroups;
+    }
+  }
+
+  groupByUnits(series) {
+    const units = series.reduce((obj, serie) => {
+      obj[serie.unitsLabelShort] = obj[serie.unitsLabelShort] || [];
+      obj[serie.unitsLabelShort].push(serie);
+      return obj;
+    }, {});
+
+    const groups = Object.keys(units).map((key) => {
+      return { units: key, series: units[key] };
+    });
+    return groups;
   }
 
   createNavigatorDates(dates) {
@@ -176,11 +215,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   formatSeriesData(series, chartInstance, dates) {
     const chartSeries = [];
     let yAxes;
+    // Check if chartInstance exists, i.e. if chart is already drawn
+    // False when navigating to analyzer
     if (!chartInstance) {
       yAxes = this.createYAxes(series, []);
     }
     series.forEach((serie, index) => {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
+      console.log('yAxes', yAxes);
       const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
       chartSeries.push({
         className: serie.id,
