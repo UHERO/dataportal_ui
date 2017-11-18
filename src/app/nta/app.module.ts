@@ -84,10 +84,10 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
       provide: 'rootCategory',
       useValue: 2487
     },
-    {
+    /* {
       provide: 'defaultCategory',
-      useValue: 3502
-    },
+      useValue: 3985
+    }, */
     {
       provide: 'logo',
       useValue: '../../assets/nta-logo.svg'

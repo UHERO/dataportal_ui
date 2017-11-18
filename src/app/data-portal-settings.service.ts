@@ -33,7 +33,7 @@ export class DataPortalSettingsService {
         series1Type: 'column',
         series2Name: 'none',
         series2Type: '',
-        buttons: [10, 25, 50, 'all']
+        buttons: []
       },
       seriesTable: {
         columns: 3,
