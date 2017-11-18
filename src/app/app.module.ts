@@ -75,10 +75,10 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'rootCategory',
       useValue: 59
     },
-    {
+    /* {
       provide: 'defaultCategory',
       useValue: 42
-    },
+    }, */
     {
       provide: 'logo',
       useValue: '../../assets/UHEROdata-Logo-color.svg'
