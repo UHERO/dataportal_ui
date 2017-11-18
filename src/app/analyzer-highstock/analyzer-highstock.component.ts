@@ -102,25 +102,99 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   addToChart(analyzerSeries, chart, navDates) {
     // Filter out series that have been selected in the analyzer but are not currently in the chart
     const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
-    addSeries.forEach((series) => {
-      const seriesUnits = series.unitsLabelShort;
-      // Find y-axis that corressponds with a series' units
-      const yAxis = chart.yAxis.find(axis => axis.userOptions.title.text === seriesUnits);
-      // Find if 'yAxis0' exists
-      const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-      if (!yAxis) {
-        this.addYAxis(chart, seriesUnits, y0Exist);
-      }
-      series.yAxis = yAxis ? yAxis.userOptions.id : (y0Exist ? 'yAxis1' : 'yAxis0');
+    if (addSeries.length) {
+      addSeries.forEach((series) => {
+        const yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
+        // If more than one yAxes, find which axis the series should be added to
+        if (yAxes.length > 1) {
+          this.addSeriesToDualAxisChart(yAxes, series, chart, analyzerSeries);
+        }
+        // If chart has one yAxis, evaluate if series should be added to existing axis or drawn on a new one
+        if (yAxes.length === 1) {
+          this.addSeriesToSingleAxisChart(yAxes, series, chart);
+        }
+      });
+      // Use nav dates as the series drawn in the navigator
+      chart.addSeries({
+        data: navDates,
+        showInNavigator: true,
+        index: -1,
+        colorIndex: -1,
+        name: 'Navigator'
+      });
+    }
+  }
+
+  addSeriesToDualAxisChart(yAxes: Array<any>, series, chart, analyzerSeries: Array<any>) {
+    const seriesUnits = series.unitsLabelShort;
+    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+    // Check if a y axis already exists for the new series' units
+    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
+    // If yes, add series to that axis
+    if (unitAxis) {
+      series.yAxis = unitAxis.userOptions.id;
       chart.addSeries(series);
-    });
-    chart.addSeries({
-      data: navDates,
-      showInNavigator: true,
-      index: -1,
-      colorIndex: -1,
-      name: 'Navigator'
-    });
+      return;
+    }
+    // If no, consolidate series currently drawn to 1 axis (i.e. series with the same units were drawn on separate axes)
+    if (!unitAxis) {
+      // Find series drawn on second axis (i.e. yAxis === 'yAxis1')
+      const y1Series = chart.series.filter(cSeries => cSeries.userOptions.yAxis === 'yAxis1');
+      y1Series.forEach((s) => {
+        // Get original data of series drawn on second axis
+        const addBackSeries = analyzerSeries.find(aSeries => aSeries.className === s.userOptions.className);
+        // Remove series from chart and reassign it to yAxis0
+        s.remove();
+        addBackSeries.yAxis = 'yAxis0';
+        // Add series back to chart
+        chart.addSeries(addBackSeries);
+      });
+      // Remove second axis
+      const y1Axis = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis1');
+      y1Axis.remove();
+      series.yAxis = 'yAxis1';
+      // Redraw axis with units of the new series to be added
+      this.addYAxis(chart, seriesUnits, y0Exist);
+      // Add new series to chart
+      chart.addSeries(series);
+      return;
+    }
+  }
+
+  addSeriesToSingleAxisChart(yAxes: Array<any>, series, chart) {
+    const seriesUnits = series.unitsLabelShort;
+    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+    // Check if a y axis already exists for the new series' units
+    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
+    // If no, draw series on a new y axis
+    if (!unitAxis) {
+      this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
+      return;
+    }
+    // If yes
+    if (unitAxis) {
+      // Get max level value of series to be added
+      const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
+      let addAxis;
+      // Check max level value of all series already drawn on axis
+      unitAxis.userOptions.series.forEach((serie) => {
+        const maxValue = Math.max(...serie.chartData.level.map(l => l[1]));
+        const diff = seriesMaxValue - maxValue;
+        // If difference between values is at least 10,000, draw series on a new axis
+        if (Math.abs(diff) >= 10000) {
+          addAxis = true;
+        }
+      });
+      if (addAxis) {
+        this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
+      }
+    }
+  }
+
+  drawNewYAxis(chart, series, seriesUnits: string, y0Exist: Boolean) {
+    this.addYAxis(chart, seriesUnits, y0Exist);
+    series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
+    chart.addSeries(series);
   }
 
   addYAxis(chart, seriesUnits, y0Exist) {
@@ -138,51 +212,77 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     });
   }
 
-  createYAxes(series, yAxes) {
-    const allUnits = series.map(serie => serie.unitsLabelShort);
-    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+  createYAxes(series: Array<any>, yAxes: Array<any>) {
+    // Group series by their units
     const unitGroups = this.groupByUnits(series);
-    const yAxesGroups =  this.setYAxesGroups(unitGroups)
-    unitGroups.forEach((unit, index) => {
+    // Create y-axis groups based on units available
+    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
+    // If only 1 units is selected, check that the max value of each series does not differ by an order of magnitude
+    // If yes, draw series on separate y axes
+    const yAxesGroups = this.setYAxesGroups(unitGroups);
+    yAxesGroups.forEach((axis, index) => {
       yAxes.push({
         labels: {
           format: '{value:,.2f}'
         },
-        id: 'yAxis' + index,
+        id: axis.axisId,
         title: {
-          text: unit.units
+          text: axis.units
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
         maxPadding: 0,
         minTickInterval: 0.01,
-        series: unit.series
+        series: axis.series
       });
     });
     return yAxes;
   }
 
   setYAxesGroups(unitGroups) {
+    // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
     const yAxesGroups = [];
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
       unitGroups.forEach((unit) => {
+        // Get max level value of first series in group
         const maxValue = Math.max(...unit.series[0].chartData.level.map(l => l[1]));
-        unit.series.forEach((serie) => {
-          const currentMaxValue = Math.max(...serie.chartData.level.map(l => l[1]));
-          const diff = maxValue - currentMaxValue;
-          if (Math.abs(diff) >= 10000) {
-            console.log('true');
-          }
-        });
-      });
-    }
-    if (unitGroups.length > 1) {
-      unitGroups.forEach((unit, unitIndex) => {
-        yAxesGroups.push({ axis: 'yAxis' + unitIndex, series: unit.series });
+        yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [unit.series[0]] });
+        this.checkMaxValues(unit, maxValue, yAxesGroups);
       });
       return yAxesGroups;
     }
+    if (unitGroups.length > 1) {
+      unitGroups.forEach((unit, unitIndex) => {
+        yAxesGroups.push({ axisId: 'yAxis' + unitIndex, units: unit.units, series: unit.series });
+      });
+      return yAxesGroups;
+    }
+  }
+
+  checkMaxValues(unit, maxValue, yAxesGroups) {
+    unit.series.forEach((serie) => {
+      // Get max level value of series
+      const currentMaxValue = Math.max(...serie.chartData.level.map(l => l[1]));
+      const diff = maxValue - currentMaxValue;
+      // If difference between values is at least 10,000, add second axis
+      if (Math.abs(diff) >= 10000) {
+        const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
+        if (!yAxis1) {
+          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+          return;
+        }
+        if (yAxis1) {
+          yAxis1.series.push(serie);
+          return;
+        }
+      }
+      // If difference is less than 10,000, add series to frist axis
+      if (Math.abs(diff) < 10000) {
+        yAxesGroups[0].series.push(serie);
+      }
+    });
+    return yAxesGroups;
   }
 
   groupByUnits(series) {
@@ -222,8 +322,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
     series.forEach((serie, index) => {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
-      console.log('yAxes', yAxes);
-      const axis = yAxes ? yAxes.find(axis => axis.title.text === serie.unitsLabelShort) : null;
+      const axis = yAxes ? yAxes.find(axis => axis.series.some(s => s.id === serie.id)) : null;
       chartSeries.push({
         className: serie.id,
         name: serie.seasonallyAdjusted ? serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' : serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
