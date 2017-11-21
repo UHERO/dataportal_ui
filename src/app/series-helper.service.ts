@@ -49,7 +49,9 @@ export class SeriesHelperService {
       currentFreq = { freq: series.frequencyShort, label: series.frequency };
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [series.geography];
-      this.seriesData.frequencies = geoFreqs.length ? geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs : [{ freq: series.frequencyShort, label: series.frequency }];
+      this.seriesData.frequencies = geoFreqs.length ?
+        geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs :
+        [{ freq: series.frequencyShort, label: series.frequency }];
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
@@ -188,7 +190,7 @@ export class SeriesHelperService {
     selectedRange.forEach((obs) => {
       if (freq === 'A' && obs.tableDate.length === 4 && obs.value === Infinity) {
         missing = true;
-        return;     
+        return;
       }
       if (freq === 'Q' && obs.tableDate.includes('Q') && obs.value === Infinity) {
         missing = true;
@@ -236,7 +238,9 @@ export class SeriesHelperService {
     const minDateIndex = seriesData.findIndex(obs => obs.date === startDate && obs.value === startValue);
     const maxDateIndex = seriesData.findIndex(obs => obs.date === endDate && obs.value === endValue);
     // minDateIndex > maxDateIndex in single series component (table is in reverse order)
-    return minDateIndex > maxDateIndex ? seriesData.slice(maxDateIndex, minDateIndex + 1) : seriesData.slice(minDateIndex, maxDateIndex + 1);
+    return minDateIndex > maxDateIndex ?
+      seriesData.slice(maxDateIndex, minDateIndex + 1) :
+      seriesData.slice(minDateIndex, maxDateIndex + 1);
   }
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {

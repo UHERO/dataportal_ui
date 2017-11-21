@@ -50,7 +50,7 @@ export class AnalyzerComponent implements OnInit {
   setInitialChartSeries(analyzerSeries: Array<any>) {
     let chartSeries = analyzerSeries.filter(series => series.showInChart === true);
     let counter = 0;
-    while(chartSeries.length < 2) {
+    while (chartSeries.length < 2) {
       if (analyzerSeries[counter]) {
         analyzerSeries[counter].showInChart = true;
         counter++;
@@ -112,7 +112,7 @@ export class AnalyzerComponent implements OnInit {
     // At least one series must be selected
     if (chartSeries.length === 1 && seriesExist) {
       this.alertUser = true;
-      this.alertMessage = 'At least one series must be selected.'
+      this.alertMessage = 'At least one series must be selected.';
       return;
     }
     // Allow up to 2 different units to be displayed in chart
@@ -136,7 +136,7 @@ export class AnalyzerComponent implements OnInit {
 
   checkSeriesUnits(chartSeries, currentSeries) {
     // List of units for series in analyzer chart
-    const allUnits = chartSeries.map(series => series.unitsLabelShort)
+    const allUnits = chartSeries.map(series => series.unitsLabelShort);
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
     if (uniqueUnits.length === 2) {
       // If two different units are already in use, check if the current series unit is in the list
