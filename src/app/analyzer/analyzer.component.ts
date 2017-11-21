@@ -44,7 +44,9 @@ export class AnalyzerComponent implements OnInit {
       this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       if (this.analyzerChartSeries.length < 2) {
         this.analyzerSeries[0].showInChart = true;
-        this.analyzerSeries[1].showInChart = true;
+        if (this.analyzerSeries.length > 1) {
+          this.analyzerSeries[1].showInChart = true;
+        }
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       }
     }
@@ -88,9 +90,25 @@ export class AnalyzerComponent implements OnInit {
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
     const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
+    console.log(seriesExist)
+    const noSeriesSelected = chartSeries.filter(series => series.showInChart === true);
+    console.log('no sereies selected', noSeriesSelected);
+    console.log('chart series', chartSeries)
+    if (chartSeries.length && !noSeriesSelected.length) {
+      chartSeries[0].showInChart = true;
+    }
+    // TO DO: Fix logic for even when user removes the remaining series drawn in chart while other series is/are unchecked
     // At least one series must be selected
     if (chartSeries.length === 1 && seriesExist) {
       this.alertUser = true;
+      chartSeries[0].showInChart = true;
+      this.analyzerSeries = this._analyzer.analyzerSeries;
+      this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
+      this.analyzerSeries.forEach((series) => {
+        series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
+      });
+  
+      this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true)
       this.alertMessage = 'At least one series must be selected.'
       return;
     }
@@ -101,6 +119,7 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
     }
+
     // Update table dates when removing series from analyzer
     this.analyzerSeries = this._analyzer.analyzerSeries;
     this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);

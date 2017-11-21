@@ -346,8 +346,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       chartSeries.push({
         data: navDates,
         showInNavigator: true,
-        index: 10,
-        colorIndex: 10,
+        index: -1,
+        colorIndex: -1,
         name: 'Navigator'
       });
     }
