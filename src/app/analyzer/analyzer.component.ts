@@ -34,27 +34,33 @@ export class AnalyzerComponent implements OnInit {
       this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
       // Sort series by length of level data
       // The default series displayed in the chart on load should be the series with the longest range of data
-      this.analyzerSeries.sort((a, b) => {
-        return b.chartData.level.length - a.chartData.level.length;
-      });
+      const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
+      this.analyzerSeries[longestSeries].showInChart = true;
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
       this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       if (this.analyzerChartSeries.length < 2) {
-        this.setInitialChartSeries(this.analyzerSeries);
-        this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+        this.analyzerChartSeries = this.setInitialChartSeries(this.analyzerSeries);
       }
     }
   }
 
   setInitialChartSeries(analyzerSeries: Array<any>) {
-    for (let i = 0; i < 2; i++) {
-      if (analyzerSeries[i]) {
-        analyzerSeries[i].showInChart = true;
+    let chartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    let counter = 0;
+    while(chartSeries.length < 2) {
+      if (analyzerSeries[counter]) {
+        analyzerSeries[counter].showInChart = true;
+        counter++;
+        chartSeries = analyzerSeries.filter(series => series.showInChart === true);
+      }
+      if (!analyzerSeries[counter]) {
+        break;
       }
     }
+    return chartSeries;
   }
 
   setAnalyzerDates(analyzerSeries) {
@@ -72,12 +78,12 @@ export class AnalyzerComponent implements OnInit {
     return this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
   }
 
-  findLongestSeries(series) {
+  findLongestSeriesIndex(series) {
     let longestSeries, seriesLength = 0;
-    series.forEach((serie) => {
+    series.forEach((serie, index) => {
       if (!longestSeries || seriesLength < serie.chartData.level.length) {
         seriesLength = serie.chartData.level.length;
-        longestSeries = serie;
+        longestSeries = index;
       }
     });
     return longestSeries;
