@@ -43,9 +43,16 @@ export class AnalyzerComponent implements OnInit {
       });
       this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
       if (this.analyzerChartSeries.length < 2) {
-        this.analyzerSeries[0].showInChart = true;
-        this.analyzerSeries[1].showInChart = true;
+        this.setInitialChartSeries(this.analyzerSeries);
         this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+      }
+    }
+  }
+
+  setInitialChartSeries(analyzerSeries: Array<any>) {
+    for (let i = 0; i < 2; i++) {
+      if (analyzerSeries[i]) {
+        analyzerSeries[i].showInChart = true;
       }
     }
   }
@@ -88,6 +95,14 @@ export class AnalyzerComponent implements OnInit {
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
     const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
+    this.analyzerSeries = this._analyzer.analyzerSeries;
+    const seriesSelected = this._analyzer.analyzerSeries.find(series => series.showInChart === true);
+    // If remaining series drawn in chart is removed from analyzer, draw next series in table
+    if (this._analyzer.analyzerSeries.length && !seriesSelected) {
+      this.analyzerSeries[0].showInChart = true;
+      this.updateChartSeries(this.analyzerSeries);
+      return;
+    }
     // At least one series must be selected
     if (chartSeries.length === 1 && seriesExist) {
       this.alertUser = true;
@@ -101,13 +116,16 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
     }
-    // Update table dates when removing series from analyzer
-    this.analyzerSeries = this._analyzer.analyzerSeries;
-    this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
-    this.analyzerSeries.forEach((series) => {
+    this.updateChartSeries(this.analyzerSeries);
+  }
+
+  updateChartSeries(analyzerSeries: Array<any>) {
+    // Update series drawn in chart and dates in analyzer table
+    this.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    analyzerSeries.forEach((series) => {
       series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
     });
-    this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+    this.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
@@ -129,5 +147,4 @@ export class AnalyzerComponent implements OnInit {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
   }
-
 }

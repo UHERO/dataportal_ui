@@ -143,13 +143,15 @@ export class SeriesHelperService {
       avg: '',
       cagr: ''
     };
+
     // Values of the selected starting and ending dates
     stats.tableStartValue = this.getStartValue(seriesData, startDate);
     stats.tableEndValue = this.getEndValue(seriesData, endDate);
     const firstValue = stats.tableStartValue;
     const lastValue = stats.tableEndValue;
-    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);    
-    if (selectedRangeData.length && firstValue !== Infinity && lastValue !== Infinity) {
+    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);
+    const missingValues = this.checkMissingValues(selectedRangeData, freq.freq, firstValue, lastValue);
+    if (selectedRangeData.length && !missingValues) {
       const periods = selectedRangeData.length - 1;
       stats.minValue = this.getMinMax(seriesData).minValue;
       stats.minValueDate = this.getMinMax(seriesData).minValueDate;
@@ -167,9 +169,9 @@ export class SeriesHelperService {
 
     // Format numbers
     formatStats.minValue = stats.minValue === Infinity ? 'N/A' : this._helper.formatNum(stats.minValue, decimals);
-    formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + this._helper.formatDate(stats.minValueDate, freq.freq) + ')';
+    formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + stats.minValueDate + ')';
     formatStats.maxValue = stats.maxValue === Infinity ? 'N/A' : this._helper.formatNum(stats.maxValue, decimals);
-    formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + this._helper.formatDate(stats.maxValueDate, freq.freq) + ')';
+    formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + stats.maxValueDate + ')';
     formatStats.percChange = stats.percChange === Infinity ? 'N/A' : this._helper.formatNum(stats.percChange, decimals);
     formatStats.levelChange = stats.levelChange === Infinity ? 'N/A' : this._helper.formatNum(stats.levelChange, decimals);
     formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
@@ -178,14 +180,37 @@ export class SeriesHelperService {
     return formatStats;
   }
 
-  getTotalValue(selectedRangeData) {
+  checkMissingValues(selectedRange: Array<any>, freq: string, firstValue, lastValue) {
+    let missing = false;
+    if (firstValue === Infinity || lastValue === Infinity) {
+      return missing = true;
+    }
+    selectedRange.forEach((obs) => {
+      if (freq === 'A' && obs.tableDate.length === 4 && obs.value === Infinity) {
+        missing = true;
+        return;     
+      }
+      if (freq === 'Q' && obs.tableDate.includes('Q') && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+      if (freq === 'S' && (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+      if (freq === 'M' && obs.tableDate.includes('-') && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+    });
+    return missing;
+  }
+
+  getTotalValue(selectedRangeData: Array<any>) {
     let total = 0;
     selectedRangeData.forEach((data) => {
       if (data.value !== Infinity) {
         total += +data.value;
-      }
-      if (data.value === Infinity) {
-        return Infinity;
       }
     });
     return total;
@@ -230,16 +255,16 @@ export class SeriesHelperService {
     }
   }
 
-  getMinMax(seriesData) {
+  getMinMax(seriesData: Array<any>) {
     let minValue = Infinity, minValueDate = '', maxValue = Infinity, maxValueDate = '';
     seriesData.forEach((item, index) => {
       if (minValue === Infinity || item.value < minValue) {
         minValue = item.value;
-        minValueDate = item.date;
+        minValueDate = item.tableDate;
       }
       if (maxValue === Infinity || item.value > maxValue && item.value !== Infinity) {
         maxValue = item.value;
-        maxValueDate = item.date;
+        maxValueDate = item.tableDate;
       }
     });
     return { minValue: minValue, minValueDate: minValueDate, maxValue: maxValue, maxValueDate: maxValueDate };
