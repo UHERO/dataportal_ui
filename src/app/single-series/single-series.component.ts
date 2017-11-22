@@ -87,6 +87,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['category']) {
         this.category = params['category'];
       }
+      if (params['start']) {
+        this.startDate = params['start'];
+      }
+      if (params['end']) {
+        this.endDate = params['end'];
+      }
       this.seriesData = this._series.getSeriesData(seriesId);
     });
     this.cdRef.detectChanges();
@@ -104,7 +110,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         id: id,
         sa: this.seasonallyAdjusted,
         geo: geo,
-        freq: freq
+        freq: freq,
+        // TO DO: Remove start and end params when navigating via dropdowns
+        start: undefined,
+        end: ''
       };
       this.startDate = this.chartStart;
       this.endDate = this.chartEnd;
@@ -120,6 +129,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
+    console.log('chart start', this.chartStart);
     this.chartEnd = e.maxDate;
   }
 
