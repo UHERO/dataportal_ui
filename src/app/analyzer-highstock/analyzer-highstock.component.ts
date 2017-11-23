@@ -1,4 +1,5 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { AnalyzerService } from '../analyzer.service';
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
@@ -26,13 +27,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() portalSettings;
   @Input() alertMessage;
   @Output() tableExtremes = new EventEmitter(true);
+  @Output() tooltipOptions = new EventEmitter();
   options;
   chart;
   private nameChecked;
   private unitsChecked;
   private geoChecked;
 
-  constructor() { }
+  constructor(private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
   }
@@ -463,16 +465,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   nameActive(e, chart, tooltipFormatter) {
     this.nameChecked = e.target.checked;
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
     return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   unitsActive(e, chart, tooltipFormatter) {
     this.unitsChecked = e.target.checked;
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });    
     return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   geoActive(e, chart, tooltipFormatter) {
     this.geoChecked = e.target.checked;
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });    
     return this.reformatTooltip(chart, tooltipFormatter);
   }
 

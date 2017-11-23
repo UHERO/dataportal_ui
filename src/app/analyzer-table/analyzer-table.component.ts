@@ -19,6 +19,7 @@ export class AnalyzerTableComponent implements OnInit {
   @Input() allTableDates;
   @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
+  @Output() tableTransform = new EventEmitter();
   portalSettings;
   private yoyChecked;
   private ytdChecked;
@@ -92,14 +93,17 @@ export class AnalyzerTableComponent implements OnInit {
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'yoy' });
   }
 
   ytdActive(e) {
     this.ytdChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'ytd' });
   }
 
   c5maActive(e) {
     this.c5maChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });    
   }
 
 

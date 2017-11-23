@@ -18,6 +18,12 @@ export class AnalyzerComponent implements OnInit {
   private alertUser;
   private alertMessage = '';
   analyzerSeries;
+  private tooltipName;
+  private tooltipUnits;
+  private tooltipGeo;
+  private tableYoy;
+  private tableYtd;
+  private tableC5ma;
 
   constructor(
     @Inject('portal') private portal,
@@ -126,4 +132,28 @@ export class AnalyzerComponent implements OnInit {
     this.maxDate = e.maxDate;
   }
 
+  checkTooltip(e) {
+    if (e.label === 'name') {
+      console.log('e', e)
+      this.tooltipName = e.value;
+    }
+    if (e.label === 'units') {
+      this.tooltipUnits = e.value;
+    }
+    if (e.label === 'geo') {
+      this.tooltipGeo = e.value;
+    }
+  }
+
+  checkTransforms(e) {
+    if (e.label === 'yoy') {
+      this.tableYoy = e.value;
+    }
+    if (e.label === 'ytd') {
+      this.tableYtd = e.value;
+    }
+    if (e.label === 'c5ma') {
+      this.tableC5ma = e.value;
+    }
+  }
 }

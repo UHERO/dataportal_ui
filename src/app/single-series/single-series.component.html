@@ -12,7 +12,7 @@
         <input type="checkbox" [(ngModel)]="seasonallyAdjusted"  (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally Adjusted
       </label>
     </div>
-    <app-share-link [startDate]="chartStart" [endDate]="chartEnd"></app-share-link>    
+    <app-share-link [view]="'series'" [startDate]="chartStart" [endDate]="chartEnd"></app-share-link>    
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
     <app-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate" [end]="endDate"

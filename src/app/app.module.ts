@@ -37,6 +37,7 @@ import { AnalyzerService } from './analyzer.service';
 import { TableHelperService } from './table-helper.service';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
+import { ClipboardService } from './clipboard.service';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
     GoogleAnalyticsEventsService,
     AnalyzerService,
     Title,
+    ClipboardService,
     {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
@@ -75,10 +77,6 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'rootCategory',
       useValue: 59
     },
-    /* {
-      provide: 'defaultCategory',
-      useValue: 42
-    }, */
     {
       provide: 'logo',
       useValue: '../../assets/UHEROdata-Logo-color.svg'
