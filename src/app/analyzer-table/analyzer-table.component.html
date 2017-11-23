@@ -9,7 +9,8 @@
     <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
-<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates" [analyzerSeries]="series" [analyzer]="true" [tableId]="analyzer-table"></app-category-datatables>
+<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates"
+  [analyzerSeries]="series" [analyzer]="true" [tableId]="'analyzer-table'"></app-category-datatables>
 <div class="analyzer-table">
   <div class="table-row">
     <div class="table" #tableScroll>
@@ -96,7 +97,7 @@
             <td>{{serie.summaryStats.levelChange}}</td>
             <td>{{serie.summaryStats.total}}</td>
             <td>{{serie.summaryStats.avg}}</td>
-            <td>{{serie.summaryStats.cagr}}</td>            
+            <td>{{serie.summaryStats.cagr}}</td>
           </tr>
         </ng-template>
       </table>

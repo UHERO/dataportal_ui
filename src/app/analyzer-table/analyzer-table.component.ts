@@ -20,12 +20,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
   portalSettings;
-  private yoyChecked;
-  private ytdChecked;
-  private c5maChecked;
+  yoyChecked;
+  ytdChecked;
+  c5maChecked;
   private previousHeight;
   private tableWidths = [];
-  private tableDates;
+  tableDates;
 
   constructor(
     @Inject('portal') private portal,
