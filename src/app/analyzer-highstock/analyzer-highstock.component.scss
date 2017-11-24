@@ -1,7 +1,7 @@
 @import 'colors';
 
 .customize-tooltip {
-  display: inline-block;
+  display: block;
   
   p {
     display:  inline-block;
@@ -34,7 +34,7 @@
 }
 
 .highcharts-subtitle {
-    fill: #B71625;
+    fill: $primary-text;
     font-weight: bold;
 }
 
@@ -110,7 +110,7 @@
 
 .highcharts-title {
     fill: $primary-text;
-    font-family: 'sans-serif';
+    font-family: sans-serif;
 }
 
 .highcharts-tooltip {
