@@ -89,13 +89,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
     if (noSeriesAxis) {
       noSeriesAxis.remove();
-      const yAxes = chart.yAxis.filter(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
       const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
       if (opposite) {
-        opposite.update({
-          opposite: false,
-        });
+        opposite.update({ opposite: false });
       }
       const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       if (remainingAxis) {
@@ -209,9 +206,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       let addAxis;
       // Check max level value of all series already drawn on axis
       unitAxis.userOptions.series.forEach((serie) => {
-        const level = serie.chartData ? serie.chartData.level : serie.data;
-        const maxValue = Math.max(...level.map(l => l[1]));
-        const diff = seriesMaxValue - maxValue;
+        const diff = this.calculateDifference(serie, seriesMaxValue);
         // If difference between values is at least 10,000, draw series on a new axis
         if (Math.abs(diff) >= 10000) {
           addAxis = true;
@@ -300,23 +295,27 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
   }
 
-  checkMaxValues(unit, maxValue, yAxesGroups) {
+  calculateDifference(serie, baseMaxValue) {
+    const level = serie.chartData ? serie.chartData.level : serie.data;
+    const maxValue = Math.max(...level.map(l => l[1]));
+    // Base max value: i.e. max value of first series in a particular group of units or axis
+    const diff = baseMaxValue - maxValue;
+    return diff;
+  }
+
+  checkMaxValues(unit, baseMaxValue, yAxesGroups) {
     unit.series.forEach((serie) => {
-      // Get max level value of series
-      const level = serie.data ? serie.data : serie.chartData.level;
-      const currentMaxValue = Math.max(...level.map(l => l[1]));
-      const diff = maxValue - currentMaxValue;
+      // compare max value of a serie's levels to the baseMaxValue
+      const diff = this.calculateDifference(serie, baseMaxValue);
+      const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
       // If difference between values is at least 10,000, add second axis ('yAxis1')
-      if (Math.abs(diff) >= 10000) {
-        const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
-        if (!yAxis1) {
-          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
-          return;
-        }
-        if (yAxis1) {
-          yAxis1.series.push(serie);
-          return;
-        }
+      if (Math.abs(diff) >= 10000 && !yAxis1) {
+        yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+        return;
+      }
+      if (Math.abs(diff) >= 10000 && yAxis1) {
+        yAxis1.series.push(serie);
+        return;
       }
       // If difference is less than 10,000, add series to frist axis
       if (Math.abs(diff) < 10000) {
@@ -617,11 +616,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         tooltip += getAnnualObs(annualSeries, point, year);
       }
       if (quarterSeries && monthSeries) {
-        if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
+        const pointMonth = Highcharts.dateFormat('%b', point.x);
+        if (pointMonth !== 'Jan' && pointMonth !== 'Apr' && pointMonth !== 'Jul' && pointMonth !== 'Oct') {
           const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
           const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
-          // Month of hovered point
-          const pointMonth = Highcharts.dateFormat('%b', point.x);
           // Quarter that hovered point falls into
           const pointQuarter = months[pointMonth];
           // Month for which there is quarterly data
