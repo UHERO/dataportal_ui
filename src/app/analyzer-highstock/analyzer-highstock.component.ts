@@ -89,6 +89,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
     if (noSeriesAxis) {
       noSeriesAxis.remove();
+      const yAxes = chart.yAxis.filter(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
       const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
       if (opposite) {
@@ -96,7 +97,29 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           opposite: false,
         });
       }
+      const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
+      if (remainingAxis) {
+        this.checkRemainingSeries(remainingAxis, chart, analyzerSeries);
+      }
     }
+  }
+
+  checkRemainingSeries(remainingAxis, chart, analyzerSeries) {
+    // after removing series from chart, check if series on remaining axis differ by an order of magnitude
+    const maxValue = Math.max(...remainingAxis.series[0].userOptions.data.map(l => l[1]));
+    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+    remainingAxis.series.forEach((serie) => {
+      const level = serie.userOptions.data.map(l => l[1]);
+      const currentMax = Math.max(...level);
+      const diff = maxValue - currentMax;
+      if (Math.abs(diff) >= 10000) {
+        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === serie.userOptions.className);
+        serie.remove();
+        this.addYAxis(chart, redrawSeries, redrawSeries.unitsLabelShort, y0Exist);
+        redrawSeries.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
+        chart.addSeries(redrawSeries);
+      }
+    });
   }
 
   addToChart(analyzerSeries, chart, navDates) {
@@ -107,7 +130,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       addSeries.forEach((series) => {
         // If chart has no y-axes, add axes, and draw series
         if (!yAxes.length) {
-          this.addYAxis(chart, series.units, false);
+          this.addYAxis(chart, series, series.units, false);
           yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
         }
         this.addSeriesToChart(yAxes, series, chart, analyzerSeries);
@@ -163,7 +186,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       y1Axis.remove();
       series.yAxis = 'yAxis1';
       // Redraw axis with units of the new series to be added
-      this.addYAxis(chart, seriesUnits, y0Exist);
+      this.addYAxis(chart, series, seriesUnits, y0Exist);
       // Add new series to chart
       chart.addSeries(series);
     }
@@ -186,7 +209,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       let addAxis;
       // Check max level value of all series already drawn on axis
       unitAxis.userOptions.series.forEach((serie) => {
-        const maxValue = Math.max(...serie.chartData.level.map(l => l[1]));
+        const level = serie.chartData ? serie.chartData.level : serie.data;
+        const maxValue = Math.max(...level.map(l => l[1]));
         const diff = seriesMaxValue - maxValue;
         // If difference between values is at least 10,000, draw series on a new axis
         if (Math.abs(diff) >= 10000) {
@@ -205,12 +229,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   drawNewYAxis(chart, series, seriesUnits: string, y0Exist: Boolean) {
-    this.addYAxis(chart, seriesUnits, y0Exist);
+    this.addYAxis(chart, series, seriesUnits, y0Exist);
     series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
     chart.addSeries(series);
   }
 
-  addYAxis(chart, seriesUnits, y0Exist) {
+  addYAxis(chart, series, seriesUnits, y0Exist) {
     const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
     chart.addAxis({
       labels: {
@@ -221,7 +245,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       id: y0Exist ? 'yAxis1' : 'yAxis0',
       opposite: oppositeExist ? false : true,
-      showLastLabel: true
+      showLastLabel: true,
+      minTickInterval: 0.01,
+      series: [series]
     });
   }
 
