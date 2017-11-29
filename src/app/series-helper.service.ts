@@ -50,20 +50,10 @@ export class SeriesHelperService {
       currentGeo = series.geography;
       currentFreq = { freq: series.frequencyShort, label: series.frequency, observationStart: '', observationEnd: '' };
       this.seriesData.currentGeo = currentGeo;
-      // TO BE DEPRECATED
-      if (freqGeos) {
-        this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [currentGeo];
-      }
-      if (geoFreqs) {
-        this.seriesData.frequencies = geoFreqs.length ? geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs : [currentFreq];
-      }
-      // NEW GEO/FREQ RESPONSES
-      if (geos) {
-        this.seriesData.regions = geos.length ? geos : [currentGeo];
-      }
-      if (freqs) {
-        this.seriesData.frequencies = freqs.length ? freqs : [currentFreq];
-      }
+      this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [series.geography];
+      this.seriesData.frequencies = geoFreqs.length ?
+        geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs :
+        [{ freq: series.frequencyShort, label: series.frequency }];
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
@@ -132,7 +122,7 @@ export class SeriesHelperService {
 
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
-  summaryStats(seriesData, freq, decimals, minDate, maxDate) {
+  summaryStats(seriesData: Array<any>, freq: Frequency, decimals: number, startDate: string, endDate: string) {
     const stats = {
       minValue: Infinity,
       minValueDate: '',
@@ -141,7 +131,10 @@ export class SeriesHelperService {
       tableStartValue: Infinity,
       tableEndValue: Infinity,
       percChange: Infinity,
-      levelChange: Infinity
+      levelChange: Infinity,
+      total: Infinity,
+      avg: Infinity,
+      cagr: Infinity
     };
     const formatStats = {
       minValue: '',
@@ -150,46 +143,134 @@ export class SeriesHelperService {
       maxValueDate: '',
       percChange: '',
       levelChange: '',
+      total: '',
+      avg: '',
+      cagr: ''
     };
-    // Find observations in seriesData that match the selected minimum and maximum dates
-    // (duplicate dates may show up in analyzer table data)
-    const minDateObs = seriesData.filter(obs => obs.date === minDate);
-    const maxDateObs = seriesData.filter(obs => obs.date === maxDate);
-    // Select observation where value is not Infinity
-    const minDateData = minDateObs.find(obs => obs.value !== Infinity);
-    const maxDateData = maxDateObs.find(obs => obs.value !== Infinity);
-    stats.tableStartValue = minDateData ? minDateData.value : Infinity;
-    stats.tableEndValue = maxDateData ? maxDateData.value : Infinity;
 
-    stats.minValue = this.getMinMax(seriesData).minValue;
-    stats.minValueDate = this.getMinMax(seriesData).minValueDate;
-    stats.maxValue = this.getMinMax(seriesData).maxValue;
-    stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
-    if (stats.tableEndValue !== Infinity && stats.tableStartValue !== Infinity) {
-      stats.percChange = ((stats.tableEndValue - stats.tableStartValue) / stats.tableStartValue) * 100;
-      stats.levelChange = stats.tableEndValue - stats.tableStartValue;
+    // Values of the selected starting and ending dates
+    stats.tableStartValue = this.getStartValue(seriesData, startDate);
+    stats.tableEndValue = this.getEndValue(seriesData, endDate);
+    const firstValue = stats.tableStartValue;
+    const lastValue = stats.tableEndValue;
+    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);
+    const missingValues = this.checkMissingValues(selectedRangeData, freq.freq, firstValue, lastValue);
+    if (selectedRangeData.length && !missingValues) {
+      const periods = selectedRangeData.length - 1;
+      stats.minValue = this.getMinMax(seriesData).minValue;
+      stats.minValueDate = this.getMinMax(seriesData).minValueDate;
+      stats.maxValue = this.getMinMax(seriesData).maxValue;
+      stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
+      stats.total = this.getTotalValue(selectedRangeData);
+      stats.avg = stats.total !== Infinity ? stats.total / selectedRangeData.length : Infinity;
+      stats.cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, periods);
+    }
+
+    if (firstValue !== Infinity && lastValue !== Infinity) {
+      stats.percChange = ((lastValue - firstValue) / firstValue) * 100;
+      stats.levelChange = lastValue - firstValue;
     }
 
     // Format numbers
-    formatStats.minValue = this._helper.formatNum(stats.minValue, decimals);
-    formatStats.minValueDate = this._helper.formatDate(stats.minValueDate, freq.freq);
-    formatStats.maxValue = this._helper.formatNum(stats.maxValue, decimals);
-    formatStats.maxValueDate = this._helper.formatDate(stats.maxValueDate, freq.freq);
-    formatStats.percChange = stats.percChange === Infinity ? ' ' : this._helper.formatNum(stats.percChange, decimals);
-    formatStats.levelChange = stats.levelChange === Infinity ? ' ' : this._helper.formatNum(stats.levelChange, decimals);
+    formatStats.minValue = stats.minValue === Infinity ? 'N/A' : this._helper.formatNum(stats.minValue, decimals);
+    formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + stats.minValueDate + ')';
+    formatStats.maxValue = stats.maxValue === Infinity ? 'N/A' : this._helper.formatNum(stats.maxValue, decimals);
+    formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + stats.maxValueDate + ')';
+    formatStats.percChange = stats.percChange === Infinity ? 'N/A' : this._helper.formatNum(stats.percChange, decimals);
+    formatStats.levelChange = stats.levelChange === Infinity ? 'N/A' : this._helper.formatNum(stats.levelChange, decimals);
+    formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
+    formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
+    formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
     return formatStats;
   }
 
-  getMinMax(seriesData) {
+  checkMissingValues(selectedRange: Array<any>, freq: string, firstValue, lastValue) {
+    let missing = false;
+    if (firstValue === Infinity || lastValue === Infinity) {
+      return missing = true;
+    }
+    selectedRange.forEach((obs) => {
+      if (freq === 'A' && obs.tableDate.length === 4 && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+      if (freq === 'Q' && obs.tableDate.includes('Q') && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+      if (freq === 'S' && (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+      if (freq === 'M' && obs.tableDate.includes('-') && obs.value === Infinity) {
+        missing = true;
+        return;
+      }
+    });
+    return missing;
+  }
+
+  getTotalValue(selectedRangeData: Array<any>) {
+    let total = 0;
+    selectedRangeData.forEach((data) => {
+      if (data.value !== Infinity) {
+        total += +data.value;
+      }
+    });
+    return total;
+  }
+
+  getStartValue(seriesData: Array<any>, startDate: string) {
+    // Find observations in seriesData that match the selected minimum date (duplicate dates may show up in analyzer table data)
+    const startDateObs = seriesData.filter(obs => obs.date === startDate);
+    // Select observation where value is not Infinity
+    const startDateData = startDateObs.find(obs => obs.value !== Infinity);
+    return startDateData ? startDateData.value : Infinity;
+  }
+
+  getEndValue(seriesData: Array<any>, endDate: string) {
+    // Find observations in seriesData that match the selected maximum date (duplicate dates may show up in analyzer table data)
+    const endDateObs = seriesData.filter(obs => obs.date === endDate);
+    // Select observation where value is not Infinity
+    const endDateData = endDateObs.find(obs => obs.value !== Infinity);
+    return endDateData ? endDateData.value : Infinity;
+  }
+
+  getSelectedRange(seriesData: Array<any>, startDate: string, endDate: string, startValue: number, endValue: number) {
+    const minDateIndex = seriesData.findIndex(obs => obs.date === startDate && obs.value === startValue);
+    const maxDateIndex = seriesData.findIndex(obs => obs.date === endDate && obs.value === endValue);
+    // minDateIndex > maxDateIndex in single series component (table is in reverse order)
+    return minDateIndex > maxDateIndex ?
+      seriesData.slice(maxDateIndex, minDateIndex + 1) :
+      seriesData.slice(minDateIndex, maxDateIndex + 1);
+  }
+
+  calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {
+    // Calculate compound annual growth rate
+    if (freq === 'A') {
+      return (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100;
+    }
+    if (freq === 'S') {
+      return (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100;
+    }
+    if (freq === 'Q') {
+      return (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100;
+    }
+    if (freq === 'M') {
+      return (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100;
+    }
+  }
+
+  getMinMax(seriesData: Array<any>) {
     let minValue = Infinity, minValueDate = '', maxValue = Infinity, maxValueDate = '';
     seriesData.forEach((item, index) => {
       if (minValue === Infinity || item.value < minValue) {
         minValue = item.value;
-        minValueDate = item.date;
+        minValueDate = item.tableDate;
       }
       if (maxValue === Infinity || item.value > maxValue && item.value !== Infinity) {
         maxValue = item.value;
-        maxValueDate = item.date;
+        maxValueDate = item.tableDate;
       }
     });
     return { minValue: minValue, minValueDate: minValueDate, maxValue: maxValue, maxValueDate: maxValueDate };

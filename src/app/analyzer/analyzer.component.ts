@@ -32,18 +32,35 @@ export class AnalyzerComponent implements OnInit {
     // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     if (this.analyzerSeries.length) {
       this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
+      // Sort series by length of level data
+      // The default series displayed in the chart on load should be the series with the longest range of data
+      const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
+      this.analyzerSeries[longestSeries].showInChart = true;
       this.analyzerSeries.forEach((series) => {
         // Array of observations using full range of dates
         series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
       });
       this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
-      if (!this.analyzerChartSeries.length) {
-        // The default series displayed in the chart on load should be the series with the longest range of data
-        const longestSeries = this.findLongestSeries(this.analyzerSeries);
-        longestSeries.showInChart = true;
-        this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+      if (this.analyzerChartSeries.length < 2) {
+        this.analyzerChartSeries = this.setInitialChartSeries(this.analyzerSeries);
       }
     }
+  }
+
+  setInitialChartSeries(analyzerSeries: Array<any>) {
+    let chartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    let counter = 0;
+    while (chartSeries.length < 2) {
+      if (analyzerSeries[counter]) {
+        analyzerSeries[counter].showInChart = true;
+        counter++;
+        chartSeries = analyzerSeries.filter(series => series.showInChart === true);
+      }
+      if (!analyzerSeries[counter]) {
+        break;
+      }
+    }
+    return chartSeries;
   }
 
   setAnalyzerDates(analyzerSeries) {
@@ -61,12 +78,12 @@ export class AnalyzerComponent implements OnInit {
     return this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
   }
 
-  findLongestSeries(series) {
+  findLongestSeriesIndex(series) {
     let longestSeries, seriesLength = 0;
-    series.forEach((serie) => {
+    series.forEach((serie, index) => {
       if (!longestSeries || seriesLength < serie.chartData.level.length) {
         seriesLength = serie.chartData.level.length;
-        longestSeries = serie;
+        longestSeries = index;
       }
     });
     return longestSeries;
@@ -84,6 +101,14 @@ export class AnalyzerComponent implements OnInit {
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
     const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
+    this.analyzerSeries = this._analyzer.analyzerSeries;
+    const seriesSelected = this._analyzer.analyzerSeries.find(series => series.showInChart === true);
+    // If remaining series drawn in chart is removed from analyzer, draw next series in table
+    if (this._analyzer.analyzerSeries.length && !seriesSelected) {
+      this.analyzerSeries[0].showInChart = true;
+      this.updateChartSeries(this.analyzerSeries);
+      return;
+    }
     // At least one series must be selected
     if (chartSeries.length === 1 && seriesExist) {
       this.alertUser = true;
@@ -97,13 +122,16 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
     }
-    // Update table dates when removing series from analyzer
-    this.analyzerSeries = this._analyzer.analyzerSeries;
-    this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
-    this.analyzerSeries.forEach((series) => {
+    this.updateChartSeries(this.analyzerSeries);
+  }
+
+  updateChartSeries(analyzerSeries: Array<any>) {
+    // Update series drawn in chart and dates in analyzer table
+    this.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    analyzerSeries.forEach((series) => {
       series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
     });
-    this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
+    this.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
@@ -125,5 +153,4 @@ export class AnalyzerComponent implements OnInit {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
   }
-
 }

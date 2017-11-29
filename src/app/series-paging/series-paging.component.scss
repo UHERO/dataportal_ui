@@ -1,8 +1,10 @@
   @import 'colors';
 
   .series-scroll {
-    display: inline-block;
+    display: block;
     cursor: default;
+    margin-bottom: 40px;
+    margin-top: -40px;
 
     i {
       cursor: pointer;

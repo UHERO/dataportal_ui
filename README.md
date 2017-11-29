@@ -4,10 +4,17 @@ This project was generated with [angular-cli](https://github.com/angular/angular
 
 ## Development server
 ### UHERO Data Portal
-Run `ng serve --app=uhero` for a dev server of the UHERO data portal. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run start-uhero-dev` for a dev server of the UHERO data portal. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ### NTA Data Portal
-Run `ng serve --app=nta` for a dev server of the NTA data portal. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run start-nta-dev` for a dev server of the NTA data portal. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+## Staging server
+### UHERO Data Portal
+Run `npm run start-uhero-staging` to run the UHERO data portal in the staging server.
+
+### NTA Data Portal
+Run `npm run start-nta-staging` to run the NTA data portal in the staging server.
 
 ## Code scaffolding
 
@@ -17,8 +24,12 @@ Run `ng generate component component-name` to generate a new component. You can 
 ### UHERO Data Portal
 Run `npm run build-uhero` for the production build of the UHERO Data Portal. The build artifacts will be stored in the `dist/` directory.
 
+For the staging server build, run `npm run  build-uhero-staging`.
+
 ### NTA Data Portal
 Run `npm run build-nta` for the production build of the UHERO Data Portal. The build artifacts will be stored in the `ntaDist/` directory.
+
+For the staging server build, run `npm run build-nta-staging`.
 
 ## Running unit tests
 
