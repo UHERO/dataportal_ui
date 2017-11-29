@@ -94,7 +94,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       if (opposite) {
         opposite.update({ opposite: false, id: 'yAxis0' });
       }
-      console.log('remove', chart.yAxis)
       const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       if (remainingAxis) {
         this.checkRemainingSeries(remainingAxis, chart, analyzerSeries);
@@ -139,6 +138,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         showInNavigator: true,
         index: -1,
         colorIndex: -1,
+        yAxis: "navigator-y-axis",
         name: 'Navigator'
       });
     }
@@ -151,7 +151,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
     // If chart has one yAxis, evaluate if series should be added to existing axis or drawn on a new one
     if (yAxes.length === 1) {
-      console.log('yaxes.length === 1', series)
       this.addSeriesToSingleAxisChart(yAxes, series, chart);
     }
   }
@@ -163,7 +162,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
     // If yes, add series to that axis
     if (unitAxis) {
-      series.yAxis = unitAxis.userOptions.id;
+      const unitAxisId = unitAxis.userOptions.id;
+      series.yAxis = unitAxisId;
+      const unitAxisSeries = unitAxis.series;
+      const seriesMin = Math.min(...series.data.map(l => l[1]));
+      const seriesMax = Math.max(...series.data.map(l => l[1]));
+      unitAxisSeries.forEach((uSeries) => {
+        const level = uSeries.options.data;
+        const sufficientOverlap = this.isOverlapSufficient(series, level, seriesMin, seriesMax);
+        if (!sufficientOverlap) {
+          series.yAxis = unitAxisId === 'yAxis0' ? 'yAxis1' : 'yAxis0';
+          return;
+        }
+      });
       chart.addSeries(series);
       return;
     }
@@ -174,10 +185,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       y1Series.forEach((s) => {
         // Get original data of series drawn on one axis to be redrawn on other
         const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === s.userOptions.className);
-        // Remove series from chart and reassign it to yAxis0
+        // Remove series from chart, reassign it to yAxis0, and add back to chart
         s.remove();
         redrawSeries.yAxis = 'yAxis0';
-        // Add series back to chart
         chart.addSeries(redrawSeries);
       });
       // Remove second axis
@@ -201,9 +211,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
       return;
     }
-    // If yes
+    // If yes, compare with values of currently drawn series
     if (unitAxis) {
-      // Get max level value of series to be added
       const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
       const seriesMinValue = Math.max(...series.data.map(l => l[1]));
       let addAxis;
@@ -211,17 +220,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         const level = serie.chartData ? serie.chartData.level : serie.data;
         const sufficientOverlap = this.isOverlapSufficient(serie, level, seriesMinValue, seriesMaxValue);
         if (!sufficientOverlap) {
-          console.log('!sufficientOverlap', serie);
           addAxis = true;
           return;
         }
       });
       if (addAxis) {
-        console.log('y0Exist', chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0'))
         this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
       }
       if (!addAxis) {
-        console.log('!addAxis')
         series.yAxis = unitAxis.userOptions.id;
         chart.addSeries(series);
       }
@@ -229,18 +235,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   drawNewYAxis(chart, series, seriesUnits: string, y0Exist) {
-    console.log(chart)
-    console.log('y0Exist', y0Exist)
     this.addYAxis(chart, series, seriesUnits, y0Exist);
     series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
-    console.log('series', series);
     chart.addSeries(series);
   }
 
   addYAxis(chart, series, seriesUnits, y0Exist) {
-    console.log('addYAxis', y0Exist)
     const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true) ? true : false;
-    console.log('opposite', oppositeExist)
     chart.addAxis({
       labels: {
         format: '{value:,.2f}'
@@ -261,7 +262,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const unitGroups = this.groupByUnits(series);
     // Create y-axis groups based on units available
     // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    // If only 1 units is selected, check that the max value of each series does not differ by an order of magnitude
+    // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
     // If yes, draw series on separate y axes
     const yAxesGroups = this.setYAxesGroups(unitGroups);
     yAxesGroups.forEach((axis, index) => {
@@ -280,7 +281,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         series: axis.series
       });
     });
-    console.log('yAxes', yAxes)
     return yAxes;
   }
 
@@ -289,14 +289,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const yAxesGroups = [];
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
-      unitGroups.forEach((unit) => {
-        // Get max level value of first series in group
-        const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
-        const maxValue = Math.max(...level.map(l => l[1]));
-        const minValue = Math.min(...level.map(l => l[1]));
-        yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
-        this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
-      });
+      const unit = unitGroups[0];
+      const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
+      const maxValue = Math.max(...level.map(l => l[1]));
+      const minValue = Math.min(...level.map(l => l[1]));
+      yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
+      this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
       return yAxesGroups;
     }
     if (unitGroups.length > 1) {
