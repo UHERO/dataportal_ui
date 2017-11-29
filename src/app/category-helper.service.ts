@@ -43,6 +43,7 @@ export class CategoryHelperService {
     } else {
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchCategories().subscribe((categories) => {
+        console.log('categories', categories);
         if (catId === null) {
           catId = categories[0].id;
         }
@@ -58,6 +59,7 @@ export class CategoryHelperService {
             sublistCopy.push(Object.assign({}, sub));
           });
           this.categoryData[cacheId].sublist = sublistCopy;
+          console.log('categoryData[cacheId]', this.categoryData[cacheId]);
           this.getSubcategoryData(selectedCategory, cacheId, catId, this.categoryData[cacheId].sublist, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
@@ -75,8 +77,9 @@ export class CategoryHelperService {
       this._uheroAPIService.fetchSelectedCategory(sub.id).subscribe((category) => {
         sub.freqGeos = category.freqGeos;
         sub.geoFreqs = category.geoFreqs;
-        sub.geographies = category.geographies;
-        sub.frequencies = category.frequencies;
+        // NEW GEO/FREQ RESPONSES
+        sub.geos = category.geos;
+        sub.freqs = category.freqs;
       },
         (error) => {
           this.errorMessage = error;
@@ -104,14 +107,14 @@ export class CategoryHelperService {
         });
       }
       // NEW GEO/FREQ RESPONSES
-      if (sub.geographies && sub.frequencies) {
-        sub.geographies.forEach((geo) => {
+      if (sub.geos && sub.freqs) {
+        sub.geos.forEach((geo) => {
           const geoExist = geoArray.find(g => g.handle === geo.handle);
           if (!geoExist) {
             geoArray.push(geo);
           }
         });
-        sub.frequencies.forEach((freq) => {
+        sub.freqs.forEach((freq) => {
           const freqExist = freqArray.find(f => f.freq === freq.freq);
           if (!freqExist) {
             freqArray.push(freq);
@@ -119,6 +122,8 @@ export class CategoryHelperService {
         });
       }
     });
+    console.log('geoarray', geoArray);
+    console.log('freqarray', freqArray);
     const selected = this.checkSelectedGeosFreqs(routeFreq, routeGeo, freqArray, geoArray);
     const selectedFreq = selected.freq;
     const selectedGeo = selected.geo;
@@ -129,6 +134,13 @@ export class CategoryHelperService {
     regions = freqArray.find(freq => freq.freq === selectedFreq).geos;
     currentGeo = regions ? regions.find(region => region.handle === selectedGeo) : geoArray.find(geo => geo.handle === selectedGeo);
     currentFreq = freqs ? freqs.find(freq => freq.freq === selectedFreq) : freqArray.find(freq => freq.freq === selectedFreq);
+    console.log('currentGeo', currentGeo);
+    console.log('currentFreq', currentFreq);
+    sublist.forEach((sub) => {
+      this._uheroAPIService.fetchSelectedCategoryWithGeoFreq(sub.id, currentGeo.handle, currentFreq.freq).subscribe((category) => {
+        console.log('new endpoint', category)
+      })
+    })
     const dates = this.setCategoryDates(sublist, currentGeo, currentFreq);
     this.categoryData[cacheId].regions = regions ? regions : geoArray;
     this.categoryData[cacheId].frequencies = freqs ? freqs : freqArray;
@@ -147,7 +159,7 @@ export class CategoryHelperService {
         currentFreq: currentFreq,
       };
       // Get seires belonging to each subcategory
-      this.getSeriesData(subcategory);
+      //this.getSeriesData(subcategory);
     });
   }
 
@@ -172,8 +184,8 @@ export class CategoryHelperService {
       }
       // NEW GEO/FREQ RESPONSES
       if (!sub.geoFreqs) {
-        const freq = sub.frequencies.find(f => f.freq === currentFreq.freq);
-        const geo = sub.geographies.find(g => g.handle === currentGeo.handle);
+        const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
+        const geo = sub.geos.find(g => g.handle === currentGeo.handle);
         if (geo) {
           const geoStartDate = geo.observationStart.substr(0, 10);
           const geoEndDate = geo.observationEnd.substr(0, 10);
