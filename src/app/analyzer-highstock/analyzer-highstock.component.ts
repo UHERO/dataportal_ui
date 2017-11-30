@@ -79,9 +79,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return chartButtons;
   }
 
-  removeFromChart(analyzerSeries, chart) {
+  removeFromChart(aSeries, chart) {
     // Filter out series from chart that are not in analayzerSeries
-    const removeSeries = chart.series.filter(cSeries => !analyzerSeries.some(aSeries => aSeries.name === cSeries.name) && cSeries.name !== 'Navigator 1');
+    const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
     removeSeries.forEach((series) => {
       series.remove();
     });
@@ -488,6 +488,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
+    // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = function (frequency, date) {
       if (frequency === 'A') {
         return '';
@@ -591,7 +592,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         tooltip += getAnnualObs(annualSeries, point, year);
       }
       if (quarterSeries && monthSeries) {
-        if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
+        const month = Highcharts.dateFormat('%b', point.x);
+        // If monthly point does is not Jan, Apr, Jul, Oct, find which Quarter the monthly observation falls into
+        if (month !== 'Jan' && month !== 'Apr' && month !== 'Jul' && month !== 'Oct') {
           const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
           const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
           // Month of hovered point

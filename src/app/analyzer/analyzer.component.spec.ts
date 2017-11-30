@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input } from '@angular/core';
-import { AnalyzerService } from '../analyzer.service'; 
+import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerComponent } from './analyzer.component';
 import { HelperService } from '../helper.service';
