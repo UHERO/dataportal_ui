@@ -40,7 +40,7 @@ export class AnalyzerService {
     // Quarterly frequency
     const qSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'Q')) > -1;
     // Semi-annual frequency
-    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;    
+    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;
     // Monthly frequency
     const mSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'M')) > -1;
     while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
@@ -63,8 +63,8 @@ export class AnalyzerService {
           dateArray.push({date: startYear.toString() + '-01-01', tableDate: startYear.toString()});
         }
       }
-      startYear = startMonth === 12 ? startYear += 1 : startYear;     
-      startMonth = startMonth === 12 ? 1 : startMonth += 1; 
+      startYear = startMonth === 12 ? startYear += 1 : startYear;
+      startMonth = startMonth === 12 ? 1 : startMonth += 1;
     }
     return dateArray;
   }

@@ -102,7 +102,7 @@ export class HighstockComponent implements OnChanges {
     }, {
       html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
     }];
-    return labelItems
+    return labelItems;
   }
 
   formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) {
@@ -111,7 +111,7 @@ export class HighstockComponent implements OnChanges {
     const series2 = chartData[portalSettings.highstock.series2Name];
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
-    const c5maLabel = seriesDetail.percent ? 'Centered 5 Year Moving Avg Change' : 'Centered 5 Year Moving Avg % Change';
+    const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
     const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
     const series = [{
       name: 'Level',
@@ -190,8 +190,7 @@ export class HighstockComponent implements OnChanges {
         inputEnabled: false
       },
       lang: {
-        exportKey: 'Download Chart',
-        printKey: 'Print Chart'
+        exportKey: 'Download Chart'
       },
       navigator: {
         series: {
@@ -207,13 +206,6 @@ export class HighstockComponent implements OnChanges {
             text: 'Download',
             _titleKey: 'exportKey',
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-          },
-          printButton: {
-            text: 'Print',
-            _titleKey: 'printKey',
-            onclick: function () {
-              this.print();
-            }
           }
         },
         filename: name + '_' + geo.name + '_' + freq.label,

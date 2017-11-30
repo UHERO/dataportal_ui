@@ -227,7 +227,9 @@ export class CategoryHelperService {
           if (splitSeries) {
             subcat.displaySeries = splitSeries.displaySeries;
             // sublist.allSeries = expandedResults;
-            this.formatCategoryData(splitSeries.displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
+            const categoryDates = this.categoryData[cacheId].categoryDates;
+            const categoryDateWrapper = this.categoryData[cacheId].categoryDateWrapper;
+            this.formatCategoryData(splitSeries.displaySeries, categoryDates, categoryDateWrapper);
             subcat.requestComplete = true;
             subcat.noData = false;
           }

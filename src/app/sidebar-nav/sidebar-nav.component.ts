@@ -22,9 +22,9 @@ export class SidebarNavComponent implements OnInit {
   private loading;
   public headerLogo;
   analyzerSeries;
+  private defaultCategory;
 
   constructor(
-    @Inject('defaultCategory') private defaultCategory,
     @Inject('logo') private logo,
     private _uheroAPIService: UheroApiService,
     private _analyzerService: AnalyzerService,
@@ -35,7 +35,13 @@ export class SidebarNavComponent implements OnInit {
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       this.categories = categories;
-    });
+    },
+      (error) => {
+        console.log('error', error);
+      },
+      () => {
+        this.defaultCategory = this.categories[0].id;
+      });
     this.route.queryParams.subscribe((params) => {
       this.id = params['id'];
       this.view = params['view'] ? params['view'] : 'chart';

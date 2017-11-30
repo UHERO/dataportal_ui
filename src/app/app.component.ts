@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     if (navigator.userAgent.search('Chrome') === -1) {
       $('.browser').show();
       setTimeout(function () {
-        $(".browser").hide();
+        $('.browser').hide();
       }, 5000);
     } else {
       $('.browser').hide();

@@ -1,12 +1,99 @@
-<h2>About</h2>
-<ol>
-<li>Baseline country estimates are deflated (inflated) to 2010 local currency units, and converted to 2010 PPP dollars using
-    deflators and exchange rates from the World Bank Development Indicators.</li>
-<li>Country group estimates refer to the aggregate of estimates for 181 countries in our NTA sample only. Counts and monetary
-    values are summed over countries within country groups, which are then used to calculate country group estimates of indicator
-    ratios, and growth rates.</li>
-<li>Melanesia, Micronesia and Polynesia are combined to form the Pacific Islands sub-region due to insufficient number of observations
-    within the original sub-regions.</li>
-<li>Assumptions: Discount rate =0.030, Productivity growth rate = 0.015; Population projections are based on UN WPP 2017 medium
-    variant projection.</li>
-</ol>
+<div>
+    <h3>Notes</h3>
+    <p>Suggested citation: NTA Network (2017) <em>NTA Indicators</em> accessed on [date], www.ntaccounts.org.</p>
+    <p>These NTA indicators quantify the direct effect of changes in population size and age structure on selected macroeconomic
+        measures. The indicators are constructed combining population projections with age profiles of consumption and labor
+        income for 181 countries. The age profiles of economic variables are held constant over the simulation and, hence,
+        all changes are due to shifts in the number of people at each age.
+    </p>
+    <p>
+        The consumption and labor income profiles are constructed following the methods described in Lee and Mason (2011) and UN
+        (2013). Labor income by age includes earnings and an estimate of the value of work by the self-employed and unpaid
+        family workers. It incorporates age variation in labor force participation, hours worked, unemployment, and wages.
+        Consumption includes all public and private consumption allocated to individuals and the age groups to which they
+        belong. Estimates of the NTA age profiles are currently available for approximately 60 countries. The age profiles
+        for other countries were constructed using methods described in Mason, Lee, et al (2017).
+    </p>
+    <p>All age profiles have been estimated for a recent year in the local currency of the country in question. Values were
+        deflated (inflated) to 2010 and then converted to 2010 PPP dollars using deflators and exchange rates from the World
+        Bank Development Indicators.
+    </p>
+    <p>Values for regional groups and income groups were constructed from the 181 country sample. Counts and monetary values
+        are summed over the countries within each group. These are then used to calculate country group estimates of indicator
+        ratios and growth rates.
+    </p>
+    <p>Population estimates and projections by single year of age from 1950 to 2100 are taken from the United Nations World
+        Population Prospects 2017, medium variant.
+    </p>
+    <p>Changes and percentage changes in the indicators are all centered five-year moving averages.</p>
+</div>
+<div>
+    <h3>Population Count Variables</h3>
+    <p>Effective consumers: Sum of population of each age weighted by the per capita age profile of consumption normalized on
+        the average consumption of persons 30-49 years of age.
+    </p>
+    <p>Effective workers: Sum of population of each age weighted by the per capita age profile of labor income normalized on
+        the average labor income of persons 30-49 years of age.
+    </p>
+</div>
+<div>
+    <h3>Age Structure Variables</h3>
+    <p>Support ratio: Effective workers as a percentage of Effective consumers; calculated using labor income and consumption
+        profiles normalized on the mean, over ages 30-49, of labor income and consumption respectively.
+    </p>
+    <p>Support ratio (alternative): Labor income as a percentage of consumption; calculated using labor income and consumption
+        profiles normalized on the mean, over ages 30-49, of labor income.
+    </p>
+    <p>Consumer-worker ratios: Effective number of consumers in broad age groups as a percentage of effective number of workers
+        of all ages.
+    </p>
+    <p>Mean ages of consumption, labor income: Central ages of aggregate consumption and aggregate labor income.</p>
+    <p>Longitudinal support ratios: Present value of prospective lifetime effective years of working as a percent of the present
+        of prospective lifetime effective years of consuming.
+    </p>
+    <p>Deficit ratios: Gap between consumption and labor income as a percentage of total labor income.</p>
+</div>
+<div>
+    <h3>Economic Aggregates and Per Capita Variables</h3>
+    <p>Consumption is computed as the product of the per capita consumption at each age and the estimated or projected population
+        of that age. The base year for the age profile is 2010 and it is assumed to shift by 1.5 percent per year.
+    </p>
+    <p>Labor income is computed as the product of the per capita labor income at each age and the estimated or projected population
+        of that age. The base year for the age profile is 2010 and it is assumed to shift by 1.5 percent per year.
+    </p>
+</div>
+<div>
+    <h3>Wealth Variables</h3>
+    <p>Present value of consumption at age x in year t is calculated as the present value of consumption to members of the population
+        cohort of age x in year t over the remainder of the cohorts existence. A discount rate of 3 percent (real) is used
+        to calculate the present value.
+    </p>
+    <p>Present value of labor income at age x in year t is calculated as the present value of labor income to members of the
+        population cohort of age x in year t over the remainder of the cohorts existence. A discount rate of 3 percent (real)
+        is used to calculate the present value.
+    </p>
+    <p>Lifecycle wealth at age x in year t is calculated as the present value of consumption at age x in year t less the present
+        value of labor income at age x in year t.
+    </p>
+    <p>Pre-retirement phase and older includes the final two phases of the lifecycle (pre-retirement and retirement). The lifecycle
+        wealth of these age groups is approximately equal to the lifecycle wealth required to fund the old-age deficit, i.e.,
+        the gap between consumption and labor income at older ages.
+    </p>
+    <p>Pension wealth is the lifecycle wealth of all persons in the pre-retirement and retirement phases of the lifecycle.
+    </p>
+</div>
+<div>
+    <h3>Sources</h3>
+    <p>Ronald Lee and Andrew Mason, lead authors and editors, 2011. <i>Population Aging and the Generational Economy: A Global Perspective</i>        (Cheltenham, UK and Northampton, MA: Edward Elgar).
+    </p>
+    <p>Andrew Mason and Ronald Lee 2017 "Intergenerational Transfers and the Older Population" Workshop on Future Directions
+        for the Demography of Aging, National Academy of Sciences, Washington, DC, August 17-18.
+    </p>
+    <p>Andrew Mason, Ronald Lee, Michael Abrigo, and Sang-Hyop Lee 2017 “Support Ratios and Demographic Dividends: Estimates
+        for the World” United Nations Department of Economic and Social Affairs, Population Division, Technical Paper No.
+        2017/1. http://www.un.org/en/development/desa/population/publications/technical/index.shtml
+    </p>
+    <p>United Nations, Department of Economic and Social Affairs, Population Division, 2013 <i>National Transfer Accounts Manual: Measuring
+    and Analyzing the Generational Economy</i> (New York, NY, United Nations).
+    </p>
+</div>
