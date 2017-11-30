@@ -108,7 +108,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
     remainingAxis.series.forEach((serie) => {
       const level = serie.options.data;
-      const sufficientOverlap = this.isOverlapSufficient(serie, level, minValue, maxValue);
+      const sufficientOverlap = this.isOverlapSufficient(level, minValue, maxValue);
       if (!sufficientOverlap) {
         const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === serie.userOptions.className);
         serie.remove();
@@ -158,28 +158,27 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   addSeriesToDualAxisChart(yAxes: Array<any>, series, chart, analyzerSeries: Array<any>) {
     const seriesUnits = series.unitsLabelShort;
     const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    // Check if a y axis already exists for the new series' units
-    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
-    // If yes, add series to that axis
-    if (unitAxis) {
-      const unitAxisId = unitAxis.userOptions.id;
-      series.yAxis = unitAxisId;
-      const unitAxisSeries = unitAxis.series;
+    const unitAxis = yAxes.filter(y => y.userOptions.title.text === seriesUnits);
+    // If two axes exist with the same units
+    if (unitAxis.length === 2) {
+      let highestOverlapSeries;
       const seriesMin = Math.min(...series.data.map(l => l[1]));
       const seriesMax = Math.max(...series.data.map(l => l[1]));
-      unitAxisSeries.forEach((uSeries) => {
-        const level = uSeries.options.data;
-        const sufficientOverlap = this.isOverlapSufficient(series, level, seriesMin, seriesMax);
-        if (!sufficientOverlap) {
-          series.yAxis = unitAxisId === 'yAxis0' ? 'yAxis1' : 'yAxis0';
-          return;
-        }
+      unitAxis.forEach((axis) => {
+        highestOverlapSeries = this.findHighestOverlap(axis.series, seriesMin, seriesMax);
       });
+      series.yAxis = highestOverlapSeries.options.yAxis;
       chart.addSeries(series);
       return;
     }
-    // If no, consolidate series currently drawn to 1 axis (i.e. series with the same units were drawn on separate axes)
-    if (!unitAxis) {
+    // If one axis exists with the same units
+    if (unitAxis.length === 1) {
+      series.yAxis = unitAxis[0].userOptions.id;
+      chart.addSeries(series);
+      return;
+    }
+    // If no axes exist for the series' units (consolidate series drawn onto 1 axis)
+    if (!unitAxis.length) {
       // Find series drawn on second axis (i.e. yAxis === 'yAxis1')
       const y1Series = chart.series.filter(cSeries => cSeries.userOptions.yAxis === 'yAxis1');
       y1Series.forEach((s) => {
@@ -201,6 +200,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
   }
 
+  findHighestOverlap(axisSeries, seriesMin, seriesMax) {
+    let highestOverlap, highestOverlapSeries;
+    axisSeries.forEach((aSeries) => {
+      const level = aSeries.options.data;
+      const overlap = this.calculateOverlap(level, seriesMin, seriesMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapSeries = aSeries;
+      }
+    });
+    return highestOverlapSeries;
+  }
+
   addSeriesToSingleAxisChart(yAxes: Array<any>, series, chart) {
     const seriesUnits = series.unitsLabelShort;
     const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0') ? true : false;
@@ -215,19 +227,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (unitAxis) {
       const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
       const seriesMinValue = Math.max(...series.data.map(l => l[1]));
-      let addAxis;
-      unitAxis.userOptions.series.forEach((serie) => {
+      const sufficientOverlap = unitAxis.userOptions.series.every((serie) => {
         const level = serie.chartData ? serie.chartData.level : serie.data;
-        const sufficientOverlap = this.isOverlapSufficient(serie, level, seriesMinValue, seriesMaxValue);
-        if (!sufficientOverlap) {
-          addAxis = true;
-          return;
-        }
+        return this.isOverlapSufficient(level, seriesMinValue, seriesMaxValue);
       });
-      if (addAxis) {
+      if (!sufficientOverlap) {
         this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
       }
-      if (!addAxis) {
+      if (sufficientOverlap) {
         series.yAxis = unitAxis.userOptions.id;
         chart.addSeries(series);
       }
@@ -306,22 +313,27 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
-  isOverlapSufficient(serie, level, baseMin, baseMax) {
+  isOverlapSufficient(level, baseMin, baseMax) {
     const sufficientOverlap = 0.5;
+    const overlap = this.calculateOverlap(level, baseMin, baseMax);
+    return overlap >= sufficientOverlap;
+  }
+
+  calculateOverlap(level, baseMin, baseMax) {
     const newMin = Math.min(...level.map(l => l[1]));
     const newMax = Math.max(...level.map(l => l[1]));
     const baseRange = baseMax - baseMin;
     const newRange = newMax - newMin;
     const baseMaxNewMin = baseMax - newMin;
     const newMaxBaseMin = newMax - baseMin;
-    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange) >= sufficientOverlap;
+    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
   }
 
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
-      const sufficientOverlap = this.isOverlapSufficient(serie, level, baseMin, baseMax);
+      const sufficientOverlap = this.isOverlapSufficient(level, baseMin, baseMax);
       const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
       if (!sufficientOverlap && !yAxis1) {
         yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
