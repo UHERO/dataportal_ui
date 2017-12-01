@@ -124,7 +124,7 @@ export class NtaHelperService {
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
-      freqs = results.frequencies;
+      freqs = results.freqs;
       obsEnd = results.observationEnd;
       obsStart = results.observationStart;
     },

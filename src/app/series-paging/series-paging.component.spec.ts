@@ -6,28 +6,6 @@ import { SeriesPagingComponent } from './series-paging.component';
   selector: 'test-cmp',
   template: '<app-series-paging [data]="mockScrollSeries"></app-series-paging>',
 })
-<<<<<<< HEAD
-class TestCmpWrapper {
-    mockScrollSeries = [
-      [{
-        categoryChart: {},
-        categoryTable: {},
-        chartData: [],
-        end: '',
-        seriesInfo: {},
-        start: '',
-        tableData: [],
-      }, {
-        categoryChart: {},
-        categoryTable: {},
-        chartData: [],
-        end: '',
-        seriesInfo: {},
-        start: '',
-        tableData: [],
-      }]
-    ];
-=======
 class TestCmpWrapperComponent {
   mockScrollSeries = [
     [{
@@ -48,7 +26,6 @@ class TestCmpWrapperComponent {
       tableData: [],
     }]
   ];
->>>>>>> 2b813acbe03c4bc6cc9619b224cef5f15696ca84
 }
 
 describe('SeriesPagingComponent', () => {

@@ -44,15 +44,17 @@ export class SeriesHelperService {
       this.seriesData.seriesDetail.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const freqGeos = series.freqGeos;
       const geoFreqs = series.geoFreqs;
-      const geos = series.geographies;
-      const freqs = series.frequencies;
+      const geos = series.geos;
+      const freqs = series.freqs;
       decimals = series.decimals ? series.decimals : 1;
       currentGeo = series.geography;
       currentFreq = { freq: series.frequencyShort, label: series.frequency, observationStart: '', observationEnd: '' };
       this.seriesData.currentGeo = currentGeo;
-      this.seriesData.regions = freqGeos.length ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : [series.geography];
-      this.seriesData.frequencies = geoFreqs.length ?
+      this.seriesData.regions = freqGeos ? freqGeos.find(freq => freq.freq === currentFreq.freq).geos : geos ? geos : [series.geography];
+      this.seriesData.frequencies = geoFreqs ?
         geoFreqs.find(geo => geo.handle === currentGeo.handle).freqs :
+        freqs ?
+        freqs :
         [{ freq: series.frequencyShort, label: series.frequency }];
       this.seriesData.yoyChange = series['percent'] === true ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = series['percent'] === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';

@@ -109,7 +109,6 @@ export class UheroApiService {
           this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
           selectedCat$ = null;
         });
-        console.log('selectedCat', selectedCat$)
       return selectedCat$;
     }
   }
