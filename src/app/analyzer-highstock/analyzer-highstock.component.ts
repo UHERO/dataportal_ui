@@ -92,11 +92,31 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
       const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
       if (opposite) {
-        opposite.update({
-          opposite: false,
-        });
+        opposite.update({ opposite: false, id: 'yAxis0' });
+      }
+      const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
+      if (remainingAxis) {
+        this.checkRemainingSeries(remainingAxis, chart, analyzerSeries);
       }
     }
+  }
+
+  checkRemainingSeries(remainingAxis, chart, analyzerSeries) {
+    // after removing series from chart, check if series on remaining axis differ by an order of magnitude
+    const maxValue = Math.max(...remainingAxis.series[0].options.data.map(l => l[1]));
+    const minValue = Math.min(...remainingAxis.series[0].options.data.map(l => l[1]));
+    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+    remainingAxis.series.forEach((serie) => {
+      const level = serie.options.data;
+      const sufficientOverlap = this.isOverlapSufficient(level, minValue, maxValue);
+      if (!sufficientOverlap) {
+        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === serie.userOptions.className);
+        serie.remove();
+        this.addYAxis(chart, redrawSeries, redrawSeries.unitsLabelShort, y0Exist);
+        redrawSeries.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
+        chart.addSeries(redrawSeries);
+      }
+    });
   }
 
   addToChart(analyzerSeries, chart, navDates) {
@@ -107,7 +127,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       addSeries.forEach((series) => {
         // If chart has no y-axes, add axes, and draw series
         if (!yAxes.length) {
-          this.addYAxis(chart, series.units, false);
+          this.addYAxis(chart, series, series.units, false);
           yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
         }
         this.addSeriesToChart(yAxes, series, chart, analyzerSeries);
@@ -118,6 +138,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         showInNavigator: true,
         index: -1,
         colorIndex: -1,
+        yAxis: "navigator-y-axis",
         name: 'Navigator'
       });
     }
@@ -137,25 +158,35 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   addSeriesToDualAxisChart(yAxes: Array<any>, series, chart, analyzerSeries: Array<any>) {
     const seriesUnits = series.unitsLabelShort;
     const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    // Check if a y axis already exists for the new series' units
-    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
-    // If yes, add series to that axis
-    if (unitAxis) {
-      series.yAxis = unitAxis.userOptions.id;
+    const unitAxis = yAxes.filter(y => y.userOptions.title.text === seriesUnits);
+    // If two axes exist with the same units
+    if (unitAxis.length === 2) {
+      let highestOverlapSeries;
+      const seriesMin = Math.min(...series.data.map(l => l[1]));
+      const seriesMax = Math.max(...series.data.map(l => l[1]));
+      unitAxis.forEach((axis) => {
+        highestOverlapSeries = this.findHighestOverlap(axis.series, seriesMin, seriesMax);
+      });
+      series.yAxis = highestOverlapSeries.options.yAxis;
       chart.addSeries(series);
       return;
     }
-    // If no, consolidate series currently drawn to 1 axis (i.e. series with the same units were drawn on separate axes)
-    if (!unitAxis) {
+    // If one axis exists with the same units
+    if (unitAxis.length === 1) {
+      series.yAxis = unitAxis[0].userOptions.id;
+      chart.addSeries(series);
+      return;
+    }
+    // If no axes exist for the series' units (consolidate series drawn onto 1 axis)
+    if (!unitAxis.length) {
       // Find series drawn on second axis (i.e. yAxis === 'yAxis1')
       const y1Series = chart.series.filter(cSeries => cSeries.userOptions.yAxis === 'yAxis1');
       y1Series.forEach((s) => {
         // Get original data of series drawn on one axis to be redrawn on other
         const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === s.userOptions.className);
-        // Remove series from chart and reassign it to yAxis0
+        // Remove series from chart, reassign it to yAxis0, and add back to chart
         s.remove();
         redrawSeries.yAxis = 'yAxis0';
-        // Add series back to chart
         chart.addSeries(redrawSeries);
       });
       // Remove second axis
@@ -163,15 +194,28 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       y1Axis.remove();
       series.yAxis = 'yAxis1';
       // Redraw axis with units of the new series to be added
-      this.addYAxis(chart, seriesUnits, y0Exist);
+      this.addYAxis(chart, series, seriesUnits, y0Exist);
       // Add new series to chart
       chart.addSeries(series);
     }
   }
 
+  findHighestOverlap(axisSeries, seriesMin, seriesMax) {
+    let highestOverlap, highestOverlapSeries;
+    axisSeries.forEach((aSeries) => {
+      const level = aSeries.options.data;
+      const overlap = this.calculateOverlap(level, seriesMin, seriesMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapSeries = aSeries;
+      }
+    });
+    return highestOverlapSeries;
+  }
+
   addSeriesToSingleAxisChart(yAxes: Array<any>, series, chart) {
     const seriesUnits = series.unitsLabelShort;
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
+    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0') ? true : false;
     // Check if a y axis already exists for the new series' units
     const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
     // If no, draw series on a new y axis
@@ -179,39 +223,32 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
       return;
     }
-    // If yes
+    // If yes, compare with values of currently drawn series
     if (unitAxis) {
-      // Get max level value of series to be added
       const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
-      let addAxis;
-      // Check max level value of all series already drawn on axis
-      unitAxis.userOptions.series.forEach((serie) => {
-        const maxValue = Math.max(...serie.chartData.level.map(l => l[1]));
-        const diff = seriesMaxValue - maxValue;
-        // If difference between values is at least 10,000, draw series on a new axis
-        if (Math.abs(diff) >= 10000) {
-          addAxis = true;
-          return;
-        }
+      const seriesMinValue = Math.max(...series.data.map(l => l[1]));
+      const sufficientOverlap = unitAxis.userOptions.series.every((serie) => {
+        const level = serie.chartData ? serie.chartData.level : serie.data;
+        return this.isOverlapSufficient(level, seriesMinValue, seriesMaxValue);
       });
-      if (addAxis) {
+      if (!sufficientOverlap) {
         this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
       }
-      if (!addAxis) {
+      if (sufficientOverlap) {
         series.yAxis = unitAxis.userOptions.id;
         chart.addSeries(series);
       }
     }
   }
 
-  drawNewYAxis(chart, series, seriesUnits: string, y0Exist: Boolean) {
-    this.addYAxis(chart, seriesUnits, y0Exist);
+  drawNewYAxis(chart, series, seriesUnits: string, y0Exist) {
+    this.addYAxis(chart, series, seriesUnits, y0Exist);
     series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
     chart.addSeries(series);
   }
 
-  addYAxis(chart, seriesUnits, y0Exist) {
-    const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true);
+  addYAxis(chart, series, seriesUnits, y0Exist) {
+    const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true) ? true : false;
     chart.addAxis({
       labels: {
         format: '{value:,.2f}'
@@ -221,7 +258,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       id: y0Exist ? 'yAxis1' : 'yAxis0',
       opposite: oppositeExist ? false : true,
-      showLastLabel: true
+      showLastLabel: true,
+      minTickInterval: 0.01,
+      series: [series]
     });
   }
 
@@ -230,7 +269,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const unitGroups = this.groupByUnits(series);
     // Create y-axis groups based on units available
     // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    // If only 1 units is selected, check that the max value of each series does not differ by an order of magnitude
+    // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
     // If yes, draw series on separate y axes
     const yAxesGroups = this.setYAxesGroups(unitGroups);
     yAxesGroups.forEach((axis, index) => {
@@ -257,13 +296,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const yAxesGroups = [];
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
-      unitGroups.forEach((unit) => {
-        // Get max level value of first series in group
-        const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
-        const maxValue = Math.max(...level.map(l => l[1]));
-        yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [unit.series[0]] });
-        this.checkMaxValues(unit, maxValue, yAxesGroups);
-      });
+      const unit = unitGroups[0];
+      const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
+      const maxValue = Math.max(...level.map(l => l[1]));
+      const minValue = Math.min(...level.map(l => l[1]));
+      yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
+      this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
       return yAxesGroups;
     }
     if (unitGroups.length > 1) {
@@ -274,26 +312,38 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
   }
 
-  checkMaxValues(unit, maxValue, yAxesGroups) {
+  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
+  isOverlapSufficient(level, baseMin, baseMax) {
+    const sufficientOverlap = 0.5;
+    const overlap = this.calculateOverlap(level, baseMin, baseMax);
+    return overlap >= sufficientOverlap;
+  }
+
+  calculateOverlap(level, baseMin, baseMax) {
+    const newMin = Math.min(...level.map(l => l[1]));
+    const newMax = Math.max(...level.map(l => l[1]));
+    const baseRange = baseMax - baseMin;
+    const newRange = newMax - newMin;
+    const baseMaxNewMin = baseMax - newMin;
+    const newMaxBaseMin = newMax - baseMin;
+    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
+  }
+
+  checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
     unit.series.forEach((serie) => {
-      // Get max level value of series
-      const level = serie.data ? serie.data : serie.chartData.level;
-      const currentMaxValue = Math.max(...level.map(l => l[1]));
-      const diff = maxValue - currentMaxValue;
-      // If difference between values is at least 10,000, add second axis ('yAxis1')
-      if (Math.abs(diff) >= 10000) {
-        const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
-        if (!yAxis1) {
-          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
-          return;
-        }
-        if (yAxis1) {
-          yAxis1.series.push(serie);
-          return;
-        }
+      // Check if series need to be drawn on separate axes
+      const level = serie.chartData ? serie.chartData.level : serie.data;
+      const sufficientOverlap = this.isOverlapSufficient(level, baseMin, baseMax);
+      const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
+      if (!sufficientOverlap && !yAxis1) {
+        yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+        return;
       }
-      // If difference is less than 10,000, add series to frist axis
-      if (Math.abs(diff) < 10000) {
+      if (!sufficientOverlap && yAxis1) {
+        yAxis1.series.push(serie);
+        return;
+      }
+      if (sufficientOverlap) {
         yAxesGroups[0].series.push(serie);
       }
     });
@@ -591,11 +641,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         tooltip += getAnnualObs(annualSeries, point, year);
       }
       if (quarterSeries && monthSeries) {
-        if (Highcharts.dateFormat('%b', point.x) !== 'Jan' && Highcharts.dateFormat('%b', point.x) !== 'Apr' && Highcharts.dateFormat('%b', point.x) !== 'Jul' && Highcharts.dateFormat('%b', point.x) !== 'Oct') {
+        const pointMonth = Highcharts.dateFormat('%b', point.x);
+        if (pointMonth !== 'Jan' && pointMonth !== 'Apr' && pointMonth !== 'Jul' && pointMonth !== 'Oct') {
           const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
           const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
-          // Month of hovered point
-          const pointMonth = Highcharts.dateFormat('%b', point.x);
           // Quarter that hovered point falls into
           const pointQuarter = months[pointMonth];
           // Month for which there is quarterly data
