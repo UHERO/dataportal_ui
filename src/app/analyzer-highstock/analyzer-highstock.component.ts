@@ -96,7 +96,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
       const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       if (remainingAxis) {
-        this.checkRemainingSeries(remainingAxis, chart, analyzerSeries);
+        this.checkRemainingSeries(remainingAxis, chart, aSeries);
       }
     }
   }
