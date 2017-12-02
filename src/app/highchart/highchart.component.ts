@@ -104,6 +104,8 @@ export class HighchartComponent implements OnInit, OnChanges {
         useHTML: true,
         align: 'left',
         widthAdjust: 0,
+        x: 0,
+        y: -5,
         style: {
           margin: 75
         }
@@ -297,6 +299,13 @@ export class HighchartComponent implements OnInit, OnChanges {
     // If there are no YTD values
     if (latestSeries0 && !latestSeries1) {
       this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+    }
+    // If no data available for a given date range, display series title and display dates where data is available for a series
+    if (!latestSeries0 && !latestSeries1) {
+      const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
+      const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
+      this.chart.setTitle({text: '<b>' + this.seriesData.seriesInfo.displayName + '</b>'});
+      this.chart.setSubtitle({text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20});
     }
   }
 

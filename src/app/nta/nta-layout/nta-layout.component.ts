@@ -59,7 +59,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       this.routeC5ma = params['c5ma'];
       this.selectedMeasure = params['m'];
       if (this.id) { this.queryParams.id = this.id; };
-      if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure };
+      if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       this.categoryData = this._ntaHelper.initContent(this.id, this.selectedMeasure);
@@ -111,7 +111,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.scrollToFragment();
   }
 
-  updatePageCounter(event, subcategory){
+  updatePageCounter(event, subcategory) {
     subcategory.scrollIndex = event;
   }
 

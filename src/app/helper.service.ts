@@ -109,7 +109,7 @@ export class HelperService {
       const entry = { date: '', value: Infinity, pseudoHistory: false };
       entry.date = d;
       entry.value = +values[index];
-      entry.pseudoHistory = pseudoHistory[index]
+      entry.pseudoHistory = pseudoHistory[index];
       return entry;
     });
     return formattedResults;
@@ -118,19 +118,26 @@ export class HelperService {
   seriesTable(seriesData, dateRange, decimals) {
     const table = [];
     dateRange.forEach((date) => {
-      table.push({ date: date.date, tableDate: date.tableDate, value: Infinity, yoyValue: Infinity, ytdValue: Infinity, c5maValue: Infinity });
+      table.push({
+        date: date.date,
+        tableDate: date.tableDate,
+        value: Infinity,
+        yoyValue: Infinity,
+        ytdValue: Infinity,
+        c5maValue: Infinity
+      });
     });
     seriesData.forEach((data) => {
       const seriesDate = data.tableDate ? data.tableDate : data.date;
       const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
       tableEntry.value = data.value;
-      tableEntry.formattedValue = data.value === null ? ' ' : this.formatNum(+data.value, decimals);
+      tableEntry.formattedValue = (data.value === null || data.value === Infinity) ? ' ' : this.formatNum(+data.value, decimals);
       tableEntry.yoyValue = data.yoyValue;
-      tableEntry.formattedYoy = data.yoyValue === null ? ' ' : this.formatNum(+data.yoyValue, decimals);
+      tableEntry.formattedYoy = (data.yoyValue === null || data.yoyValue === Infinity) ? ' ' : this.formatNum(+data.yoyValue, decimals);
       tableEntry.ytdValue = data.ytdValue;
-      tableEntry.formattedYtd = data.ytdValue === null ? ' ' : this.formatNum(+data.ytdValue, decimals);
+      tableEntry.formattedYtd = (data.ytdValue === null || data.ytdValue === Infinity) ? ' ' : this.formatNum(+data.ytdValue, decimals);
       tableEntry.c5maValue = data.c5maValue;
-      tableEntry.formattedC5ma = data.c5maValue === null ? ' ' : this.formatNum(+data.c5maValue, decimals);
+      tableEntry.formattedC5ma = (data.c5maValue === null || data.c5maValue === Infinity) ? ' ' : this.formatNum(+data.c5maValue, decimals);
     });
     return table;
   }

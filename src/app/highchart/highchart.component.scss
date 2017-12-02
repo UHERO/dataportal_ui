@@ -62,10 +62,10 @@
         font-size: 0.85em !important;
     }
 
-    .highcharts-title {
-        color: $primary-text !important;
-        font-size: 0.9em !important;
+    .highcharts-title, .highcharts-subtitle {
+        font-size: 0.9em;
         letter-spacing: 0.05em;
+        fill: $primary-text;        
     }
 
     .highcharts-tooltip {
