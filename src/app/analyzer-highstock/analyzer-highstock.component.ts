@@ -79,9 +79,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return chartButtons;
   }
 
-  removeFromChart(analyzerSeries, chart) {
+  removeFromChart(aSeries, chart) {
     // Filter out series from chart that are not in analayzerSeries
-    const removeSeries = chart.series.filter(cSeries => !analyzerSeries.some(aSeries => aSeries.name === cSeries.name) && cSeries.name !== 'Navigator 1');
+    const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
     removeSeries.forEach((series) => {
       series.remove();
     });
@@ -96,7 +96,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
       const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
       if (remainingAxis) {
-        this.checkRemainingSeries(remainingAxis, chart, analyzerSeries);
+        this.checkRemainingSeries(remainingAxis, chart, aSeries);
       }
     }
   }
@@ -538,6 +538,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
+    // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = function (frequency, date) {
       if (frequency === 'A') {
         return '';
