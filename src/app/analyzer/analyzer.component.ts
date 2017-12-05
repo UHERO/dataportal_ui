@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { DateWrapper } from '../date-wrapper';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -29,10 +30,34 @@ export class AnalyzerComponent implements OnInit {
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
     private _dataPortalSettings: DataPortalSettingsService,
+    private route: ActivatedRoute,
+    private _router: Router,
     private _helper: HelperService
   ) { }
 
   ngOnInit() {
+    this.route.params.subscribe(params => {
+      console.log('route params', params);
+      let urlASeries;
+      if (params['analyzerSeries']) {
+        console.log('analyzerSeries', params['analyzerSeries']);
+        urlASeries = params['analyzerSeries'].split('-').map(Number);
+        console.log('urlASeries', urlASeries)
+      }
+      if (params['chartSeries']) {
+        const urlCSeries = params['chartSeries'].split('-').map(Number);
+        console.log('urlCSeries', urlCSeries);
+      }
+      if (params['start']) {
+        const urlStart = params['start'];
+      }
+      if (params['end']) {
+        const urlEnd = params['end'];
+      }
+      if (Object.keys(params).length !== 0) {
+      }
+    });
+
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries;
     // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
