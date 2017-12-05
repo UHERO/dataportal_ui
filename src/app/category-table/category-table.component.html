@@ -12,7 +12,7 @@
 					</tr>
 					<ng-template ngFor let-serie [ngForOf]="data" let-i="index">
 						<tr>
-							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.title}}" data-animation='false'
+							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}" title="{{serie.seriesInfo.displayName}}" data-animation='false'
 							 data-html='true' data-placement='left' data-toggle='tooltip' on-mouseover="showTooltip()">
 								<a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam }" queryParamsHandling='merge'
 								 (click)="hideInfo(serie.seriesInfo.id)">

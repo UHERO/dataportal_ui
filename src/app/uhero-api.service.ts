@@ -19,6 +19,7 @@ export class UheroApiService {
   private cachedGeos;
   private cachedExpanded = [];
   private cachedSelectedCategory = [];
+  private cachedSelectedCategoryGeoFreq = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
   private cachedSeries = [];
@@ -27,13 +28,13 @@ export class UheroApiService {
   private cachedSearchExpand = [];
   private cachedSearch = [];
   private cachedCatMeasures = [];
-  private cachedMeasureSeries =  [];
+  private cachedMeasureSeries = [];
 
-  constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
-     this.baseUrl = environment['apiUrl'];
-     this.headers = new Headers();
-     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
-     this.requestOptionsArgs = {headers: this.headers};
+  constructor( @Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
+    this.baseUrl = environment['apiUrl'];
+    this.headers = new Headers();
+    this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
+    this.requestOptionsArgs = { headers: this.headers };
   }
 
   // Get data from API
@@ -42,7 +43,7 @@ export class UheroApiService {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
-      let categories$ = this.http.get(`${this.baseUrl}/category`, this.requestOptionsArgs)
+      let categories$ = this.http.get(`${this.baseUrl}/category?u=` + this.portal, this.requestOptionsArgs)
         .map(mapCategories, this)
         .do(val => {
           this.cachedCategories = val;
@@ -97,6 +98,21 @@ export class UheroApiService {
     }
   }
 
+  // Gets a particular category. Used to identify a category's date ranges
+  fetchSelectedCategoryWithGeoFreq(id: number, geo: string, freq: string): Observable<Category> {
+    if (this.cachedSelectedCategoryGeoFreq[id]) {
+      return Observable.of(this.cachedSelectedCategoryGeoFreq[id + geo + freq]);
+    } else {
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
+          selectedCat$ = null;
+        });
+      return selectedCat$;
+    }
+  }
+
   fetchSeries(id: number, geo: string, freq: string): Observable<Series[]> {
     if (this.cachedSeries[id + geo + freq]) {
       return Observable.of(this.cachedSeries[id + geo + freq]);
@@ -145,13 +161,13 @@ export class UheroApiService {
     if (this.cachedGeoSeries[id + handle]) {
       return Observable.of(this.cachedGeoSeries[id + handle]);
     } else {
-    let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle, this.requestOptionsArgs)
-      .map(mapData)
-      .do(val => {
-        this.cachedGeoSeries[id + handle] = val;
-        geoSeries$ = null;
-      });
-    return geoSeries$;
+      let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=` + id + `&geo=` + handle, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedGeoSeries[id + handle] = val;
+          geoSeries$ = null;
+        });
+      return geoSeries$;
     }
   }
 
@@ -159,13 +175,13 @@ export class UheroApiService {
     if (this.cachedCatMeasures[id]) {
       return Observable.of(this.cachedCatMeasures[id]);
     } else {
-    let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=` + id, this.requestOptionsArgs)
-      .map(mapData)
-      .do(val => {
-        this.cachedCatMeasures[id] = val;
-        catMeasures$ = null;
-      });
-    return catMeasures$;
+      let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=` + id, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedCatMeasures[id] = val;
+          catMeasures$ = null;
+        });
+      return catMeasures$;
     }
   }
 
@@ -173,13 +189,13 @@ export class UheroApiService {
     if (this.cachedMeasureSeries[id]) {
       return Observable.of(this.cachedMeasureSeries[id]);
     } else {
-    let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&expand=true`, this.requestOptionsArgs)
-      .map(mapData)
-      .do(val => {
-        this.cachedMeasureSeries[id] = val;
-        measureSeries$ = null;
-      });
-    return measureSeries$;
+      let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=` + id + `&expand=true`, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedMeasureSeries[id] = val;
+          measureSeries$ = null;
+        });
+      return measureSeries$;
     }
   }
 
