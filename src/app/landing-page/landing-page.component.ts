@@ -18,6 +18,7 @@ declare var $: any;
 })
 export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   private sub;
+  private defaultCategory;
   private id: number;
   private routeGeo: string;
   private routeFreq: string;

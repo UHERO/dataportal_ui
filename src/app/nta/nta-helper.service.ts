@@ -120,10 +120,11 @@ export class NtaHelperService {
 
   getSearch(cacheId, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
-    let freqGeos, obsEnd, obsStart;
+    let freqGeos, freqs, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
+      freqs = results.freqs;
       obsEnd = results.observationEnd;
       obsStart = results.observationStart;
     },
@@ -134,7 +135,7 @@ export class NtaHelperService {
         if (obsEnd && obsStart) {
           const dateWrapper = <DateWrapper>{};
           this.getSearchData(catId, cacheId, dateWrapper);
-          this.categoryData[cacheId].currentFreq = freqGeos[0];
+          this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
           this.categoryData[cacheId].selectedCategory = 'Search: ' + catId;
         } else {
           this.categoryData[cacheId].invalid = catId;
