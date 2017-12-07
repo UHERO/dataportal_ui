@@ -59,13 +59,13 @@ export class HelperService {
         }
       });
     }
-    if (yoyResults && yoyResults.dates) {
+    if (yoyResults && yoyResults.dates.length) {
       yoy = this.formatObservations(yoyResults);
     }
-    if (ytdResults && ytdResults.dates) {
+    if (ytdResults && ytdResults.dates.length) {
       ytd = this.formatObservations(ytdResults);
     }
-    if (c5maResults && c5maResults.dates) {
+    if (c5maResults && c5maResults.dates.length) {
       c5ma = this.formatObservations(c5maResults);
     }
     combinedObservations = level.map((entry, index) => {
