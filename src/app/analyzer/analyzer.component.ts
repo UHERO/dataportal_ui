@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HelperService } from '../helper.service';
+import { SeriesHelperService } from '../series-helper.service';
 import { DateWrapper } from '../date-wrapper';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 
@@ -29,6 +30,7 @@ export class AnalyzerComponent implements OnInit {
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
+    private _series: SeriesHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
     private route: ActivatedRoute,
     private _router: Router,
@@ -60,6 +62,9 @@ export class AnalyzerComponent implements OnInit {
 
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries;
+    console.log('analyzerSeries', this.analyzerSeries);
+    const test = this._analyzer.getAnalyzerData(this.analyzerSeries);
+    console.log('test', test);
     // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
     if (this.analyzerSeries.length) {
       this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
