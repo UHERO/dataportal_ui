@@ -39,69 +39,51 @@ describe('Service: Helper', () => {
       transformationResults: [
         {
           transformation: 'lvl',
-          observations: [
-            {
-              date: '1962-01-01',
-              value: '195.2833'
-            }
+          dates: [
+            '1962-01-01'
+          ],
+          values: [
+            '195.2833',
+          ],
+          pseudoHistory: [
+            false
           ]
         }, {
           transformation: 'pc1',
-          observations: []
+          dates: [],
+          pseudoHistory: []
         }, {
           transformation: 'ytd',
-          observations: []
+          dates: [],
+          pseudoHistory: []
         }, {
           transformation: 'c5ma',
-          observations: []
+          dates: [],
+          pseudoHistory: []
         }
       ]
     };
     const dates = [
-      { date: '1960-01-01', tableDate: '1960' },
-      { date: '1961-01-01', tableDate: '1961' },
       { date: '1962-01-01', tableDate: '1962' }
     ];
     const decimals = 2;
-    const level = [
-      [Date.parse('1960-01-01'), null],
-      [Date.parse('1961-01-01'), null],
+    const lvl = [
       [Date.parse('1962-01-01'), 195.2833]
     ];
     const yoy = [
-      [Date.parse('1960-01-01'), null],
-      [Date.parse('1961-01-01'), null],
       [Date.parse('1962-01-01'), null]
     ];
     const c5ma = [
-      [Date.parse('1960-01-01'), null],
-      [Date.parse('1961-01-01'), null],
       [Date.parse('1962-01-01'), null]
     ];
     const chartData = {
-      level: level,
+      level: lvl,
       pseudoZones: [],
       yoy: yoy,
       ytd: yoy,
       c5ma: c5ma
     };
     const tableData = [{
-      date: '1960-01-01',
-      tableDate: '1960',
-      value: Infinity,
-      yoyValue: Infinity,
-      ytdValue: Infinity,
-      c5maValue: Infinity
-    },
-    {
-      date: '1961-01-01',
-      tableDate: '1961',
-      value: Infinity,
-      yoyValue: Infinity,
-      ytdValue: Infinity,
-      c5maValue: Infinity
-    },
-    {
       date: '1962-01-01',
       tableDate: '1962',
       value: 195.2833,
