@@ -24,7 +24,7 @@
 				<label *ngIf="routeView === 'table' && data.currentFreq?.freq !== 'A'" class="form-check-inline">
           <input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event, sub.id)">Year-to-Date
         </label>
-        <app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings" [dates]="data.sliderDates" [sublist]="data.sublist" [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
+        <app-date-slider class="sliders" *ngIf="sub.requestComplete && !sub.noData" [portalSettings]="portalSettings" [dates]="data.sliderDates" [sublist]="data.sublist" [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
         <app-category-datatables *ngIf="routeView === 'table' && sub.requestComplete" [portalSettings]="portalSettings" [geo]="data.currentGeo" [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates" [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
 				<i *ngIf="!sub.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			</div>

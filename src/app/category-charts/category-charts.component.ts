@@ -55,7 +55,7 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
       const values = this.getSeriesValues(serie, start, end);
       const min = values.reduce(function (a, b) {
         return Math.min(a, b);
-      });
+      }, null);
       if (minValue === null || min < minValue) {
         minValue = min;
       }
@@ -69,7 +69,7 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
       const values = this.getSeriesValues(serie, start, end);
       const max = values.reduce(function (a, b) {
         return Math.max(a, b);
-      });
+      }, null);
       if (maxValue === null || max > maxValue) {
         maxValue = max;
       }
