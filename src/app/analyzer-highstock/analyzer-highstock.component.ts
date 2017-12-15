@@ -41,7 +41,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
-    const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);
+    let selectedAnalyzerSeries;
+    if (this.series.length) {
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);      
+    }
     if (this.chart) {
       const navDates = this.createNavigatorDates(this.allDates);
       // If a chart has been generated:
@@ -65,7 +68,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Draw chart if no chart exists
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+    if (!this.chart && selectedAnalyzerSeries) {
+      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);      
+    }
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -354,8 +359,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   groupByUnits(series) {
     const units = series.reduce((obj, serie) => {
-      obj[serie.unitsLabelShort] = obj[serie.unitsLabelShort] || [];
-      obj[serie.unitsLabelShort].push(serie);
+      obj[serie.seriesDetail.unitsLabelShort] = obj[serie.seriesDetail.unitsLabelShort] || [];
+      obj[serie.seriesDetail.unitsLabelShort].push(serie);
       return obj;
     }, {});
 
@@ -391,19 +396,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
       chartSeries.push({
-        className: serie.id,
-        name: serie.seasonallyAdjusted ?
-          serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' :
-          serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
+        className: serie.seriesDetail.id,
+        name: serie.seriesDetail.seasonallyAdjusted ?
+          serie.seriesDetail.title + ' (' + serie.seriesDetail.frequencyShort + '; ' + serie.seriesDetail.geography.handle + '; SA)' :
+          serie.seriesDetail.title + ' (' + serie.seriesDetail.frequencyShort + '; ' + serie.seriesDetail.geography.handle + ')',
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        displayName: serie.title,
-        decimals: serie.decimals,
-        frequency: serie.frequencyShort,
-        geography: serie.geography.name,
+        displayName: serie.seriesDetail.title,
+        decimals: serie.seriesDetail.decimals,
+        frequency: serie.seriesDetail.frequencyShort,
+        geography: serie.seriesDetail.geography.name,
         showInNavigator: false,
-        unitsLabelShort: serie.unitsLabelShort,
-        seasonallyAdjusted: serie.seasonallyAdjusted,
+        unitsLabelShort: serie.seriesDetail.unitsLabelShort,
+        seasonallyAdjusted: serie.seriesDetail.seasonallyAdjusted,
         dataGrouping: {
           enabled: false
         },

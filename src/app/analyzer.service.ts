@@ -12,21 +12,26 @@ export class AnalyzerService {
 
   public analyzerSeries = [];
 
+  public analyzerData = {
+    analyzerTableDates: [],
+    analyzerSeries: [],
+    analyzerChartSeries: []
+  };
+
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
   getAnalyzerData(aSeries) {
-    const analyzerData = [];
+    let seriesIndex = 0;
     aSeries.forEach((series, index) => {
       let decimals;
       const seriesData = {
-        analyzerTableDates: [],
         seriesDetail: {},
         currentGeo: <Geography>{},
         currentFreq: <Frequency>{},
-        chartData: [],
+        chartData: {},
         seriesTableData: [],
         error: null,
         noData: '',
@@ -58,17 +63,30 @@ export class AnalyzerService {
             } else {
               seriesData.noData = 'Data not available';
             }
-          });
-          if (index === aSeries.length - 1) {
-            console.log('data done', aSeries);
-            aSeries.forEach((series) => {
-              seriesData.analyzerTableDates = this.setAnalyzerDates(aSeries);
+          },
+            (error) => {
+              console.log('error', error);
+            },
+            () => {
+              seriesIndex++;
+              console.log(seriesIndex)
+              if (seriesIndex === aSeries.length) {
+                console.log('data done', aSeries);
+                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(aSeries);
+                this.analyzerData.analyzerSeries.forEach((series) => {
+                  // Array of observations using full range of dates
+                  series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+                });
+                // The default series displayed in the chart on load should be the series with the longest range of data
+                const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
+                this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
+                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+              }
             });
-          }
         });
-      analyzerData.push(seriesData);
+      this.analyzerData.analyzerSeries.push(seriesData);
     });
-    return Observable.forkJoin(Observable.of(analyzerData));
+    return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
   setAnalyzerDates(analyzerSeries) {
@@ -95,8 +113,29 @@ export class AnalyzerService {
     }
   }
 
+  findLongestSeriesIndex(series) {
+    let longestSeries, seriesLength = 0;
+    series.forEach((serie, index) => {
+      if (!longestSeries || seriesLength < serie.chartData.level.length) {
+        seriesLength = serie.chartData.level.length;
+        longestSeries = index;
+      }
+    });
+    return longestSeries;
+  }
+
   updateAnalyzer(seriesInfo, tableData?, chartData?) {
-    if (seriesInfo.analyze) {
+    console.log('seriesInfo', seriesInfo);
+    const seriesExist = this.analyzerSeries.findIndex(seriesId => seriesId === seriesInfo.id);
+    console.log(seriesExist)
+    if (seriesExist >= 0) {
+      this.analyzerSeries.splice(seriesExist, 1);
+    }
+    if (seriesExist < 0) {
+      this.analyzerSeries.push(seriesInfo.id);
+    }
+    console.log('analyzer series', this.analyzerSeries)
+    /* if (seriesInfo.analyze) {
       const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
       const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);
       if (seriesIndex > -1) {
@@ -110,7 +149,7 @@ export class AnalyzerService {
       seriesInfo.chartData = chartData;
       this.analyzerSeries.push(seriesInfo);
       seriesInfo.analyze = true;
-    }
+    } */
   }
 
   createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {
