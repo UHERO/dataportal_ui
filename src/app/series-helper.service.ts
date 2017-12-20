@@ -81,11 +81,10 @@ export class SeriesHelperService {
     this._uheroAPIService.fetchObservations(seriesDetail.id).subscribe((observations) => {
       const obs = observations;
       seriesDetail.seriesObservations = obs;
-      const levelData = obs.transformationResults[0].observations;
-      const newLevelData = obs.transformationResults[0].dates;
+      const levelData = obs.transformationResults[0].dates;
       const obsStart = obs.observationStart;
       const obsEnd = obs.observationEnd;
-      if (levelData || newLevelData) {
+      if (levelData) {
         // Use to format dates for table
         this._helper.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
         const data = this._helper.dataTransform(obs, dateArray, decimals);

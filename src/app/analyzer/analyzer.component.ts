@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HelperService } from '../helper.service';
+import { SeriesHelperService } from '../series-helper.service';
 import { DateWrapper } from '../date-wrapper';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 
@@ -25,10 +26,12 @@ export class AnalyzerComponent implements OnInit {
   private tableYoy;
   private tableYtd;
   private tableC5ma;
+  private analyzerData;
 
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
+    private _series: SeriesHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
     private route: ActivatedRoute,
     private _router: Router,
@@ -60,22 +63,8 @@ export class AnalyzerComponent implements OnInit {
 
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerSeries = this._analyzer.analyzerSeries;
-    // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
-    if (this.analyzerSeries.length) {
-      this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
-      // Sort series by length of level data
-      // The default series displayed in the chart on load should be the series with the longest range of data
-      const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
-      this.analyzerSeries[longestSeries].showInChart = true;
-      this.analyzerSeries.forEach((series) => {
-        // Array of observations using full range of dates
-        series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
-      });
-      this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
-      if (this.analyzerChartSeries.length < 2) {
-        this.analyzerChartSeries = this.setInitialChartSeries(this.analyzerSeries);
-      }
-    }
+    console.log('analyzerSeries', this.analyzerSeries);
+    this.analyzerData = this._analyzer.getAnalyzerData(this.analyzerSeries);
   }
 
   setInitialChartSeries(analyzerSeries: Array<any>) {
@@ -94,21 +83,6 @@ export class AnalyzerComponent implements OnInit {
     return chartSeries;
   }
 
-  setAnalyzerDates(analyzerSeries) {
-    const frequencies = [];
-    const dateWrapper = { firstDate: '', endDate: '' };
-    analyzerSeries.forEach((series) => {
-      const freqExist = frequencies.find(freq => freq.freq === series.frequencyShort);
-      if (!freqExist) {
-        frequencies.push({ freq: series.frequencyShort, label: series.frequency });
-      }
-      // Get earliest start date and latest end date
-      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
-    });
-    // Array of full range of dates for series selected in analyzer
-    return this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
-  }
-
   findLongestSeriesIndex(series) {
     let longestSeries, seriesLength = 0;
     series.forEach((serie, index) => {
@@ -118,15 +92,6 @@ export class AnalyzerComponent implements OnInit {
       }
     });
     return longestSeries;
-  }
-
-  setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
-    if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
-      dateWrapper.firstDate = seriesStart;
-    }
-    if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
-      dateWrapper.endDate = seriesEnd;
-    }
   }
 
   updateAnalyzerChart(event, chartSeries) {
@@ -158,7 +123,7 @@ export class AnalyzerComponent implements OnInit {
 
   updateChartSeries(analyzerSeries: Array<any>) {
     // Update series drawn in chart and dates in analyzer table
-    this.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    this.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
     analyzerSeries.forEach((series) => {
       series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
     });

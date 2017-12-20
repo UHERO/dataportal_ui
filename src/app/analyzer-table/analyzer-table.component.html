@@ -9,8 +9,8 @@
     <input type="checkbox" (change)="c5maActive($event)">Annual Change
   </label>
 </div>
-<app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates"
-  [analyzerSeries]="series" [analyzer]="true" [tableId]="'analyzer-table'"></app-category-datatables>
+<!-- <app-category-datatables [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates"
+  [analyzerSeries]="series" [analyzer]="true" [tableId]="'analyzer-table'"></app-category-datatables> -->
 <div class="analyzer-table">
   <div class="table-row">
     <div class="table" #tableScroll>
@@ -25,13 +25,13 @@
         </tr>
         <ng-template ngFor let-serie [ngForOf]="series" let-i="index">
           <tr>
-            <th title="{{serie.title}}">
+            <th title="{{serie.seriesDetail.title}}">
               <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
-              <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
-              <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.id)">
-                {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
+              <i class="material-icons analyze-chart color{{serie.seriesDetail.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
+              <a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.seriesDetail.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.seriesDetail.id)">
+                {{serie.seriesDetail.tablePrefix + serie.seriesDetail.title + serie.seriesDetail.tablePostfix + ' (' + serie.seriesDetail.frequencyShort + ', ' + serie.seriesDetail.geography.handle + ')'}}
               </a>
-              <a tabindex="0" id="{{serie.id}}" class="info" (click)="showPopover(serie)" role="button" data-animation='false' data-toggle="popover">
+              <a tabindex="0" id="{{serie.seriesDetail.id}}" class="info" (click)="showPopover(serie.seriesDetail)" role="button" data-animation='false' data-toggle="popover">
                 <i class="material-icons info-icon">&#xE88F;</i>
               </a>
             </th>
@@ -68,7 +68,7 @@
     </div>
   </div>
 </div>
-<div class="analyzer-table">
+<!-- <div class="analyzer-table">
   <div class="table-row">
     <div class="table">
       <table>
@@ -87,13 +87,13 @@
             <th class="series-title" title="{{serie.title}}">
               <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
               <i class="material-icons analyze-chart color{{serie.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
-              <a [routerLink]="['/series']" [queryParams]="{ id: serie.id, sa: serie.saParam }" queryParamsHandling='merge'>
-                {{serie.tablePrefix + serie.title + serie.tablePostfix + ' (' + serie.frequencyShort + ', ' + serie.geography.handle + ')'}}
+              <a [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.seriesDetail.saParam }" queryParamsHandling='merge'>
+                {{serie.seriesDetail.tablePrefix + serie.seriesDetail.title + serie.seriesDetail.tablePostfix + ' (' + serie.seriesDetail.frequencyShort + ', ' + serie.seriesDetail.geography.handle + ')'}}
               </a>
             </th>
             <td>{{serie.summaryStats.minValue + ' ' + serie.summaryStats.minValueDate }}</td>
             <td>{{serie.summaryStats.maxValue + ' ' + serie.summaryStats.maxValueDate }}</td>
-            <td>{{!serie.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
+            <td>{{!serie.seriesDetail.percent ? serie.summaryStats.percChange : '&nbsp;'}}</td>
             <td>{{serie.summaryStats.levelChange}}</td>
             <td>{{serie.summaryStats.total}}</td>
             <td>{{serie.summaryStats.avg}}</td>
@@ -103,4 +103,4 @@
       </table>
     </div>
   </div>
-</div>
+</div> -->

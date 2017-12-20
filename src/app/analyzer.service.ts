@@ -1,17 +1,141 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { UheroApiService } from './uhero-api.service';
+import { HelperService } from './helper.service';
+import { Frequency } from './frequency';
+import { Geography } from './geography';
+import { DateWrapper } from './date-wrapper';
 
 @Injectable()
 export class AnalyzerService {
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   public analyzerSeries = [];
+
+  public analyzerData = {
+    analyzerTableDates: [],
+    analyzerSeries: [],
+    analyzerChartSeries: []
+  };
 
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
+  getAnalyzerData(aSeries) {
+    let seriesIndex = 0;
+    aSeries.forEach((series, index) => {
+      let decimals;
+      const seriesData = {
+        seriesDetail: {},
+        currentGeo: <Geography>{},
+        currentFreq: <Frequency>{},
+        chartData: {},
+        seriesTableData: [],
+        error: null,
+        noData: '',
+        observations: { transformationResults: [], observationStart: '', observationEnd: '' }
+      };
+      this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
+        seriesData.seriesDetail = detail;
+        decimals = detail.decimals ? detail.decimals : 1;
+        seriesData.currentGeo = detail.geography;
+        seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
+      },
+        (error) => {
+          console.log('error', error);
+        },
+        () => {
+          this._uheroAPIService.fetchObservations(series.id).subscribe((observations) => {
+            seriesData.observations = observations;
+            //seriesData.seriesDetail.seriesObservations = obs;
+            const levelData = seriesData.observations.transformationResults[0].dates;
+            const obsStart = seriesData.observations.observationStart;
+            const obsEnd = seriesData.observations.observationEnd;
+            const dateArray = [];
+            if (levelData) {
+              // Use to format dates for table
+              this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+              const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
+              seriesData.chartData = data.chartData;
+              seriesData.seriesTableData = data.tableData;
+            } else {
+              seriesData.noData = 'Data not available';
+            }
+          },
+            (error) => {
+              console.log('error', error);
+            },
+            () => {
+              seriesIndex++;
+              console.log(seriesIndex)
+              if (seriesIndex === aSeries.length) {
+                console.log('data done', aSeries);
+                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(aSeries);
+                this.analyzerData.analyzerSeries.forEach((series) => {
+                  // Array of observations using full range of dates
+                  series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+                });
+                // The default series displayed in the chart on load should be the series with the longest range of data
+                const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
+                this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
+                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+              }
+            });
+        });
+      this.analyzerData.analyzerSeries.push(seriesData);
+    });
+    return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  setAnalyzerDates(analyzerSeries) {
+    const frequencies = [];
+    const dateWrapper = { firstDate: '', endDate: '' };
+    analyzerSeries.forEach((series) => {
+      const freqExist = frequencies.find(freq => freq.freq === series.frequencyShort);
+      if (!freqExist) {
+        frequencies.push({ freq: series.frequencyShort, label: series.frequency });
+      }
+      // Get earliest start date and latest end date
+      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
+    });
+    // Array of full range of dates for series selected in analyzer
+    return this.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
+  }
+
+  setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
+    if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
+      dateWrapper.firstDate = seriesStart;
+    }
+    if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
+      dateWrapper.endDate = seriesEnd;
+    }
+  }
+
+  findLongestSeriesIndex(series) {
+    let longestSeries, seriesLength = 0;
+    series.forEach((serie, index) => {
+      if (!longestSeries || seriesLength < serie.chartData.level.length) {
+        seriesLength = serie.chartData.level.length;
+        longestSeries = index;
+      }
+    });
+    return longestSeries;
+  }
+
   updateAnalyzer(seriesInfo, tableData?, chartData?) {
-    if (seriesInfo.analyze) {
+    console.log('seriesInfo', seriesInfo);
+    const seriesExist = this.analyzerSeries.findIndex(seriesId => seriesId === seriesInfo.id);
+    console.log(seriesExist)
+    if (seriesExist >= 0) {
+      this.analyzerSeries.splice(seriesExist, 1);
+    }
+    if (seriesExist < 0) {
+      this.analyzerSeries.push(seriesInfo.id);
+    }
+    console.log('analyzer series', this.analyzerSeries)
+    /* if (seriesInfo.analyze) {
       const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
       const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);
       if (seriesIndex > -1) {
@@ -25,7 +149,7 @@ export class AnalyzerService {
       seriesInfo.chartData = chartData;
       this.analyzerSeries.push(seriesInfo);
       seriesInfo.analyze = true;
-    }
+    } */
   }
 
   createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {
