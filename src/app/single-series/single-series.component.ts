@@ -123,7 +123,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   updateAnalyze(seriesInfo, tableData, chartData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
+    this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
+    seriesInfo.analyze = this._analyzer.analyzerSeries.find(aSeriesId => aSeriesId === seriesInfo.id)
   }
 
   updateChartExtremes(e) {

@@ -79,10 +79,12 @@ export class AnalyzerService {
                 });
                 // The default series displayed in the chart on load should be the series with the longest range of data
                 const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
+                console.log('urlChartSeries', urlChartSeries)
                 if (urlChartSeries) {
                   urlChartSeries.forEach((cSeries) => {
                     const series = this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === cSeries);
                     series.showInChart = true;
+                    console.log(this.analyzerData.analyzerSeries);
                   });
                 }
                 this.analyzerData.analyzerSeries[longestSeries].showInChart = true;

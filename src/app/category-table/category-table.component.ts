@@ -106,6 +106,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   }
 
   updateAnalyze(seriesInfo, tableData, chartData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
+    this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
+    seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
   }
 }

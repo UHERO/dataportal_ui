@@ -28,14 +28,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() alertMessage;
   @Input() start;
   @Input() end;
-  @Input() tooltip;
+  // @Input() tooltip;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   options;
   chart;
-  private nameChecked;
-  private unitsChecked;
-  private geoChecked;
+  @Input() nameChecked;
+  @Input() unitsChecked;
+  @Input() geoChecked;
 
   constructor(private _analyzer: AnalyzerService) { }
 
@@ -434,9 +434,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
-    const tooltipName = this.tooltip ? this.tooltip.name === 'true' : false;
-    const tooltipUnits = this.tooltip ? this.tooltip.units === 'true' : false;
-    const tooltipGeo = this.tooltip ? this.tooltip.geography === 'true' : false;
+    const tooltipName = this.nameChecked;
+    const tooltipUnits = this.unitsChecked;
+    const tooltipGeo = this.geoChecked;
 
     this.options = {
       chart: {
@@ -493,10 +493,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           exportButton: {
             text: 'Download',
             _titleKey: 'exportKey',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-            onclick: function (this) {
-              this.exportChart(null, { subtitle: { text: '' } });
-            }
+            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
           }
         },
         chartOptions: {
@@ -521,6 +518,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           },
           title: {
             align: 'left'
+          },
+          subtitle: {
+            text: ''
           }
         }
       },

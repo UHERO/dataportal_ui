@@ -39,7 +39,7 @@ export class SeriesHelperService {
     this._uheroAPIService.fetchSeriesDetail(id).subscribe((series) => {
       this.seriesData.seriesDetail = series;
       // Check if series is in the analyzer
-      const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === series.id);
+      const existAnalyze = analyzerSeries.find(aSeriesId => aSeriesId === series.id);
       this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
       this.seriesData.seriesDetail.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const freqGeos = series.freqGeos;

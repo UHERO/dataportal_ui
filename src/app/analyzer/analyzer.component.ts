@@ -20,17 +20,15 @@ export class AnalyzerComponent implements OnInit {
   private alertUser;
   private alertMessage = '';
   analyzerSeries;
-  private tooltipName;
-  private tooltipUnits;
-  private tooltipGeo;
   private tableYoy;
   private tableYtd;
   private tableC5ma;
   private analyzerData;
   private startDate;
   private endDate;
-  private tooltipsChecked;
-  private tableOptions;
+  private tooltipName;
+  private tooltipUnits;
+  private tooltipGeo;
 
   constructor(
     @Inject('portal') private portal,
@@ -44,23 +42,16 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     let urlCSeries;
-    this.tooltipsChecked = { name: '', units: '', geography: '' };
-    this.tableOptions = { yoy: '', ytd: '', c5ma: '' };
     this.route.params.subscribe(params => {
-      console.log('route params', params);
       let urlASeries;
       if (params['analyzerSeries']) {
-        console.log('analyzerSeries', params['analyzerSeries']);
         urlASeries = params['analyzerSeries'].split('-').map(Number);
         urlASeries.forEach((uSeries) => {
-          console.log(uSeries)
             this._analyzer.analyzerSeries.push(uSeries);
         });
-        console.log('urlASeries', urlASeries)
       }
       if (params['chartSeries']) {
-        const urlCSeries = params['chartSeries'].split('-').map(Number);
-        console.log('urlCSeries', urlCSeries);
+        urlCSeries = params['chartSeries'].split('-').map(Number);
       }
       if (params['start']) {
         this.startDate = params['start'];
@@ -69,25 +60,22 @@ export class AnalyzerComponent implements OnInit {
         this.endDate = params['end'];
       }
       if (params['name']) {
-        this.tooltipsChecked.name = params['name'];
+        this.tooltipName = (params['name'] === 'true');
       }
       if (params['units']) {
-        this.tooltipsChecked.units = params['units'];
+        this.tooltipUnits = (params['units'] === 'true');
       }
       if (params['geography']) {
-        this.tooltipsChecked.geography = params['geography'];
+        this.tooltipGeo = (params['geography'] === 'true');
       }
       if (params['yoy']) {
-        this.tableOptions.yoy = params['yoy'];
-        console.log('table options', this.tableOptions)
+        this.tableYoy = (params['yoy'] === 'true');
       }
       if (params['ytd']) {
-        this.tableOptions.ytd = params['ytd'];
+        this.tableYtd = (params['ytd'] === 'true');
       }
       if (params['c5ma']) {
-        this.tableOptions.c5ma = params['c5ma'];
-      }
-      if (Object.keys(params).length !== 0) {
+        this.tableC5ma = (params['c5ma'] === 'true');
       }
     });
 

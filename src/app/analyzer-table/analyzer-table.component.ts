@@ -18,13 +18,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() maxDate;
   @Input() allTableDates;
   @Input() chartSeries;
-  @Input() tableOptions;
   @Output() updateChartSeries = new EventEmitter();
   @Output() tableTransform = new EventEmitter();
-  portalSettings;
-  yoyChecked;
-  ytdChecked;
-  c5maChecked;
+  @Input() yoyChecked;
+  @Input() ytdChecked;
+  @Input() c5maChecked;
+  portalSettings;  
   private previousHeight;
   private tableWidths = [];
   tableDates;

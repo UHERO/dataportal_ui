@@ -4,12 +4,12 @@
 <div class="customize-tooltip">
     <p>Tooltip Display:</p>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="nameActive($event, chart, formatTooltip)" [checked]="tooltip ? tooltip.name === 'true' : false">Series Name
+        <input type="checkbox" (change)="nameActive($event, chart, formatTooltip)" [checked]="nameChecked">Series Name
     </label>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="unitsActive($event, chart, formatTooltip)" [checked]="tooltip ? tooltip.units === 'true' : false">Units
+        <input type="checkbox" (change)="unitsActive($event, chart, formatTooltip)" [checked]="unitsChecked">Units
     </label>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="geoActive($event, chart, formatTooltip)" [checked]="tooltip ? tooltip.geography === 'true' : false">Geography
+        <input type="checkbox" (change)="geoActive($event, chart, formatTooltip)" [checked]="geoChecked">Geography
     </label>
 </div>
