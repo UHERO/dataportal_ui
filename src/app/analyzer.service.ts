@@ -19,13 +19,14 @@ export class AnalyzerService {
   };
 
   checkAnalyzer(seriesInfo) {
-    const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
+    const analyzeSeries = this.analyzerSeries.find(seriesId => seriesId === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
-  getAnalyzerData(aSeries) {
+  getAnalyzerData(aSeries, urlChartSeries) {
     let seriesIndex = 0;
-    aSeries.forEach((series, index) => {
+    this.analyzerData.analyzerSeries = [];
+    aSeries.forEach((seriesId, index) => {
       let decimals;
       const seriesData = {
         seriesDetail: {},
@@ -37,7 +38,7 @@ export class AnalyzerService {
         noData: '',
         observations: { transformationResults: [], observationStart: '', observationEnd: '' }
       };
-      this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
+      this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((detail) => {
         seriesData.seriesDetail = detail;
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
@@ -47,9 +48,9 @@ export class AnalyzerService {
           console.log('error', error);
         },
         () => {
-          this._uheroAPIService.fetchObservations(series.id).subscribe((observations) => {
+          //this.getObservations(seriesId, seriesData, urlChartSeries, aSeries, seriesIndex);
+          this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
             seriesData.observations = observations;
-            //seriesData.seriesDetail.seriesObservations = obs;
             const levelData = seriesData.observations.transformationResults[0].dates;
             const obsStart = seriesData.observations.observationStart;
             const obsEnd = seriesData.observations.observationEnd;
@@ -69,36 +70,83 @@ export class AnalyzerService {
             },
             () => {
               seriesIndex++;
-              console.log(seriesIndex)
+              this.analyzerData.analyzerSeries.push(seriesData);
               if (seriesIndex === aSeries.length) {
-                console.log('data done', aSeries);
-                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(aSeries);
+                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
                 this.analyzerData.analyzerSeries.forEach((series) => {
                   // Array of observations using full range of dates
                   series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
                 });
                 // The default series displayed in the chart on load should be the series with the longest range of data
-                const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
+                const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
+                if (urlChartSeries) {
+                  urlChartSeries.forEach((cSeries) => {
+                    const series = this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === cSeries);
+                    series.showInChart = true;
+                  });
+                }
                 this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
                 this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
               }
             });
         });
-      this.analyzerData.analyzerSeries.push(seriesData);
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  getObservations(seriesId, seriesData, urlChartSeries, aSeries, seriesIndex) {
+    this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
+      seriesData.observations = observations;
+      const levelData = seriesData.observations.transformationResults[0].dates;
+      const obsStart = seriesData.observations.observationStart;
+      const obsEnd = seriesData.observations.observationEnd;
+      const dateArray = [];
+      if (levelData) {
+        // Use to format dates for table
+        this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+        const data = this._helper.dataTransform(seriesData.observations, dateArray, seriesData.seriesDetail.decimals);
+        seriesData.chartData = data.chartData;
+        seriesData.seriesTableData = data.tableData;
+      } else {
+        seriesData.noData = 'Data not available';
+      }
+    },
+      (error) => {
+        console.log('error', error);
+      },
+      () => {
+        seriesIndex++;
+        this.analyzerData.analyzerSeries.push(seriesData);
+        if (seriesIndex === aSeries.length) {
+          this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+          this.analyzerData.analyzerSeries.forEach((series) => {
+            // Array of observations using full range of dates
+            series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+          });
+          // The default series displayed in the chart on load should be the series with the longest range of data
+          const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
+          if (urlChartSeries) {
+            urlChartSeries.forEach((cSeries) => {
+              const series = this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === cSeries);
+              series.showInChart = true;
+            });
+          }
+          this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
+          this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+        }
+      });
   }
 
   setAnalyzerDates(analyzerSeries) {
     const frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
     analyzerSeries.forEach((series) => {
-      const freqExist = frequencies.find(freq => freq.freq === series.frequencyShort);
+      const freqExist = frequencies.find(freq => freq.freq === series.seriesDetail.frequencyShort);
       if (!freqExist) {
-        frequencies.push({ freq: series.frequencyShort, label: series.frequency });
+        frequencies.push({ freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency });
       }
       // Get earliest start date and latest end date
-      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
+      this.setDateWrapper(dateWrapper, series.observations.observationStart, series.observations.observationEnd);
     });
     // Array of full range of dates for series selected in analyzer
     return this.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
@@ -124,17 +172,15 @@ export class AnalyzerService {
     return longestSeries;
   }
 
-  updateAnalyzer(seriesInfo, tableData?, chartData?) {
-    console.log('seriesInfo', seriesInfo);
-    const seriesExist = this.analyzerSeries.findIndex(seriesId => seriesId === seriesInfo.id);
-    console.log(seriesExist)
+  updateAnalyzer(seriesId, tableData?, chartData?) {
+    const seriesExist = this.analyzerSeries.findIndex(id => id === seriesId);
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
+      this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
     }
     if (seriesExist < 0) {
-      this.analyzerSeries.push(seriesInfo.id);
+      this.analyzerSeries.push(seriesId);
     }
-    console.log('analyzer series', this.analyzerSeries)
     /* if (seriesInfo.analyze) {
       const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
       const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);

@@ -161,7 +161,6 @@ export class HighstockComponent implements OnChanges {
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
-    console.log('start date', startDate);
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
 

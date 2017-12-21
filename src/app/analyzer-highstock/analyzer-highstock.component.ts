@@ -26,6 +26,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() allDates;
   @Input() portalSettings;
   @Input() alertMessage;
+  @Input() start;
+  @Input() end;
+  @Input() tooltip;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   options;
@@ -102,7 +105,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         opposite.update({ opposite: false, id: 'yAxis0' });
       }
       const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
-      if (remainingAxis) {
+      if (remainingAxis && remainingAxis.series[0]) {
         this.checkRemainingSeries(remainingAxis, chart, aSeries);
       }
     }
@@ -429,6 +432,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
+    const startDate = this.start ? this.start : null;
+    const endDate = this.end ? this.end : null;
+    const tooltipName = this.tooltip ? this.tooltip.name === 'true' : false;
+    const tooltipUnits = this.tooltip ? this.tooltip.units === 'true' : false;
+    const tooltipGeo = this.tooltip ? this.tooltip.geography === 'true' : false;
+
     this.options = {
       chart: {
         alignTicks: false,
@@ -457,6 +466,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         }
       },
       rangeSelector: {
+        selected: !startDate && !endDate ? 3 : null,
         buttons: buttons,
         buttonPosition: {
           x: 10,
@@ -519,7 +529,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         shadow: false,
         shared: true,
         formatter: function (args) {
-          return tooltipFormatter(args, this.points, this.x);
+          return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
         }
       },
       credits: {
@@ -527,6 +537,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       xAxis: {
         minRange: 1000 * 3600 * 24 * 30 * 12,
+        min: startDate ? Date.parse(startDate) : undefined,
+        max: endDate ? Date.parse(endDate) : undefined,
         ordinal: false
       },
       yAxis: yAxis,

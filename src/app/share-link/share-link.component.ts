@@ -79,10 +79,10 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     let cSeries = ';chartSeries=';
     if (this.analyzerSeries.length) {
       this.analyzerSeries.forEach((series, index) => {
-        aSeries += index === 0 ? series.id : '-' + series.id;
+        aSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
       this.chartSeries.forEach((series, index) => {
-        cSeries += index === 0 ? series.id : '-' + series.id;
+        cSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
     }
     seriesUrl += start + end;

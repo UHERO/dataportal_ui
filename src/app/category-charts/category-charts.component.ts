@@ -92,6 +92,8 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
   }
 
   updateAnalyze(seriesInfo, tableData, chartData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
+    this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
+    // Update analyze button on chart
+    seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
   }
 }

@@ -18,6 +18,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() maxDate;
   @Input() allTableDates;
   @Input() chartSeries;
+  @Input() tableOptions;
   @Output() updateChartSeries = new EventEmitter();
   @Output() tableTransform = new EventEmitter();
   portalSettings;
@@ -51,7 +52,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     }
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
-    console.log('table series', this.series)
     this.series.forEach((series) => {
       series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
@@ -109,7 +109,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
 
   updateAnalyze(series) {
-    this._analyzer.updateAnalyzer(series);
+    this._analyzer.updateAnalyzer(series.seriesDetail.id);
     this.updateChartSeries.emit(series);
   }
 

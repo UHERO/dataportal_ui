@@ -80,7 +80,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.route.params.subscribe(params => {
-      console.log('route params', params);
       if (params['start']) {
         this.startDate = params['start'];
       }
@@ -129,7 +128,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
-    console.log('chart start', this.chartStart);
     this.chartEnd = e.maxDate;
   }
 

@@ -108,7 +108,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     if (analyzer) {
       analyzerSeries.forEach((series) => {
         const observations = {};
-        const title = series.displayName;
+        const title = series.seriesDetail.title + ' (' + series.seriesDetail.frequencyShort + ', ' + series.seriesDetail.geography.handle + ')';
         series.analyzerTableData.forEach((obs) => {
           observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
         });
