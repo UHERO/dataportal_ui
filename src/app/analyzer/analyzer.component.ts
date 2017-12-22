@@ -19,7 +19,6 @@ export class AnalyzerComponent implements OnInit {
   private portalSettings;
   private alertUser;
   private alertMessage = '';
-  analyzerSeries;
   private tableYoy;
   private tableYtd;
   private tableC5ma;
@@ -47,11 +46,15 @@ export class AnalyzerComponent implements OnInit {
       if (params['analyzerSeries']) {
         urlASeries = params['analyzerSeries'].split('-').map(Number);
         urlASeries.forEach((uSeries) => {
-            this._analyzer.analyzerSeries.push(uSeries);
+            this._analyzer.analyzerSeries.push({ id: uSeries });
         });
       }
       if (params['chartSeries']) {
         urlCSeries = params['chartSeries'].split('-').map(Number);
+        urlCSeries.forEach((cSeries) => {
+          const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+          aSeries.showInChart = true;
+        });
       }
       if (params['start']) {
         this.startDate = params['start'];
@@ -80,9 +83,7 @@ export class AnalyzerComponent implements OnInit {
     });
 
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
-    this.analyzerSeries = this._analyzer.analyzerSeries;
-    console.log('analyzerSeries', this.analyzerSeries);
-    this.analyzerData = this._analyzer.getAnalyzerData(this.analyzerSeries, urlCSeries);
+    this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
   }
 
   setInitialChartSeries(analyzerSeries: Array<any>) {
@@ -115,7 +116,6 @@ export class AnalyzerComponent implements OnInit {
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
     const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesDetail.id);
-    this.analyzerSeries = this._analyzer.analyzerSeries;
     const seriesSelected = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
     if (this._analyzer.analyzerData.analyzerSeries.length && !seriesSelected) {
@@ -135,15 +135,16 @@ export class AnalyzerComponent implements OnInit {
       this.alertUser = false;
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
+      // toggle showInChart in list of analyzer series
+      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesDetail.id);
+      aSeries.showInChart = !aSeries.showInChart;
     }
     this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
   }
 
   updateChartSeries(analyzerSeries: Array<any>) {
     // Update series drawn in chart and dates in analyzer table
-    console.log('update chart series', analyzerSeries)
     this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
-    console.log('analyzerData', this._analyzer.analyzerData)
     analyzerSeries.forEach((series) => {
       series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this._analyzer.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
     });
@@ -172,7 +173,6 @@ export class AnalyzerComponent implements OnInit {
 
   checkTooltip(e) {
     if (e.label === 'name') {
-      console.log('e', e)
       this.tooltipName = e.value;
     }
     if (e.label === 'units') {

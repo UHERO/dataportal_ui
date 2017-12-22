@@ -5,6 +5,7 @@ import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
 import { DateWrapper } from './date-wrapper';
+import { notEqual } from 'assert';
 
 @Injectable()
 export class AnalyzerService {
@@ -19,27 +20,32 @@ export class AnalyzerService {
   };
 
   checkAnalyzer(seriesInfo) {
-    const analyzeSeries = this.analyzerSeries.find(seriesId => seriesId === seriesInfo.id);
+    const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
-  getAnalyzerData(aSeries, urlChartSeries) {
+  getAnalyzerData(aSeries) {
     let seriesIndex = 0;
     this.analyzerData.analyzerSeries = [];
-    aSeries.forEach((seriesId, index) => {
+    aSeries.forEach((series, index) => {
       let decimals;
       const seriesData = {
         seriesDetail: {},
         currentGeo: <Geography>{},
         currentFreq: <Frequency>{},
         chartData: {},
+        displayName: '',
         seriesTableData: [],
         error: null,
         noData: '',
-        observations: { transformationResults: [], observationStart: '', observationEnd: '' }
+        observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+        showInChart: series.showInChart
       };
-      this._uheroAPIService.fetchSeriesDetail(seriesId).subscribe((detail) => {
+      this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
+        seriesData.displayName = detail.seasonalAdjustment === 'seasonally_adjusted' ?
+          detail.title + ' (' + detail.geography.handle + ', ' + detail.frequencyShort + '; SA)' :
+          detail.title + ' (' + detail.geography.handle + ', ' + detail.frequencyShort + '; SA)';
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
         seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
@@ -48,8 +54,7 @@ export class AnalyzerService {
           console.log('error', error);
         },
         () => {
-          //this.getObservations(seriesId, seriesData, urlChartSeries, aSeries, seriesIndex);
-          this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
+          this._uheroAPIService.fetchObservations(series.id).subscribe((observations) => {
             seriesData.observations = observations;
             const levelData = seriesData.observations.transformationResults[0].dates;
             const obsStart = seriesData.observations.observationStart;
@@ -79,64 +84,19 @@ export class AnalyzerService {
                 });
                 // The default series displayed in the chart on load should be the series with the longest range of data
                 const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
-                console.log('urlChartSeries', urlChartSeries)
-                if (urlChartSeries) {
-                  urlChartSeries.forEach((cSeries) => {
-                    const series = this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === cSeries);
-                    series.showInChart = true;
-                    console.log(this.analyzerData.analyzerSeries);
-                  });
-                }
                 this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
                 this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+                while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1) {
+                  const notInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart !== true);
+                  this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true; 
+                  notInChart.showInChart = true;
+                  this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);                  
+                }
               }
             });
         });
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
-  }
-
-  getObservations(seriesId, seriesData, urlChartSeries, aSeries, seriesIndex) {
-    this._uheroAPIService.fetchObservations(seriesId).subscribe((observations) => {
-      seriesData.observations = observations;
-      const levelData = seriesData.observations.transformationResults[0].dates;
-      const obsStart = seriesData.observations.observationStart;
-      const obsEnd = seriesData.observations.observationEnd;
-      const dateArray = [];
-      if (levelData) {
-        // Use to format dates for table
-        this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-        const data = this._helper.dataTransform(seriesData.observations, dateArray, seriesData.seriesDetail.decimals);
-        seriesData.chartData = data.chartData;
-        seriesData.seriesTableData = data.tableData;
-      } else {
-        seriesData.noData = 'Data not available';
-      }
-    },
-      (error) => {
-        console.log('error', error);
-      },
-      () => {
-        seriesIndex++;
-        this.analyzerData.analyzerSeries.push(seriesData);
-        if (seriesIndex === aSeries.length) {
-          this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-          this.analyzerData.analyzerSeries.forEach((series) => {
-            // Array of observations using full range of dates
-            series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
-          });
-          // The default series displayed in the chart on load should be the series with the longest range of data
-          const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
-          if (urlChartSeries) {
-            urlChartSeries.forEach((cSeries) => {
-              const series = this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === cSeries);
-              series.showInChart = true;
-            });
-          }
-          this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
-          this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
-        }
-      });
   }
 
   setAnalyzerDates(analyzerSeries) {
@@ -175,29 +135,14 @@ export class AnalyzerService {
   }
 
   updateAnalyzer(seriesId, tableData?, chartData?) {
-    const seriesExist = this.analyzerSeries.findIndex(id => id === seriesId);
+    const seriesExist = this.analyzerSeries.findIndex(series => series.id === seriesId);
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
     }
     if (seriesExist < 0) {
-      this.analyzerSeries.push(seriesId);
+      this.analyzerSeries.push({ id: seriesId });
     }
-    /* if (seriesInfo.analyze) {
-      const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
-      const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);
-      if (seriesIndex > -1) {
-        this.analyzerSeries.splice(seriesIndex, 1);
-      }
-      seriesInfo.analyze = false;
-      return;
-    }
-    if (!seriesInfo.analyze) {
-      seriesInfo.tableData = tableData;
-      seriesInfo.chartData = chartData;
-      this.analyzerSeries.push(seriesInfo);
-      seriesInfo.analyze = true;
-    } */
   }
 
   createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {

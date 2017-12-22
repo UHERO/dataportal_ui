@@ -70,7 +70,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         text: 'Download CSV <i class="fa fa-file-excel-o" aria-hidden="true"></i>',
         filename: analyzer ? 'analyzer' : sublistName,
         customize: function (csv) {
-          return  analyzer ? portalSettings.catTable.portalSource + '\n\n' + csv :
+          return analyzer ? portalSettings.catTable.portalSource + '\n\n' + csv :
             portalSettings.catTable.portalSource +
             parentName + sublistName + ' (' + geoName + freq.label + ')' +
             ': ' + portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
@@ -108,10 +108,12 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     if (analyzer) {
       analyzerSeries.forEach((series) => {
         const observations = {};
-        const title = series.seriesDetail.title + ' (' + series.seriesDetail.frequencyShort + ', ' + series.seriesDetail.geography.handle + ')';
-        series.analyzerTableData.forEach((obs) => {
-          observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
-        });
+        const title = series.displayName;
+        if (series.analyzerTableData) {
+          series.analyzerTableData.forEach((obs) => {
+            observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
+          });
+        }
         tableData.push({
           series: title,
           observations: observations
@@ -169,7 +171,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       });
     analyzerSeries.forEach((series) => {
       const ytd = {};
-      const percent = series.percent;
+      const percent = series.seriesDetail.percent;
       const ytdLabel = percent ? ' (ch)' : ' (%)';
       const title = series.displayName;
       series.analyzerTableData.forEach((obs) => {
@@ -221,7 +223,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       });
     analyzerSeries.forEach((series) => {
       const ytd = {};
-      const percent = series.percent;
+      const percent = series.seriesDetail.percent;
       const ytdLabel = percent ? ' (ch)' : ' (%)';
       const title = series.displayName;
       series.analyzerTableData.forEach((obs) => {
@@ -273,7 +275,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       });
     analyzerSeries.forEach((series) => {
       const c5ma = {};
-      const percent = series.percent;
+      const percent = series.seriesDetail.percent;
       const c5maLabel = percent ? ' (ch)' : ' (%)';
       const title = series.displayName;
       series.analyzerTableData.forEach((obs) => {

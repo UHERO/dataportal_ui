@@ -28,14 +28,13 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() alertMessage;
   @Input() start;
   @Input() end;
-  // @Input() tooltip;
+  @Input() nameChecked;
+  @Input() unitsChecked;
+  @Input() geoChecked;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   options;
   chart;
-  @Input() nameChecked;
-  @Input() unitsChecked;
-  @Input() geoChecked;
 
   constructor(private _analyzer: AnalyzerService) { }
 
@@ -91,6 +90,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   removeFromChart(aSeries, chart) {
     // Filter out series from chart that are not in analayzerSeries
+    console.log('chart', chart)
     const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
     removeSeries.forEach((series) => {
       series.remove();
@@ -397,12 +397,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     }
     series.forEach((serie, index) => {
       // Find corresponding y-axis on initial display (i.e. no chartInstance)
-      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
+      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
         className: serie.seriesDetail.id,
-        name: serie.seriesDetail.seasonallyAdjusted ?
-          serie.seriesDetail.title + ' (' + serie.seriesDetail.frequencyShort + '; ' + serie.seriesDetail.geography.handle + '; SA)' :
-          serie.seriesDetail.title + ' (' + serie.seriesDetail.frequencyShort + '; ' + serie.seriesDetail.geography.handle + ')',
+        name: serie.displayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         displayName: serie.seriesDetail.title,
@@ -552,8 +550,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   saveInstance(chartInstance) {
-    this.chart = chartInstance;
-    this.setTableExtremes(chartInstance);
+    // work around for when exporting destroys chartInstace (https://github.com/gevgeny/angular2-highcharts/issues/158)
+    if (!this.chart) {
+      this.chart = chartInstance;
+      this.setTableExtremes(chartInstance);  
+    }
   }
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
