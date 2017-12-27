@@ -1,4 +1,4 @@
-<chart id="analyzer-chart" type="StockChart" [options]="options" (load)="saveInstance($event.context)">
+<chart id="analyzer-chart" type="StockChart" *ngIf="showChart" [options]="options" (load)="saveInstance($event.context)">
     <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
 </chart>
 <div class="customize-tooltip">

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { HighchartComponent } from 'app/highchart/highchart.component';
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
@@ -35,6 +36,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Output() tooltipOptions = new EventEmitter();
   options;
   chart;
+  showChart;
 
   constructor(private _analyzer: AnalyzerService) { }
 
@@ -42,18 +44,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    // 'destroy' chart on changes
+    this.showChart = false;
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries;
     if (this.series.length) {
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);      
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);      
     }
-    if (this.chart) {
-      const navDates = this.createNavigatorDates(this.allDates);
-      // If a chart has been generated:
-      // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
-      this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
-      // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.addToChart(selectedAnalyzerSeries.series, this.chart, navDates);
+    /* if (this.chart) {
+      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);      
+      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons)
       // Add a chart subtitle to alert user of a warning
       this.chart.setSubtitle({
         text: this.alertMessage,
@@ -66,7 +66,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         }, 3000);
       }
       return;
-    }
+    } */
     // Draw chart if no chart exists
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -88,132 +88,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return chartButtons;
   }
 
-  removeFromChart(aSeries, chart) {
-    // Filter out series from chart that are not in analayzerSeries
-    console.log('chart', chart)
-    const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
-    removeSeries.forEach((series) => {
-      series.remove();
-    });
-    // Remove y-axis if it has no series
-    const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
-    if (noSeriesAxis) {
-      noSeriesAxis.remove();
-      // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
-      const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
-      if (opposite) {
-        opposite.update({ opposite: false, id: 'yAxis0' });
-      }
-      const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
-      if (remainingAxis && remainingAxis.series[0]) {
-        this.checkRemainingSeries(remainingAxis, chart, aSeries);
-      }
-    }
-  }
-
-  checkRemainingSeries(remainingAxis, chart, analyzerSeries) {
-    // after removing series from chart, check if series on remaining axis differ by an order of magnitude
-    const maxValue = Math.max(...remainingAxis.series[0].options.data.map(l => l[1]));
-    const minValue = Math.min(...remainingAxis.series[0].options.data.map(l => l[1]));
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    remainingAxis.series.forEach((serie) => {
-      const level = serie.options.data;
-      const sufficientOverlap = this.isOverlapSufficient(level, minValue, maxValue);
-      if (!sufficientOverlap) {
-        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === serie.userOptions.className);
-        serie.remove();
-        this.addYAxis(chart, redrawSeries, redrawSeries.unitsLabelShort, y0Exist);
-        redrawSeries.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
-        chart.addSeries(redrawSeries);
-      }
-    });
-  }
-
-  addToChart(analyzerSeries, chart, navDates) {
-    // Filter out series that have been selected in the analyzer but are not currently in the chart
-    const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
-    let yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
-    if (addSeries.length) {
-      addSeries.forEach((series) => {
-        // If chart has no y-axes, add axes, and draw series
-        if (!yAxes.length) {
-          this.addYAxis(chart, series, series.units, false);
-          yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
-        }
-        this.addSeriesToChart(yAxes, series, chart, analyzerSeries);
-      });
-      // Use nav dates as the series drawn in the navigator
-      chart.addSeries({
-        data: navDates,
-        showInNavigator: true,
-        index: -1,
-        colorIndex: -1,
-        yAxis: "navigator-y-axis",
-        name: 'Navigator'
-      });
-    }
-  }
-
-  addSeriesToChart(yAxes: Array<any>, series, chart, analyzerSeries) {
-    // If more than one yAxes, find which axis the series should be added to
-    if (yAxes.length > 1) {
-      this.addSeriesToDualAxisChart(yAxes, series, chart, analyzerSeries);
-    }
-    // If chart has one yAxis, evaluate if series should be added to existing axis or drawn on a new one
-    if (yAxes.length === 1) {
-      this.addSeriesToSingleAxisChart(yAxes, series, chart);
-    }
-  }
-
-  addSeriesToDualAxisChart(yAxes: Array<any>, series, chart, analyzerSeries: Array<any>) {
-    const seriesUnits = series.unitsLabelShort;
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    const unitAxis = yAxes.filter(y => y.userOptions.title.text === seriesUnits);
-    // If two axes exist with the same units
-    if (unitAxis.length === 2) {
-      let highestOverlapSeries;
-      const seriesMin = Math.min(...series.data.map(l => l[1]));
-      const seriesMax = Math.max(...series.data.map(l => l[1]));
-      unitAxis.forEach((axis) => {
-        highestOverlapSeries = this.findHighestOverlap(axis.series, seriesMin, seriesMax);
-      });
-      series.yAxis = highestOverlapSeries.options.yAxis;
-      chart.addSeries(series);
-      return;
-    }
-    // If one axis exists with the same units
-    if (unitAxis.length === 1) {
-      series.yAxis = unitAxis[0].userOptions.id;
-      chart.addSeries(series);
-      return;
-    }
-    // If no axes exist for the series' units (consolidate series drawn onto 1 axis)
-    if (!unitAxis.length) {
-      // Find series drawn on second axis (i.e. yAxis === 'yAxis1')
-      const y1Series = chart.series.filter(cSeries => cSeries.userOptions.yAxis === 'yAxis1');
-      y1Series.forEach((s) => {
-        // Get original data of series drawn on one axis to be redrawn on other
-        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === s.userOptions.className);
-        // Remove series from chart, reassign it to yAxis0, and add back to chart
-        s.remove();
-        redrawSeries.yAxis = 'yAxis0';
-        chart.addSeries(redrawSeries);
-      });
-      // Remove second axis
-      const y1Axis = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis1');
-      y1Axis.remove();
-      series.yAxis = 'yAxis1';
-      // Redraw axis with units of the new series to be added
-      this.addYAxis(chart, series, seriesUnits, y0Exist);
-      // Add new series to chart
-      chart.addSeries(series);
-    }
-  }
-
   findHighestOverlap(axisSeries, seriesMin, seriesMax) {
     let highestOverlap, highestOverlapSeries;
     axisSeries.forEach((aSeries) => {
-      const level = aSeries.options.data;
+      const level = aSeries.chartData.level;
       const overlap = this.calculateOverlap(level, seriesMin, seriesMax);
       if (!highestOverlap || overlap >= highestOverlap) {
         highestOverlap = overlap;
@@ -221,40 +99,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
     });
     return highestOverlapSeries;
-  }
-
-  addSeriesToSingleAxisChart(yAxes: Array<any>, series, chart) {
-    const seriesUnits = series.unitsLabelShort;
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0') ? true : false;
-    // Check if a y axis already exists for the new series' units
-    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
-    // If no, draw series on a new y axis
-    if (!unitAxis) {
-      this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
-      return;
-    }
-    // If yes, compare with values of currently drawn series
-    if (unitAxis) {
-      const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
-      const seriesMinValue = Math.max(...series.data.map(l => l[1]));
-      const sufficientOverlap = unitAxis.userOptions.series.every((serie) => {
-        const level = serie.chartData ? serie.chartData.level : serie.data;
-        return this.isOverlapSufficient(level, seriesMinValue, seriesMaxValue);
-      });
-      if (!sufficientOverlap) {
-        this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
-      }
-      if (sufficientOverlap) {
-        series.yAxis = unitAxis.userOptions.id;
-        chart.addSeries(series);
-      }
-    }
-  }
-
-  drawNewYAxis(chart, series, seriesUnits: string, y0Exist) {
-    this.addYAxis(chart, series, seriesUnits, y0Exist);
-    series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
-    chart.addSeries(series);
   }
 
   addYAxis(chart, series, seriesUnits, y0Exist) {
@@ -340,6 +184,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
+    // TO DO: Check series for sufficient overlap
+    // If no sufficient overlap with any series, group with series with the highest overlap
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
@@ -387,16 +233,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return navigatorDates;
   }
 
-  formatSeriesData(series, chartInstance, dates) {
+  formatSeriesData(series, dates) {
     const chartSeries = [];
     let yAxes;
-    // Check if chartInstance exists, i.e. if chart is already drawn
-    // False when navigating to analyzer
-    if (!chartInstance) {
-      yAxes = this.createYAxes(series, []);
-    }
+    yAxes = this.createYAxes(series, []);
     series.forEach((serie, index) => {
-      // Find corresponding y-axis on initial display (i.e. no chartInstance)
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
         className: serie.seriesDetail.id,
@@ -408,6 +249,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
         showInNavigator: false,
+        events: {
+          legendItemClick: function() {
+            return false;
+          }
+        },
         unitsLabelShort: serie.seriesDetail.unitsLabelShort,
         seasonallyAdjusted: serie.seriesDetail.seasonallyAdjusted,
         dataGrouping: {
@@ -416,16 +262,15 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    if (!chartInstance) {
       const navDates = this.createNavigatorDates(dates);
       chartSeries.push({
         data: navDates,
+        showInLegend: false,
         showInNavigator: true,
         index: -1,
         colorIndex: -1,
         name: 'Navigator'
       });
-    }
     return { series: chartSeries, yAxis: yAxes };
   }
 
@@ -463,6 +308,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           display: 'none'
         }
       },
+      legend: {
+        enabled: true,
+        // align: 'top',
+        // verticalAlign: 'top'
+      },
       rangeSelector: {
         selected: !startDate && !endDate ? 3 : null,
         buttons: buttons,
@@ -484,7 +334,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         }
       },
       exporting: {
-        buttons: {
+        /* buttons: {
           contextButton: {
             enabled: false
           },
@@ -493,7 +343,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
             _titleKey: 'exportKey',
             menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
           }
-        },
+        }, */
         chartOptions: {
           events: null,
           navigator: {
@@ -547,14 +397,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       },
       series: series
     };
+    console.log('Highcharts', Highcharts.getOptions());
+    this.showChart = true;
   }
 
   saveInstance(chartInstance) {
-    // work around for when exporting destroys chartInstace (https://github.com/gevgeny/angular2-highcharts/issues/158)
-    if (!this.chart) {
-      this.chart = chartInstance;
-      this.setTableExtremes(chartInstance);  
-    }
+    this.setTableExtremes(chartInstance);
   }
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
@@ -681,31 +529,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return tooltip;
   }
 
-  reformatTooltip(chart, tooltipFormatter) {
-    const name = this.nameChecked;
-    const units = this.unitsChecked;
-    const geo = this.geoChecked;
-    chart.tooltip.options.formatter = function (args) {
-      return tooltipFormatter(args, this.points, this.x, name, units, geo);
-    };
-  }
-
   nameActive(e, chart, tooltipFormatter) {
     this.nameChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-    return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   unitsActive(e, chart, tooltipFormatter) {
     this.unitsChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });    
-    return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   geoActive(e, chart, tooltipFormatter) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });    
-    return this.reformatTooltip(chart, tooltipFormatter);
   }
 
   setTableExtremes(e) {
