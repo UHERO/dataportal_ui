@@ -46,13 +46,15 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.id = params['id'];
-      this.geo = params['geo'] ? params['geo'] : null;
-      this.freq = params['freq'] ? params['freq'] : null;
-      this.sa = params['sa'] ? params['sa'] : null;
-      this.shareLink = this.createSeriesShareLink();
-    });
+    if (this.route) {
+      this.route.queryParams.subscribe(params => {
+        this.id = params['id'];
+        this.geo = params['geo'] ? params['geo'] : null;
+        this.freq = params['freq'] ? params['freq'] : null;
+        this.sa = params['sa'] ? params['sa'] : null;
+        this.shareLink = this.createSeriesShareLink();
+      });
+    }
   }
 
   ngOnChanges() {

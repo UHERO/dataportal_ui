@@ -43,9 +43,7 @@ export class AnalyzerService {
       };
       this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
-        seriesData.displayName = detail.seasonalAdjustment === 'seasonally_adjusted' ?
-          detail.title + ' (' + detail.geography.handle + ': ' + detail.frequencyShort + '; SA)' :
-          detail.title + ' (' + detail.geography.handle + ': ' + detail.frequencyShort + '; SA)';
+        seriesData.displayName = this.formatDisplayName(detail);
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
         seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
@@ -97,6 +95,18 @@ export class AnalyzerService {
         });
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  formatDisplayName(detail) {
+    if (detail.seasonalAdjustment === 'seasonally_adjusted') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Seasonally Adjusted)';
+    }
+    if (detail.seasonalAdjustment === 'not_seasonally_adjusted') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Not Seasonally Adjusted)';
+    }
+    if (detail.seasonalAdjustment === 'not_applicable') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + ')';
+    }
   }
 
   setAnalyzerDates(analyzerSeries) {

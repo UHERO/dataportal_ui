@@ -49,7 +49,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries;
     if (this.series.length) {
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);      
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
     }
     /* if (this.chart) {
       const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);      
@@ -71,7 +71,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
     if (!this.chart && selectedAnalyzerSeries) {
-      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);      
+      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
     }
   }
 
@@ -86,19 +86,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return allButtons;
     }, []);
     return chartButtons;
-  }
-
-  findHighestOverlap(axisSeries, seriesMin, seriesMax) {
-    let highestOverlap, highestOverlapSeries;
-    axisSeries.forEach((aSeries) => {
-      const level = aSeries.chartData.level;
-      const overlap = this.calculateOverlap(level, seriesMin, seriesMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapSeries = aSeries;
-      }
-    });
-    return highestOverlapSeries;
   }
 
   addYAxis(chart, series, seriesUnits, y0Exist) {
@@ -151,7 +138,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
-      const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
+      // use series with the maximum level value as the base to compare with other series
+      const maxValueSeries = this.findMaxLevelSeries(unit);
+      const level = maxValueSeries.chartData.level;
       const maxValue = Math.max(...level.map(l => l[1]));
       const minValue = Math.min(...level.map(l => l[1]));
       yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
@@ -164,6 +153,18 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       });
       return yAxesGroups;
     }
+  }
+
+  findMaxLevelSeries(unit) {
+    let maxLevelValue, maxValueSeries;
+    unit.series.forEach((s) => {
+      const max = Math.max(...s.chartData.level.map(l => l[1]));
+      if (!maxLevelValue || max > maxLevelValue) {
+        maxLevelValue = max;
+        maxValueSeries = s;
+      }
+    });
+    return maxValueSeries;
   }
 
   // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
@@ -183,24 +184,49 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
   }
 
+  findHighestOverlap(yAxesGroups, baseMin, baseMax) {
+    const y0Series = yAxesGroups[0].series;
+    const y1Series = yAxesGroups[1].series;
+    let highestOverlap, highestOverlapAxis;
+    y0Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y0Series;
+      }
+    });
+    y1Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y1Series;
+      }
+    });
+    return highestOverlapAxis;
+  }
+
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
-    // TO DO: Check series for sufficient overlap
-    // If no sufficient overlap with any series, group with series with the highest overlap
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
       const sufficientOverlap = this.isOverlapSufficient(level, baseMin, baseMax);
       const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
-      if (!sufficientOverlap && !yAxis1) {
-        yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
-        return;
-      }
-      if (!sufficientOverlap && yAxis1) {
-        yAxis1.series.push(serie);
-        return;
-      }
       if (sufficientOverlap) {
         yAxesGroups[0].series.push(serie);
+        return;
+      }
+      if (!sufficientOverlap) {
+        if (yAxis1) {
+          const highestOverlapAxis = this.findHighestOverlap(yAxesGroups, baseMin, baseMax);
+          highestOverlapAxis.push(serie)
+          return;
+        }
+        if (!yAxis1) {
+          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+          return;
+        }
       }
     });
     return yAxesGroups;
@@ -250,7 +276,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         geography: serie.seriesDetail.geography.name,
         showInNavigator: false,
         events: {
-          legendItemClick: function() {
+          legendItemClick: function () {
             return false;
           }
         },
@@ -262,16 +288,16 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-      const navDates = this.createNavigatorDates(dates);
-      chartSeries.push({
-        data: navDates,
-        showInLegend: false,
-        showInNavigator: true,
-        includeInCSVExport: false,
-        index: -1,
-        colorIndex: -1,
-        name: 'Navigator'
-      });
+    const navDates = this.createNavigatorDates(dates);
+    chartSeries.push({
+      data: navDates,
+      showInLegend: false,
+      showInNavigator: true,
+      includeInCSVExport: false,
+      index: -1,
+      colorIndex: -1,
+      name: 'Navigator'
+    });
     return { series: chartSeries, yAxis: yAxes };
   }
 
@@ -283,154 +309,151 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const tooltipGeo = this.geoChecked;
 
     this.options = {
-      chart: {
-        alignTicks: false,
-        zoomType: 'x',
-        // Description used in xAxis label formatter
-        // description: freq.freq
-      },
+      chart: {},
       labels: {
-        items: [{
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: portalSettings.highstock.labels.portal,
-        }, {
-          html: portalSettings.highstock.labels.portalLink
-        }, {
-          html: ''
-        }],
-        style: {
-          display: 'none'
-        }
+        style: {}
       },
-      legend: {
-        enabled: true,
-        // align: 'top',
-        // verticalAlign: 'top'
-      },
+      legend: {},
       rangeSelector: {
-        selected: !startDate && !endDate ? 3 : null,
-        buttons: buttons,
-        buttonPosition: {
-          x: 10,
-          y: 10
-        },
-        labelStyle: {
-          visibility: 'hidden'
-        },
-        inputEnabled: false
+        labelStyle: {}
       },
-      lang: {
-        exportKey: 'Download Chart'
-      },
+      lang: {},
       exporting: {
         buttons: {
-          contextButton: {
-            enabled: false
-          },
-          exportButton: {
-            text: 'Download',
-            _titleKey: 'exportKey',
-            menuItems: [
-              {
-                textKey: 'downloadPNG',
-                onclick: function() {
-                  this.exportChart();
-                }
-              },
-              {
-                textKey: 'downloadJPEG',
-                onclick: function () {
-                  this.exportChart({
-                    type: 'image/jpeg'
-                  });
-                }
-              },
-              {
-                textKey: 'downloadPDF',
-                onclick: function () {
-                  this.exportChart({
-                    type: 'application/pdf'
-                  });
-                }
-              },
-              {
-                textKey: 'downloadSVG',
-                onclick: function () {
-                  this.exportChart({
-                    type: 'image/svg+xml'
-                  });
-                }
-              },
-              {
-                textKey: 'downloadCSV',
-                onclick: function() {
-                  this.downloadCSV();
-                }
-              }
-            ]
-          }
+          contextButton: {},
+          exportButton: {}
         },
         chartOptions: {
-          events: null,
-          navigator: {
-            enabled: false
-          },
-          scrollbar: {
-            enabled: false
-          },
-          rangeSelector: {
-            enabled: false
-          },
-          credits: {
-            enabled: true,
-            text: portalSettings.highstock.credits,
-            position: {
-              align: 'right',
-              x: -115,
-              y: -41
-            }
-          },
-          title: {
-            align: 'left'
-          },
-          subtitle: {
-            text: ''
-          }
+          navigator: {},
+          scrollbar: {},
+          rangeSelector: {},
+          credits: {},
+          title: {},
+          subtitle: {}
         }
       },
-      tooltip: {
-        borderWidth: 0,
-        shadow: false,
-        shared: true,
-        formatter: function (args) {
-          return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-        }
-      },
-      credits: {
-        enabled: false
-      },
-      xAxis: {
-        minRange: 1000 * 3600 * 24 * 30 * 12,
-        min: startDate ? Date.parse(startDate) : undefined,
-        max: endDate ? Date.parse(endDate) : undefined,
-        ordinal: false
-      },
-      yAxis: yAxis,
+      tooltip: {},
+      credits: {},
+      xAxis: {},
+      yAxis: [],
       plotOptions: {
-        series: {
-          cropThreshold: 0,
-        }
+        series: {}
       },
-      series: series
+      series: []
     };
-    console.log('Highcharts', Highcharts.getOptions());
+
+    // Chart Options
+    this.options.chart.alignTicks = false;
+    this.options.zoomType = 'x';
+
+    // Labels
+    this.options.labels.items = [
+      {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: portalSettings.highstock.labels.portal,
+      }, {
+        html: portalSettings.highstock.labels.portalLink
+      }, {
+        html: ''
+      }
+    ];
+    this.options.labels.style.display = 'none';
+
+    // Legend
+    this.options.legend.enabled = true;
+    this.options.legend.labelFormatter = function () {
+      return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
+    };
+
+    // Range Selector
+    this.options.rangeSelector.selected = !startDate && !endDate ? 3 : null;
+    this.options.rangeSelector.buttons = buttons;
+    this.options.rangeSelector.buttonPosition = { x: 10, y: 10 };
+    this.options.rangeSelector.labelStyle.visibility = 'hidden';
+    this.options.rangeSelector.inputEnabled = false;
+    this.options.lang.exportKey = 'Download Chart';
+
+    // Exporting
+    this.options.exporting.buttons.contextButton.enabled = false;
+    this.options.exporting.buttons.exportButton.text = 'Download';
+    this.options.exporting.buttons.exportButton._titleKey = 'exportKey';
+    this.options.exporting.buttons.exportButton.menuItems = [
+      {
+        textKey: 'downloadPNG',
+        onclick: function () {
+          this.exportChart();
+        }
+      }, {
+        textKey: 'downloadJPEG',
+        onclick: function () {
+          this.exportChart({
+            type: 'image/jpeg'
+          });
+        }
+      }, {
+        textKey: 'downloadPDF',
+        onclick: function () {
+          this.exportChart({
+            type: 'application/pdf'
+          });
+        }
+      }, {
+        textKey: 'downloadSVG',
+        onclick: function () {
+          this.exportChart({
+            type: 'image/svg+xml'
+          });
+        }
+      }, {
+        textKey: 'downloadCSV',
+        onclick: function () {
+          this.downloadCSV();
+        }
+      }
+    ];
+    this.options.exporting.chartOptions.events = null;
+    this.options.exporting.chartOptions.navigator.enabled = false;
+    this.options.exporting.chartOptions.scrollbar.enabled = false;
+    this.options.exporting.chartOptions.rangeSelector.enabled = false;
+    this.options.exporting.chartOptions.credits.enabled = true;
+    this.options.exporting.chartOptions.credits.text = portalSettings.highstock.credits;
+    this.options.exporting.chartOptions.credits.position = { align: 'right', x: -115, y: -41 };
+    this.options.exporting.chartOptions.title.align = 'left';
+    this.options.exporting.chartOptions.subtitle.text = '';
+
+    // Tooltip
+    this.options.tooltip.borderWidth = 0;
+    this.options.tooltip.shadow = false;
+    this.options.tooltip.shared = true;
+    this.options.tooltip.formatter = function (args) {
+      return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+    };
+
+    // Credits
+    this.options.credits.enabled = false;
+
+    // xAxis
+    this.options.xAxis.minRange = 1000 * 3600 * 24 * 30 * 12;
+    this.options.xAxis.min = startDate ? Date.parse(startDate) : undefined;
+    this.options.xAxis.max = endDate ? Date.parse(endDate) : undefined;
+    this.options.xAxis.ordinal = false;
+
+    // yAxis
+    this.options.yAxis = yAxis;
+
+    // Plot Options
+    this.options.plotOptions.series.cropThreshold = 0;
+
+    // Series
+    this.options.series = series;
+
     this.showChart = true;
   }
 
@@ -484,7 +507,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const unitsLabel = sUnits ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
       const geoLabel = sGeo ? point.userOptions.geography + '<br>' : '<br>';
-      const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted <br>' : '<br>';
       const label = displayName + ' ' + date + ': ' + value + unitsLabel;
       const pseudoZones = point.userOptions.pseudoZones;
       if (pseudoZones.length) {
@@ -498,7 +520,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         });
       }
       if (!pseudoZones.length) {
-        s += seriesColor + label + geoLabel + seasonal + '<br>';
+        s += seriesColor + label + geoLabel + '<br>';
       }
       return s;
     };
@@ -569,12 +591,12 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   unitsActive(e, chart, tooltipFormatter) {
     this.unitsChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });    
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
   }
 
   geoActive(e, chart, tooltipFormatter) {
     this.geoChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });    
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
   }
 
   setTableExtremes(e) {

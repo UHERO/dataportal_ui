@@ -41,46 +41,49 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     let urlCSeries;
-    this.route.params.subscribe(params => {
-      let urlASeries;
-      if (params['analyzerSeries']) {
-        urlASeries = params['analyzerSeries'].split('-').map(Number);
-        urlASeries.forEach((uSeries) => {
+    if (this.route) {
+      this.route.params.subscribe(params => {
+        let urlASeries;
+        if (params['analyzerSeries']) {
+          urlASeries = params['analyzerSeries'].split('-').map(Number);
+          urlASeries.forEach((uSeries) => {
             this._analyzer.analyzerSeries.push({ id: uSeries });
-        });
-      }
-      if (params['chartSeries']) {
-        urlCSeries = params['chartSeries'].split('-').map(Number);
-        urlCSeries.forEach((cSeries) => {
-          const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
-          aSeries.showInChart = true;
-        });
-      }
-      if (params['start']) {
-        this.startDate = params['start'];
-      }
-      if (params['end']) {
-        this.endDate = params['end'];
-      }
-      if (params['name']) {
-        this.tooltipName = (params['name'] === 'true');
-      }
-      if (params['units']) {
-        this.tooltipUnits = (params['units'] === 'true');
-      }
-      if (params['geography']) {
-        this.tooltipGeo = (params['geography'] === 'true');
-      }
-      if (params['yoy']) {
-        this.tableYoy = (params['yoy'] === 'true');
-      }
-      if (params['ytd']) {
-        this.tableYtd = (params['ytd'] === 'true');
-      }
-      if (params['c5ma']) {
-        this.tableC5ma = (params['c5ma'] === 'true');
-      }
-    });
+          });
+        }
+        if (params['chartSeries']) {
+          urlCSeries = params['chartSeries'].split('-').map(Number);
+          urlCSeries.forEach((cSeries) => {
+            const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+            aSeries.showInChart = true;
+          });
+        }
+        if (params['start']) {
+          this.startDate = params['start'];
+        }
+        if (params['end']) {
+          this.endDate = params['end'];
+        }
+        if (params['name']) {
+          this.tooltipName = (params['name'] === 'true');
+        }
+        if (params['units']) {
+          this.tooltipUnits = (params['units'] === 'true');
+        }
+        if (params['geography']) {
+          this.tooltipGeo = (params['geography'] === 'true');
+        }
+        if (params['yoy']) {
+          this.tableYoy = (params['yoy'] === 'true');
+        }
+        if (params['ytd']) {
+          this.tableYtd = (params['ytd'] === 'true');
+        }
+        if (params['c5ma']) {
+          this.tableC5ma = (params['c5ma'] === 'true');
+        }
+      });
+    }
+
 
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
