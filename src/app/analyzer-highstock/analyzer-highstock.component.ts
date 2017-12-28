@@ -51,27 +51,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (this.series.length) {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
     }
-    /* if (this.chart) {
-      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);      
-      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons)
-      // Add a chart subtitle to alert user of a warning
-      this.chart.setSubtitle({
-        text: this.alertMessage,
-        align: 'center',
-        verticalAlign: 'bottom',
-      });
-      if (this.chart.subtitle) {
-        setTimeout(() => {
-          this.chart.subtitle.fadeOut('slow');
-        }, 3000);
-      }
-      return;
-    } */
-    // Draw chart if no chart exists
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    if (!this.chart && selectedAnalyzerSeries) {
+    if (selectedAnalyzerSeries) {
       this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+    }
+    // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
+    if (this.alertMessage) {
+      setTimeout(() => this.alertMessage = '', 4000);
     }
   }
 
@@ -424,7 +411,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     this.options.exporting.chartOptions.rangeSelector.enabled = false;
     this.options.exporting.chartOptions.credits.enabled = true;
     this.options.exporting.chartOptions.credits.text = portalSettings.highstock.credits;
-    this.options.exporting.chartOptions.credits.position = { align: 'right', x: -115, y: -41 };
+    this.options.exporting.chartOptions.credits.position = { align: 'right' };
     this.options.exporting.chartOptions.title.align = 'left';
     this.options.exporting.chartOptions.subtitle.text = '';
 

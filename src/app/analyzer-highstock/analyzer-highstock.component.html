@@ -1,4 +1,4 @@
-<p *ngIf="alertMessage">{{alertMessage}}</p>
+<p *ngIf="alertMessage" class="alert-message">{{alertMessage}}</p>
 <chart id="analyzer-chart" type="StockChart" *ngIf="showChart" [options]="options" (load)="saveInstance($event.context)">
     <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
 </chart>

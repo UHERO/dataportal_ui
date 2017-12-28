@@ -42,6 +42,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   ngOnChanges() {
     // Update table as minDate & maxDate change
+    console.log('this.series', this.series)
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
       if (this.maxDate === this.allTableDates[i].date) {
@@ -54,7 +55,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     this.series.forEach((series) => {
       series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      // series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals, this.minDate, this.maxDate);
+      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph

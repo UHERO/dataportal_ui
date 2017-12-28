@@ -40,22 +40,13 @@ export class AnalyzerComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    let urlCSeries;
     if (this.route) {
       this.route.params.subscribe(params => {
-        let urlASeries;
         if (params['analyzerSeries']) {
-          urlASeries = params['analyzerSeries'].split('-').map(Number);
-          urlASeries.forEach((uSeries) => {
-            this._analyzer.analyzerSeries.push({ id: uSeries });
-          });
+          this.storeUrlSeries(params);
         }
         if (params['chartSeries']) {
-          urlCSeries = params['chartSeries'].split('-').map(Number);
-          urlCSeries.forEach((cSeries) => {
-            const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
-            aSeries.showInChart = true;
-          });
+          this.storeUrlChartSeries(params);
         }
         if (params['start']) {
           this.startDate = params['start'];
@@ -83,10 +74,26 @@ export class AnalyzerComponent implements OnInit {
         }
       });
     }
-
-
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
     this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
+  }
+
+  storeUrlSeries(params) {
+    const urlASeries = params['analyzerSeries'].split('-').map(Number);
+    urlASeries.forEach((uSeries) => {
+      const seriesExists = this._analyzer.analyzerSeries.find(s => s.id === uSeries);
+      if (!seriesExists) {
+        this._analyzer.analyzerSeries.push({ id: uSeries, showInChart: false });              
+      }
+    });
+  }
+
+  storeUrlChartSeries(params) {
+    const urlCSeries = params['chartSeries'].split('-').map(Number);
+    urlCSeries.forEach((cSeries) => {
+      const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+      aSeries.showInChart = true;
+    });
   }
 
   setInitialChartSeries(analyzerSeries: Array<any>) {
@@ -140,7 +147,9 @@ export class AnalyzerComponent implements OnInit {
       event.showInChart = !event.showInChart;
       // toggle showInChart in list of analyzer series
       const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesDetail.id);
-      aSeries.showInChart = !aSeries.showInChart;
+      if (aSeries) {
+        aSeries.showInChart = !aSeries.showInChart;
+      }
     }
     this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
   }

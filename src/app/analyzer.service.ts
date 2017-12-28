@@ -37,6 +37,7 @@ export class AnalyzerService {
         displayName: '',
         seriesTableData: [],
         error: null,
+        saParam: false,
         noData: '',
         observations: { transformationResults: [], observationStart: '', observationEnd: '' },
         showInChart: series.showInChart
@@ -44,6 +45,7 @@ export class AnalyzerService {
       this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
         seriesData.displayName = this.formatDisplayName(detail);
+        seriesData.saParam = detail.seasonalAdjustment !== 'not_seasonally_adjusted';
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
         seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
@@ -80,11 +82,8 @@ export class AnalyzerService {
                   // Array of observations using full range of dates
                   series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
                 });
-                // The default series displayed in the chart on load should be the series with the longest range of data
-                const longestSeries = this.findLongestSeriesIndex(this.analyzerData.analyzerSeries);
-                this.analyzerData.analyzerSeries[longestSeries].showInChart = true;
                 this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
-                while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1) {
+                while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
                   const notInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart !== true);
                   this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true; 
                   notInChart.showInChart = true;
@@ -107,6 +106,7 @@ export class AnalyzerService {
     if (detail.seasonalAdjustment === 'not_applicable') {
       return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + ')';
     }
+    return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequencyShort + ')';
   }
 
   setAnalyzerDates(analyzerSeries) {
