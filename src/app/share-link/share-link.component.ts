@@ -34,7 +34,7 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   private sa;
 
   private baseUrl;
-  private shareLink;
+  shareLink;
 
   constructor(
     private route: ActivatedRoute,

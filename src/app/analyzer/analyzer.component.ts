@@ -22,13 +22,13 @@ export class AnalyzerComponent implements OnInit {
   private tableYoy;
   private tableYtd;
   private tableC5ma;
-  private analyzerData;
   private startDate;
   private endDate;
   private tooltipName;
   private tooltipUnits;
   private tooltipGeo;
-
+  analyzerData;
+  
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
