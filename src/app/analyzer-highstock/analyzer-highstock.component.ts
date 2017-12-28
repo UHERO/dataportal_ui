@@ -267,6 +267,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         data: navDates,
         showInLegend: false,
         showInNavigator: true,
+        includeInCSVExport: false,
         index: -1,
         colorIndex: -1,
         name: 'Navigator'
@@ -328,22 +329,54 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       lang: {
         exportKey: 'Download Chart'
       },
-      navigator: {
-        series: {
-          includeInCSVExport: false,
-        }
-      },
       exporting: {
-        /* buttons: {
+        buttons: {
           contextButton: {
             enabled: false
           },
           exportButton: {
             text: 'Download',
             _titleKey: 'exportKey',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2)
+            menuItems: [
+              {
+                textKey: 'downloadPNG',
+                onclick: function() {
+                  this.exportChart();
+                }
+              },
+              {
+                textKey: 'downloadJPEG',
+                onclick: function () {
+                  this.exportChart({
+                    type: 'image/jpeg'
+                  });
+                }
+              },
+              {
+                textKey: 'downloadPDF',
+                onclick: function () {
+                  this.exportChart({
+                    type: 'application/pdf'
+                  });
+                }
+              },
+              {
+                textKey: 'downloadSVG',
+                onclick: function () {
+                  this.exportChart({
+                    type: 'image/svg+xml'
+                  });
+                }
+              },
+              {
+                textKey: 'downloadCSV',
+                onclick: function() {
+                  this.downloadCSV();
+                }
+              }
+            ]
           }
-        }, */
+        },
         chartOptions: {
           events: null,
           navigator: {

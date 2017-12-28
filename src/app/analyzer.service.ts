@@ -44,8 +44,8 @@ export class AnalyzerService {
       this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
         seriesData.displayName = detail.seasonalAdjustment === 'seasonally_adjusted' ?
-          detail.title + ' (' + detail.geography.handle + ', ' + detail.frequencyShort + '; SA)' :
-          detail.title + ' (' + detail.geography.handle + ', ' + detail.frequencyShort + '; SA)';
+          detail.title + ' (' + detail.geography.handle + ': ' + detail.frequencyShort + '; SA)' :
+          detail.title + ' (' + detail.geography.handle + ': ' + detail.frequencyShort + '; SA)';
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
         seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
