@@ -121,6 +121,11 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   copyLink(linkUrl) {
+    $('.share-link').attr('title', 'Link Copied');
     this.clipboard.copy(linkUrl);
+    setTimeout(() => {
+      // Reset share link title
+      $('.share-link').attr('title', 'Copy Link');
+    }, 3000);
   }
 }

@@ -7,6 +7,8 @@ import { SeriesHelperService } from '../series-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
+declare var $: any;
+
 @Component({
   selector: 'app-single-series',
   templateUrl: './single-series.component.html',
