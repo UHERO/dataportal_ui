@@ -25,6 +25,7 @@ import { AnalyzerTableComponent } from '../analyzer-table/analyzer-table.compone
 import { AnalyzerHighstockComponent } from '../analyzer-highstock/analyzer-highstock.component';
 import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
+import { ShareLinkComponent } from '../share-link/share-link.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { HelpDirective } from '../help.directive';
     AnalyzerHighstockComponent,
     AnalyzerTableComponent,
     HelpComponent,
-    HelpDirective
+    HelpDirective,
+    ShareLinkComponent
   ],
   imports: [
     CommonModule,

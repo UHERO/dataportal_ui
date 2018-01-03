@@ -7,6 +7,8 @@ import { SeriesHelperService } from '../series-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 
+declare var $: any;
+
 @Component({
   selector: 'app-single-series',
   templateUrl: './single-series.component.html',
@@ -79,6 +81,14 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.route.params.subscribe(params => {
+      if (params['start']) {
+        this.startDate = params['start'];
+      }
+      if (params['end']) {
+        this.endDate = params['end'];
+      }
+    });
     this.route.queryParams.subscribe(params => {
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
@@ -115,7 +125,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   updateAnalyze(seriesInfo, tableData, chartData) {
-    this._analyzer.updateAnalyzer(seriesInfo, tableData, chartData);
+    this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
+    seriesInfo.analyze = this._analyzer.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id)
   }
 
   updateChartExtremes(e) {

@@ -1,4 +1,6 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { AnalyzerService } from '../analyzer.service';
+import { HighchartComponent } from 'app/highchart/highchart.component';
 
 // import * as highcharts from 'highcharts';
 declare var require: any;
@@ -25,45 +27,39 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() allDates;
   @Input() portalSettings;
   @Input() alertMessage;
+  @Input() start;
+  @Input() end;
+  @Input() nameChecked;
+  @Input() unitsChecked;
+  @Input() geoChecked;
   @Output() tableExtremes = new EventEmitter(true);
+  @Output() tooltipOptions = new EventEmitter();
   options;
   chart;
-  private nameChecked;
-  private unitsChecked;
-  private geoChecked;
+  showChart;
 
-  constructor() { }
+  constructor(private _analyzer: AnalyzerService) { }
 
   ngOnInit() {
   }
 
   ngOnChanges() {
+    // 'destroy' chart on changes
+    this.showChart = false;
     // Series in the analyzer that have been selected to be displayed in the chart
-    const selectedAnalyzerSeries = this.formatSeriesData(this.series, this.chart, this.allDates);
-    if (this.chart) {
-      const navDates = this.createNavigatorDates(this.allDates);
-      // If a chart has been generated:
-      // Check if series in the chart is selected in the analyzer, if not, remove series from the chart
-      this.removeFromChart(selectedAnalyzerSeries.series, this.chart);
-      // Check if the selected series have been drawn in the chart, if not, add series to the chart
-      this.addToChart(selectedAnalyzerSeries.series, this.chart, navDates);
-      // Add a chart subtitle to alert user of a warning
-      this.chart.setSubtitle({
-        text: this.alertMessage,
-        align: 'center',
-        verticalAlign: 'bottom',
-      });
-      if (this.chart.subtitle) {
-        setTimeout(() => {
-          this.chart.subtitle.fadeOut('slow');
-        }, 3000);
-      }
-      return;
+    let selectedAnalyzerSeries;
+    if (this.series.length) {
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
     }
-    // Draw chart if no chart exists
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+    if (selectedAnalyzerSeries) {
+      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+    }
+    // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
+    if (this.alertMessage) {
+      setTimeout(() => this.alertMessage = '', 4000);
+    }
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -77,174 +73,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return allButtons;
     }, []);
     return chartButtons;
-  }
-
-  removeFromChart(aSeries, chart) {
-    // Filter out series from chart that are not in analayzerSeries
-    const removeSeries = chart.series.filter(cSeries => !aSeries.some(a => a.name === cSeries.name) && cSeries.name !== 'Navigator 1');
-    removeSeries.forEach((series) => {
-      series.remove();
-    });
-    // Remove y-axis if it has no series
-    const noSeriesAxis = chart.yAxis.find(axis => !axis.series.length && axis.userOptions.className !== 'highcharts-navigator-yaxis');
-    if (noSeriesAxis) {
-      noSeriesAxis.remove();
-      // If remaining y Axis is on the right side of the chart, update the right axis to be positioned on the left
-      const opposite = chart.yAxis.find(axis => axis.userOptions.opposite);
-      if (opposite) {
-        opposite.update({ opposite: false, id: 'yAxis0' });
-      }
-      const remainingAxis = chart.yAxis.find(axis => axis.userOptions.className !== 'highcharts-navigator-yaxis');
-      if (remainingAxis) {
-        this.checkRemainingSeries(remainingAxis, chart, aSeries);
-      }
-    }
-  }
-
-  checkRemainingSeries(remainingAxis, chart, analyzerSeries) {
-    // after removing series from chart, check if series on remaining axis differ by an order of magnitude
-    const maxValue = Math.max(...remainingAxis.series[0].options.data.map(l => l[1]));
-    const minValue = Math.min(...remainingAxis.series[0].options.data.map(l => l[1]));
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    remainingAxis.series.forEach((serie) => {
-      const level = serie.options.data;
-      const sufficientOverlap = this.isOverlapSufficient(level, minValue, maxValue);
-      if (!sufficientOverlap) {
-        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === serie.userOptions.className);
-        serie.remove();
-        this.addYAxis(chart, redrawSeries, redrawSeries.unitsLabelShort, y0Exist);
-        redrawSeries.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
-        chart.addSeries(redrawSeries);
-      }
-    });
-  }
-
-  addToChart(analyzerSeries, chart, navDates) {
-    // Filter out series that have been selected in the analyzer but are not currently in the chart
-    const addSeries = analyzerSeries.filter(aSeries => !chart.series.some(cSeries => cSeries.name === aSeries.name));
-    let yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
-    if (addSeries.length) {
-      addSeries.forEach((series) => {
-        // If chart has no y-axes, add axes, and draw series
-        if (!yAxes.length) {
-          this.addYAxis(chart, series, series.units, false);
-          yAxes = chart.yAxis.filter(y => y.userOptions.className !== 'highcharts-navigator-yaxis');
-        }
-        this.addSeriesToChart(yAxes, series, chart, analyzerSeries);
-      });
-      // Use nav dates as the series drawn in the navigator
-      chart.addSeries({
-        data: navDates,
-        showInNavigator: true,
-        index: -1,
-        colorIndex: -1,
-        yAxis: "navigator-y-axis",
-        name: 'Navigator'
-      });
-    }
-  }
-
-  addSeriesToChart(yAxes: Array<any>, series, chart, analyzerSeries) {
-    // If more than one yAxes, find which axis the series should be added to
-    if (yAxes.length > 1) {
-      this.addSeriesToDualAxisChart(yAxes, series, chart, analyzerSeries);
-    }
-    // If chart has one yAxis, evaluate if series should be added to existing axis or drawn on a new one
-    if (yAxes.length === 1) {
-      this.addSeriesToSingleAxisChart(yAxes, series, chart);
-    }
-  }
-
-  addSeriesToDualAxisChart(yAxes: Array<any>, series, chart, analyzerSeries: Array<any>) {
-    const seriesUnits = series.unitsLabelShort;
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0');
-    const unitAxis = yAxes.filter(y => y.userOptions.title.text === seriesUnits);
-    // If two axes exist with the same units
-    if (unitAxis.length === 2) {
-      let highestOverlapSeries;
-      const seriesMin = Math.min(...series.data.map(l => l[1]));
-      const seriesMax = Math.max(...series.data.map(l => l[1]));
-      unitAxis.forEach((axis) => {
-        highestOverlapSeries = this.findHighestOverlap(axis.series, seriesMin, seriesMax);
-      });
-      series.yAxis = highestOverlapSeries.options.yAxis;
-      chart.addSeries(series);
-      return;
-    }
-    // If one axis exists with the same units
-    if (unitAxis.length === 1) {
-      series.yAxis = unitAxis[0].userOptions.id;
-      chart.addSeries(series);
-      return;
-    }
-    // If no axes exist for the series' units (consolidate series drawn onto 1 axis)
-    if (!unitAxis.length) {
-      // Find series drawn on second axis (i.e. yAxis === 'yAxis1')
-      const y1Series = chart.series.filter(cSeries => cSeries.userOptions.yAxis === 'yAxis1');
-      y1Series.forEach((s) => {
-        // Get original data of series drawn on one axis to be redrawn on other
-        const redrawSeries = analyzerSeries.find(aSeries => aSeries.className === s.userOptions.className);
-        // Remove series from chart, reassign it to yAxis0, and add back to chart
-        s.remove();
-        redrawSeries.yAxis = 'yAxis0';
-        chart.addSeries(redrawSeries);
-      });
-      // Remove second axis
-      const y1Axis = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis1');
-      y1Axis.remove();
-      series.yAxis = 'yAxis1';
-      // Redraw axis with units of the new series to be added
-      this.addYAxis(chart, series, seriesUnits, y0Exist);
-      // Add new series to chart
-      chart.addSeries(series);
-    }
-  }
-
-  findHighestOverlap(axisSeries, seriesMin, seriesMax) {
-    let highestOverlap, highestOverlapSeries;
-    axisSeries.forEach((aSeries) => {
-      const level = aSeries.options.data;
-      const overlap = this.calculateOverlap(level, seriesMin, seriesMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapSeries = aSeries;
-      }
-    });
-    return highestOverlapSeries;
-  }
-
-  addSeriesToSingleAxisChart(yAxes: Array<any>, series, chart) {
-    const seriesUnits = series.unitsLabelShort;
-    const y0Exist = chart.yAxis.find(axis => axis.userOptions.id === 'yAxis0') ? true : false;
-    // Check if a y axis already exists for the new series' units
-    const unitAxis = yAxes.find(y => y.userOptions.title.text === seriesUnits);
-    // If no, draw series on a new y axis
-    if (!unitAxis) {
-      this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
-      return;
-    }
-    // If yes, compare with values of currently drawn series
-    if (unitAxis) {
-      const seriesMaxValue = Math.max(...series.data.map(l => l[1]));
-      const seriesMinValue = Math.max(...series.data.map(l => l[1]));
-      const sufficientOverlap = unitAxis.userOptions.series.every((serie) => {
-        const level = serie.chartData ? serie.chartData.level : serie.data;
-        return this.isOverlapSufficient(level, seriesMinValue, seriesMaxValue);
-      });
-      if (!sufficientOverlap) {
-        this.drawNewYAxis(chart, series, seriesUnits, y0Exist);
-      }
-      if (sufficientOverlap) {
-        series.yAxis = unitAxis.userOptions.id;
-        chart.addSeries(series);
-      }
-    }
-  }
-
-  drawNewYAxis(chart, series, seriesUnits: string, y0Exist) {
-    this.addYAxis(chart, series, seriesUnits, y0Exist);
-    series.yAxis = y0Exist ? 'yAxis1' : 'yAxis0';
-    chart.addSeries(series);
   }
 
   addYAxis(chart, series, seriesUnits, y0Exist) {
@@ -297,7 +125,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
-      const level = unit.series[0].data ? unit.series[0].data : unit.series[0].chartData.level;
+      // use series with the maximum level value as the base to compare with other series
+      const maxValueSeries = this.findMaxLevelSeries(unit);
+      const level = maxValueSeries.chartData.level;
       const maxValue = Math.max(...level.map(l => l[1]));
       const minValue = Math.min(...level.map(l => l[1]));
       yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
@@ -310,6 +140,18 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       });
       return yAxesGroups;
     }
+  }
+
+  findMaxLevelSeries(unit) {
+    let maxLevelValue, maxValueSeries;
+    unit.series.forEach((s) => {
+      const max = Math.max(...s.chartData.level.map(l => l[1]));
+      if (!maxLevelValue || max > maxLevelValue) {
+        maxLevelValue = max;
+        maxValueSeries = s;
+      }
+    });
+    return maxValueSeries;
   }
 
   // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
@@ -329,22 +171,49 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
   }
 
+  findHighestOverlap(yAxesGroups, baseMin, baseMax) {
+    const y0Series = yAxesGroups[0].series;
+    const y1Series = yAxesGroups[1].series;
+    let highestOverlap, highestOverlapAxis;
+    y0Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y0Series;
+      }
+    });
+    y1Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y1Series;
+      }
+    });
+    return highestOverlapAxis;
+  }
+
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
       const sufficientOverlap = this.isOverlapSufficient(level, baseMin, baseMax);
       const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
-      if (!sufficientOverlap && !yAxis1) {
-        yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
-        return;
-      }
-      if (!sufficientOverlap && yAxis1) {
-        yAxis1.series.push(serie);
-        return;
-      }
       if (sufficientOverlap) {
         yAxesGroups[0].series.push(serie);
+        return;
+      }
+      if (!sufficientOverlap) {
+        if (yAxis1) {
+          const highestOverlapAxis = this.findHighestOverlap(yAxesGroups, baseMin, baseMax);
+          highestOverlapAxis.push(serie)
+          return;
+        }
+        if (!yAxis1) {
+          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
+          return;
+        }
       }
     });
     return yAxesGroups;
@@ -352,8 +221,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   groupByUnits(series) {
     const units = series.reduce((obj, serie) => {
-      obj[serie.unitsLabelShort] = obj[serie.unitsLabelShort] || [];
-      obj[serie.unitsLabelShort].push(serie);
+      obj[serie.seriesDetail.unitsLabelShort] = obj[serie.seriesDetail.unitsLabelShort] || [];
+      obj[serie.seriesDetail.unitsLabelShort].push(serie);
       return obj;
     }, {});
 
@@ -377,163 +246,205 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return navigatorDates;
   }
 
-  formatSeriesData(series, chartInstance, dates) {
+  formatSeriesData(series, dates) {
     const chartSeries = [];
     let yAxes;
-    // Check if chartInstance exists, i.e. if chart is already drawn
-    // False when navigating to analyzer
-    if (!chartInstance) {
-      yAxes = this.createYAxes(series, []);
-    }
+    yAxes = this.createYAxes(series, []);
     series.forEach((serie, index) => {
-      // Find corresponding y-axis on initial display (i.e. no chartInstance)
-      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
+      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
-        className: serie.id,
-        name: serie.seasonallyAdjusted ?
-          serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + '; SA)' :
-          serie.title + ' (' + serie.frequencyShort + '; ' + serie.geography.handle + ')',
+        className: serie.seriesDetail.id,
+        name: serie.displayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        displayName: serie.title,
-        decimals: serie.decimals,
-        frequency: serie.frequencyShort,
-        geography: serie.geography.name,
+        displayName: serie.seriesDetail.title,
+        decimals: serie.seriesDetail.decimals,
+        frequency: serie.seriesDetail.frequencyShort,
+        geography: serie.seriesDetail.geography.name,
         showInNavigator: false,
-        unitsLabelShort: serie.unitsLabelShort,
-        seasonallyAdjusted: serie.seasonallyAdjusted,
+        events: {
+          legendItemClick: function () {
+            return false;
+          }
+        },
+        unitsLabelShort: serie.seriesDetail.unitsLabelShort,
+        seasonallyAdjusted: serie.seriesDetail.seasonallyAdjusted,
         dataGrouping: {
           enabled: false
         },
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    if (!chartInstance) {
-      const navDates = this.createNavigatorDates(dates);
-      chartSeries.push({
-        data: navDates,
-        showInNavigator: true,
-        index: -1,
-        colorIndex: -1,
-        name: 'Navigator'
-      });
-    }
+    const navDates = this.createNavigatorDates(dates);
+    chartSeries.push({
+      data: navDates,
+      showInLegend: false,
+      showInNavigator: true,
+      includeInCSVExport: false,
+      index: -1,
+      colorIndex: -1,
+      name: 'Navigator'
+    });
     return { series: chartSeries, yAxis: yAxes };
   }
 
   drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
+    const startDate = this.start ? this.start : null;
+    const endDate = this.end ? this.end : null;
+    const tooltipName = this.nameChecked;
+    const tooltipUnits = this.unitsChecked;
+    const tooltipGeo = this.geoChecked;
+
     this.options = {
-      chart: {
-        alignTicks: false,
-        zoomType: 'x',
-        // Description used in xAxis label formatter
-        // description: freq.freq
-      },
+      chart: {},
       labels: {
-        items: [{
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: ''
-        }, {
-          html: portalSettings.highstock.labels.portal,
-        }, {
-          html: portalSettings.highstock.labels.portalLink
-        }, {
-          html: ''
-        }],
-        style: {
-          display: 'none'
-        }
+        style: {}
       },
+      legend: {},
       rangeSelector: {
-        buttons: buttons,
-        buttonPosition: {
-          x: 10,
-          y: 10
-        },
-        labelStyle: {
-          visibility: 'hidden'
-        },
-        inputEnabled: false
+        labelStyle: {}
       },
-      lang: {
-        exportKey: 'Download Chart'
-      },
-      navigator: {
-        series: {
-          includeInCSVExport: false,
-        }
-      },
+      lang: {},
       exporting: {
         buttons: {
-          contextButton: {
-            enabled: false
-          },
-          exportButton: {
-            text: 'Download',
-            _titleKey: 'exportKey',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-            onclick: function (this) {
-              this.exportChart(null, { subtitle: { text: '' } });
-            }
-          }
+          contextButton: {},
+          exportButton: {}
         },
         chartOptions: {
-          events: null,
-          navigator: {
-            enabled: false
-          },
-          scrollbar: {
-            enabled: false
-          },
-          rangeSelector: {
-            enabled: false
-          },
-          credits: {
-            enabled: true,
-            text: portalSettings.highstock.credits,
-            position: {
-              align: 'right',
-              x: -115,
-              y: -41
-            }
-          },
-          title: {
-            align: 'left'
-          }
+          navigator: {},
+          scrollbar: {},
+          rangeSelector: {},
+          credits: {},
+          title: {},
+          subtitle: {}
         }
       },
-      tooltip: {
-        borderWidth: 0,
-        shadow: false,
-        shared: true,
-        formatter: function (args) {
-          return tooltipFormatter(args, this.points, this.x);
-        }
-      },
-      credits: {
-        enabled: false
-      },
-      xAxis: {
-        minRange: 1000 * 3600 * 24 * 30 * 12,
-        ordinal: false
-      },
-      yAxis: yAxis,
+      tooltip: {},
+      credits: {},
+      xAxis: {},
+      yAxis: [],
       plotOptions: {
-        series: {
-          cropThreshold: 0,
-        }
+        series: {}
       },
-      series: series
+      series: []
     };
+
+    // Chart Options
+    this.options.chart.alignTicks = false;
+    this.options.zoomType = 'x';
+
+    // Labels
+    this.options.labels.items = [
+      {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: ''
+      }, {
+        html: portalSettings.highstock.labels.portal,
+      }, {
+        html: portalSettings.highstock.labels.portalLink
+      }, {
+        html: ''
+      }
+    ];
+    this.options.labels.style.display = 'none';
+
+    // Legend
+    this.options.legend.enabled = true;
+    this.options.legend.labelFormatter = function () {
+      return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
+    };
+
+    // Range Selector
+    this.options.rangeSelector.selected = !startDate && !endDate ? 3 : null;
+    this.options.rangeSelector.buttons = buttons;
+    this.options.rangeSelector.buttonPosition = { x: 10, y: 10 };
+    this.options.rangeSelector.labelStyle.visibility = 'hidden';
+    this.options.rangeSelector.inputEnabled = false;
+    this.options.lang.exportKey = 'Download Chart';
+
+    // Exporting
+    this.options.exporting.buttons.contextButton.enabled = false;
+    this.options.exporting.buttons.exportButton.text = 'Download';
+    this.options.exporting.buttons.exportButton._titleKey = 'exportKey';
+    this.options.exporting.buttons.exportButton.menuItems = [
+      {
+        textKey: 'downloadPNG',
+        onclick: function () {
+          this.exportChart();
+        }
+      }, {
+        textKey: 'downloadJPEG',
+        onclick: function () {
+          this.exportChart({
+            type: 'image/jpeg'
+          });
+        }
+      }, {
+        textKey: 'downloadPDF',
+        onclick: function () {
+          this.exportChart({
+            type: 'application/pdf'
+          });
+        }
+      }, {
+        textKey: 'downloadSVG',
+        onclick: function () {
+          this.exportChart({
+            type: 'image/svg+xml'
+          });
+        }
+      }, {
+        textKey: 'downloadCSV',
+        onclick: function () {
+          this.downloadCSV();
+        }
+      }
+    ];
+    this.options.exporting.chartOptions.events = null;
+    this.options.exporting.chartOptions.navigator.enabled = false;
+    this.options.exporting.chartOptions.scrollbar.enabled = false;
+    this.options.exporting.chartOptions.rangeSelector.enabled = false;
+    this.options.exporting.chartOptions.credits.enabled = true;
+    this.options.exporting.chartOptions.credits.text = portalSettings.highstock.credits;
+    this.options.exporting.chartOptions.credits.position = { align: 'right' };
+    this.options.exporting.chartOptions.title.align = 'left';
+    this.options.exporting.chartOptions.subtitle.text = '';
+
+    // Tooltip
+    this.options.tooltip.borderWidth = 0;
+    this.options.tooltip.shadow = false;
+    this.options.tooltip.shared = true;
+    this.options.tooltip.formatter = function (args) {
+      return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+    };
+
+    // Credits
+    this.options.credits.enabled = false;
+
+    // xAxis
+    this.options.xAxis.minRange = 1000 * 3600 * 24 * 30 * 12;
+    this.options.xAxis.min = startDate ? Date.parse(startDate) : undefined;
+    this.options.xAxis.max = endDate ? Date.parse(endDate) : undefined;
+    this.options.xAxis.ordinal = false;
+
+    // yAxis
+    this.options.yAxis = yAxis;
+
+    // Plot Options
+    this.options.plotOptions.series.cropThreshold = 0;
+
+    // Series
+    this.options.series = series;
+
+    this.showChart = true;
   }
 
   saveInstance(chartInstance) {
-    this.chart = chartInstance;
     this.setTableExtremes(chartInstance);
   }
 
@@ -583,7 +494,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const unitsLabel = sUnits ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
       const geoLabel = sGeo ? point.userOptions.geography + '<br>' : '<br>';
-      const seasonal = point.userOptions.seasonallyAdjusted ? 'Seasonally Adjusted <br>' : '<br>';
       const label = displayName + ' ' + date + ': ' + value + unitsLabel;
       const pseudoZones = point.userOptions.pseudoZones;
       if (pseudoZones.length) {
@@ -597,7 +507,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         });
       }
       if (!pseudoZones.length) {
-        s += seriesColor + label + geoLabel + seasonal + '<br>';
+        s += seriesColor + label + geoLabel + '<br>';
       }
       return s;
     };
@@ -661,28 +571,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return tooltip;
   }
 
-  reformatTooltip(chart, tooltipFormatter) {
-    const name = this.nameChecked;
-    const units = this.unitsChecked;
-    const geo = this.geoChecked;
-    chart.tooltip.options.formatter = function (args) {
-      return tooltipFormatter(args, this.points, this.x, name, units, geo);
-    };
-  }
-
   nameActive(e, chart, tooltipFormatter) {
     this.nameChecked = e.target.checked;
-    return this.reformatTooltip(chart, tooltipFormatter);
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
   }
 
   unitsActive(e, chart, tooltipFormatter) {
     this.unitsChecked = e.target.checked;
-    return this.reformatTooltip(chart, tooltipFormatter);
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
   }
 
   geoActive(e, chart, tooltipFormatter) {
     this.geoChecked = e.target.checked;
-    return this.reformatTooltip(chart, tooltipFormatter);
+    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
   }
 
   setTableExtremes(e) {

@@ -1,6 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HelperService } from '../helper.service';
+import { SeriesHelperService } from '../series-helper.service';
 import { DateWrapper } from '../date-wrapper';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 
@@ -17,34 +19,81 @@ export class AnalyzerComponent implements OnInit {
   private portalSettings;
   private alertUser;
   private alertMessage = '';
-  analyzerSeries;
-
+  private tableYoy;
+  private tableYtd;
+  private tableC5ma;
+  private startDate;
+  private endDate;
+  private tooltipName;
+  private tooltipUnits;
+  private tooltipGeo;
+  analyzerData;
+  
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
+    private _series: SeriesHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
+    private route: ActivatedRoute,
+    private _router: Router,
     private _helper: HelperService
   ) { }
 
   ngOnInit() {
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
-    this.analyzerSeries = this._analyzer.analyzerSeries;
-    // this.analyzerChartSeries = this._analyzer.analyzerSeries.analyzerChart;
-    if (this.analyzerSeries.length) {
-      this.analyzerTableDates = this.setAnalyzerDates(this.analyzerSeries);
-      // Sort series by length of level data
-      // The default series displayed in the chart on load should be the series with the longest range of data
-      const longestSeries = this.findLongestSeriesIndex(this.analyzerSeries);
-      this.analyzerSeries[longestSeries].showInChart = true;
-      this.analyzerSeries.forEach((series) => {
-        // Array of observations using full range of dates
-        series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
+    if (this.route) {
+      this.route.params.subscribe(params => {
+        if (params['analyzerSeries']) {
+          this.storeUrlSeries(params);
+        }
+        if (params['chartSeries']) {
+          this.storeUrlChartSeries(params);
+        }
+        if (params['start']) {
+          this.startDate = params['start'];
+        }
+        if (params['end']) {
+          this.endDate = params['end'];
+        }
+        if (params['name']) {
+          this.tooltipName = (params['name'] === 'true');
+        }
+        if (params['units']) {
+          this.tooltipUnits = (params['units'] === 'true');
+        }
+        if (params['geography']) {
+          this.tooltipGeo = (params['geography'] === 'true');
+        }
+        if (params['yoy']) {
+          this.tableYoy = (params['yoy'] === 'true');
+        }
+        if (params['ytd']) {
+          this.tableYtd = (params['ytd'] === 'true');
+        }
+        if (params['c5ma']) {
+          this.tableC5ma = (params['c5ma'] === 'true');
+        }
       });
-      this.analyzerChartSeries = this.analyzerSeries.filter(series => series.showInChart === true);
-      if (this.analyzerChartSeries.length < 2) {
-        this.analyzerChartSeries = this.setInitialChartSeries(this.analyzerSeries);
-      }
     }
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
+    this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
+  }
+
+  storeUrlSeries(params) {
+    const urlASeries = params['analyzerSeries'].split('-').map(Number);
+    urlASeries.forEach((uSeries) => {
+      const seriesExists = this._analyzer.analyzerSeries.find(s => s.id === uSeries);
+      if (!seriesExists) {
+        this._analyzer.analyzerSeries.push({ id: uSeries, showInChart: false });              
+      }
+    });
+  }
+
+  storeUrlChartSeries(params) {
+    const urlCSeries = params['chartSeries'].split('-').map(Number);
+    urlCSeries.forEach((cSeries) => {
+      const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+      aSeries.showInChart = true;
+    });
   }
 
   setInitialChartSeries(analyzerSeries: Array<any>) {
@@ -63,21 +112,6 @@ export class AnalyzerComponent implements OnInit {
     return chartSeries;
   }
 
-  setAnalyzerDates(analyzerSeries) {
-    const frequencies = [];
-    const dateWrapper = { firstDate: '', endDate: '' };
-    analyzerSeries.forEach((series) => {
-      const freqExist = frequencies.find(freq => freq.freq === series.frequencyShort);
-      if (!freqExist) {
-        frequencies.push({ freq: series.frequencyShort, label: series.frequency });
-      }
-      // Get earliest start date and latest end date
-      this.setDateWrapper(dateWrapper, series.seriesObservations.observationStart, series.seriesObservations.observationEnd);
-    });
-    // Array of full range of dates for series selected in analyzer
-    return this._analyzer.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
-  }
-
   findLongestSeriesIndex(series) {
     let longestSeries, seriesLength = 0;
     series.forEach((serie, index) => {
@@ -89,24 +123,14 @@ export class AnalyzerComponent implements OnInit {
     return longestSeries;
   }
 
-  setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
-    if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
-      dateWrapper.firstDate = seriesStart;
-    }
-    if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
-      dateWrapper.endDate = seriesEnd;
-    }
-  }
-
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
-    const seriesExist = chartSeries.find(cSeries => cSeries.id === event.id);
-    this.analyzerSeries = this._analyzer.analyzerSeries;
-    const seriesSelected = this._analyzer.analyzerSeries.find(series => series.showInChart === true);
+    const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesDetail.id);
+    const seriesSelected = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
-    if (this._analyzer.analyzerSeries.length && !seriesSelected) {
-      this.analyzerSeries[0].showInChart = true;
-      this.updateChartSeries(this.analyzerSeries);
+    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesSelected) {
+      this._analyzer.analyzerData.analyzerSeries[0].showInChart = true;
+      this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
       return;
     }
     // At least one series must be selected
@@ -121,26 +145,31 @@ export class AnalyzerComponent implements OnInit {
       this.alertUser = false;
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
+      // toggle showInChart in list of analyzer series
+      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesDetail.id);
+      if (aSeries) {
+        aSeries.showInChart = !aSeries.showInChart;
+      }
     }
-    this.updateChartSeries(this.analyzerSeries);
+    this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
   }
 
   updateChartSeries(analyzerSeries: Array<any>) {
     // Update series drawn in chart and dates in analyzer table
-    this.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
     analyzerSeries.forEach((series) => {
-      series.analyzerTableData = this._helper.seriesTable(series.tableData, this.analyzerTableDates, series.decimals);
+      series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this._analyzer.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
     });
-    this.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
     // List of units for series in analyzer chart
-    const allUnits = chartSeries.map(series => series.unitsLabelShort);
+    const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
     if (uniqueUnits.length === 2) {
       // If two different units are already in use, check if the current series unit is in the list
-      const unitsExist = chartSeries.find(cSeries => cSeries.unitsLabelShort === currentSeries.unitsLabelShort);
+      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === currentSeries.seriesDetail.unitsLabelShort);
       this.alertUser = unitsExist ? false : true;
       this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
       return unitsExist ? true : false;
@@ -152,5 +181,29 @@ export class AnalyzerComponent implements OnInit {
   setTableDates(e) {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
+  }
+
+  checkTooltip(e) {
+    if (e.label === 'name') {
+      this.tooltipName = e.value;
+    }
+    if (e.label === 'units') {
+      this.tooltipUnits = e.value;
+    }
+    if (e.label === 'geo') {
+      this.tooltipGeo = e.value;
+    }
+  }
+
+  checkTransforms(e) {
+    if (e.label === 'yoy') {
+      this.tableYoy = e.value;
+    }
+    if (e.label === 'ytd') {
+      this.tableYtd = e.value;
+    }
+    if (e.label === 'c5ma') {
+      this.tableC5ma = e.value;
+    }
   }
 }

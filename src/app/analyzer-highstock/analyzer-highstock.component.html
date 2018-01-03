@@ -1,15 +1,16 @@
-<chart id="analyzer-chart" type="StockChart" [options]="options" (load)="saveInstance($event.context)">
+<p *ngIf="alertMessage" class="alert-message">{{alertMessage}}</p>
+<chart id="analyzer-chart" type="StockChart" *ngIf="showChart" [options]="options" (load)="saveInstance($event.context)">
     <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
 </chart>
 <div class="customize-tooltip">
     <p>Tooltip Display:</p>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="nameActive($event, chart, formatTooltip)">Series Name
+        <input type="checkbox" (change)="nameActive($event, chart, formatTooltip)" [checked]="nameChecked">Series Name
     </label>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="unitsActive($event, chart, formatTooltip)">Units
+        <input type="checkbox" (change)="unitsActive($event, chart, formatTooltip)" [checked]="unitsChecked">Units
     </label>
     <label class="form-check-inline">
-        <input type="checkbox" (change)="geoActive($event, chart, formatTooltip)">Geography
+        <input type="checkbox" (change)="geoActive($event, chart, formatTooltip)" [checked]="geoChecked">Geography
     </label>
 </div>

@@ -42,6 +42,7 @@ import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
 import { SeriesPagingComponent } from '../series-paging/series-paging.component';
+import { ClipboardService } from '../clipboard.service';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     TableHelperService,
     GoogleAnalyticsEventsService,
     HelpService,
+    ClipboardService,
     Title,
     {
       provide: HighchartsStatic,

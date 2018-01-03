@@ -1,6 +1,6 @@
 # Dataportal
 
-This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.30.
+This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.4.8 (with NPM v. 3.10.10 and Node v. 6.10.3).
 
 ## Development server
 ### UHERO Data Portal

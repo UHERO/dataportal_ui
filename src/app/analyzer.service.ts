@@ -1,30 +1,157 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { UheroApiService } from './uhero-api.service';
+import { HelperService } from './helper.service';
+import { Frequency } from './frequency';
+import { Geography } from './geography';
+import { DateWrapper } from './date-wrapper';
+import { notEqual } from 'assert';
 
 @Injectable()
 export class AnalyzerService {
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   public analyzerSeries = [];
+
+  public analyzerData = {
+    analyzerTableDates: [],
+    analyzerSeries: [],
+    analyzerChartSeries: []
+  };
 
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
-  updateAnalyzer(seriesInfo, tableData?, chartData?) {
-    if (seriesInfo.analyze) {
-      const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
-      const seriesIndex = this.analyzerSeries.indexOf(analyzeSeries);
-      if (seriesIndex > -1) {
-        this.analyzerSeries.splice(seriesIndex, 1);
-      }
-      seriesInfo.analyze = false;
-      return;
+  getAnalyzerData(aSeries) {
+    let seriesIndex = 0;
+    this.analyzerData.analyzerSeries = [];
+    aSeries.forEach((series, index) => {
+      let decimals;
+      const seriesData = {
+        seriesDetail: {},
+        currentGeo: <Geography>{},
+        currentFreq: <Frequency>{},
+        chartData: {},
+        displayName: '',
+        seriesTableData: [],
+        error: null,
+        saParam: false,
+        noData: '',
+        observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+        showInChart: series.showInChart
+      };
+      this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
+        seriesData.seriesDetail = detail;
+        seriesData.displayName = this.formatDisplayName(detail);
+        seriesData.saParam = detail.seasonalAdjustment !== 'not_seasonally_adjusted';
+        decimals = detail.decimals ? detail.decimals : 1;
+        seriesData.currentGeo = detail.geography;
+        seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
+      },
+        (error) => {
+          console.log('error', error);
+        },
+        () => {
+          this._uheroAPIService.fetchObservations(series.id).subscribe((observations) => {
+            seriesData.observations = observations;
+            const levelData = seriesData.observations.transformationResults[0].dates;
+            const obsStart = seriesData.observations.observationStart;
+            const obsEnd = seriesData.observations.observationEnd;
+            const dateArray = [];
+            if (levelData) {
+              // Use to format dates for table
+              this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+              const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
+              seriesData.chartData = data.chartData;
+              seriesData.seriesTableData = data.tableData;
+            } else {
+              seriesData.noData = 'Data not available';
+            }
+          },
+            (error) => {
+              console.log('error', error);
+            },
+            () => {
+              seriesIndex++;
+              this.analyzerData.analyzerSeries.push(seriesData);
+              if (seriesIndex === aSeries.length) {
+                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+                this.analyzerData.analyzerSeries.forEach((series) => {
+                  // Array of observations using full range of dates
+                  series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+                });
+                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+                while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+                  const notInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart !== true);
+                  this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true; 
+                  notInChart.showInChart = true;
+                  this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);                  
+                }
+              }
+            });
+        });
+    });
+    return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  formatDisplayName(detail) {
+    if (detail.seasonalAdjustment === 'seasonally_adjusted') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Seasonally Adjusted)';
     }
-    if (!seriesInfo.analyze) {
-      seriesInfo.tableData = tableData;
-      seriesInfo.chartData = chartData;
-      this.analyzerSeries.push(seriesInfo);
-      seriesInfo.analyze = true;
+    if (detail.seasonalAdjustment === 'not_seasonally_adjusted') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Not Seasonally Adjusted)';
+    }
+    if (detail.seasonalAdjustment === 'not_applicable') {
+      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + ')';
+    }
+    return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequencyShort + ')';
+  }
+
+  setAnalyzerDates(analyzerSeries) {
+    const frequencies = [];
+    const dateWrapper = { firstDate: '', endDate: '' };
+    analyzerSeries.forEach((series) => {
+      const freqExist = frequencies.find(freq => freq.freq === series.seriesDetail.frequencyShort);
+      if (!freqExist) {
+        frequencies.push({ freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency });
+      }
+      // Get earliest start date and latest end date
+      this.setDateWrapper(dateWrapper, series.observations.observationStart, series.observations.observationEnd);
+    });
+    // Array of full range of dates for series selected in analyzer
+    return this.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
+  }
+
+  setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
+    if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
+      dateWrapper.firstDate = seriesStart;
+    }
+    if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
+      dateWrapper.endDate = seriesEnd;
+    }
+  }
+
+  findLongestSeriesIndex(series) {
+    let longestSeries, seriesLength = 0;
+    series.forEach((serie, index) => {
+      if (!longestSeries || seriesLength < serie.chartData.level.length) {
+        seriesLength = serie.chartData.level.length;
+        longestSeries = index;
+      }
+    });
+    return longestSeries;
+  }
+
+  updateAnalyzer(seriesId, tableData?, chartData?) {
+    const seriesExist = this.analyzerSeries.findIndex(series => series.id === seriesId);
+    if (seriesExist >= 0) {
+      this.analyzerSeries.splice(seriesExist, 1);
+      this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
+    }
+    if (seriesExist < 0) {
+      this.analyzerSeries.push({ id: seriesId });
     }
   }
 

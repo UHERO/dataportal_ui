@@ -19,10 +19,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() allTableDates;
   @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
-  portalSettings;
-  yoyChecked;
-  ytdChecked;
-  c5maChecked;
+  @Output() tableTransform = new EventEmitter();
+  @Input() yoyChecked;
+  @Input() ytdChecked;
+  @Input() c5maChecked;
+  portalSettings;  
   private previousHeight;
   private tableWidths = [];
   tableDates;
@@ -41,6 +42,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   ngOnChanges() {
     // Update table as minDate & maxDate change
+    console.log('this.series', this.series)
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
       if (this.maxDate === this.allTableDates[i].date) {
@@ -51,17 +53,17 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      series.analyzerTableDisplay = series.analyzerTableData.slice(tableStart, tableEnd + 1);
-      const seriesFreq = { freq: series.frequencyShort, label: series.frequency };
-      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.decimals, this.minDate, this.maxDate);
-      const seriesInChart = $('.highcharts-series.' + series.id);
+      series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
+      const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
+      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
-        $('.color' + series.id).css('color', seriesInChart.css('stroke'));
+        $('.color' + series.seriesDetail.id).css('color', seriesInChart.css('stroke'));
       }
       if (!seriesInChart.length) {
         // If series is not selected for the chart, reset color of show_chart icon
-        $('.color' + series.id).css('color', '#000');
+        $('.color' + series.seriesDetail.id).css('color', '#000');
       }
     });
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
@@ -92,19 +94,22 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'yoy' });
   }
 
   ytdActive(e) {
     this.ytdChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'ytd' });
   }
 
   c5maActive(e) {
     this.c5maChecked = e.target.checked;
+    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });    
   }
 
 
   updateAnalyze(series) {
-    this._analyzer.updateAnalyzer(series);
+    this._analyzer.updateAnalyzer(series.seriesDetail.id);
     this.updateChartSeries.emit(series);
   }
 

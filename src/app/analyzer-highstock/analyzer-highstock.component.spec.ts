@@ -1,7 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input } from '@angular/core';
-
+import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
 import { AnalyzerHighstockComponent } from './analyzer-highstock.component';
+import { AnalyzerService } from '../analyzer.service';
+import { UheroApiService } from '../uhero-api.service';
+import { HelperService } from '../helper.service';
 
 // Create stub for chart component
 @Component({selector: 'chart', template: ''})
@@ -19,7 +22,15 @@ describe('AnalyzerHighstockComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerHighstockComponent, XAxisStubComponent, ChartStubComponent ]
+      declarations: [ AnalyzerHighstockComponent, XAxisStubComponent, ChartStubComponent ],
+      providers: [
+        AnalyzerService,
+        UheroApiService,
+        HelperService,
+        { provide: 'rootCategory', useValue: 59 },
+        { provide: 'portal', useValue: 'uhero' }
+      ],
+      imports: [ HttpModule ]      
     })
     .compileComponents();
   }));

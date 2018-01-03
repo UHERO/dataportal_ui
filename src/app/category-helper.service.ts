@@ -283,6 +283,8 @@ export class CategoryHelperService {
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchSearch(search).subscribe((results) => {
         this.defaults = results.defaults;
+        this.defaultGeo = results.defaultGeo;
+        this.defaultFreq = results.defaultFreq;
         // TO BE DEPRECATED
         freqGeos = results.freqGeos;
         geoFreqs = results.geoFreqs;
