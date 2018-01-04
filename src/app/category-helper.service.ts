@@ -190,24 +190,11 @@ export class CategoryHelperService {
     const categoryDateArray = [];
     // Check subcategories for the earliest/latest start and end dates
     // Used to create array of dates for enitre category
-    // TO BE DEPRECATED
     sublist.forEach((sub) => {
-      if (sub.geoFreqs) {
-        const geo = sub.geoFreqs.find(geoFreq => geoFreq.handle === currentGeo.handle);
-        const freq = geo ? geo.freqs.find(f => f.freq === currentFreq.freq) : null;
-        if (freq) {
-          if (freq.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-            categoryDateWrapper.firstDate = freq.observationStart.substr(0, 10);
-          }
-          if (freq.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-            categoryDateWrapper.endDate = freq.observationEnd.substr(0, 10);
-          }
-        }
-      }
-      // NEW GEO/FREQ RESPONSES
       if (!sub.geoFreqs && sub.current) {
-        const freqStart = sub.freqs.find(freq => freq.freq === currentFreq.freq).observationStart.substr(0, 10);
-        const freqEnd = sub.freqs.find(freq => freq.freq === currentFreq.freq).observationEnd.substr(0, 10);
+        const freq = sub.freqs.find(freq => freq.freq === currentFreq.freq)
+        const freqStart = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
+        const freqEnd = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
         const startDate = sub.current.observationStart.substr(0, 10);
         const endDate = sub.current.observationEnd.substr(0, 10);
         if (freqStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
