@@ -48,6 +48,8 @@ export class TableHelperService {
         // popoverEl = popover DOM element
         // el = DOM element that triggers popover
         let position = 'top';
+        console.log('el', el);
+        console.log('el offset', $(el).offset().top)
         const elOffset = $(el).offset().top;
         if (elOffset <= 150) {
           position = 'bottom';
@@ -58,6 +60,7 @@ export class TableHelperService {
       title: function () {
         let title = seriesInfo.title;
         title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
+        title += '<i class="material-icons close-info">&#xE14C;</i>'
         return title;
       },
       content: function () {
