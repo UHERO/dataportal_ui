@@ -25,8 +25,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() c5maChecked;
   portalSettings;  
   private previousHeight;
-  private missingSummaryStat = false;
   private tableWidths = [];
+  missingSummaryStat = false;
   tableDates;
 
   constructor(
