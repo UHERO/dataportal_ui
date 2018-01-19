@@ -25,6 +25,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() c5maChecked;
   portalSettings;  
   private previousHeight;
+  private missingSummaryStat = false;
   private tableWidths = [];
   tableDates;
 
@@ -42,7 +43,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   ngOnChanges() {
     // Update table as minDate & maxDate change
-    console.log('this.series', this.series)
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
       if (this.maxDate === this.allTableDates[i].date) {
@@ -56,6 +56,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      this.missingSummaryStat = series.summaryStats.missing ? true : this.missingSummaryStat;
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
@@ -66,6 +67,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
         $('.color' + series.seriesDetail.id).css('color', '#000');
       }
     });
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.checkSummaryStats();
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
 
@@ -81,6 +84,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
     // Scroll tables to the right when table widths changes, i.e. changing frequency from A to Q | M
     return this._table.checkTableWidth(this.tableWidths);
+  }
+
+  checkSummaryStats() {
+    let i = 0, missing;
+    while (i < this.series.length) {
+      if (this.series[i].summaryStats.missing) {
+        missing = true;
+        break;
+      }
+      missing = false;
+      i++;
+    }
+    return missing;
   }
 
   showPopover(seriesInfo) {

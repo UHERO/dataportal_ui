@@ -18,6 +18,20 @@
   display: inline-block;
 }
 
+.stat-warning {
+  font-size: 0.85em;
+  color: $primary-text;
+  
+  i {
+    font-size: 16px;
+    vertical-align: sub;
+  }
+
+  ul, li {
+    margin-bottom: 0;
+  }
+}
+
 .analyzer-table {
     vertical-align: top;
     display: inline-block;

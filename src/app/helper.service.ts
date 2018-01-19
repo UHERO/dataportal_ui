@@ -116,14 +116,16 @@ export class HelperService {
     seriesData.forEach((data) => {
       const seriesDate = data.tableDate ? data.tableDate : data.date;
       const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
-      tableEntry.value = data.value;
-      tableEntry.formattedValue = (data.value === null || data.value === Infinity) ? ' ' : this.formatNum(+data.value, decimals);
-      tableEntry.yoyValue = data.yoyValue;
-      tableEntry.formattedYoy = (data.yoyValue === null || data.yoyValue === Infinity) ? ' ' : this.formatNum(+data.yoyValue, decimals);
-      tableEntry.ytdValue = data.ytdValue;
-      tableEntry.formattedYtd = (data.ytdValue === null || data.ytdValue === Infinity) ? ' ' : this.formatNum(+data.ytdValue, decimals);
-      tableEntry.c5maValue = data.c5maValue;
-      tableEntry.formattedC5ma = (data.c5maValue === null || data.c5maValue === Infinity) ? ' ' : this.formatNum(+data.c5maValue, decimals);
+      if (tableEntry) {
+        tableEntry.value = data.value;
+        tableEntry.formattedValue = (data.value === null || data.value === Infinity) ? ' ' : this.formatNum(+data.value, decimals);
+        tableEntry.yoyValue = data.yoyValue;
+        tableEntry.formattedYoy = (data.yoyValue === null || data.yoyValue === Infinity) ? ' ' : this.formatNum(+data.yoyValue, decimals);
+        tableEntry.ytdValue = data.ytdValue;
+        tableEntry.formattedYtd = (data.ytdValue === null || data.ytdValue === Infinity) ? ' ' : this.formatNum(+data.ytdValue, decimals);
+        tableEntry.c5maValue = data.c5maValue;
+        tableEntry.formattedC5ma = (data.c5maValue === null || data.c5maValue === Infinity) ? ' ' : this.formatNum(+data.c5maValue, decimals);  
+      }
     });
     return table;
   }

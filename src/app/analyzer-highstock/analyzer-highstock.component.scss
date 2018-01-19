@@ -15,9 +15,16 @@
     display: inline-block;
     margin-left: 10px;
     margin-bottom: 0;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: $primary-text;
-    font-weight: bold;
+    border-radius: 0;
+    padding: 0.3rem;
+    margin-bottom: 0;
+
+    i {
+        font-size: 16px;
+        vertical-align: sub;
+    }
 }
 
 #analyzer-chart, #chart {
