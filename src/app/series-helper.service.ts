@@ -183,7 +183,7 @@ export class SeriesHelperService {
     formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
     formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
     formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
-    formatStats.missing = missingValues ? true : false;
+    formatStats.missing = Boolean(missingValues);
     return formatStats;
   }
 

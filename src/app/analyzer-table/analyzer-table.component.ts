@@ -56,7 +56,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
-      this.missingSummaryStat = series.summaryStats.missing ? true : this.missingSummaryStat;
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
@@ -68,7 +67,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       }
     });
     // Check if the summary statistics for a series has NA values
-    this.missingSummaryStat = this.checkSummaryStats();
+    this.missingSummaryStat = this.isSummaryStatMissing();
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
 
@@ -86,17 +85,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     return this._table.checkTableWidth(this.tableWidths);
   }
 
-  checkSummaryStats() {
-    let i = 0, missing;
-    while (i < this.series.length) {
-      if (this.series[i].summaryStats.missing) {
-        missing = true;
-        break;
-      }
-      missing = false;
-      i++;
-    }
-    return missing;
+  isSummaryStatMissing() {
+    return this.series.some((s) => s.summaryStats.missing);
   }
 
   showPopover(seriesInfo) {

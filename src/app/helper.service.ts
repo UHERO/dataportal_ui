@@ -118,17 +118,19 @@ export class HelperService {
       const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
       if (tableEntry) {
         tableEntry.value = data.value;
-        tableEntry.formattedValue = (data.value === null || data.value === Infinity) ? ' ' : this.formatNum(+data.value, decimals);
+        tableEntry.formattedValue = this.formattedValue(data.value, decimals);
         tableEntry.yoyValue = data.yoyValue;
-        tableEntry.formattedYoy = (data.yoyValue === null || data.yoyValue === Infinity) ? ' ' : this.formatNum(+data.yoyValue, decimals);
+        tableEntry.formattedYoy = this.formattedValue(data.yoyValue, decimals);
         tableEntry.ytdValue = data.ytdValue;
-        tableEntry.formattedYtd = (data.ytdValue === null || data.ytdValue === Infinity) ? ' ' : this.formatNum(+data.ytdValue, decimals);
+        tableEntry.formattedYtd = this.formattedValue(data.ytdValue, decimals);
         tableEntry.c5maValue = data.c5maValue;
-        tableEntry.formattedC5ma = (data.c5maValue === null || data.c5maValue === Infinity) ? ' ' : this.formatNum(+data.c5maValue, decimals);  
+        tableEntry.formattedC5ma = this.formattedValue(data.c5maValue, decimals);
       }
     });
     return table;
   }
+
+  formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);  
 
   seriesChart(seriesData, dateRange) {
     const levelValue = [];

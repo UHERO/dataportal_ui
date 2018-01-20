@@ -45,8 +45,8 @@ export class AnalyzerService {
       };
       this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
-        seriesData.displayName = this.formatDisplayName(detail);
-        seriesData.chartDisplayName = this.formatChartName(detail);
+        seriesData.displayName = this.formatDisplayName({ title: detail.title, geography: detail.geography, frequencyShort: detail.frequencyShort, seasonalAdjustment: detail.seasonalAdjustment});
+        seriesData.chartDisplayName = this.formatChartName({ title: detail.title, geography: detail.geography, frequency: detail.frequency, seasonalAdjustment: detail.seasonalAdjustment});
         seriesData.saParam = detail.seasonalAdjustment !== 'not_seasonally_adjusted';
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
@@ -98,30 +98,26 @@ export class AnalyzerService {
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
-  formatDisplayName(detail) {
-    if (detail.seasonalAdjustment === 'seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Seasonally Adjusted)';
+  formatDisplayName({ title, geography, frequencyShort, seasonalAdjustment }) {
+    let ending = '';
+    if (seasonalAdjustment === 'seasonally_adjusted') {
+      ending = '; Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Not Seasonally Adjusted)';
+    if (seasonalAdjustment === 'not_seasonall_adjusted') {
+      ending = '; Not Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_applicable') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + ')';
-    }
-    return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequencyShort + ')';
+    return `${title} (${geography.handle}; ${frequencyShort}${ending})`;
   }
 
-  formatChartName(detail) {
-    if (detail.seasonalAdjustment === 'seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequency + '; Seasonally Adjusted)';
+  formatChartName({ title, geography, frequency, seasonalAdjustment }) {
+    let ending = '';
+    if (seasonalAdjustment === 'seasonally_adjusted') {
+      ending = '; Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequency + '; Not Seasonally Adjusted)';
+    if (seasonalAdjustment === 'not_seasonalyl_adjusted') {
+      ending = '; Not Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_applicable') {
-      return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequency + ')';
-    }
-    return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequency + ')';
+    return `${title} (${geography.shortName}; ${frequency}${ending})`;
   }
 
   setAnalyzerDates(analyzerSeries) {
