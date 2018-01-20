@@ -209,7 +209,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       if (!sufficientOverlap) {
         if (yAxis1) {
           const highestOverlapAxis = this.findHighestOverlap(yAxesGroups, baseMin, baseMax);
-          highestOverlapAxis.push(serie)
+          highestOverlapAxis.push(serie);
           return;
         }
         if (!yAxis1) {

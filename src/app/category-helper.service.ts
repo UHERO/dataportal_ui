@@ -192,7 +192,7 @@ export class CategoryHelperService {
     // Used to create array of dates for enitre category
     sublist.forEach((sub) => {
       if (!sub.geoFreqs && sub.current) {
-        const freq = sub.freqs.find(freq => freq.freq === currentFreq.freq)
+        const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
         const freqStart = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
         const freqEnd = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
         const startDate = sub.current.observationStart.substr(0, 10);

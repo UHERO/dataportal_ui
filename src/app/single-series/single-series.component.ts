@@ -75,7 +75,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit() {
-    this.currentGeo = { fips: null, handle: null, name: null };
+    this.currentGeo = { fips: null, handle: null, name: null , shortName: null };
     this.currentFreq = { freq: null, label: null };
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }
@@ -126,7 +126,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   updateAnalyze(seriesInfo, tableData, chartData) {
     this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
-    seriesInfo.analyze = this._analyzer.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id)
+    seriesInfo.analyze = this._analyzer.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id);
   }
 
   updateChartExtremes(e) {

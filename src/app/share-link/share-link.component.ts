@@ -65,12 +65,12 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     const start = this.startDate ? ';start=' + this.startDate : '';
     const end = this.endDate ? ';end=' + this.endDate : '';
     if (this.view === 'series') {
-      let seriesUrl;
+      const seriesUrl = '';
       const urlParams = this.getSeriesUrlParams(start, end, seriesUrl);
       return this.baseUrl + urlParams;
     }
     if (this.view === 'analyzer') {
-      let seriesUrl = '/analyzer';
+      const seriesUrl = '/analyzer';
       const urlParams = this.getAnalyzerParams(start, end, seriesUrl);
       return this.baseUrl + urlParams;
     }

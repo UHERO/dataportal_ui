@@ -23,7 +23,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
-  portalSettings;  
+  portalSettings;
   private previousHeight;
   private tableWidths = [];
   missingSummaryStat = false;
@@ -110,7 +110,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   c5maActive(e) {
     this.c5maChecked = e.target.checked;
-    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });    
+    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
   }
 
 

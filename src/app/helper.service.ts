@@ -130,7 +130,7 @@ export class HelperService {
     return table;
   }
 
-  formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);  
+  formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);
 
   seriesChart(seriesData, dateRange) {
     const levelValue = [];

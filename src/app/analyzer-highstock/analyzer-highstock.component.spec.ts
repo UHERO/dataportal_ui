@@ -30,7 +30,7 @@ describe('AnalyzerHighstockComponent', () => {
         { provide: 'rootCategory', useValue: 59 },
         { provide: 'portal', useValue: 'uhero' }
       ],
-      imports: [ HttpModule ]      
+      imports: [ HttpModule ]
     })
     .compileComponents();
   }));
