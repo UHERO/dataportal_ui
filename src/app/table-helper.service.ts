@@ -44,16 +44,6 @@ export class TableHelperService {
     const popoverId = subcatIndex ? '#' + subcatIndex + seriesInfo.id : '#' + seriesInfo.id;
     const popover = $(popoverId).popover({
       trigger: 'manual',
-      placement: function (popoverEl, el) {
-        // popoverEl = popover DOM element
-        // el = DOM element that triggers popover
-        let position = 'top';
-        const elOffset = $(el).offset().top;
-        if (elOffset <= 150) {
-          position = 'bottom';
-        }
-        return position;
-      },
       html: true,
       title: function () {
         let title = seriesInfo.title;

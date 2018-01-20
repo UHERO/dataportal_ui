@@ -201,10 +201,9 @@
 }
 
 .tooltip {
-  &.bs-tether-element-attached-left {
+  &.bs-tooltip-right {
 
-    .tooltip-inner::before {
-      border-left-color: $tooltip;
+    .arrow::before {
       border-right-color: $tooltip;
     }
   }

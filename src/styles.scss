@@ -90,7 +90,7 @@ body {
   }
 
   .popover {
-    .popover-title {
+    .popover-header {
       font-size: 0.85em;
       font-weight: bold;
       padding: 10px;
@@ -102,7 +102,7 @@ body {
       }
     }
 
-    .popover-content {
+    .popover-body {
       font-size: 0.9em;
     }
   }
