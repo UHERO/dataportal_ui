@@ -49,7 +49,7 @@ class ShareStubComponent {
   @Input() ytd;
   @Input() c5ma;
   @Input() startDate;
-  @Input() endDate
+  @Input() endDate;
 }
 
 let activatedRoute: ActivatedRouteStub;

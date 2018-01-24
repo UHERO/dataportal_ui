@@ -9,8 +9,6 @@ import { notEqual } from 'assert';
 
 @Injectable()
 export class AnalyzerService {
-  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
-
   public analyzerSeries = [];
 
   public analyzerData = {
@@ -18,6 +16,8 @@ export class AnalyzerService {
     analyzerSeries: [],
     analyzerChartSeries: []
   };
+
+  constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
@@ -35,6 +35,7 @@ export class AnalyzerService {
         currentFreq: <Frequency>{},
         chartData: {},
         displayName: '',
+        chartDisplayName: '',
         seriesTableData: [],
         error: null,
         saParam: false,
@@ -44,7 +45,20 @@ export class AnalyzerService {
       };
       this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
         seriesData.seriesDetail = detail;
-        seriesData.displayName = this.formatDisplayName(detail);
+        const abbreviatedNameDetails = {
+          title: detail.title,
+          geography: detail.geography.handle,
+          frequency: detail.frequencyShort,
+          seasonalAdjustment: detail.seasonalAdjustment
+        };
+        const chartNameDetails = {
+          title: detail.title,
+          geography: detail.geography.shortName,
+          frequency: detail.frequency,
+          seasonalAdjustment: detail.seasonalAdjustment
+        };
+        seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
+        seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
         seriesData.saParam = detail.seasonalAdjustment !== 'not_seasonally_adjusted';
         decimals = detail.decimals ? detail.decimals : 1;
         seriesData.currentGeo = detail.geography;
@@ -78,16 +92,16 @@ export class AnalyzerService {
               this.analyzerData.analyzerSeries.push(seriesData);
               if (seriesIndex === aSeries.length) {
                 this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-                this.analyzerData.analyzerSeries.forEach((series) => {
+                this.analyzerData.analyzerSeries.forEach((s) => {
                   // Array of observations using full range of dates
-                  series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+                  s.analyzerTableData = this._helper.seriesTable(s.seriesTableData, this.analyzerData.analyzerTableDates, s.seriesDetail.decimals);
                 });
-                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);
+                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
                 while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
-                  const notInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart !== true);
-                  this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true; 
+                  const notInChart = this.analyzerData.analyzerSeries.find(s => s.showInChart !== true);
+                  this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true;
                   notInChart.showInChart = true;
-                  this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(series => series.showInChart === true);                  
+                  this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
                 }
               }
             });
@@ -96,17 +110,15 @@ export class AnalyzerService {
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
-  formatDisplayName(detail) {
-    if (detail.seasonalAdjustment === 'seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Seasonally Adjusted)';
+  formatDisplayName({ title, geography, frequency, seasonalAdjustment }) {
+    let ending = '';
+    if (seasonalAdjustment === 'seasonally_adjusted') {
+      ending = '; Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_seasonally_adjusted') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + '; Not Seasonally Adjusted)';
+    if (seasonalAdjustment === 'not_seasonall_adjusted') {
+      ending = '; Not Seasonally Adjusted';
     }
-    if (detail.seasonalAdjustment === 'not_applicable') {
-      return detail.title + ' (' + detail.geography.handle + '; ' + detail.frequencyShort + ')';
-    }
-    return detail.title + ' (' + detail.geography.shortName + '; ' + detail.frequencyShort + ')';
+    return `${title} (${geography}; ${frequency}${ending})`;
   }
 
   setAnalyzerDates(analyzerSeries) {

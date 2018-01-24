@@ -44,20 +44,12 @@ export class TableHelperService {
     const popoverId = subcatIndex ? '#' + subcatIndex + seriesInfo.id : '#' + seriesInfo.id;
     const popover = $(popoverId).popover({
       trigger: 'manual',
-      placement: function (popoverEl, el) {
-        // popoverEl = popover DOM element
-        // el = DOM element that triggers popover
-        let position = 'top';
-        const elOffset = $(el).offset().top;
-        if (elOffset <= 150) {
-          position = 'bottom';
-        }
-        return position;
-      },
       html: true,
       title: function () {
         let title = seriesInfo.title;
+        title += ' (' + seriesInfo.geography.shortName + '; ' + seriesInfo.frequency + ')';
         title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
+        title += '<i class="material-icons close-info">&#xE14C;</i>';
         return title;
       },
       content: function () {

@@ -6,7 +6,7 @@
   right: 30px;
 
   .form-control {
-    padding: 0.25rem 1rem;
+    padding: 0.125rem 1rem;
     font-family: "FontAwesome", "Lucida Sans", sans-serif;
   }
 
@@ -30,8 +30,9 @@
 
   .btn {
     line-height: 1.15;
-    padding: 0.25rem 1rem;
     background-color: $primary;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     
     .material-icons.md-18 {
       font-size: 18px;

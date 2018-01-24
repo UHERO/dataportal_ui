@@ -102,5 +102,12 @@
         </ng-template>
       </table>
     </div>
+    <p *ngIf="missingSummaryStat" class="stat-warning"><i class="material-icons text-danger">&#xE001;</i> The following series contain N/As due to missing values included in the selected range: 
+      <ng-template ngFor let-serie [ngForOf]="series">
+        <ul>
+          <li *ngIf="serie.summaryStats && serie.summaryStats.missing">{{serie.displayName}}</li>
+        </ul>
+      </ng-template>  
+    </p>
   </div>
 </div>

@@ -7,16 +7,20 @@
     "start-uhero-staging": "ng serve --app=uhero --env=staging --port=4200",
     "start-nta-staging": "ng serve --app=nta --env=staging --port=4200",
     "start-uhero-dev": "ng serve --app=uhero --env=dev",
-    "start-uhero-api-dev": "ng serve --app=uhero --env=apiDev",    
+    "start-uhero-api-dev": "ng serve --app=uhero --env=apiDev",
     "start-nta-dev": "ng serve --app=nta --env=dev",
-    "start-nta-api-dev": "ng serve --app=nta --env=apiDev",    
+    "start-nta-api-dev": "ng serve --app=nta --env=apiDev",
     "build-uhero-staging": "ng build --app=uhero --env=staging --output-path=dist_staging",
-    "build-nta-staging": "ng build --app=nta --env=staging --base-href=/nta/ --output-path=ntaDist_staging", 
+    "build-nta-staging": "ng build --app=nta --env=staging --base-href=/nta/ --output-path=ntaDist_staging",
     "build-uhero": "ng build --app=uhero --prod",
     "build-nta": "ng build --app=nta --prod --base-href=/nta/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
+  },
+  "engines": {
+    "node": "8.9.4",
+    "npm": "5.6.0"
   },
   "private": true,
   "dependencies": {
@@ -30,7 +34,7 @@
     "@angular/platform-browser-dynamic": "^4.0.0-beta",
     "@angular/router": "^4.0.0-beta",
     "angular2-highcharts": "https://github.com/gevgeny/angular2-highcharts",
-    "bootstrap": "4.0.0-beta.2",
+    "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.4.1",
     "datatables.net": "^1.10.13",
     "datatables.net-buttons": "^1.2.4",
@@ -41,7 +45,7 @@
     "highcharts-export-csv": "^1.4.3",
     "ion-rangeslider": "^2.1.7",
     "ng2-recaptcha": "^1.5.4",
-    "popper.js": "^1.11.1",
+    "popper.js": "^1.12.9",
     "primeng": "4.2.2",
     "rxjs": "^5.1.0",
     "tether": "^1.4.0",
@@ -49,7 +53,7 @@
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
-    "@angular/cli": "^1.1.1",
+    "@angular/cli": "^1.6.4",
     "@angular/compiler-cli": "^4.0.0-beta",
     "@types/google.analytics": "0.0.33",
     "@types/jasmine": "2.5.38",

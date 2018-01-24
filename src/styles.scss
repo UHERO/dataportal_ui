@@ -86,12 +86,14 @@ body {
     padding: 0.175rem 1.75rem 0.175rem 0.75rem;
     background: $white url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
     background-size: 8px 10px;
+    width: unset;
   }
 
   .popover {
     .popover-header {
       font-size: 0.85em;
       font-weight: bold;
+      padding: 10px;
 
       .close-info {
         font-size: 1.1em;
@@ -100,7 +102,7 @@ body {
       }
     }
 
-    .popover-content {
+    .popover-body {
       font-size: 0.9em;
     }
   }

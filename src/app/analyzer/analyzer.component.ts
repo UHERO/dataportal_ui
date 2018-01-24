@@ -28,7 +28,7 @@ export class AnalyzerComponent implements OnInit {
   private tooltipUnits;
   private tooltipGeo;
   analyzerData;
-  
+
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
@@ -83,7 +83,7 @@ export class AnalyzerComponent implements OnInit {
     urlASeries.forEach((uSeries) => {
       const seriesExists = this._analyzer.analyzerSeries.find(s => s.id === uSeries);
       if (!seriesExists) {
-        this._analyzer.analyzerSeries.push({ id: uSeries, showInChart: false });              
+        this._analyzer.analyzerSeries.push({ id: uSeries, showInChart: false });
       }
     });
   }

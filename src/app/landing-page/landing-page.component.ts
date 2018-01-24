@@ -55,7 +55,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   ) {}
 
   ngOnInit() {
-    this.currentGeo = { fips: null, name: null, handle: null };
+    this.currentGeo = { fips: null, name: null, shortName: null, handle: null };
     this.currentFreq = { freq: null, label: null };
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
   }

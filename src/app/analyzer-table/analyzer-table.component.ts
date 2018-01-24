@@ -23,9 +23,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
-  portalSettings;  
+  portalSettings;
   private previousHeight;
   private tableWidths = [];
+  missingSummaryStat = false;
   tableDates;
 
   constructor(
@@ -42,7 +43,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   ngOnChanges() {
     // Update table as minDate & maxDate change
-    console.log('this.series', this.series)
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
       if (this.maxDate === this.allTableDates[i].date) {
@@ -66,6 +66,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
         $('.color' + series.seriesDetail.id).css('color', '#000');
       }
     });
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.isSummaryStatMissing();
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
 
@@ -81,6 +83,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
     // Scroll tables to the right when table widths changes, i.e. changing frequency from A to Q | M
     return this._table.checkTableWidth(this.tableWidths);
+  }
+
+  isSummaryStatMissing() {
+    return this.series.some((s) => s.summaryStats.missing);
   }
 
   showPopover(seriesInfo) {
@@ -104,7 +110,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
 
   c5maActive(e) {
     this.c5maChecked = e.target.checked;
-    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });    
+    this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
   }
 
 

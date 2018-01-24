@@ -87,6 +87,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       id: y0Exist ? 'yAxis1' : 'yAxis0',
       opposite: oppositeExist ? false : true,
       showLastLabel: true,
+      minPadding: 0,
+      maxPadding: 0,
       minTickInterval: 0.01,
       series: [series]
     });
@@ -207,7 +209,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       if (!sufficientOverlap) {
         if (yAxis1) {
           const highestOverlapAxis = this.findHighestOverlap(yAxesGroups, baseMin, baseMax);
-          highestOverlapAxis.push(serie)
+          highestOverlapAxis.push(serie);
           return;
         }
         if (!yAxis1) {
@@ -254,10 +256,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
         className: serie.seriesDetail.id,
-        name: serie.displayName,
+        name: serie.chartDisplayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        displayName: serie.seriesDetail.title,
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
@@ -490,7 +491,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     };
     const formatSeriesLabel = function (sName, sUnits, sGeo, point, seriesValue: number, date: string, pointX, s: string) {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = sName ? point.userOptions.displayName : '';
+      const displayName = sName ? point.userOptions.name : '';
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const unitsLabel = sUnits ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
       const geoLabel = sGeo ? point.userOptions.geography + '<br>' : '<br>';
