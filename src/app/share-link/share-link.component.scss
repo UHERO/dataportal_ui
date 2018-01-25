@@ -1,8 +1,29 @@
 @import 'colors';
 
-.share-link {
-    color: $primary;
+.share {
+    /* color: $primary;
     font-size: 1.2em;
-    cursor: pointer;
+    cursor: pointer; */
+    display: inline-block;
+    margin-left: 5px;
     vertical-align: middle;
+
+    span.input-group-addon {
+        background-color: $light-gray;
+        cursor: pointer;
+        padding: 0.175rem;
+        height: calc(1.75rem - 2px); 
+
+        .share-link {
+            color: $primary;
+            font-size: 16px;
+            line-height: 1;
+        }
+    }
+
+    input.form-control {
+        font-size: 0.85em;
+        height: calc(1.75rem - 2px);
+        padding: 0.175rem;
+    }
 }

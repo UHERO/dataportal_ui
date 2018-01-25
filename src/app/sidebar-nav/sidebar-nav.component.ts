@@ -43,6 +43,7 @@ export class SidebarNavComponent implements OnInit {
         this.defaultCategory = this.categories[0].id;
       });
     this.route.queryParams.subscribe((params) => {
+      console.log('queryparams', params)
       this.id = params['id'];
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
@@ -91,7 +92,7 @@ export class SidebarNavComponent implements OnInit {
     this.loading = true;
     this.selectedCategory = catId;
     setTimeout(() => {
-      this._router.navigate(['/category'], { queryParams: { id: catId }, queryParamsHandling: 'merge' });
+      this._router.navigate(['/category'], { queryParams: { id: catId, start: null }, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 15);
   }

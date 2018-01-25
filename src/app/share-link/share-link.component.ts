@@ -62,10 +62,10 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   createSeriesShareLink() {
-    const start = this.startDate ? ';start=' + this.startDate : '';
-    const end = this.endDate ? ';end=' + this.endDate : '';
+    const start = this.startDate ? this.startDate : '';
+    const end = this.endDate ? this.endDate : '';
     if (this.view === 'series') {
-      const seriesUrl = '';
+      const seriesUrl = '/series';
       const urlParams = this.getSeriesUrlParams(start, end, seriesUrl);
       return this.baseUrl + urlParams;
     }
@@ -99,12 +99,11 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   getSeriesUrlParams(start, end, seriesUrl) {
-    seriesUrl = '/series' + start + end;
-    const urlParams = this.addQueryParams(seriesUrl);
+    const urlParams = this.addQueryParams(seriesUrl, start, end);
     return urlParams;
   }
 
-  addQueryParams(seriesUrl) {
+  addQueryParams(seriesUrl, start, end) {
     if (this.id) {
       seriesUrl += '?id=' + this.id;
     }
@@ -116,6 +115,12 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     }
     if (this.freq) {
       seriesUrl += '&freq=' + this.freq;
+    }
+    if (start) {
+      seriesUrl += '&start=' + start;
+    }
+    if (end) {
+      seriesUrl += '&end=' + end;
     }
     return seriesUrl;
   }

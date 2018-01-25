@@ -1,1 +1,9 @@
-<i class="material-icons share-link" (click)="copyLink(shareLink)" title="Copy Link">&#xE157;</i>
+<!-- <i class="material-icons share-link" (click)="copyLink(shareLink)" title="Copy Link">&#xE157;</i> -->
+<div class="share">
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">
+            <i class="material-icons share-link" (click)="copyLink(shareLink)" title="Copy Link">&#xE157;</i>
+        </span>
+        <input type="text" class="form-control" [value]="shareLink" aria-describedby="basic-addon1">
+    </div>
+</div>
