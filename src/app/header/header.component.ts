@@ -19,13 +19,13 @@ export class HeaderComponent implements OnInit {
     const searchQParams = {
       id: event,
       start: null,
-      end: null, 
+      end: null,
       analyzerSeries: null,
       chartSeries: null,
       name: null,
       units: null,
       geography: null
-    }
+    };
     this._router.navigate(['/category'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 }
