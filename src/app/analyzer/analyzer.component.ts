@@ -41,7 +41,7 @@ export class AnalyzerComponent implements OnInit {
 
   ngOnInit() {
     if (this.route) {
-      this.route.params.subscribe(params => {
+      this.route.queryParams.subscribe(params => {
         if (params['analyzerSeries']) {
           this.storeUrlSeries(params);
         }

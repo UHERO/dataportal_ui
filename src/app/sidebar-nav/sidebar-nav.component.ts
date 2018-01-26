@@ -43,7 +43,6 @@ export class SidebarNavComponent implements OnInit {
         this.defaultCategory = this.categories[0].id;
       });
     this.route.queryParams.subscribe((params) => {
-      console.log('queryparams', params)
       this.id = params['id'];
       this.view = params['view'] ? params['view'] : 'chart';
       this.yoy = params['yoy'] ? params['yoy'] : 'false';
@@ -92,7 +91,17 @@ export class SidebarNavComponent implements OnInit {
     this.loading = true;
     this.selectedCategory = catId;
     setTimeout(() => {
-      this._router.navigate(['/category'], { queryParams: { id: catId, start: null }, queryParamsHandling: 'merge' });
+      const catQParams = {
+        id: catId,
+        start: null,
+        end: null,
+        analyzerSeries: null,
+        chartSeries: null,
+        name: null,
+        units: null,
+        geography: null
+      }
+      this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 15);
   }
@@ -103,7 +112,17 @@ export class SidebarNavComponent implements OnInit {
   }
 
   onSearch(event) {
-    this._router.navigate(['/category'], { queryParams: { id: event }, queryParamsHandling: 'merge' });
+    const searchQParams = {
+      id: event,
+      start: null,
+      end: null, 
+      analyzerSeries: null,
+      chartSeries: null,
+      name: null,
+      units: null,
+      geography: null
+    }
+    this._router.navigate(['/category'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
 }

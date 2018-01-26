@@ -77,8 +77,8 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   getAnalyzerParams(start, end, seriesUrl) {
-    let aSeries = ';analyzerSeries=';
-    let cSeries = ';chartSeries=';
+    let aSeries = '?analyzerSeries=';
+    let cSeries = '&chartSeries=';
     if (this.analyzerSeries.length) {
       this.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
@@ -87,14 +87,14 @@ export class ShareLinkComponent implements OnInit, OnChanges {
         cSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
     }
-    seriesUrl += start + end;
     seriesUrl += aSeries + cSeries;
-    seriesUrl += this.name ? ';name=' + this.name : '';
-    seriesUrl += this.units ? ';units=' + this.units : '';
-    seriesUrl += this.geography ? ';geography=' + this.geography : '';
-    seriesUrl += this.yoy ? ';yoy=' + this.yoy : '';
-    seriesUrl += this.ytd ? ';ytd=' + this.ytd : '';
-    seriesUrl += this.c5ma ? ';c5ma=' + this.c5ma : '';
+    seriesUrl += '&start=' + start + '&end=' + end;
+    seriesUrl += this.name ? '&name=' + this.name : '';
+    seriesUrl += this.units ? '&units=' + this.units : '';
+    seriesUrl += this.geography ? '&geography=' + this.geography : '';
+    seriesUrl += this.yoy ? '&yoy=' + this.yoy : '';
+    seriesUrl += this.ytd ? '&ytd=' + this.ytd : '';
+    seriesUrl += this.c5ma ? '&c5ma=' + this.c5ma : '';
     return seriesUrl;
   }
 
