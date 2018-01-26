@@ -52,7 +52,7 @@ export class SidebarNavComponent implements OnInit {
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const helpUrl = event.url === '/help';
-        const analyzerUrl = event.url === '/analyzer';
+        const analyzerUrl = event.url.substr(0, 9) === '/analyzer';
         this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
       }
     });
@@ -100,7 +100,7 @@ export class SidebarNavComponent implements OnInit {
         name: null,
         units: null,
         geography: null
-      }
+      };
       this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       this.loading = false;
     }, 15);
@@ -115,13 +115,13 @@ export class SidebarNavComponent implements OnInit {
     const searchQParams = {
       id: event,
       start: null,
-      end: null, 
+      end: null,
       analyzerSeries: null,
       chartSeries: null,
       name: null,
       units: null,
       geography: null
-    }
+    };
     this._router.navigate(['/category'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
