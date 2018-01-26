@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 
 @Component({
   selector: 'app-feedback',
