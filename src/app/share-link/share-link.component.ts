@@ -62,10 +62,10 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   createSeriesShareLink() {
-    const start = this.startDate ? ';start=' + this.startDate : '';
-    const end = this.endDate ? ';end=' + this.endDate : '';
+    const start = this.startDate ? this.startDate : '';
+    const end = this.endDate ? this.endDate : '';
     if (this.view === 'series') {
-      const seriesUrl = '';
+      const seriesUrl = '/series';
       const urlParams = this.getSeriesUrlParams(start, end, seriesUrl);
       return this.baseUrl + urlParams;
     }
@@ -77,8 +77,8 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   }
 
   getAnalyzerParams(start, end, seriesUrl) {
-    let aSeries = ';analyzerSeries=';
-    let cSeries = ';chartSeries=';
+    let aSeries = '?analyzerSeries=';
+    let cSeries = '&chartSeries=';
     if (this.analyzerSeries.length) {
       this.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
@@ -87,24 +87,23 @@ export class ShareLinkComponent implements OnInit, OnChanges {
         cSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
     }
-    seriesUrl += start + end;
     seriesUrl += aSeries + cSeries;
-    seriesUrl += this.name ? ';name=' + this.name : '';
-    seriesUrl += this.units ? ';units=' + this.units : '';
-    seriesUrl += this.geography ? ';geography=' + this.geography : '';
-    seriesUrl += this.yoy ? ';yoy=' + this.yoy : '';
-    seriesUrl += this.ytd ? ';ytd=' + this.ytd : '';
-    seriesUrl += this.c5ma ? ';c5ma=' + this.c5ma : '';
+    seriesUrl += '&start=' + start + '&end=' + end;
+    seriesUrl += this.name ? '&name=' + this.name : '';
+    seriesUrl += this.units ? '&units=' + this.units : '';
+    seriesUrl += this.geography ? '&geography=' + this.geography : '';
+    seriesUrl += this.yoy ? '&yoy=' + this.yoy : '';
+    seriesUrl += this.ytd ? '&ytd=' + this.ytd : '';
+    seriesUrl += this.c5ma ? '&c5ma=' + this.c5ma : '';
     return seriesUrl;
   }
 
   getSeriesUrlParams(start, end, seriesUrl) {
-    seriesUrl = '/series' + start + end;
-    const urlParams = this.addQueryParams(seriesUrl);
+    const urlParams = this.addQueryParams(seriesUrl, start, end);
     return urlParams;
   }
 
-  addQueryParams(seriesUrl) {
+  addQueryParams(seriesUrl, start, end) {
     if (this.id) {
       seriesUrl += '?id=' + this.id;
     }
@@ -116,6 +115,12 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     }
     if (this.freq) {
       seriesUrl += '&freq=' + this.freq;
+    }
+    if (start) {
+      seriesUrl += '&start=' + start;
+    }
+    if (end) {
+      seriesUrl += '&end=' + end;
     }
     return seriesUrl;
   }

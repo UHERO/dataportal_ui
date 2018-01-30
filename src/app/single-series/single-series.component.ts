@@ -81,14 +81,14 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.route.params.subscribe(params => {
+    /* this.route.params.subscribe(params => {
       if (params['start']) {
         this.startDate = params['start'];
       }
       if (params['end']) {
         this.endDate = params['end'];
       }
-    });
+    }); */
     this.route.queryParams.subscribe(params => {
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
@@ -96,6 +96,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
       if (params['category']) {
         this.category = params['category'];
+      }
+      if (params['start']) {
+        this.startDate = params['start'];
+      }
+      if (params['end']) {
+        this.endDate = params['end'];
       }
       this.seriesData = this._series.getSeriesData(seriesId);
     });

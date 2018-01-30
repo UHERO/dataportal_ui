@@ -27,7 +27,6 @@ export function highchartsFactory() {
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { RecaptchaModule } from 'ng2-recaptcha';
 import { AppComponent } from './app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
@@ -61,7 +60,6 @@ import { ClipboardService } from '../clipboard.service';
     ReactiveFormsModule,
     HttpModule,
     DataTableModule, SharedModule,
-    RecaptchaModule.forRoot()
   ],
   entryComponents: [
     NtaHelpComponent

@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { RecaptchaModule } from 'ng2-recaptcha';
+import { RecaptchaModule } from 'ng-recaptcha';
 import { HeaderComponent } from '../header/header.component';
 import { SingleSeriesComponent } from '../single-series/single-series.component';
 import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
