@@ -29,6 +29,7 @@ export class UheroApiService {
   private cachedSearch = [];
   private cachedCatMeasures = [];
   private cachedMeasureSeries = [];
+  private cachedPackageCategory = [];
 
   constructor( @Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
     this.baseUrl = environment['apiUrl'];
@@ -100,13 +101,27 @@ export class UheroApiService {
 
   // Gets a particular category. Used to identify a category's date ranges
   fetchSelectedCategoryWithGeoFreq(id: number, geo: string, freq: string): Observable<Category> {
-    if (this.cachedSelectedCategoryGeoFreq[id]) {
+    if (this.cachedSelectedCategoryGeoFreq[id + geo + freq]) {
       return Observable.of(this.cachedSelectedCategoryGeoFreq[id + geo + freq]);
     } else {
       let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
+          selectedCat$ = null;
+        });
+      return selectedCat$;
+    }
+  }
+
+  fetchPackageCategory(id: number, geo: string, freq: string): Observable<Category> {
+    if (this.cachedPackageCategory[id + geo + freq]) {
+      return Observable.of(this.cachedPackageCategory[id + geo + freq]);
+    } else {
+      let selectedCat$ = this.http.get(`${this.baseUrl}/package/category?id=` + id + `&geo=` + geo  +`&freq=` + freq, this.requestOptionsArgs)
+        .map(mapData)
+        .do(val => {
+          this.cachedPackageCategory[id + geo + freq] = val;
           selectedCat$ = null;
         });
       return selectedCat$;

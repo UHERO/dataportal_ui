@@ -52,19 +52,78 @@ export class CategoryHelperService {
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
-          this.categoryData[cacheId].selectedCategory = selectedCategory;
-          const sublistCopy = [];
-          sublist.forEach((sub) => {
-            sublistCopy.push(Object.assign({}, sub));
+          let geo = routeGeo ? routeGeo : this.defaultGeo.handle;
+          let freq = routeFreq ? routeFreq : this.defaultFreq.freq;
+          let data;
+          this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
+            this.categoryData[cacheId].results = categoryData;
+            this.categoryData[cacheId].subcategories = categoryData.categories.slice(0, categoryData.categories.length - 1);
+            this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
+            this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
+            this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+            this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
+            const dates = this.setCategoryDates(this.categoryData[cacheId].subcategories, this.categoryData[cacheId].currentGeo, this.categoryData[cacheId].currentFreq, cacheId);
+            this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
+            this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
+            this.categoryData[cacheId].categoryDates = dates.categoryDates;
+            this.formatSeriesForDisplay(this.categoryData[cacheId].subcategories, cacheId);
           });
-          this.categoryData[cacheId].sublist = sublistCopy;
-          this.getSubcategoryData(selectedCategory, cacheId, catId, this.categoryData[cacheId].sublist, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
       });
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
+  }
+
+  getUniqueRegionsList(subcategories: Array<any>) {
+    const geoArray = [];
+    subcategories.forEach((sub) => {
+      if (sub.geos) {
+        sub.geos.forEach((geo) => {
+          const geoExist = geoArray.find(g => g.handle === geo.handle);
+          if (!geoExist) {
+            geoArray.push(geo);
+          }
+        });
+      }
+    });
+    return geoArray;
+  }
+
+  getUniqueFreqsList(subcategories: Array<any>) {
+    const freqArray = [];
+    subcategories.forEach((sub) => {
+      if (sub.freqs) {
+        sub.freqs.forEach((freq) => {
+          const freqExist = freqArray.find(f => f.freq === freq.freq);
+          if (!freqExist) {
+            freqArray.push(freq);
+          }
+        });
+      }
+    });
+    return freqArray;
+  }
+
+  formatSeriesForDisplay(subcategories: Array<any>, cacheId) {
+    this.categoryData[cacheId].subcategories.forEach((sub) => {
+      sub.requestComplete = false;
+      // sublist id used as anchor fragments in landing-page component, fragment expects a string
+      sub.id = sub.id.toString();
+      if (sub.series) {
+        const splitSeries = this.getDisplaySeries(sub.series, this.categoryData[cacheId].currentFreq.freq);
+        if (splitSeries) {
+          sub.displaySeries = splitSeries.displaySeries;
+          sub.noData = false;
+          this.formatCategoryData(splitSeries.displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
+          sub.requestComplete = true;
+        }
+      }
+      if (!sub.series) {
+        this.setNoData(sub);
+      }
+    });
   }
 
   getSubcategoryData(catName: string, cacheId, catId: number, sublist: Array<any>, routeGeo?: string, routeFreq?: string) {
