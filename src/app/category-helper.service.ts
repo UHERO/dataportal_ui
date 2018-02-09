@@ -52,28 +52,59 @@ export class CategoryHelperService {
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
-          let geo = routeGeo ? routeGeo : this.defaultGeo.handle;
-          let freq = routeFreq ? routeFreq : this.defaultFreq.freq;
+          let selectedGeo = routeGeo ? routeGeo : this.defaultGeo.handle;
+          let selectedFreq = routeFreq ? routeFreq : this.defaultFreq.freq;
           let data;
-          this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
-            this.categoryData[cacheId].results = categoryData;
-            this.categoryData[cacheId].subcategories = categoryData.categories.slice(0, categoryData.categories.length - 1);
-            this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
-            this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
-            this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
-            this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-            const dates = this.setCategoryDates(this.categoryData[cacheId].subcategories, this.categoryData[cacheId].currentGeo, this.categoryData[cacheId].currentFreq, cacheId);
-            this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
-            this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
-            this.categoryData[cacheId].categoryDates = dates.categoryDates;
-            this.formatSeriesForDisplay(this.categoryData[cacheId].subcategories, cacheId);
-          });
+          if (routeGeo && routeFreq) {
+            this.checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId);
+          }
+          if (!routeGeo || !routeFreq) {
+            this.getDataWithDefaults(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
+          }
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
       });
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
+  }
+
+  checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId) {
+    let routeGeoExists, routeFreqExists, routeExists;
+    this._uheroAPIService.fetchPackageCategory(catId, routeGeo, routeFreq).subscribe((data) => {
+      const subcategories = data.categories.slice(0, data.categories.length - 1);
+      const regions = this.getUniqueRegionsList(subcategories);
+      const frequencies = this.getUniqueFreqsList(subcategories);
+      routeGeoExists = regions.find(region => region.handle === routeGeo);
+      routeFreqExists = frequencies.find(frequency => frequency.freq === routeFreq);
+    },
+      (error) => {
+        console.log('check route error', error);
+      },
+      () => {
+        if (routeGeoExists && routeFreqExists) {
+          this.getDataWithDefaults(catId, routeGeo, routeFreq, cacheId);
+        }
+        if (!routeGeoExists || !routeFreqExists) {
+          this.getDataWithDefaults(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
+        }
+      });
+  }
+
+  getDataWithDefaults(catId: any, geo: string, freq: string, cacheId: string) {
+    this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
+      this.categoryData[cacheId].results = categoryData;
+      this.categoryData[cacheId].subcategories = categoryData.categories.slice(0, categoryData.categories.length - 1);
+      this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
+      this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
+      this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+      this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
+      const dates = this.setCategoryDates(this.categoryData[cacheId].subcategories, this.categoryData[cacheId].currentGeo, this.categoryData[cacheId].currentFreq, cacheId);
+      this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
+      this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
+      this.categoryData[cacheId].categoryDates = dates.categoryDates;
+      this.formatSeriesForDisplay(this.categoryData[cacheId].subcategories, cacheId);
+    });
   }
 
   getUniqueRegionsList(subcategories: Array<any>) {
@@ -327,31 +358,48 @@ export class CategoryHelperService {
     } else {
       let obsEnd, obsStart, freqGeos, geoFreqs, freqs, geos;
       this.categoryData[cacheId] = <CategoryData>{};
-      this._uheroAPIService.fetchSearch(search).subscribe((results) => {
-        this.defaults = results.defaults;
+      this._uheroAPIService.fetchPackageSearch(search, routeGeo, routeFreq).subscribe((results) => {
         this.defaultGeo = results.defaultGeo;
-        this.defaultFreq = results.defaultFreq;
-        // TO BE DEPRECATED
-        freqGeos = results.freqGeos;
-        geoFreqs = results.geoFreqs;
-        // NEW GEO/FREQ RESPONSES
-        freqs = results.freqs;
+        this.defaultGeo = results.defaultFreq;
         geos = results.geos;
+        freqs = results.freqs;
         obsEnd = results.observationEnd;
         obsStart = results.observationStart;
-      },
-        (error) => {
-          this.errorMessage = error;
-        },
-        () => {
-          if (obsEnd && obsStart) {
-            const dateWrapper = <DateWrapper>{};
-            this.searchSettings(search, cacheId, dateWrapper, geoFreqs, freqGeos, freqs, geos, routeGeo, routeFreq);
-            this.categoryData[cacheId].selectedCategory = 'Search: ' + search;
-          } else {
-            this.categoryData[cacheId].invalid = search;
-          }
-        });
+        if (obsStart && obsEnd) {
+          const categoryDateWrapper = { firstDate: '', endDate: '' };
+          let selectedGeo = routeGeo ? routeGeo : results.defaultGeo.handle;
+          let selectedFreq = routeFreq ? routeFreq : results.defaultFreq.freq;
+          const routeGeoExists = routeGeo ? geos.find(geo => geo.handle === routeGeo) : false;
+          const routeFreqExists = routeFreq ? freqs.find(freq => freq.freq === routeFreq) : false;
+          const dateWrapper = <DateWrapper>{};
+          this.categoryData[cacheId].selectedCategory = 'Search: ' + search;
+          this.categoryData[cacheId].regions = geos;
+          this.categoryData[cacheId].currentGeo = routeGeoExists ? routeGeoExists : geos.find(geo => geo.handle === results.defaultGeo.handle);
+          this.categoryData[cacheId].frequencies = freqs;
+          this.categoryData[cacheId].currentFreq = routeFreqExists ? routeFreqExists : freqs.find(freq => freq.freq === results.defaultFreq.freq);
+          const splitSeries = this.getDisplaySeries(results.series, selectedFreq);
+          const sublist = {
+            id: 'search',
+            parentName: 'Search',
+            name: search,
+            displaySeries: splitSeries.displaySeries,
+            requestComplete: false
+          };
+          const catWrapper = this.getSearchDates(splitSeries.displaySeries);
+          const categoryDateArray = [];
+          this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, selectedFreq, categoryDateArray);
+          this.formatCategoryData(splitSeries.displaySeries, categoryDateArray, catWrapper);
+          this.categoryData[cacheId].subcategories = [sublist];
+          this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
+          this.categoryData[cacheId].categoryDates = categoryDateArray;
+          this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
+          this.categoryData[cacheId].requestComplete = true;
+          sublist.requestComplete = true;
+        }
+        if (!obsStart || !obsEnd) {
+          this.categoryData[cacheId].invalid = search;
+        }
+      });
       return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
     }
   }
