@@ -53,19 +53,18 @@ export class HelperService {
     // Method for new API observation responses
     if (levelResults.dates) {
       level = this.formatObservations(levelResults);
-      level.forEach((l, index) => {
-        if (l.pseudoHistory && !level[index + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(l.date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-        }
-      });
+      const ph = level.lastIndexOf(l => l.pseudoHistory);
+      if (ph > -1 && !level[ph + 1].pseudoHistory) {
+        pseudoZones.push({ value: Date.parse(level[ph].date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });        
+      }
     }
-    if (yoyResults && yoyResults.dates.length) {
+    if (yoyResults && yoyResults.dates) {
       yoy = this.formatObservations(yoyResults);
     }
-    if (ytdResults && ytdResults.dates.length) {
+    if (ytdResults && ytdResults.dates) {
       ytd = this.formatObservations(ytdResults);
     }
-    if (c5maResults && c5maResults.dates.length) {
+    if (c5maResults && c5maResults.dates) {
       c5ma = this.formatObservations(c5maResults);
     }
     combinedObservations = level.map((entry, index) => {
