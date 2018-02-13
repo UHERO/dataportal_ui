@@ -52,7 +52,6 @@ export class CategoryHelperService {
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
-          let data;
           if (routeGeo && routeFreq) {
             this.checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId);
           }
@@ -82,7 +81,6 @@ export class CategoryHelperService {
       },
       () => {
         if (routeGeoExists && routeFreqExists) {
-          console.log('routeGeoFreqExists', categoryData);
           this.getData(catId, routeGeo, routeFreq, cacheId);
         }
         if (!routeGeoExists || !routeFreqExists) {
@@ -198,7 +196,7 @@ export class CategoryHelperService {
     if (this.categoryData[cacheId]) {
       return Observable.of([this.categoryData[cacheId]]);
     } else {
-      let obsEnd, obsStart, freqs, geos;
+      let obsEnd, obsStart;
       this.categoryData[cacheId] = <CategoryData>{};
       if (routeGeo && routeFreq) {
         this._uheroAPIService.fetchPackageSearch(search, routeGeo, routeFreq).subscribe((results) => {

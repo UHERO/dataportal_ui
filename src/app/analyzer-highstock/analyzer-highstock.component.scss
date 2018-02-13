@@ -114,6 +114,11 @@
     stroke: $analyzer-series4;
 }
 
+.pseudoHistory {
+    stroke: #7CB5EC;
+    stroke-dasharray: 5, 10;
+}
+
 .highcharts-navigator-series {
     .highcharts-graph {
         color: #505050;

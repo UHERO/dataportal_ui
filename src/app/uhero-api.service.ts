@@ -105,7 +105,8 @@ export class UheroApiService {
     if (this.cachedSelectedCategoryGeoFreq[id + geo + freq]) {
       return Observable.of(this.cachedSelectedCategoryGeoFreq[id + geo + freq]);
     } else {
-      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` + id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=` +
+        id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
@@ -119,7 +120,8 @@ export class UheroApiService {
     if (this.cachedPackageCategory[id + geo + freq]) {
       return Observable.of(this.cachedPackageCategory[id + geo + freq]);
     } else {
-      let selectedCat$ = this.http.get(`${this.baseUrl}/package/category?id=` + id + `&geo=` + geo  +`&freq=` + freq, this.requestOptionsArgs)
+      let selectedCat$ = this.http.get(`${this.baseUrl}/package/category?id=` +
+        id + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedPackageCategory[id + geo + freq] = val;
@@ -262,7 +264,8 @@ export class UheroApiService {
     if (this.cachedPackageSearch[search + geo + freq]) {
       return Observable.of(this.cachedPackageSearch[search + geo + freq]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/package/search?q=` + search + `&u=` + this.portal + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
+      let search$ = this.http.get(`${this.baseUrl}/package/search?q=` +
+        search + `&u=` + this.portal + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
