@@ -50,39 +50,65 @@ export class HelperService {
     const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
     const pseudoZones = [];
     let formattedObservations;
-    if (level.dates) {
-      formattedObservations = level.dates.map((date, index) => {
-        const obj = { date: '', value: null, yoyValue: null, ytdValue: null, c5maValue: null, pseudoHistory: false };
-        const yoyDateIndex = yoy && yoy.dates ? yoy.dates.indexOf(date) : -1;        
-        const ytdDateIndex = ytd && ytd.dates ? ytd.dates.indexOf(date) : -1;
-        const c5maDateIndex = c5ma && c5ma.dates ? c5ma.dates.indexOf(date) : -1;
-        // const yoyDateIndex = yoy && yoy.dates ? yoy.dates.findIndex(yoyDate => yoyDate === date) : -1;
-        // const ytdDateIndex = ytd && ytd.dates ? ytd.dates.findIndex(ytdDate => ytdDate === date) : -1;
-        // const c5maDateIndex = c5ma && c5ma.dates ? c5ma.dates.findIndex(c5maDate => c5maDate === date) : -1;
-        obj.date = date;
-        obj.value = +level.values[index];
-        obj.yoyValue = yoyDateIndex > -1 ? +yoy.values[yoyDateIndex] : null;
-        obj.ytdValue = ytdDateIndex > -1 ? +ytd.values[ytdDateIndex] : null;
-        obj.c5maValue = c5maDateIndex > -1 ? +c5ma.values[c5maDateIndex] : null;
-        obj.pseudoHistory = level.pseudoHistory[index];
-        return obj;
-      });
-      formattedObservations.forEach((obs, index) => {
-        if (obs.pseudoHistory && !formattedObservations[index + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(obs.date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
         }
       });
     }
-    const tableData = this.seriesTable(formattedObservations, dates, decimals);
-    const chart = this.seriesChart(formattedObservations, dates);
+    const seriesTable = this.createSeriesTable(dates, observations, decimals);
+    const chart = this.createSeriesChart(dates, observations);
     const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
-    results = { chartData: chartData, tableData: tableData, start: start, end: end };
+    results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
     return results;
   }
 
-  seriesTable(seriesData, dateRange, decimals) {
-    let table;
-    table = dateRange.map((date) => {
+  addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
+    const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
+    if (tableEntry > -1) {
+      tableObj[value] = valueArray.values[tableEntry];
+      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+    }
+  }
+
+  formatHighchartData(dateRange, seriesData) {
+    const dataArray = dateRange.map((date) => {
+      const obj = [Date.parse(date.date)];
+      const dateIndex = seriesData.dates.findIndex(obs => obs === date.date);
+      obj[1] = dateIndex ? +seriesData.values[dateIndex] : null;
+      return obj;
+    });
+    return dataArray;
+  }
+
+  createSeriesChart(dateRange, observations) {
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    let levelValue, yoyValue, ytdValue, c5maValue;
+    if (level) {
+      levelValue = this.formatHighchartData(dateRange, level);
+    }
+    if (yoy) {
+      yoyValue = this.formatHighchartData(dateRange, yoy);
+    }
+    if (ytd) {
+      ytdValue = this.formatHighchartData(dateRange, ytd);
+    }
+    if (c5ma) {
+      c5maValue = this.formatHighchartData(dateRange, c5ma);
+    }
+    return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
+  }
+  
+  createSeriesTable(dateRange: Array<any>, observations, decimals: number) {
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    const tableCopy = dateRange.map((date) => {
       const tableObj = {
         date: date.date,
         tableDate: date.tableDate,
@@ -95,42 +121,24 @@ export class HelperService {
         c5maValue: Infinity,
         formattedC5ma: ''
       }
-      const tableEntry = seriesData.findIndex(obs => obs.date === date.date || obs.date === date.tableDate);
-      if (tableEntry > -1) {
-        tableObj.value = seriesData[tableEntry].value;
-        tableObj.formattedValue = this.formattedValue(seriesData[tableEntry].value, decimals);
-        tableObj.yoyValue = seriesData[tableEntry].yoyValue;
-        tableObj.formattedYoy = this.formattedValue(seriesData[tableEntry].yoyValue, decimals);
-        tableObj.ytdValue = seriesData[tableEntry].ytdValue;
-        tableObj.formattedYtd = this.formattedValue(seriesData[tableEntry].ytdValue, decimals);
-        tableObj.c5maValue = seriesData[tableEntry].c5maValue;
-        tableObj.formattedC5ma = this.formattedValue(seriesData[tableEntry].c5maValue, decimals);
+      if (level) {
+        this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
+      }
+      if (yoy) {
+        this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', decimals);
+      }
+      if (ytd) {
+        this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', decimals);
+      }
+      if (c5ma) {
+        this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
       }
       return tableObj;
     });
-    return table;
+    return tableCopy;
   }
 
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);
-
-  seriesChart(seriesData, dateRange) {
-    let levelValue, yoyValue, ytdValue, c5maValue;
-    levelValue = this.formatHighchartData(dateRange, seriesData, 'value');
-    yoyValue = this.formatHighchartData(dateRange, seriesData, 'yoyValue');
-    ytdValue = this.formatHighchartData(dateRange, seriesData, 'ytdValue');
-    c5maValue = this.formatHighchartData(dateRange, seriesData, 'c5maValue');
-    return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
-  }
-
-  formatHighchartData(dateRange, seriesData, value) {
-    const dataArray = dateRange.map((date) => {
-      const obj = [Date.parse(date.date)];
-      const data = seriesData.find(obs => obs.date === date.date);
-      obj[1] = data ? data[value] : null;
-      return obj;
-    });
-    return dataArray;
-  }
 
   setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
     dateWrapper.firstDate = '';
@@ -163,25 +171,7 @@ export class HelperService {
   }
 
   formatNum(num: number, decimal: number) {
-    let fixedNum: any;
-    fixedNum = num.toFixed(decimal);
-    // remove decimals
-    const int = fixedNum | 0;
-    const signCheck = num < 0 ? 1 : 0;
-    // store deicmal value
-    const remainder = Math.abs(fixedNum - int);
-    const decimalString = ('' + remainder.toFixed(decimal)).substr(2, decimal);
-    const intString = '' + int;
-    let i = intString.length;
-    let r = '';
-    while ((i -= 3) > signCheck) { r = ',' + intString.substr(i, 3) + r; }
-    const returnValue = intString.substr(0, i + 3) + r + (decimalString ? '.' + decimalString : '');
-    // If int == 0, converting int to string drops minus sign
-    if (int === 0 && num < 0) {
-      // Check if decimal string contains only 0's (i.e. return value === 0.00)
-      return /^0*$/.test(decimalString) ? returnValue : '-' + returnValue;
-    }
-    return returnValue;
+    return num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
   }
 
   // Get a unique array of available regions for a category

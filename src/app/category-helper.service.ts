@@ -142,12 +142,15 @@ export class CategoryHelperService {
       // sublist id used as anchor fragments in landing-page component, fragment expects a string
       sub.id = sub.id.toString();
       if (sub.series) {
-        const splitSeries = this.getDisplaySeries(sub.series, this.categoryData[cacheId].currentFreq.freq);
-        if (splitSeries) {
-          sub.displaySeries = splitSeries.displaySeries;
+        const displaySeries = this.getDisplaySeries(sub.series, this.categoryData[cacheId].currentFreq.freq);
+        if (displaySeries) {
+          sub.displaySeries = displaySeries;
           sub.noData = false;
-          this.formatCategoryData(splitSeries.displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
+          this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
+        }
+        if (!displaySeries) {
+          this.setNoData(sub);
         }
       }
       if (!sub.series) {
@@ -237,18 +240,18 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
-      const splitSeries = this.getDisplaySeries(results.series, freq);
+      const displaySeries = this.getDisplaySeries(results.series, freq);
       const sublist = {
         id: 'search',
         parentName: 'Search',
         name: search,
-        displaySeries: splitSeries.displaySeries,
+        displaySeries: displaySeries,
         requestComplete: false
       };
-      const catWrapper = this.getSearchDates(splitSeries.displaySeries);
+      const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-      this.formatCategoryData(splitSeries.displaySeries, categoryDateArray, catWrapper);
+      this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
       this.categoryData[cacheId].subcategories = [sublist];
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
@@ -317,14 +320,19 @@ export class CategoryHelperService {
     measurements.forEach((measurement) => displaySeries.push(measurement));
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq);
-    return filtered.length ? { displaySeries: filtered } : null;
+    return filtered.length ? filtered : null;
   }
 
   formatCategoryData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
-        series['categoryTable'] = this._helper.seriesTable(series.tableData, dateArray, decimals);
+        const observations = series.seriesInfo.seriesObservations;
+        const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+        const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+        const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+        const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+        series['categoryTable'] = this._helper.createSeriesTable(dateArray, observations, decimals);
         series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
