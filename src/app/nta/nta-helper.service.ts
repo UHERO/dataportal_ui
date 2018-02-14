@@ -292,7 +292,7 @@ export class NtaHelperService {
 
   formatSeriesData(series, categoryDateArray) {
     const decimals = series.decimals ? series.decimals : 1;
-    const catTable = this._helper.seriesTable(series.tableData, categoryDateArray, decimals);
+    const catTable = this._helper.createSeriesTable(categoryDateArray, series.seriesInfo.seriesObservations, decimals);
     const catChart = this._helper.dataTransform(series.seriesInfo.seriesObservations, categoryDateArray, decimals);
     return { catTable: catTable, catChart: catChart };
   }

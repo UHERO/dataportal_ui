@@ -1,5 +1,6 @@
 export interface Category {
   id: number;
+  categories: Array<any>;
   name: string;
   geos?: Array<any>;
   freqs?: Array<any>;

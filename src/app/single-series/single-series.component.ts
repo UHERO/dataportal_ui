@@ -19,7 +19,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
   private newTableData;
   private summaryStats;
-  private seasonallyAdjusted = null;
+  private seasonallyAdjusted = false;
   private seasonalAdjustment;
   private startDate;
   private endDate;
@@ -81,14 +81,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    /* this.route.params.subscribe(params => {
-      if (params['start']) {
-        this.startDate = params['start'];
-      }
-      if (params['end']) {
-        this.endDate = params['end'];
-      }
-    }); */
     this.route.queryParams.subscribe(params => {
       const seriesId = Number.parseInt(params['id']);
       if (params['sa'] !== undefined) {
