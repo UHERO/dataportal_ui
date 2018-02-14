@@ -40,7 +40,6 @@ export class HelperService {
   }
 
   dataTransform(seriesObs, dates, decimals) {
-    let results = null;
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
@@ -60,14 +59,14 @@ export class HelperService {
     const seriesTable = this.createSeriesTable(dates, observations, decimals);
     const chart = this.createSeriesChart(dates, observations);
     const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
-    results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
+    const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
     return results;
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
     const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
     if (tableEntry > -1) {
-      tableObj[value] = valueArray.values[tableEntry];
+      tableObj[value] = +valueArray.values[tableEntry];
       tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
     }
   }
@@ -76,7 +75,7 @@ export class HelperService {
     const dataArray = dateRange.map((date) => {
       const obj = [Date.parse(date.date)];
       const dateIndex = seriesData.dates.findIndex(obs => obs === date.date);
-      obj[1] = dateIndex ? +seriesData.values[dateIndex] : null;
+      obj[1] = dateIndex > -1 ? +seriesData.values[dateIndex] : null;
       return obj;
     });
     return dataArray;
@@ -108,18 +107,18 @@ export class HelperService {
     const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
     const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
     const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
-    const tableCopy = dateRange.map((date) => {
+    const table = dateRange.map((date) => {
       const tableObj = {
         date: date.date,
         tableDate: date.tableDate,
-        value: Infinity,
-        formattedValue: '',
-        yoyValue: Infinity,
-        formattedYoy: '',
-        ytdValue: Infinity,
-        formattedYtd: '',
-        c5maValue: Infinity,
-        formattedC5ma: ''
+        value: null,
+        formattedValue: ' ',
+        yoyValue: null,
+        formattedYoy: ' ',
+        ytdValue: null,
+        formattedYtd: ' ',
+        c5maValue: null,
+        formattedC5ma: ' '
       }
       if (level) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
@@ -135,7 +134,7 @@ export class HelperService {
       }
       return tableObj;
     });
-    return tableCopy;
+    return table;
   }
 
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);
@@ -172,62 +171,6 @@ export class HelperService {
 
   formatNum(num: number, decimal: number) {
     return num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
-  }
-
-  // Get a unique array of available regions for a category
-  uniqueGeos(geo, geoList) {
-    const existGeo = geoList.find(region => region.handle === geo.handle);
-    if (existGeo) {
-      const freqs = geo.freqs;
-      // If region already exists, check it's list of frequencies
-      // Add frequency if it doesn't exist
-      this.addFreq(freqs, existGeo);
-    }
-    if (!existGeo) {
-      geoList.push(geo);
-    }
-  }
-
-  // Check if freq exists in freqArray
-  freqExist(freqArray, freq) {
-    const exist = freqArray.find(frequency => frequency.freq === freq);
-    return exist ? true : false;
-  }
-
-  addFreq(freqList, geo) {
-    freqList.forEach((freq) => {
-      if (!this.freqExist(geo.freqs, freq.freq)) {
-        geo.freqs.push(freq);
-      }
-    });
-  }
-
-  // Get a unique array of available frequencies for a category
-  uniqueFreqs(freq, freqList) {
-    const existFreq = freqList.find(frequency => frequency.label === freq.label);
-    if (existFreq) {
-      const geos = freq.geos;
-      // If frequency already exists, check it's list of regions
-      // Add geo if it doesn't exist
-      this.addGeo(geos, existFreq);
-    }
-    if (!existFreq) {
-      freqList.push(freq);
-    }
-  }
-
-  // Check if geo exists in geoArray
-  geoExist(geoArray, geo) {
-    const exist = geoArray.find(region => region.handle === geo);
-    return exist ? true : false;
-  }
-
-  addGeo(geoList, freq) {
-    geoList.forEach((geo) => {
-      if (!this.geoExist(freq.geos, geo.handle)) {
-        freq.geos.push(geo);
-      }
-    });
   }
 
   setDefaultChartRange(freq, dataArray, defaults) {

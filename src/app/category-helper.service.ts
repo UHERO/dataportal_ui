@@ -52,6 +52,12 @@ export class CategoryHelperService {
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
           this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
+          this.categoryData[cacheId].selectedCategory = selectedCategory;
+          const sublistCopy = [];
+          sublist.forEach((sub) => {
+            sublistCopy.push(Object.assign({}, sub));
+          });
+          this.categoryData[cacheId].subcategories = sublistCopy;
           if (routeGeo && routeFreq) {
             this.checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId);
           }
@@ -93,7 +99,14 @@ export class CategoryHelperService {
   getData(catId: any, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
       this.categoryData[cacheId].results = categoryData;
-      this.categoryData[cacheId].subcategories = categoryData.categories.slice(0, categoryData.categories.length - 1);
+      const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
+      // Merge subcats with original list of categories from /category response
+      const sublistCopy = [];
+      subcats.forEach((sub) => {
+        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.name === sub.name);
+        sublistCopy.push(Object.assign({}, sub, subMatch));
+      });
+      this.categoryData[cacheId].subcategories = sublistCopy;
       this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
@@ -137,7 +150,7 @@ export class CategoryHelperService {
   }
 
   formatSeriesForDisplay(subcategories: Array<any>, cacheId) {
-    this.categoryData[cacheId].subcategories.forEach((sub) => {
+    subcategories.forEach((sub) => {
       sub.requestComplete = false;
       // sublist id used as anchor fragments in landing-page component, fragment expects a string
       sub.id = sub.id.toString();
