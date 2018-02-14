@@ -170,35 +170,26 @@ export class SeriesHelperService {
     if (firstValue === Infinity || lastValue === Infinity) {
       return missing = true;
     }
-    selectedRange.forEach((obs) => {
-      if (freq === 'A' && obs.tableDate.length === 4 && obs.value === Infinity) {
-        missing = true;
-        return;
-      }
-      if (freq === 'Q' && obs.tableDate.includes('Q') && obs.value === Infinity) {
-        missing = true;
-        return;
-      }
-      if (freq === 'S' && (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) {
-        missing = true;
-        return;
-      }
-      if (freq === 'M' && obs.tableDate.includes('-') && obs.value === Infinity) {
-        missing = true;
-        return;
-      }
-    });
+    if (freq === 'A') {
+      missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === Infinity) ? true : false;
+    }
+    if (freq === 'Q') {
+      missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === Infinity) ? true : false;
+    }
+    if (freq === 'S') {
+      missing = selectedRange.find(obs => (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) ? true : false;
+    }
+    if (freq === 'M') {
+      missing = selectedRange.find(obs => obs.tableDate.includes('-') && obs.value === Infinity) ? true : false;
+    }
     return missing;
   }
 
   getTotalValue(selectedRangeData: Array<any>) {
-    let total = 0;
-    selectedRangeData.forEach((data) => {
-      if (data.value !== Infinity) {
-        total += +data.value;
-      }
-    });
-    return total;
+    const sum = selectedRangeData.reduce((total, data) => {
+      return data.value === Infinity ? total : total + +data.value;
+    }, 0);
+    return sum;
   }
 
   getStartValue(seriesData: Array<any>, startDate: string) {
