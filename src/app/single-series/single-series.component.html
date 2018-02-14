@@ -10,7 +10,7 @@
     <app-share-link [view]="'series'" [startDate]="chartStart" [endDate]="chartEnd"></app-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
-        <input type="checkbox" [(ngModel)]="seasonallyAdjusted"  (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally Adjusted
+        <input type="checkbox" [(ngModel)]="data.seriesDetail.seasonallyAdjusted"  (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally Adjusted
       </label>
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>

@@ -94,7 +94,9 @@ export class AnalyzerService {
                 this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
                 this.analyzerData.analyzerSeries.forEach((s) => {
                   // Array of observations using full range of dates
-                  s.analyzerTableData = this._helper.seriesTable(s.seriesTableData, this.analyzerData.analyzerTableDates, s.seriesDetail.decimals);
+                  if (s.observations) {
+                    s.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, s.observations, s.seriesDetail.decimals);
+                  }
                 });
                 this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
                 while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {

@@ -40,119 +40,104 @@ export class HelperService {
   }
 
   dataTransform(seriesObs, dates, decimals) {
-    let results = null;
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const levelResults = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-    const yoyResults = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-    const ytdResults = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-    const c5maResults = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
     const pseudoZones = [];
-    let level, yoy, ytd, c5ma, combinedObservations;
-    // Method for new API observation responses
-    if (levelResults.dates) {
-      level = this.formatObservations(levelResults);
-      level.forEach((l, index) => {
-        if (l.pseudoHistory && !level[index + 1].pseudoHistory) {
-          pseudoZones.push({ value: Date.parse(l.date), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+    let formattedObservations;
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
         }
       });
     }
-    if (yoyResults && yoyResults.dates.length) {
-      yoy = this.formatObservations(yoyResults);
-    }
-    if (ytdResults && ytdResults.dates.length) {
-      ytd = this.formatObservations(ytdResults);
-    }
-    if (c5maResults && c5maResults.dates.length) {
-      c5ma = this.formatObservations(c5maResults);
-    }
-    combinedObservations = level.map((entry, index) => {
-      const obj = { date: '', value: null, yoyValue: null, ytdValue: null, c5maValue: null };
-      const yoyDateIndex = yoy ? yoy.findIndex(y => y.date === entry.date) : -1;
-      const ytdDateIndex = ytd ? ytd.findIndex(y => y.date === entry.date) : -1;
-      const c5maDateIndex = c5ma ? c5ma.findIndex(c => c.date === entry.date) : -1;
-      obj.date = entry.date;
-      obj.value = entry.value;
-      obj.yoyValue = yoyDateIndex > -1 ? yoy[yoyDateIndex].value : null;
-      obj.ytdValue = ytdDateIndex > -1 ? ytd[ytdDateIndex].value : null;
-      obj.c5maValue = c5maDateIndex > -1 ? c5ma[c5maDateIndex].value : null;
-      return obj;
-    });
-    const tableData = this.seriesTable(combinedObservations, dates, decimals);
-    const chart = this.seriesChart(combinedObservations, dates);
+    const seriesTable = this.createSeriesTable(dates, observations, decimals);
+    const chart = this.createSeriesChart(dates, observations);
     const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
-    results = { chartData: chartData, tableData: tableData, start: start, end: end };
+    const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
     return results;
   }
 
-  formatObservations(results) {
-    const dates = results.dates;
-    const values = results.values;
-    const pseudoHistory = results.pseudoHistory;
-    const formattedResults = dates.map((d, index) => {
-      const entry = { date: '', value: Infinity, pseudoHistory: false };
-      entry.date = d;
-      entry.value = +values[index];
-      entry.pseudoHistory = pseudoHistory[index];
-      return entry;
-    });
-    return formattedResults;
+  addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
+    const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
+    if (tableEntry > -1) {
+      tableObj[value] = +valueArray.values[tableEntry];
+      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+    }
   }
 
-  seriesTable(seriesData, dateRange, decimals) {
-    const table = [];
-    dateRange.forEach((date) => {
-      table.push({
+  formatHighchartData(dateRange, seriesData) {
+    const dataArray = dateRange.map((date) => {
+      const obj = [Date.parse(date.date)];
+      const dateIndex = seriesData.dates.findIndex(obs => obs === date.date);
+      obj[1] = dateIndex > -1 ? +seriesData.values[dateIndex] : null;
+      return obj;
+    });
+    return dataArray;
+  }
+
+  createSeriesChart(dateRange, observations) {
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    let levelValue, yoyValue, ytdValue, c5maValue;
+    if (level && level.dates) {
+      levelValue = this.formatHighchartData(dateRange, level);
+    }
+    if (yoy && yoy.dates) {
+      yoyValue = this.formatHighchartData(dateRange, yoy);
+    }
+    if (ytd && ytd.dates) {
+      ytdValue = this.formatHighchartData(dateRange, ytd);
+    }
+    if (c5ma && c5ma.dates) {
+      c5maValue = this.formatHighchartData(dateRange, c5ma);
+    }
+    return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
+  }
+  
+  createSeriesTable(dateRange: Array<any>, observations, decimals: number) {
+    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
+    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
+    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
+    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    const table = dateRange.map((date) => {
+      const tableObj = {
         date: date.date,
         tableDate: date.tableDate,
-        value: Infinity,
-        yoyValue: Infinity,
-        ytdValue: Infinity,
-        c5maValue: Infinity
-      });
-    });
-    seriesData.forEach((data) => {
-      const seriesDate = data.tableDate ? data.tableDate : data.date;
-      const tableEntry = table.find(date => data.tableDate ? date.tableDate === seriesDate : date.date === seriesDate);
-      if (tableEntry) {
-        tableEntry.value = data.value;
-        tableEntry.formattedValue = this.formattedValue(data.value, decimals);
-        tableEntry.yoyValue = data.yoyValue;
-        tableEntry.formattedYoy = this.formattedValue(data.yoyValue, decimals);
-        tableEntry.ytdValue = data.ytdValue;
-        tableEntry.formattedYtd = this.formattedValue(data.ytdValue, decimals);
-        tableEntry.c5maValue = data.c5maValue;
-        tableEntry.formattedC5ma = this.formattedValue(data.c5maValue, decimals);
+        value: null,
+        formattedValue: ' ',
+        yoyValue: null,
+        formattedYoy: ' ',
+        ytdValue: null,
+        formattedYtd: ' ',
+        c5maValue: null,
+        formattedC5ma: ' '
       }
+      if (level && level.dates) {
+        this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
+      }
+      if (yoy && yoy.dates) {
+        this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', decimals);
+      }
+      if (ytd && ytd.dates) {
+        this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', decimals);
+      }
+      if (c5ma && c5ma.dates) {
+        this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
+      }
+      return tableObj;
     });
     return table;
   }
 
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);
-
-  seriesChart(seriesData, dateRange) {
-    const levelValue = [];
-    const yoyValue = [];
-    const ytdValue = [];
-    const c5maValue = [];
-    dateRange.forEach((date) => {
-      const data = seriesData.find(obs => obs.date === date.date);
-      if (data) {
-        levelValue.push([Date.parse(date.date), data.value]);
-        yoyValue.push([Date.parse(date.date), data.yoyValue]);
-        ytdValue.push([Date.parse(date.date), data.ytdValue]);
-        c5maValue.push([Date.parse(date.date), data.c5maValue]);
-      } else {
-        levelValue.push([Date.parse(date.date), null]);
-        yoyValue.push([Date.parse(date.date), null]);
-        ytdValue.push([Date.parse(date.date), null]);
-        c5maValue.push([Date.parse(date.date), null]);
-      }
-    });
-    return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
-  }
 
   setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
     dateWrapper.firstDate = '';
@@ -165,29 +150,6 @@ export class HelperService {
         dateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
       }
     });
-  }
-
-  // Combine level and percent arrays from Observation data
-  // Used to construct table data for single series view
-  combineObsData(level, yoy, ytd, c5ma) {
-    let data;
-    data = level.map((obs) => {
-      const obsObject = { date: obs.date, yoyValue: null, ytdValue: null, c5maValue: null, value: +obs.value };
-      if (yoy) {
-        const yoyObs = yoy.find(y => y.date === obs.date);
-        obsObject.yoyValue = yoyObs ? +yoyObs.value : null;
-      }
-      if (ytd) {
-        const ytdObs = ytd.find(y => y.date === obs.date);
-        obsObject.ytdValue = ytdObs ? +ytdObs.value : null;
-      }
-      if (c5ma) {
-        const c5maObs = c5ma.find(c => c.date === obs.date);
-        obsObject.c5maValue = c5maObs ? +c5maObs.value : null;
-      }
-      return obsObject;
-    });
-    return data;
   }
 
   formatDate(date: string, freq: string) {
@@ -208,81 +170,7 @@ export class HelperService {
   }
 
   formatNum(num: number, decimal: number) {
-    let fixedNum: any;
-    fixedNum = num.toFixed(decimal);
-    // remove decimals
-    const int = fixedNum | 0;
-    const signCheck = num < 0 ? 1 : 0;
-    // store deicmal value
-    const remainder = Math.abs(fixedNum - int);
-    const decimalString = ('' + remainder.toFixed(decimal)).substr(2, decimal);
-    const intString = '' + int;
-    let i = intString.length;
-    let r = '';
-    while ((i -= 3) > signCheck) { r = ',' + intString.substr(i, 3) + r; }
-    const returnValue = intString.substr(0, i + 3) + r + (decimalString ? '.' + decimalString : '');
-    // If int == 0, converting int to string drops minus sign
-    if (int === 0 && num < 0) {
-      // Check if decimal string contains only 0's (i.e. return value === 0.00)
-      return /^0*$/.test(decimalString) ? returnValue : '-' + returnValue;
-    }
-    return returnValue;
-  }
-
-  // Get a unique array of available regions for a category
-  uniqueGeos(geo, geoList) {
-    const existGeo = geoList.find(region => region.handle === geo.handle);
-    if (existGeo) {
-      const freqs = geo.freqs;
-      // If region already exists, check it's list of frequencies
-      // Add frequency if it doesn't exist
-      this.addFreq(freqs, existGeo);
-    }
-    if (!existGeo) {
-      geoList.push(geo);
-    }
-  }
-
-  // Check if freq exists in freqArray
-  freqExist(freqArray, freq) {
-    const exist = freqArray.find(frequency => frequency.freq === freq);
-    return exist ? true : false;
-  }
-
-  addFreq(freqList, geo) {
-    freqList.forEach((freq) => {
-      if (!this.freqExist(geo.freqs, freq.freq)) {
-        geo.freqs.push(freq);
-      }
-    });
-  }
-
-  // Get a unique array of available frequencies for a category
-  uniqueFreqs(freq, freqList) {
-    const existFreq = freqList.find(frequency => frequency.label === freq.label);
-    if (existFreq) {
-      const geos = freq.geos;
-      // If frequency already exists, check it's list of regions
-      // Add geo if it doesn't exist
-      this.addGeo(geos, existFreq);
-    }
-    if (!existFreq) {
-      freqList.push(freq);
-    }
-  }
-
-  // Check if geo exists in geoArray
-  geoExist(geoArray, geo) {
-    const exist = geoArray.find(region => region.handle === geo);
-    return exist ? true : false;
-  }
-
-  addGeo(geoList, freq) {
-    geoList.forEach((geo) => {
-      if (!this.geoExist(freq.geos, geo.handle)) {
-        freq.geos.push(geo);
-      }
-    });
+    return num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
   }
 
   setDefaultChartRange(freq, dataArray, defaults) {
@@ -331,10 +219,7 @@ export class HelperService {
   }
 
   getTableDates(dateArray: Array<any>) {
-    const tableDates = [];
-    dateArray.forEach((date) => {
-      tableDates.push(date.tableDate);
-    });
+    const tableDates = dateArray.map(date => date.tableDate);
     return tableDates;
   }
 }

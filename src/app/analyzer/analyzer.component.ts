@@ -158,7 +158,7 @@ export class AnalyzerComponent implements OnInit {
     // Update series drawn in chart and dates in analyzer table
     this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
     analyzerSeries.forEach((series) => {
-      series.analyzerTableData = this._helper.seriesTable(series.seriesTableData, this._analyzer.analyzerData.analyzerTableDates, series.seriesDetail.decimals);
+      series.analyzerTableData = this._helper.createSeriesTable(this._analyzer.analyzerData.analyzerTableDates, series.observations, series.seriesDetail.decimals);
     });
     this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
   }
