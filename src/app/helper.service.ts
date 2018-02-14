@@ -87,16 +87,16 @@ export class HelperService {
     const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
     const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
     let levelValue, yoyValue, ytdValue, c5maValue;
-    if (level) {
+    if (level && level.dates) {
       levelValue = this.formatHighchartData(dateRange, level);
     }
-    if (yoy) {
+    if (yoy && yoy.dates) {
       yoyValue = this.formatHighchartData(dateRange, yoy);
     }
-    if (ytd) {
+    if (ytd && ytd.dates) {
       ytdValue = this.formatHighchartData(dateRange, ytd);
     }
-    if (c5ma) {
+    if (c5ma && c5ma.dates) {
       c5maValue = this.formatHighchartData(dateRange, c5ma);
     }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
@@ -120,16 +120,16 @@ export class HelperService {
         c5maValue: null,
         formattedC5ma: ' '
       }
-      if (level) {
+      if (level && level.dates) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
       }
-      if (yoy) {
+      if (yoy && yoy.dates) {
         this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', decimals);
       }
-      if (ytd) {
+      if (ytd && ytd.dates) {
         this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', decimals);
       }
-      if (c5ma) {
+      if (c5ma && c5ma.dates) {
         this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
       }
       return tableObj;
