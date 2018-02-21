@@ -27,6 +27,79 @@ export class AnalyzerService {
   getAnalyzerData(aSeries) {
     let seriesIndex = 0;
     this.analyzerData.analyzerSeries = [];
+    console.log('aSeries', aSeries);
+    const ids = aSeries.map(s => s.id).join();
+    console.log('ids', ids)
+    this._uheroAPIService.fetchPackageAnalyzer(ids).subscribe((results) => {
+      /* const series = results.series;
+      aSeries.forEach((a) => {
+        let decimals;
+        const seriesMatch = series.find(s => s.id === a.id);
+        const seriesData = {
+          seriesDetail: {},
+          currentGeo: <Geography>{},
+          currentFreq: <Frequency>{},
+          chartData: {},
+          displayName: '',
+          chartDisplayName: '',
+          seriesTableData: [],
+          error: null,
+          saParam: false,
+          noData: '',
+          observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+          showInChart: a.showInChart
+        }
+        const abbreviatedNameDetails = {
+          title: seriesMatch.title,
+          geography: seriesMatch.geography.handle,
+          frequency: seriesMatch.frequencyShort,
+          seasonalAdjustment: seriesMatch.seasonalAdjustment
+        };
+        const chartNameDetails = {
+          title: seriesMatch.title,
+          geography: seriesMatch.geography.shortName,
+          frequency: seriesMatch.frequency,
+          seasonalAdjustment: seriesMatch.seasonalAdjustment
+        };
+        seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
+        seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
+        seriesData.saParam = seriesMatch.seasonalAdjustment !== 'not_seasonally_adjusted';
+        decimals = seriesMatch.decimals ? seriesMatch.decimals : 1;
+        seriesData.currentGeo = seriesMatch.geography;
+        seriesData.currentFreq = { freq: seriesMatch.frequencyShort, label: seriesMatch.frequency };
+        seriesData.observations = seriesMatch.seriesObservations;
+        const levelData = seriesData.observations.transformationResults[0].dates;
+        const obsStart = seriesData.observations.observationStart;
+        const obsEnd = seriesData.observations.observationEnd;
+        const dateArray = [];
+        if (levelData) {
+          // Use to format dates for table
+          this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+          const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
+          seriesData.chartData = data.chartData;
+          seriesData.seriesTableData = data.tableData;
+        } else {
+          seriesData.noData = 'Data not available';
+        }
+        // this.analyzerData.analyzerSeries.push(seriesData);
+
+        console.log('seriesData', seriesData)
+      });
+      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+      this.analyzerData.analyzerSeries.forEach((s) => {
+        // Array of observations using full range of dates
+        if (s.observations) {
+          s.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, s.observations, s.seriesDetail.decimals);
+        }
+      });
+      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
+      while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+        const notInChart = this.analyzerData.analyzerSeries.find(s => s.showInChart !== true);
+        this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true;
+        notInChart.showInChart = true;
+        this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
+      } */
+    });
     aSeries.forEach((series, index) => {
       let decimals;
       const seriesData = {
