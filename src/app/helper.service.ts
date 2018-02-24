@@ -111,13 +111,13 @@ export class HelperService {
       const tableObj = {
         date: date.date,
         tableDate: date.tableDate,
-        value: null,
+        value: Infinity,
         formattedValue: ' ',
-        yoyValue: null,
+        yoyValue: Infinity,
         formattedYoy: ' ',
-        ytdValue: null,
+        ytdValue: Infinity,
         formattedYtd: ' ',
-        c5maValue: null,
+        c5maValue: Infinity,
         formattedC5ma: ' '
       }
       if (level && level.dates) {
@@ -170,7 +170,7 @@ export class HelperService {
   }
 
   formatNum(num: number, decimal: number) {
-    return num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
+    return num === Infinity ? ' ' : num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
   }
 
   setDefaultChartRange(freq, dataArray, defaults) {
