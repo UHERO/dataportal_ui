@@ -7,6 +7,7 @@
     "start-uhero-staging": "ng serve --app=uhero --env=staging --port=4200",
     "start-nta-staging": "ng serve --app=nta --env=staging --port=4200",
     "start-uhero-dev": "ng serve --app=uhero --env=dev",
+    "start-hawaii-dev": "ng serve --app=hawaii-county --env=dev",
     "start-uhero-api-dev": "ng serve --app=uhero --env=apiDev",
     "start-nta-dev": "ng serve --app=nta --env=dev",
     "start-nta-api-dev": "ng serve --app=nta --env=apiDev",
