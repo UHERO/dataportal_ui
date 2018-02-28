@@ -22,15 +22,25 @@
 
   a {
     padding: 0;
-    width: 275px;
+    width: auto;
     overflow: hidden;
   }
 
   img {
-    // position: absolute;
     height: 55px;
-    padding: 10px;
+    // padding: 10px;
     max-width: 275px;
+  }
+
+  p {
+    color: $primary;
+    display: inline-block;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    letter-spacing: 1px;
+    margin-bottom: 0;
+    padding: 10px;
+    text-transform: uppercase;
+    vertical-align: middle;
   }
 }
 

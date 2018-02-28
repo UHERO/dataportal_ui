@@ -79,7 +79,12 @@ import { ClipboardService } from './clipboard.service';
     },
     {
       provide: 'logo',
-      useValue: '../../assets/UHEROdata-Logo-color.svg'
+      useValue: {
+        altText: 'UHERO Data Portal',
+        displayImg: true,
+        headerText: '',
+        imgSrc: '../../assets/UHEROdata-Logo-color.svg'
+      }
     },
     {
       provide: 'defaultRange',

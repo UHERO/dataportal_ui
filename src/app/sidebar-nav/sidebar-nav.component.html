@@ -4,9 +4,9 @@
       &#9776;
     </button>
     <a class="navbar-brand" routerLink="/">
-      <img [src]="headerLogo" alt="UHERO.data logo">
+      <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+      <p *ngIf="!headerLogo.displayImg">{{headerLogo.headerText}}</p>
     </a>
-    <!-- <app-search-bar (onSearch)="onSearch($event)"></app-search-bar> -->
   </div>
   <ul id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>

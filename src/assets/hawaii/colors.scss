@@ -1,6 +1,6 @@
 $black: #000;
 $white: #FFF;
-$blue: #1D667F;
+$blue: #1F7AAB;
 $orange: #F6A01B;
 $dark-gray: #505050;
 $series-gray: #9E9E9E; 
@@ -11,7 +11,7 @@ $purple: #8064A2;
 
 $primary: $blue;
 $primary-text: $dark-gray;
-$secondary: $orange;
+$secondary: $dark-gray;
 $border: $gray;
 $tooltip: $light-gray;
 
@@ -33,4 +33,4 @@ $table-gray: rgba(212, 212, 212, 0.2);
 $table-analyze-button: rgb(212, 212, 212);
 
 /* Loading Screen */
-$img-src: '/../../assets/hawaii-county-logo.svg';
+$img-src: '/../../assets/hawaii-county-logo-gray.svg';

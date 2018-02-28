@@ -84,13 +84,14 @@ import { ClipboardService } from '../clipboard.service';
       provide: 'rootCategory',
       useValue: 2487
     },
-    /* {
-      provide: 'defaultCategory',
-      useValue: 3985
-    }, */
     {
       provide: 'logo',
-      useValue: '../../assets/nta-logo.svg'
+      useValue: {
+        altText: 'NTA Data Portal',
+        displayImg: true,
+        headerText: '',
+        imgSrc: '../../assets/nta-logo.svg'
+      }
     },
     {
       provide: 'defaultRange',

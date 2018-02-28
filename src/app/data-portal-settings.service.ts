@@ -98,7 +98,7 @@ export class DataPortalSettingsService {
       },
       sliderInteraction: true
     },
-    hawaii: {
+    coh: {
       catTable: {
         portalSource: 'County of Hawaii: http://data.uhero.hawaii.edu/ \n ',
         portalLink: 'http://data.uhero.hawaii.edu/#/category?id='
