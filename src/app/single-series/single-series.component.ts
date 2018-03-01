@@ -77,7 +77,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.currentGeo = { fips: null, handle: null, name: null , shortName: null };
     this.currentFreq = { freq: null, label: null };
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
   ngAfterViewInit() {

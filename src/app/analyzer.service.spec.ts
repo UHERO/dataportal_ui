@@ -13,7 +13,16 @@ describe('AnalyzerService', () => {
         UheroApiService,
         HelperService,
         { provide: 'rootCategory', useValue: 59 },
-        { provide: 'portal', useValue: 'uhero' }
+        {
+          provide: 'portal',
+          useValue: {
+            universe: 'uhero',
+            title: 'Data Portal',
+            favicon: 'manoa.jpg',
+            feedback: true,
+            backgroundImg: false
+          }
+        }
       ],
       imports: [
         HttpModule

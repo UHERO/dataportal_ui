@@ -33,7 +33,7 @@ export class UheroApiService {
   private cachedPackageCategory = [];
   private cachedPackageSearch = [];
 
-  constructor( @Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
+  constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: Http) {
     this.baseUrl = environment['apiUrl'];
     this.headers = new Headers();
     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
@@ -46,7 +46,7 @@ export class UheroApiService {
     if (this.cachedCategories) {
       return Observable.of(this.cachedCategories);
     } else {
-      let categories$ = this.http.get(`${this.baseUrl}/category?u=` + this.portal, this.requestOptionsArgs)
+      let categories$ = this.http.get(`${this.baseUrl}/category?u=` + this.portal.universe, this.requestOptionsArgs)
         .map(mapCategories, this)
         .do(val => {
           this.cachedCategories = val;
@@ -236,7 +236,7 @@ export class UheroApiService {
     if (this.cachedSearch[search]) {
       return Observable.of(this.cachedSearch[search]);
     } else {
-      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search + `&u=` + this.portal, this.requestOptionsArgs)
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=` + search + `&u=` + this.portal.universe, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearch[search] = val;
@@ -250,7 +250,7 @@ export class UheroApiService {
     if (this.cachedSearchExpand[search]) {
       return Observable.of(this.cachedSearchExpand[search]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&u=` + this.portal, this.requestOptionsArgs)
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=` + search + `&u=` + this.portal.universe, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search] = val;
@@ -265,7 +265,7 @@ export class UheroApiService {
       return Observable.of(this.cachedSearchExpand[search + geo + freq]);
     } else {
       let search$ = this.http.get(`${this.baseUrl}/search/series?q=` +
-        search + `&geo=` + geo + `&freq=` + freq + `&u=` + this.portal + `&expand=true`, this.requestOptionsArgs)
+        search + `&geo=` + geo + `&freq=` + freq + `&u=` + this.portal.universe + `&expand=true`, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
@@ -280,7 +280,7 @@ export class UheroApiService {
       return Observable.of(this.cachedPackageSearch[search + geo + freq]);
     } else {
       let search$ = this.http.get(`${this.baseUrl}/package/search?q=` +
-        search + `&u=` + this.portal + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
+        search + `&u=` + this.portal.universe + `&geo=` + geo + `&freq=` + freq, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedSearchExpand[search + geo + freq] = val;

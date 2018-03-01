@@ -25,7 +25,7 @@ export function highchartsFactory() {
 }
 import { Shared } from '../shared/shared.module';
 import { routing } from '../app.routes';
-import { AppComponent } from './app.component';
+import { AppComponent } from '../app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -75,7 +75,7 @@ import { ClipboardService } from '../clipboard.service';
     },
     {
       provide: 'rootCategory',
-      useValue: 59
+      useValue: 4429
     },
     {
       provide: 'logo',
@@ -91,7 +91,13 @@ import { ClipboardService } from '../clipboard.service';
     },
     {
       provide: 'portal',
-      useValue: 'coh'
+      useValue: {
+        universe: 'coh',
+        title: 'County of Hawaii Data Portal',
+        favicon: 'hawaii-county-seal.png',
+        feedback: false,
+        backgroundImg: true
+      }
     }
   ],
   bootstrap: [AppComponent]

@@ -28,7 +28,19 @@ describe('AppComponent', () => {
         AppComponent,
         HeaderStubComponent, SidebarNavStubComponent, FeedbackStubComponent
       ],
-      imports: [ RouterTestingModule ]
+      imports: [ RouterTestingModule ],
+      providers: [
+        {
+          provide: 'portal',
+          useValue: {
+            universe: 'uhero',
+            title: 'Data Portal',
+            favicon: 'manoa.jpg',
+            feedback: true,
+            backgroundImg: false
+          }
+        }
+      ]
     })
     .compileComponents()
     .then(() => {

@@ -1,8 +1,8 @@
-<div id="wrapper">
+<div id="wrapper" [class.portal-bg]="portal.backgroundImg">
     <app-header></app-header>
     <div class="container">
         <div class="row">
-            <div class="col-xs-1 col-md-4 col-lg-3 col-xl-2 sidebar-container">
+            <div class="col-xs-1 col-md-4 col-lg-3 col-xl-2 sidebar-container" [class.nav-bg]="portal.backgroundImg">
                 <div class="sidebar-col">
                     <app-sidebar-nav></app-sidebar-nav>
                 </div>
@@ -15,7 +15,7 @@
                     This site works best on <a class="alert-link" href="https://www.google.com/chrome/" target="_blank">Google Chrome</a>.
                 </div>
                 <router-outlet></router-outlet>
-                <app-feedback></app-feedback>
+                <app-feedback *ngIf="portal.feedback"></app-feedback>
             </div>
         </div>
     </div>

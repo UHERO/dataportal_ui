@@ -27,7 +27,7 @@ export function highchartsFactory() {
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { AppComponent } from './app.component';
+import { AppComponent } from '../app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -99,7 +99,13 @@ import { ClipboardService } from '../clipboard.service';
     },
     {
       provide: 'portal',
-      useValue: 'nta'
+      useValue: {
+        universe: 'nta',
+        title: 'NTA Data Portal',
+        favicon: 'nta-logo.svg',
+        feedback: false,
+        backgroundImg: false
+      }
     }
   ],
   bootstrap: [AppComponent]

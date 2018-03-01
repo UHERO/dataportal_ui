@@ -92,7 +92,14 @@ import { ClipboardService } from './clipboard.service';
     },
     {
       provide: 'portal',
-      useValue: 'uhero'
+      useValue: {
+        universe: 'uhero',
+        title: 'Data Portal',
+        favicon: 'manoa.jpg',
+        feedback: true,
+        backgroundImg: false
+      }
+
     }
   ],
   bootstrap: [AppComponent]
