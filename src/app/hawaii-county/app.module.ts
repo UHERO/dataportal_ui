@@ -81,8 +81,10 @@ import { ClipboardService } from '../clipboard.service';
       provide: 'logo',
       useValue: {
         altText: 'County of Hawaii Data Portal',
-        displayImg: false,
-        headerText: 'County of Hawaii Data Portal'
+        displayImg: true,
+        headerText: 'County of Hawaii Data Portal',
+        imgSrc: '../../assets/hawaii-county-logo-bw.svg',
+        mobileLogo: false
       }
     },
     {
@@ -95,8 +97,7 @@ import { ClipboardService } from '../clipboard.service';
         universe: 'coh',
         title: 'County of Hawaii Data Portal',
         favicon: 'hawaii-county-seal.png',
-        feedback: false,
-        backgroundImg: true
+        feedback: false
       }
     }
   ],

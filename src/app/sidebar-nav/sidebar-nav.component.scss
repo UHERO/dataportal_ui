@@ -57,6 +57,13 @@
   .navbar-side {
     padding-left: 0px;
 
+    .mobile-logo {
+      display: block;
+      max-height: 55px;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
     @media (max-width: 543px) {
       height: 100%;
       width: 85%;
@@ -97,7 +104,7 @@
     @media (min-width: 768px) {
       width: fit-content;
 
-      .mobile-divider {
+      .mobile-divider, .mobile-logo {
         display: none;
       }
 

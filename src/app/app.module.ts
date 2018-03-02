@@ -83,7 +83,8 @@ import { ClipboardService } from './clipboard.service';
         altText: 'UHERO Data Portal',
         displayImg: true,
         headerText: '',
-        imgSrc: '../../assets/UHEROdata-Logo-color.svg'
+        imgSrc: '../../assets/UHEROdata-Logo-color.svg',
+        mobileLogo: true
       }
     },
     {
@@ -96,8 +97,7 @@ import { ClipboardService } from './clipboard.service';
         universe: 'uhero',
         title: 'Data Portal',
         favicon: 'manoa.jpg',
-        feedback: true,
-        backgroundImg: false
+        feedback: true
       }
 
     }

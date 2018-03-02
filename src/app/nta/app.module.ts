@@ -90,7 +90,8 @@ import { ClipboardService } from '../clipboard.service';
         altText: 'NTA Data Portal',
         displayImg: true,
         headerText: '',
-        imgSrc: '../../assets/nta-logo.svg'
+        imgSrc: '../../assets/nta-logo.svg',
+        mobileLogo: true,
       }
     },
     {
@@ -103,8 +104,7 @@ import { ClipboardService } from '../clipboard.service';
         universe: 'nta',
         title: 'NTA Data Portal',
         favicon: 'nta-logo.svg',
-        feedback: false,
-        backgroundImg: false
+        feedback: false
       }
     }
   ],
