@@ -73,15 +73,13 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
   findDefaultRange() {
     const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.dates, this.defaultRange);
     let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
-    this.dates.forEach((date, index) => {
-      // Range slider is converting annual year strings to numbers
-      if (date == this.dateFrom) {
-        startIndex = index;
-      }
-      if (date == this.dateTo) {
-        endIndex = index;
-      }
-    });
+    // Range slider is converting annual year strings to numbers
+    const dateFromExists = this.dates.findIndex(date => date == this.dateFrom);
+    const dateToExists = this.dates.findIndex(date => date == this.dateTo);
+    if (dateFromExists > -1 && dateToExists > -1) {
+      startIndex = dateFromExists;
+      endIndex = dateToExists;
+    }
     return { start: startIndex, end: endIndex };
   }
 
