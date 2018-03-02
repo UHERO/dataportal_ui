@@ -72,10 +72,10 @@ describe('Service: UheroApi', () => {
   }));
 
   describe('fetchCategories', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, rootCategory: number, portal) => {
+    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal) => {
       backend = be;
       portal = portalObj;
-      service = new UheroApiService(rootCategory, portal, http);
+      service = new UheroApiService(root, portal, http);
       const mockCategories = mockCategoryData();
       const options = new ResponseOptions({ status: 200, body: { data: mockCategories } });
       response = new Response(options);
