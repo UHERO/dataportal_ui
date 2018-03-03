@@ -395,8 +395,9 @@ export class HighstockComponent implements OnChanges {
   }
 
   getSelectedChartRange(userStart, userEnd, levelData, defaults) {
+    const defaultEnd = defaults.end ? defaults.end : new Date(levelData[levelData.length - 1][0]).toISOString().substr(0, 4);    
     let counter = levelData.length ? levelData.length - 1 : null;
-    while (new Date(levelData[counter][0]).toISOString().substr(0, 4) > defaults.end) {
+    while (new Date(levelData[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
     const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
