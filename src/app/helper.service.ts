@@ -173,7 +173,7 @@ export class HelperService {
   }
 
   setDefaultChartRange(freq, dataArray, defaults) {
-    const defaultEnd = defaults.end;
+    const defaultEnd = defaults.end ? defaults.end : new Date(dataArray[dataArray.length - 1][0]).toISOString().substr(0, 4);
     let counter = dataArray.length - 1;
     while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
@@ -182,7 +182,7 @@ export class HelperService {
   }
 
   setDefaultSliderRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end;
+    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     // https://github.com/IonDen/ion.rangeSlider/issues/298
     // Slider values being converted from strings to numbers for annual dates
@@ -193,7 +193,7 @@ export class HelperService {
   }
 
   setDefaultTableRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end;
+    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
