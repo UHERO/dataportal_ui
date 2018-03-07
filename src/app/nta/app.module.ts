@@ -106,6 +106,10 @@ import { ClipboardService } from '../clipboard.service';
         favicon: 'nta-logo.svg',
         feedback: false
       }
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-4'
     }
   ],
   bootstrap: [AppComponent]

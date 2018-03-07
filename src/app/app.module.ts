@@ -99,7 +99,10 @@ import { ClipboardService } from './clipboard.service';
         favicon: 'manoa.jpg',
         feedback: true
       }
-
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-3'
     }
   ],
   bootstrap: [AppComponent]

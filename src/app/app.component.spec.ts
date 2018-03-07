@@ -39,7 +39,8 @@ describe('AppComponent', () => {
             feedback: true,
             backgroundImg: false
           }
-        }
+        },
+        { provide: 'GoogleAnalyticsId', useValue: 'gaId' }
       ]
     })
     .compileComponents()
