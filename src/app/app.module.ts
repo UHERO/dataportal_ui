@@ -97,7 +97,8 @@ import { ClipboardService } from './clipboard.service';
         universe: 'uhero',
         title: 'Data Portal',
         favicon: 'manoa.jpg',
-        feedback: true
+        feedback: true,
+        categoryTabs: true // Display subcategory navigation tabs in category chart/table view
       }
     },
     {

@@ -103,8 +103,9 @@ import { ClipboardService } from '../clipboard.service';
       useValue: {
         universe: 'nta',
         title: 'NTA Data Portal',
-        favicon: 'nta-logo.svg',
-        feedback: false
+        favicon: '../nta-logo.svg',
+        feedback: false,
+        categoryTabs: false // Display subcategory navigation tabs in category chart/table view
       }
     },
     {
