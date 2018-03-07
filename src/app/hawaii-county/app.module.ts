@@ -100,6 +100,10 @@ import { ClipboardService } from '../clipboard.service';
         feedback: false,
         categoryTabs: false
       }
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-5'
     }
   ],
   bootstrap: [AppComponent]

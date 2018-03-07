@@ -12,6 +12,7 @@
 				<hr class="sublist-separator" *ngIf="data.subcategories.length > 1">
 			</ul>
 			<p class="category-header" *ngIf="sub.isHeader">{{sub.name}}</p>
+			<hr class="sublist-separator" *ngIf="data.subcategories.length > 1 && sub.isHeader">
 			<p class="subcategory-header" *ngIf="!sub.isHeader">{{sub.name}}</p>
 			<div class="filters" *ngIf="sub.requestComplete && !sub.isHeader">
 				<app-geo-selector [regions]="data.regions" [selectedGeo]="data.currentGeo" (selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq, sub.id)"
@@ -32,7 +33,6 @@
 			<i *ngIf="!sub.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 			<app-category-table *ngIf="routeView === 'table' && sub.requestComplete && !sub.isHeader" [dates]="data.categoryDates" [tableStart]="tableStart" [tableEnd]="tableEnd" [subCats]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
       <app-category-charts *ngIf="routeView !== 'table' && sub.requestComplete && !sub.isHeader" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
-			<hr class="sublist-separator" *ngIf="data.subcategories.length > 1 && sub.isHeader">
 		</ng-template>
 	</ng-template>
 </div>
