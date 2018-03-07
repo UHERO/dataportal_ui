@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 
-declare var ga: Function;
+declare var gtag: Function;
 
 @Injectable()
 export class GoogleAnalyticsEventsService {
   constructor() { }
 
   public emitEvent(category: string, action: string, label: string) {
-    ga('send', 'event', {
+    gtag('event', action, {
       eventCategory: category,
-      eventAction: action,
       eventLabel: label
     });
   }

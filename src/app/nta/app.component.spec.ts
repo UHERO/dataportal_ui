@@ -28,6 +28,9 @@ describe('AppComponent', () => {
         AppComponent,
         HeaderStubComponent, SidebarNavStubComponent, FeedbackStubComponent
       ],
+      providers: [
+        { provide: 'GoogleAnalyticsId', useValue: 'gaId' }
+      ],
       imports: [ RouterTestingModule ]
     })
     .compileComponents()

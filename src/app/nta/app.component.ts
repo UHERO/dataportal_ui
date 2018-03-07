@@ -1,8 +1,8 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
-declare var ga: Function;
+declare var gtag: Function;
 
 @Component({
   selector: 'app-root',
@@ -10,13 +10,13 @@ declare var ga: Function;
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  constructor(private titleService: Title, public _router: Router) {
+  constructor(@Inject('GoogleAnalyticsId') private gaId, private titleService: Title, public _router: Router) {
+    this.appendGATrackingCode(this.gaId);
     this.titleService.setTitle('NTA Dataportal');
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         // Send page views to Google Analytics
-        ga('set', 'page', event.urlAfterRedirects);
-        ga('send', 'pageview');
+        gtag('config', this.gaId, { 'page_path': event.urlAfterRedirects });
       }
     });
   }
@@ -29,6 +29,24 @@ export class AppComponent implements OnInit {
       }, 5000);
     } else {
       $('.browser').hide();
+    }
+  }
+
+  private appendGATrackingCode(gaId) {
+    try {
+      const gTagScript = document.createElement('script');
+      gTagScript.async = true;
+      gTagScript.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+      document.head.appendChild(gTagScript);
+      const script = document.createElement('script');
+      script.innerHTML = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+      `;
+      document.head.appendChild(script);
+    } catch(err) {
+      console.log('Error adding Google Analytics', err);
     }
   }
 }

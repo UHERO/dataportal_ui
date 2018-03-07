@@ -88,6 +88,10 @@ import { ClipboardService } from './clipboard.service';
     {
       provide: 'portal',
       useValue: 'uhero'
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-3'
     }
   ],
   bootstrap: [AppComponent]
