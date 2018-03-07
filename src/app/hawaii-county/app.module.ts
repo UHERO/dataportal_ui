@@ -96,8 +96,9 @@ import { ClipboardService } from '../clipboard.service';
       useValue: {
         universe: 'coh',
         title: 'County of Hawaii Data Portal',
-        favicon: 'hawaii-county-seal.png',
-        feedback: false
+        favicon: './hawaii-county-seal.png',
+        feedback: false,
+        categoryTabs: false
       }
     }
   ],

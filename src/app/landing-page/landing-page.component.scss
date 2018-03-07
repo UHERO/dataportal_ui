@@ -25,6 +25,19 @@
     }
   }
 
+  .category-header {
+    color: $primary;
+    font-size: 1.05em;
+    letter-spacing: 0.075em;
+    margin-bottom: 0;
+    text-transform: uppercase;
+  }
+
+  .subcategory-header {
+    color: $primary;
+    margin-bottom: 0;
+  }
+
   .content-links:before {
     display: block;
     content: ' ';
