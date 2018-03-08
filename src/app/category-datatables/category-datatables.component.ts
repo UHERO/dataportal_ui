@@ -126,7 +126,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         this.addAnalyzerYtd(tableData, analyzerSeries);
       }
       if (c5maSelected) {
-        this.addAnalyzerC5ma(tableData, analyzer);
+        this.addAnalyzerC5ma(tableData, analyzerSeries);
       }
       return { tableColumns: tableColumns, tableData: tableData };
     }
