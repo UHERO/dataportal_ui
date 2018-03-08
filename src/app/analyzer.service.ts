@@ -9,6 +9,7 @@ import { notEqual } from 'assert';
 
 @Injectable()
 export class AnalyzerService {
+  // Keep track of series in the analyzer
   public analyzerSeries = [];
 
   public analyzerData = {
@@ -25,7 +26,6 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeries) {
-    let seriesIndex = 0;
     this.analyzerData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
     this._uheroAPIService.fetchPackageAnalyzer(ids).subscribe((results) => {
@@ -46,7 +46,7 @@ export class AnalyzerService {
           noData: '',
           observations: { transformationResults: [], observationStart: '', observationEnd: '' },
           showInChart: aSeriesMatch.showInChart
-        }
+        };
         const abbreviatedNameDetails = {
           title: s.title,
           geography: s.geography.handle,
@@ -81,22 +81,31 @@ export class AnalyzerService {
         }
         this.analyzerData.analyzerSeries.push(seriesData);
         this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-        this.analyzerData.analyzerSeries.forEach((s) => {
-          // Array of observations using full range of dates
-          if (s.observations) {
-            s.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, s.observations, s.seriesDetail.decimals);
-          }
-        });
-        this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
-        while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
-          const notInChart = this.analyzerData.analyzerSeries.find(s => s.showInChart !== true);
-          this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true;
-          notInChart.showInChart = true;
-          this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
-        }  
+        this.createAnalyzerTableData();
+        this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+        this.checkAnalyzerChartSeries();
       });
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  createAnalyzerTableData() {
+    this.analyzerData.analyzerSeries.forEach((serie) => {
+      // Array of observations using full range of dates
+      if (serie.observations) {
+        serie.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, serie.observations, serie.seriesDetail.decimals);
+      }
+    });
+  }
+
+  checkAnalyzerChartSeries() {
+    // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
+    while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+      const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
+      this.analyzerSeries.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
+      notInChart.showInChart = true;
+      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+    }
   }
 
   formatDisplayName({ title, geography, frequency, seasonalAdjustment }) {

@@ -48,7 +48,6 @@ export class HelperService {
     const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
     const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
     const pseudoZones = [];
-    let formattedObservations;
     if (level.pseudoHistory) {
       level.pseudoHistory.forEach((obs, index) => {
         if (obs && !level.pseudoHistory[index + 1]) {
@@ -101,7 +100,7 @@ export class HelperService {
     }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
-  
+
   createSeriesTable(dateRange: Array<any>, observations, decimals: number) {
     const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
     const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
@@ -119,7 +118,7 @@ export class HelperService {
         formattedYtd: ' ',
         c5maValue: Infinity,
         formattedC5ma: ' '
-      }
+      };
       if (level && level.dates) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
       }
