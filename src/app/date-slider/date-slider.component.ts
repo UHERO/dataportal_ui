@@ -37,6 +37,11 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
       keyboard: true,
       keyboard_step: 1,
       type: 'double',
+      onChange: function (data) {
+        if (that.portalSettings.sliderInteraction) {
+          that.updateOtherSliders(that.sublist, that.subCat.id, data.from, data.to);
+        }
+      },
       onFinish: function (data) {
         const chartStart = that.formatChartDate(data.from_value, freq);
         const chartEnd = that.formatChartDate(data.to_value, freq);
@@ -48,26 +53,25 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges() {
-    if (this.portalSettings.sliderInteraction && this.dates && this.dates.length) {
+    if (this.dates && this.dates.length) {
       const defaultRanges = this.findDefaultRange();
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = defaultRanges.start;
       this.end = defaultRanges.end;
-      this.sublist.forEach((sub) => {
-        const slider = $('#' + sub.id).data('ionRangeSlider');
-        this.updateSlider(slider);
-      });
     }
-    if (!this.portalSettings.sliderInteraction && this.dates && this.dates.length) {
-      const defaultRanges = this.findDefaultRange();
-      // Start and end used for 'from' and 'to' inputs in slider
-      // If start/end exist in values array, position handles at start/end; otherwise, use default range
-      this.start = defaultRanges.start;
-      this.end = defaultRanges.end;
-      const slider = $('#' + this.subCat.id).data('ionRangeSlider');
-      this.updateSlider(slider);
-    }
+  }
+
+  updateOtherSliders(sublist, subcatId, from, to) {
+    sublist.forEach((sub) => {
+      const slider = sub.id !== subcatId ? $('#' + sub.id).data('ionRangeSlider') : null;
+      if (slider) {
+        slider.update({
+          from: from,
+          to: to
+        });
+      }
+    });
   }
 
   findDefaultRange() {
@@ -81,15 +85,6 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
       endIndex = dateToExists;
     }
     return { start: startIndex, end: endIndex };
-  }
-
-  updateSlider(slider) {
-    if (slider) {
-      slider.update({
-        from: this.start,
-        to: this.end
-      });
-    }
   }
 
   formatChartDate(value, freq) {
