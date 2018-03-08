@@ -99,6 +99,10 @@ import { ClipboardService } from '../clipboard.service';
     {
       provide: 'portal',
       useValue: 'nta'
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-4'
     }
   ],
   bootstrap: [AppComponent]

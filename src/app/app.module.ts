@@ -83,11 +83,15 @@ import { ClipboardService } from './clipboard.service';
     },
     {
       provide: 'defaultRange',
-      useValue: { start: '2007', end: '2017', range: 10 }
+      useValue: { start: '', end: '', range: 10 }
     },
     {
       provide: 'portal',
       useValue: 'uhero'
+    },
+    {
+      provide: 'GoogleAnalyticsId',
+      useValue: 'UA-18074519-3'
     }
   ],
   bootstrap: [AppComponent]

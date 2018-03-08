@@ -88,11 +88,11 @@ describe('Service: Helper', () => {
       tableDate: '1962',
       value: 195.2833,
       formattedValue: '195.28',
-      yoyValue: null,
+      yoyValue: Infinity,
       formattedYoy: ' ',
-      ytdValue: null,
+      ytdValue: Infinity,
       formattedYtd: ' ',
-      c5maValue: null,
+      c5maValue: Infinity,
       formattedC5ma: ' '
     }];
     const expected = {
