@@ -100,7 +100,7 @@ export class HelperService {
     }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
-  
+
   createSeriesTable(dateRange: Array<any>, observations, decimals: number) {
     const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
     const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
