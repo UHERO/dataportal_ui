@@ -158,7 +158,8 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     }
   }
 
-  addAnalyzerYoy(tableData, analyzerSeries) {
+  addTransformationLabel(tableData, transformLabel) {
+    // Add empty rows between data transformations in CSV
     tableData.push({
       series: '',
       observations: ''
@@ -166,151 +167,70 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         series: '',
         observations: ''
       }, {
-        series: 'Year/Year',
+        series: transformLabel,
         observations: ''
       });
-    analyzerSeries.forEach((series) => {
-      const ytd = {};
-      const percent = series.seriesDetail.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.displayName;
-      series.analyzerTableData.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
+  }
+
+  addCategoryTransformation(displaySeries: Array<any>, transformValue: string, tableData: Array<any>) {
+    displaySeries.forEach((series) => {
+      const transformation = {};
+      const percent = series.seriesInfo.percent;
+      const transformLabel = percent ? ' (ch)' : ' (%)';
+      const title = series.seriesInfo.displayName;
+      series.categoryTable.forEach((obs) => {
+        transformation[obs.tableDate] = obs[transformValue] === Infinity ? null : obs[transformValue];
       });
       tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
+        series: title + transformLabel,
+        observations: transformation
       });
     });
+  }
+
+  addAnalyzerTransformation(analyzerSeries: Array<any>, transformValue: string, tableData: Array<any>) {
+    analyzerSeries.forEach((series) => {
+      const transformation = {};
+      const percent = series.seriesDetail.percent;
+      const transformLabel = percent ? ' (ch)' : ' (%)';
+      const title = series.displayName;
+      series.analyzerTableData.forEach((obs) => {
+        transformation[obs.tableDate] = obs[transformValue] === Infinity ? null : obs[transformValue];
+      });
+      tableData.push({
+        series: title + transformLabel,
+        observations: transformation
+      });
+    });
+  }
+
+  addAnalyzerYoy(tableData, analyzerSeries) {
+    this.addTransformationLabel(tableData, 'Year/Year');
+    this.addAnalyzerTransformation(analyzerSeries, 'yoyValue', tableData);
   }
 
   addCategoryYoy(tableData, displaySeries) {
-    tableData.push({
-      series: '',
-      observations: ''
-    }, {
-        series: '',
-        observations: ''
-      }, {
-        series: 'Year/Year',
-        observations: ''
-      });
-    displaySeries.forEach((series) => {
-      const ytd = {};
-      const percent = series.seriesInfo.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.seriesInfo.displayName;
-      series.categoryTable.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
-      });
-      tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
-      });
-    });
+    this.addTransformationLabel(tableData, 'Year/Year');
+    this.addCategoryTransformation(displaySeries, 'yoyValue', tableData);
   }
 
   addAnalyzerYtd(tableData, analyzerSeries) {
-    tableData.push({
-      series: '',
-      observations: ''
-    }, {
-        series: '',
-        observations: ''
-      }, {
-        series: 'Year-to-Date',
-        observations: ''
-      });
-    analyzerSeries.forEach((series) => {
-      const ytd = {};
-      const percent = series.seriesDetail.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.displayName;
-      series.analyzerTableData.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
-      });
-      tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
-      });
-    });
+    this.addTransformationLabel(tableData, 'Year-to-Date');
+    this.addAnalyzerTransformation(analyzerSeries, 'ytdValue', tableData);
   }
 
   addCategoryYtd(tableData, displaySeries) {
-    tableData.push({
-      series: '',
-      observations: ''
-    }, {
-        series: '',
-        observations: ''
-      }, {
-        series: 'Year-to-Date',
-        observations: ''
-      });
-    displaySeries.forEach((series) => {
-      const ytd = {};
-      const percent = series.seriesInfo.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.seriesInfo.displayName;
-      series.categoryTable.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
-      });
-      tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
-      });
-    });
+    this.addTransformationLabel(tableData, 'Year-to-Date');
+    this.addCategoryTransformation(displaySeries, 'ytdValue', tableData);    
   }
 
   addAnalyzerC5ma(tableData, analyzerSeries) {
-    tableData.push({
-      series: '',
-      observations: ''
-    }, {
-        series: '',
-        observations: ''
-      }, {
-        series: 'Annual Change',
-        observations: ''
-      });
-    analyzerSeries.forEach((series) => {
-      const c5ma = {};
-      const percent = series.seriesDetail.percent;
-      const c5maLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.displayName;
-      series.analyzerTableData.forEach((obs) => {
-        c5ma[obs.tableDate] = obs.c5maValue === Infinity ? null : obs.c5maValue;
-      });
-      tableData.push({
-        series: title + c5maLabel,
-        observations: c5ma
-      });
-    });
+    this.addTransformationLabel(tableData, 'Annual Change');
+    this.addAnalyzerTransformation(analyzerSeries, 'c5maValue', tableData);    
   }
 
   addCategoryC5ma(tableData, displaySeries) {
-    tableData.push({
-      series: '',
-      observations: ''
-    }, {
-        series: '',
-        observations: ''
-      }, {
-        series: 'Annual Change',
-        observations: ''
-      });
-    displaySeries.forEach((series) => {
-      const c5ma = {};
-      const percent = series.seriesInfo.percent;
-      const c5maLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.seriesInfo.displayName;
-      series.categoryTable.forEach((obs) => {
-        c5ma[obs.tableDate] = obs.c5maValue === Infinity ? null : obs.c5maValue;
-      });
-      tableData.push({
-        series: title + c5maLabel,
-        observations: c5ma
-      });
-    });
+    this.addTransformationLabel(tableData, 'Annual Change');
+    this.addCategoryTransformation(displaySeries, 'c5maValue', tableData);
   }
 }
