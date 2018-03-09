@@ -27,8 +27,7 @@
 
   .category-header {
     color: $primary;
-    font-size: 1.05em;
-    letter-spacing: 0.025em;
+    font-size: 1.3em;
     margin-bottom: 0;
   }
 
@@ -119,6 +118,7 @@
     margin-bottom: 0.5rem;
     background-color: $primary;
     height: 2px;
+    border-top: 0;
   }
 
   .material-icons.md-18 {
