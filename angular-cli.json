@@ -10,7 +10,6 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico",
         "manoa.jpg"
       ],
       "index": "index.html",
@@ -54,7 +53,8 @@
       "root": "src",
       "outDir": "ntaDist",
       "assets":[
-        "assets"
+        "assets",
+        "nta-logo.png"
       ],
       "index": "index.html",
       "main": "ntaMain.ts",
@@ -94,11 +94,12 @@
       }
     },
     {
-      "name": "hawaii-county",
+      "name": "coh",
       "root": "src",
       "outDir": "hawaiiDist",
       "assets":[
-        "assets"
+        "assets",
+        "hawaii-county-seal.png"
       ],
       "index": "index.html",
       "main": "hawaiiMain.ts",
