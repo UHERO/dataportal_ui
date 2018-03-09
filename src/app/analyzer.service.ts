@@ -9,6 +9,7 @@ import { notEqual } from 'assert';
 
 @Injectable()
 export class AnalyzerService {
+  // Keep track of series in the analyzer
   public analyzerSeries = [];
 
   public analyzerData = {
@@ -25,91 +26,86 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeries) {
-    let seriesIndex = 0;
     this.analyzerData.analyzerSeries = [];
-    aSeries.forEach((series, index) => {
-      let decimals;
-      const seriesData = {
-        seriesDetail: {},
-        currentGeo: <Geography>{},
-        currentFreq: <Frequency>{},
-        chartData: {},
-        displayName: '',
-        chartDisplayName: '',
-        seriesTableData: [],
-        error: null,
-        saParam: false,
-        noData: '',
-        observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-        showInChart: series.showInChart
-      };
-      this._uheroAPIService.fetchSeriesDetail(series.id).subscribe((detail) => {
-        seriesData.seriesDetail = detail;
+    const ids = aSeries.map(s => s.id).join();
+    this._uheroAPIService.fetchPackageAnalyzer(ids).subscribe((results) => {
+      const series = results.series;
+      series.forEach((s) => {
+        let decimals;
+        const aSeriesMatch = aSeries.find(a => a.id === s.id);
+        const seriesData = {
+          seriesDetail: s,
+          currentGeo: <Geography>{},
+          currentFreq: <Frequency>{},
+          chartData: {},
+          displayName: '',
+          chartDisplayName: '',
+          seriesTableData: [],
+          error: null,
+          saParam: false,
+          noData: '',
+          observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+          showInChart: aSeriesMatch.showInChart
+        };
         const abbreviatedNameDetails = {
-          title: detail.title,
-          geography: detail.geography.handle,
-          frequency: detail.frequencyShort,
-          seasonalAdjustment: detail.seasonalAdjustment
+          title: s.title,
+          geography: s.geography.handle,
+          frequency: s.frequencyShort,
+          seasonalAdjustment: s.seasonalAdjustment
         };
         const chartNameDetails = {
-          title: detail.title,
-          geography: detail.geography.shortName,
-          frequency: detail.frequency,
-          seasonalAdjustment: detail.seasonalAdjustment
+          title: s.title,
+          geography: s.geography.shortName,
+          frequency: s.frequency,
+          seasonalAdjustment: s.seasonalAdjustment
         };
         seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
         seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
-        seriesData.saParam = detail.seasonalAdjustment !== 'not_seasonally_adjusted';
-        decimals = detail.decimals ? detail.decimals : 1;
-        seriesData.currentGeo = detail.geography;
-        seriesData.currentFreq = { freq: detail.frequencyShort, label: detail.frequency };
-      },
-        (error) => {
-          console.log('error', error);
-        },
-        () => {
-          this._uheroAPIService.fetchObservations(series.id).subscribe((observations) => {
-            seriesData.observations = observations;
-            const levelData = seriesData.observations.transformationResults[0].dates;
-            const obsStart = seriesData.observations.observationStart;
-            const obsEnd = seriesData.observations.observationEnd;
-            const dateArray = [];
-            if (levelData) {
-              // Use to format dates for table
-              this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-              const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-              seriesData.chartData = data.chartData;
-              seriesData.seriesTableData = data.tableData;
-            } else {
-              seriesData.noData = 'Data not available';
-            }
-          },
-            (error) => {
-              console.log('error', error);
-            },
-            () => {
-              seriesIndex++;
-              this.analyzerData.analyzerSeries.push(seriesData);
-              if (seriesIndex === aSeries.length) {
-                this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-                this.analyzerData.analyzerSeries.forEach((s) => {
-                  // Array of observations using full range of dates
-                  if (s.observations) {
-                    s.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, s.observations, s.seriesDetail.decimals);
-                  }
-                });
-                this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
-                while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
-                  const notInChart = this.analyzerData.analyzerSeries.find(s => s.showInChart !== true);
-                  this.analyzerSeries.find(s => s.id === notInChart.seriesDetail.id).showInChart = true;
-                  notInChart.showInChart = true;
-                  this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart === true);
-                }
-              }
-            });
-        });
+        seriesData.saParam = s.seasonalAdjustment !== 'not_seasonally_adjusted';
+        decimals = s.decimals ? s.decimals : 1;
+        seriesData.currentGeo = s.geography;
+        seriesData.currentFreq = { freq: s.frequencyShort, label: s.frequency };
+        seriesData.observations = s.seriesObservations;
+        const levelData = seriesData.observations.transformationResults[0].dates;
+        const obsStart = seriesData.observations.observationStart;
+        const obsEnd = seriesData.observations.observationEnd;
+        const dateArray = [];
+        if (levelData) {
+          // Use to format dates for table
+          this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+          const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
+          seriesData.chartData = data.chartData;
+          seriesData.seriesTableData = data.tableData;
+        } else {
+          seriesData.noData = 'Data not available';
+        }
+        this.analyzerData.analyzerSeries.push(seriesData);
+        this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+        this.createAnalyzerTableData();
+        this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+        this.checkAnalyzerChartSeries();
+      });
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+
+  createAnalyzerTableData() {
+    this.analyzerData.analyzerSeries.forEach((serie) => {
+      // Array of observations using full range of dates
+      if (serie.observations) {
+        serie.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, serie.observations, serie.seriesDetail.decimals);
+      }
+    });
+  }
+
+  checkAnalyzerChartSeries() {
+    // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
+    while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+      const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
+      this.analyzerSeries.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
+      notInChart.showInChart = true;
+      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+    }
   }
 
   formatDisplayName({ title, geography, frequency, seasonalAdjustment }) {

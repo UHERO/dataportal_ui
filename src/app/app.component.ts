@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
     try {
       const gTagScript = document.createElement('script');
       gTagScript.async = true;
-      gTagScript.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+      gTagScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
       document.head.appendChild(gTagScript);
       const script = document.createElement('script');
       script.innerHTML = `
@@ -53,7 +53,7 @@ export class AppComponent implements OnInit {
         gtag('js', new Date());
       `;
       document.head.appendChild(script);
-    } catch(err) {
+    } catch (err) {
       console.log('Error adding Google Analytics', err);
     }
   }
