@@ -170,16 +170,16 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         observations: ''
       });
     analyzerSeries.forEach((series) => {
-      const ytd = {};
+      const yoy = {};
       const percent = series.seriesDetail.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
+      const yoyLabel = percent ? ' (ch)' : ' (%)';
       const title = series.displayName;
       series.analyzerTableData.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
+        yoy[obs.tableDate] = obs.yoyValue === Infinity ? null : obs.yoyValue;
       });
       tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
+        series: title + yoyLabel,
+        observations: yoy
       });
     });
   }
@@ -196,16 +196,16 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         observations: ''
       });
     displaySeries.forEach((series) => {
-      const ytd = {};
+      const yoy = {};
       const percent = series.seriesInfo.percent;
-      const ytdLabel = percent ? ' (ch)' : ' (%)';
+      const yoyLabel = percent ? ' (ch)' : ' (%)';
       const title = series.seriesInfo.displayName;
       series.categoryTable.forEach((obs) => {
-        ytd[obs.tableDate] = obs.ytdValue === Infinity ? null : obs.ytdValue;
+        yoy[obs.tableDate] = obs.yoyValue === Infinity ? null : obs.yoyValue;
       });
       tableData.push({
-        series: title + ytdLabel,
-        observations: ytd
+        series: title + yoyLabel,
+        observations: yoy
       });
     });
   }
