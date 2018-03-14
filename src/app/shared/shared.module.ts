@@ -7,6 +7,8 @@ import { HttpModule } from '@angular/http';
 import { ChartModule } from 'angular2-highcharts';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng-recaptcha';
+import { AppComponent } from '../app.component';
+import { LandingPageComponent } from '../landing-page/landing-page.component';
 import { HeaderComponent } from '../header/header.component';
 import { SingleSeriesComponent } from '../single-series/single-series.component';
 import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
@@ -29,6 +31,8 @@ import { ShareLinkComponent } from '../share-link/share-link.component';
 
 @NgModule({
   declarations: [
+    AppComponent,
+    LandingPageComponent,
     HeaderComponent,
     SingleSeriesComponent,
     SidebarNavComponent,

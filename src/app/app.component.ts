@@ -11,7 +11,7 @@ declare var gtag: Function;
 })
 export class AppComponent implements OnInit {
   constructor(
-    @Inject('portal') private portal,
+    @Inject('portal') public portal,
     @Inject('GoogleAnalyticsId') private gaId,
     private titleService: Title,
     public _router: Router

@@ -25,7 +25,6 @@ export function highchartsFactory() {
 }
 import { Shared } from '../shared/shared.module';
 import { routing } from '../app.routes';
-import { AppComponent } from '../app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -35,15 +34,13 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 import { HelpService } from '../help.service';
 import { AnalyzerService } from '../analyzer.service';
 import { TableHelperService } from '../table-helper.service';
-import { LandingPageComponent } from '../landing-page/landing-page.component';
-import { UheroHelpComponent } from '../uhero-help/uhero-help.component';
+import { AppComponent } from '../app.component';
+import { CohHelpComponent } from '../coh-help/coh-help.component';
 import { ClipboardService } from '../clipboard.service';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LandingPageComponent,
-    UheroHelpComponent
+    CohHelpComponent
   ],
   imports: [
     Shared,
@@ -55,7 +52,7 @@ import { ClipboardService } from '../clipboard.service';
     HttpModule
   ],
   entryComponents: [
-    UheroHelpComponent
+    CohHelpComponent
   ],
   providers: [
     UheroApiService,
