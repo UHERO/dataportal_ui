@@ -122,7 +122,7 @@ export class UheroApiService {
     if (this.cachedPackageSeries[id]) {
       return Observable.of(this.cachedPackageSeries[id]);
     } else {
-      let series$ = this.http.get(`${this.baseUrl}/package/series?id=` + id, this.requestOptionsArgs)
+      let series$ = this.http.get(`${this.baseUrl}/package/series?id=` + id + `&u=` + this.portal.universe, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedPackageSeries[id] = val;
@@ -295,7 +295,7 @@ export class UheroApiService {
     if (this.cachedPackageAnalyzer[ids]) {
       return Observable.of(this.cachedPackageAnalyzer[ids]);
     } else {
-      let analyzer$ = this.http.get(`${this.baseUrl}/package/analyzer?ids=` + ids, this.requestOptionsArgs)
+      let analyzer$ = this.http.get(`${this.baseUrl}/package/analyzer?ids=` + ids + `&u=` + this.portal.universe, this.requestOptionsArgs)
         .map(mapData)
         .do(val => {
           this.cachedPackageAnalyzer[ids] = val;
