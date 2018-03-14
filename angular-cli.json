@@ -110,7 +110,7 @@
       "prefix": "hawaii",
       "stylePreprocessorOptions": {
         "includePaths": [
-          "./assets/hawaii"
+          "./assets/coh"
         ]
       },
       "styles": [
