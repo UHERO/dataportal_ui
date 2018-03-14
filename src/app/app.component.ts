@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Injectable, Inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
@@ -10,12 +10,17 @@ declare var gtag: Function;
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  constructor(@Inject('GoogleAnalyticsId') private gaId, private titleService: Title, public _router: Router) {
+  constructor(
+    @Inject('portal') public portal,
+    @Inject('GoogleAnalyticsId') private gaId,
+    private titleService: Title,
+    public _router: Router
+  ) {
     this.appendGATrackingCode(this.gaId);
     // Set title
-    this.titleService.setTitle('Dataportal');
+    this.titleService.setTitle(this.portal.title);
     // Set favicon
-    $('#favicon').attr('href', 'manoa.jpg');
+    $('#favicon').attr('href', this.portal.favicon);
 
     this._router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {

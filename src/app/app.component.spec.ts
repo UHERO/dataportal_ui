@@ -28,10 +28,20 @@ describe('AppComponent', () => {
         AppComponent,
         HeaderStubComponent, SidebarNavStubComponent, FeedbackStubComponent
       ],
+      imports: [ RouterTestingModule ],
       providers: [
+        {
+          provide: 'portal',
+          useValue: {
+            universe: 'uhero',
+            title: 'Data Portal',
+            favicon: 'manoa.jpg',
+            feedback: true,
+            backgroundImg: false
+          }
+        },
         { provide: 'GoogleAnalyticsId', useValue: 'gaId' }
-      ],
-      imports: [ RouterTestingModule ]
+      ]
     })
     .compileComponents()
     .then(() => {

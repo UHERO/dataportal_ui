@@ -1,14 +1,15 @@
-<nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light bg-white">
+<nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light">
   <div>
     <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
       &#9776;
     </button>
     <a class="navbar-brand" routerLink="/">
-      <img [src]="headerLogo" alt="UHERO.data logo">
+      <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+      <p *ngIf="!headerLogo.mobileLogo">{{headerLogo.headerText}}</p>
     </a>
-    <!-- <app-search-bar (onSearch)="onSearch($event)"></app-search-bar> -->
   </div>
   <ul id="navbar-side" class="navbar-side" [class.reveal]="reveal">
+    <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
     <hr class="mobile-divider">
     <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category.id === selectedCategory">

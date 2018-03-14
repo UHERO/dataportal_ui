@@ -74,7 +74,7 @@ export class AnalyzerComponent implements OnInit {
         }
       });
     }
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
     if (this._analyzer.analyzerSeries.length) {
       this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
     }

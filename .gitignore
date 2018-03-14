@@ -4,8 +4,10 @@
 /tmp
 /dist
 /ntaDist
+/cohDist
 /dist_staging
 /ntaDist_staging
+/cohDist_staging
 
 # dependencies
 /node_modules

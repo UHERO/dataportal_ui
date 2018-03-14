@@ -27,7 +27,6 @@ export function highchartsFactory() {
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { AppComponent } from './app.component';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -37,6 +36,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 import { TableHelperService } from '../table-helper.service';
 import { HelpService } from '../help.service';
 import { AnalyzerService } from '../analyzer.service';
+import { AppComponent } from '../app.component';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
 import { MeasurementSelectorComponent } from '../measurement-selector/measurement-selector.component';
@@ -45,7 +45,6 @@ import { ClipboardService } from '../clipboard.service';
 
 @NgModule({
   declarations: [
-    AppComponent,
     NtaLayoutComponent,
     NtaHelpComponent,
     MeasurementSelectorComponent,
@@ -84,13 +83,15 @@ import { ClipboardService } from '../clipboard.service';
       provide: 'rootCategory',
       useValue: 2487
     },
-    /* {
-      provide: 'defaultCategory',
-      useValue: 3985
-    }, */
     {
       provide: 'logo',
-      useValue: '../../assets/nta-logo.svg'
+      useValue: {
+        altText: 'NTA Data Portal',
+        displayImg: true,
+        headerText: '',
+        imgSrc: '../../assets/nta-logo.svg',
+        mobileLogo: true,
+      }
     },
     {
       provide: 'defaultRange',
@@ -98,7 +99,13 @@ import { ClipboardService } from '../clipboard.service';
     },
     {
       provide: 'portal',
-      useValue: 'nta'
+      useValue: {
+        universe: 'nta',
+        title: 'NTA Data Portal',
+        favicon: '../nta-logo.png',
+        feedback: false,
+        categoryTabs: false // Display subcategory navigation tabs in category chart/table view
+      }
     },
     {
       provide: 'GoogleAnalyticsId',

@@ -23,7 +23,16 @@ describe('ShareLinkComponent', () => {
         ClipboardService,
         HelperService,
         UheroApiService,
-        { provide: 'portal', useValue: 'test' },
+        {
+          provide: 'portal',
+          useValue: {
+            universe: 'uhero',
+            title: 'Data Portal',
+            favicon: 'manoa.jpg',
+            feedback: true,
+            backgroundImg: false
+          }
+        },
         { provide: 'rootCategory', useValue: 59 },
         { provide: ActivatedRoute, useValue: activatedRoute }
       ],

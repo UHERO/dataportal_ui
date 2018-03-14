@@ -38,7 +38,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   ) { }
 
   ngOnInit() {
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
   ngOnChanges() {

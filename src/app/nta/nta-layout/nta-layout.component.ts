@@ -48,7 +48,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   ) { }
 
   ngOnInit() {
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal];
+    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
   ngAfterViewInit() {

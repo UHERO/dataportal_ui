@@ -21,7 +21,7 @@ export class HelpComponent implements AfterViewInit {
 
   loadComponent() {
     // Get content for the help page based on which data portal is built/loaded
-    const helpItem: HelpItem = this._help.helpDocs[this.portal];
+    const helpItem: HelpItem = this._help.helpDocs[this.portal.universe];
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(helpItem.component);
     const viewContainerRef = this.appHelp.viewContainerRef;
     viewContainerRef.clear();

@@ -25,6 +25,17 @@
     }
   }
 
+  .category-header {
+    color: $primary;
+    font-size: 1.3em;
+    margin-bottom: 0;
+  }
+
+  .subcategory-header {
+    color: $primary;
+    margin-bottom: 0;
+  }
+
   .content-links:before {
     display: block;
     content: ' ';
@@ -107,6 +118,7 @@
     margin-bottom: 0.5rem;
     background-color: $primary;
     height: 2px;
+    border-top: 0;
   }
 
   .material-icons.md-18 {

@@ -166,8 +166,11 @@ export class CategoryHelperService {
           this.setNoData(sub);
         }
       }
-      if (!sub.series) {
+      if (!sub.series && !sub.isHeader) {
         this.setNoData(sub);
+      }
+      if (sub.isHeader){
+        sub.requestComplete = true;
       }
     });
   }
