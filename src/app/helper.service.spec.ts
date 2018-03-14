@@ -89,11 +89,11 @@ describe('Service: Helper', () => {
       value: 195.2833,
       formattedValue: '195.28',
       yoyValue: Infinity,
-      formattedYoy: ' ',
+      formattedYoy: '',
       ytdValue: Infinity,
-      formattedYtd: ' ',
+      formattedYtd: '',
       c5maValue: Infinity,
-      formattedC5ma: ' '
+      formattedC5ma: ''
     }];
     const expected = {
       chartData: chartData,
