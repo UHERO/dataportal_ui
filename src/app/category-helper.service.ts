@@ -182,11 +182,11 @@ export class CategoryHelperService {
     // Used to create array of dates for enitre category
     sublist.forEach((sub) => {
       if (!sub.geoFreqs && sub.current) {
+        console.log('sub', sub)
         const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
         const freqStart = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
         const freqEnd = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
-        const startDate = sub.current.observationStart.substr(0, 10);
-        const endDate = sub.current.observationEnd.substr(0, 10);
+        const selectedGeo = sub.geos.find(g => g.handle === currentGeo.handle);
         if (freqStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
           categoryDateWrapper.firstDate = freqStart;
         }
