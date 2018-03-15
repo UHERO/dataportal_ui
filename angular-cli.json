@@ -96,7 +96,7 @@
     {
       "name": "coh",
       "root": "src",
-      "outDir": "hawaiiDist",
+      "outDir": "cohDist",
       "assets":[
         "assets",
         "hawaii-county-seal.png"

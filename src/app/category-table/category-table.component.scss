@@ -59,6 +59,10 @@
           }
         }
 
+        td:empty:after {
+          content: "\00a0";
+        }
+
         th {
           position: absolute;
           *position: relative;
