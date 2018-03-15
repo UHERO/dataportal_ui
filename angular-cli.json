@@ -96,7 +96,7 @@
     {
       "name": "coh",
       "root": "src",
-      "outDir": "hawaiiDist",
+      "outDir": "cohDist",
       "assets":[
         "assets",
         "hawaii-county-seal.png"
@@ -110,7 +110,7 @@
       "prefix": "hawaii",
       "stylePreprocessorOptions": {
         "includePaths": [
-          "./assets/hawaii"
+          "./assets/coh"
         ]
       },
       "styles": [
