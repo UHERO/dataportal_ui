@@ -96,6 +96,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         this.endDate = params['end'];
       }
       this.seriesData = this._series.getSeriesData(seriesId);
+      console.log('single series', this.seriesData);
     });
     this.cdRef.detectChanges();
   }
@@ -136,6 +137,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   redrawTable(e, seriesDetail, tableData, freq) {
     const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
     let minDate, maxDate, tableStart, tableEnd;
+    console.log('e', e)
     minDate = e.minDate;
     maxDate = e.maxDate;
     for (let i = 0; i < tableData.length; i++) {
@@ -146,7 +148,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         tableEnd = i;
       }
     }
+    console.log('tableEnd', tableEnd);
+    console.log('tableStart', tableStart);
+    console.log('tableData', tableData)
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
+    console.log('newTableData', this.newTableData)
     this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
   }
 }

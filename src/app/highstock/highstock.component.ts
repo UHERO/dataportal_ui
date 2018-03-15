@@ -163,6 +163,7 @@ export class HighstockComponent implements OnChanges {
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
+    console.log('series', series)
 
     this.options = {
       chart: {
@@ -366,6 +367,8 @@ export class HighstockComponent implements OnChanges {
     }
     const extremes = this.getChartExtremes(this.chartObject);
     if (extremes) {
+      console.log('chartObject', this.chartObject)
+      console.log('extremes', extremes)
       this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     }
   }
@@ -381,10 +384,10 @@ export class HighstockComponent implements OnChanges {
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (chartObject.series[1].points) {
-      selectedRange = chartObject.series[1].points;
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
     }
-    if (!chartObject.series[1].points.length) {
+    if (!chartObject.series[0].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {

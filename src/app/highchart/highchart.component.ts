@@ -302,8 +302,11 @@ export class HighchartComponent implements OnInit, OnChanges {
     }
     // If no data available for a given date range, display series title and display dates where data is available for a series
     if (!latestSeries0 && !latestSeries1) {
+      console.log('seriesData', this.seriesData);
       const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
       const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
+      console.log('start', start);
+      console.log('end', end)
       this.chart.setTitle({text: '<b>' + this.seriesData.seriesInfo.displayName + '</b>'});
       this.chart.setSubtitle({text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20});
     }
