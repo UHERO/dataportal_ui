@@ -1,0 +1,42 @@
+@import 'colors';
+
+
+h2, h3, h4 {
+    color: $primary;
+}
+
+h2 {
+    font-size: 1.3rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+}
+
+h4 {
+    font-size: 1rem;
+}
+
+p {
+    font-size: 0.9rem;
+}
+
+#chart-view {
+    width: 884px;
+    max-width: 100%;
+}
+
+#table-view {
+    width: 893px;
+    max-width: 100%;
+}
+
+#series-view {
+    width: 925px;
+    max-width: 100%;
+}
+
+#search-box {
+    width: 615px;
+    max-width: 100%;
+}
