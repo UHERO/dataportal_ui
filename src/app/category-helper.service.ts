@@ -182,16 +182,19 @@ export class CategoryHelperService {
     // Used to create array of dates for enitre category
     sublist.forEach((sub) => {
       if (!sub.geoFreqs && sub.current) {
-        const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
-        const freqStart = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
-        const freqEnd = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
-        const startDate = sub.current.observationStart.substr(0, 10);
-        const endDate = sub.current.observationEnd.substr(0, 10);
-        if (freqStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-          categoryDateWrapper.firstDate = freqStart;
+        let start, end;
+        if (sub.current.geo === currentGeo.hanlde && sub.current.freq === currentFreq.freq) {
+          start = sub.current.observationStart.substr(0, 10);
+          end = sub.current.observationEnd.substr(0, 10);
         }
-        if (freqEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-          categoryDateWrapper.endDate = freqEnd;
+        const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
+        start = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
+        end = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
+        if (start < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+          categoryDateWrapper.firstDate = start;
+        }
+        if (end > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+          categoryDateWrapper.endDate = end;
         }
       }
     });

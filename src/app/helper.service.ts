@@ -111,13 +111,13 @@ export class HelperService {
         date: date.date,
         tableDate: date.tableDate,
         value: Infinity,
-        formattedValue: ' ',
+        formattedValue: '',
         yoyValue: Infinity,
-        formattedYoy: ' ',
+        formattedYoy: '',
         ytdValue: Infinity,
-        formattedYtd: ' ',
+        formattedYtd: '',
         c5maValue: Infinity,
-        formattedC5ma: ' '
+        formattedC5ma: ''
       };
       if (level && level.dates) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
@@ -136,7 +136,7 @@ export class HelperService {
     return table;
   }
 
-  formattedValue = (value, decimals) => (value === null || value === Infinity) ? ' ' : this.formatNum(+value, decimals);
+  formattedValue = (value, decimals) => (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals);
 
   setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
     dateWrapper.firstDate = '';

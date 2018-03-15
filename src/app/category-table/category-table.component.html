@@ -48,7 +48,7 @@
 						</tr>
 						<tr *ngIf="ytdActive && serie.seriesInfo.frequencyShort !== 'A'">
 							<th class="{{serie.seriesInfo.indent ? 'indent' + serie.seriesInfo.indent : ''}}">
-								{{(serie.seriesInfo.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
+								{{(serie.seriesInfo.percent) ? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
 							</th>
 							<ng-template ngFor let-item [ngForOf]="serie.trimCatTable">
 								<td>{{item.formattedYtd}}</td>
