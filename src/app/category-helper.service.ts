@@ -103,7 +103,7 @@ export class CategoryHelperService {
       // Merge subcats with original list of categories from /category response
       const sublistCopy = [];
       subcats.forEach((sub) => {
-        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.name === sub.name);
+        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
         sublistCopy.push(Object.assign({}, sub, subMatch));
       });
       this.categoryData[cacheId].subcategories = sublistCopy;

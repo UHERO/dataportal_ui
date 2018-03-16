@@ -26,11 +26,12 @@ export class HighchartComponent implements OnInit, OnChanges {
   private chart;
 
   static findLastValue(valueArray) {
+    console.log('valueArray', valueArray)
     let counter = valueArray.length - 1;
     while (valueArray[counter].y === null) {
       counter--;
       if (counter === -1) {
-        return null;
+        return -1;
       }
     }
     return counter;
@@ -161,6 +162,7 @@ export class HighchartComponent implements OnInit, OnChanges {
           // Add year
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           this.points.forEach((point) => {
+            console.log('point', point)
             const displayValue = Highcharts.numberFormat(point.y, decimals);
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             const name = getLabelName(point.series.name, dataFreq, percent);
@@ -275,34 +277,58 @@ export class HighchartComponent implements OnInit, OnChanges {
     const series0 = this.chart.series[0];
     const series1 = this.chart.series[1];
     // Get position of last non-null value
-    latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : null;
-    latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : null;
+    latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : -1;
+    latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : -1;
+    console.log('latestSeries0 ', latestSeries0)
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
     this.chart.tooltip.hide = function() {
-      if (latestSeries0 > 0 && latestSeries1 > 0) {
+      if (latestSeries0 > -1 && latestSeries1 > -1) {
         this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
         series0.points[latestSeries0].setState('hover');
       }
       // Tooltip for charts that only displays 1 series (ex. NTA portal)
-      if (latestSeries0 > 0 && !latestSeries1) {
+      if (latestSeries0 > -1 && latestSeries1 === -1) {
+        console.log('seriesData', this.seriesData);
+        console.log('series0', series0);
+        // series0.visible = false;
+        const displayMarker = series0.yData.filter(value => Number.isFinite(value));
+        console.log('displayMarker length', displayMarker.length)
         this.chart.tooltip.refresh([series0.points[latestSeries0]]);
         series0.points[latestSeries0].setState('hover');
+        if (displayMarker.length <= 1) {
+          series0.points[latestSeries0].setState('');
+        }
       }
     };
 
     // Display tooltip when chart loads
-    if (latestSeries0 > 0 && latestSeries1 > 0) {
+    if (latestSeries0 > -1 && latestSeries1 > -1) {
       this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
+      const pointCount = series0.yData.filter(value => Number.isFinite(value));
+      if (pointCount.length <= 1) {
+        series0.visible = false;
+        series0.userOptions.states.hover.enabled = false;
+        series0.options.marker.states.hover.enabled = false;
+        console.log('class name', series0.points[latestSeries0].getClassName())
+        series0.points[latestSeries0].setState('');
+      }
     }
     // If there are no YTD values
-    if (latestSeries0 && !latestSeries1) {
+    if (latestSeries0 > -1 && latestSeries1 === -1) {
       this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+      const pointCount = series0.yData.filter(value => Number.isFinite(value));
+      if (pointCount.length <= 1) {
+        series0.visible = false;
+        series0.userOptions.states.hover.enabled = false;
+        series0.options.marker.states.hover.enabled = false;
+        console.log('class name', series0.points[latestSeries0].getClassName())
+        series0.points[latestSeries0].setState('');
+      }
     }
     // If no data available for a given date range, display series title and display dates where data is available for a series
-    if (!latestSeries0 && !latestSeries1) {
-      console.log('seriesData', this.seriesData);
+    if (latestSeries0 === -1 && latestSeries1 === -1) {
       const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
       const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
       console.log('start', start);
