@@ -56,6 +56,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
     series0 = series0 ? this.trimData(series0, start, end) : null;
     series1 = series1 ? this.trimData(series1, start, end) : null;
+    const pointCount = series0.map(x => x[1]).filter(value => Number.isFinite(value));
     const chartSeries = [];
     const minValue = min;
     const maxValue = max;
@@ -161,32 +162,33 @@ export class HighchartComponent implements OnInit, OnChanges {
           s = s + getFreqLabel(dataFreq, this.x);
           // Add year
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
-          this.points.forEach((point) => {
-            console.log('point', point)
-            const displayValue = Highcharts.numberFormat(point.y, decimals);
-            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const name = getLabelName(point.series.name, dataFreq, percent);
-            let label = name + formattedValue;
-            if (point.series.name === 'level') {
-              label += ' (' + unitsShort + ') <br>';
-            }
-            if (pseudoZones.length > 0) {
-              pseudoZones.forEach((zone) => {
-                if (point.x < zone.value) {
-                  const otherSeriesLabel = pseudo + name + formattedValue;
-                  const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
-                  s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
-                  s += pseudo + name + formattedValue;
-                }
-                if (point.x >= zone.value) {
-                  s += label;
-                }
-              });
-            }
-            if (pseudoZones.length === 0) {
-              s += label;
-            }
-          });
+          if (pointCount.length > 1) {
+            this.points.forEach((point) => {
+              const displayValue = Highcharts.numberFormat(point.y, decimals);
+              const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+              const name = getLabelName(point.series.name, dataFreq, percent);
+              let label = name + formattedValue;
+              if (point.series.name === 'level') {
+                label += ' (' + unitsShort + ') <br>';
+              }
+              if (pseudoZones.length > 0) {
+                pseudoZones.forEach((zone) => {
+                  if (point.x < zone.value) {
+                    const otherSeriesLabel = pseudo + name + formattedValue;
+                    const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
+                    s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
+                    s += pseudo + name + formattedValue;
+                  }
+                  if (point.x >= zone.value) {
+                    s += label;
+                  }
+                });
+              }
+              if (pseudoZones.length === 0) {
+                s += label;
+              }
+            });
+          }
           return s;
         },
         useHTML: true
@@ -279,22 +281,27 @@ export class HighchartComponent implements OnInit, OnChanges {
     // Get position of last non-null value
     latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : -1;
     latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : -1;
-    console.log('latestSeries0 ', latestSeries0)
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
     this.chart.tooltip.hide = function() {
       if (latestSeries0 > -1 && latestSeries1 > -1) {
+        const displayMarker = series0.yData.filter(value => Number.isFinite(value));
         this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
-        series0.points[latestSeries0].setState('hover');
+        series0.points[latestSeries0].setState('hover');  
+        if (displayMarker.length <= 1) {
+          this.chart.setTitle({
+            text: series0.points[latestSeries0].y,
+            x: 50,
+            y: 50,    
+          });
+          series0.points[latestSeries0].setState('');
+        }
       }
       // Tooltip for charts that only displays 1 series (ex. NTA portal)
       if (latestSeries0 > -1 && latestSeries1 === -1) {
-        console.log('seriesData', this.seriesData);
-        console.log('series0', series0);
         // series0.visible = false;
         const displayMarker = series0.yData.filter(value => Number.isFinite(value));
-        console.log('displayMarker length', displayMarker.length)
         this.chart.tooltip.refresh([series0.points[latestSeries0]]);
         series0.points[latestSeries0].setState('hover');
         if (displayMarker.length <= 1) {
@@ -305,13 +312,17 @@ export class HighchartComponent implements OnInit, OnChanges {
 
     // Display tooltip when chart loads
     if (latestSeries0 > -1 && latestSeries1 > -1) {
-      this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
       const pointCount = series0.yData.filter(value => Number.isFinite(value));
+      this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
       if (pointCount.length <= 1) {
-        series0.visible = false;
+        // series0.visible = false;
         series0.userOptions.states.hover.enabled = false;
         series0.options.marker.states.hover.enabled = false;
-        console.log('class name', series0.points[latestSeries0].getClassName())
+        this.chart.setTitle({
+          text: series0.points[latestSeries0].y,
+          x: 50,
+          y: 50,    
+        });
         series0.points[latestSeries0].setState('');
       }
     }
@@ -320,10 +331,9 @@ export class HighchartComponent implements OnInit, OnChanges {
       this.chart.tooltip.refresh([series0.points[latestSeries0]]);
       const pointCount = series0.yData.filter(value => Number.isFinite(value));
       if (pointCount.length <= 1) {
-        series0.visible = false;
+        //series0.visible = false;
         series0.userOptions.states.hover.enabled = false;
         series0.options.marker.states.hover.enabled = false;
-        console.log('class name', series0.points[latestSeries0].getClassName())
         series0.points[latestSeries0].setState('');
       }
     }
@@ -331,8 +341,6 @@ export class HighchartComponent implements OnInit, OnChanges {
     if (latestSeries0 === -1 && latestSeries1 === -1) {
       const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
       const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
-      console.log('start', start);
-      console.log('end', end)
       this.chart.setTitle({text: '<b>' + this.seriesData.seriesInfo.displayName + '</b>'});
       this.chart.setSubtitle({text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20});
     }
