@@ -27,7 +27,6 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
   ngAfterViewInit() {
     const that = this;
     const freq = this.freq;
-    console.log('subcatid', this.subCat.id)
     $('#' + this.subCat.id).ionRangeSlider({
       min: 0,
       from: this.start,
