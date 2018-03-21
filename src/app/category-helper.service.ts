@@ -169,7 +169,7 @@ export class CategoryHelperService {
       if (!sub.series && !sub.isHeader) {
         this.setNoData(sub);
       }
-      if (sub.isHeader){
+      if (sub.isHeader) {
         sub.requestComplete = true;
       }
     });

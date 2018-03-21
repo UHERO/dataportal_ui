@@ -55,6 +55,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
     series0 = series0 ? this.trimData(series0, start, end) : null;
     series1 = series1 ? this.trimData(series1, start, end) : null;
+    // Check how many non-null points exist in level series
     const pointCount = series0.map(x => x[1]).filter(value => Number.isFinite(value));
     const chartSeries = [];
     const minValue = min;
@@ -162,7 +163,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             // Get Quarter or Month for Q/M frequencies
             s = s + getFreqLabel(dataFreq, this.x);
             // Add year
-            s = s + Highcharts.dateFormat('%Y', this.x) + '';  
+            s = s + Highcharts.dateFormat('%Y', this.x) + '';
             this.points.forEach((point) => {
               const displayValue = Highcharts.numberFormat(point.y, decimals);
               const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
@@ -230,7 +231,7 @@ export class HighchartComponent implements OnInit, OnChanges {
       plotOptions: {
         line: {
           marker: {
-            enabled: true,
+            enabled: pointCount.length === 1 ? false : true,
             radius: 1.5
           }
         }
@@ -287,119 +288,97 @@ export class HighchartComponent implements OnInit, OnChanges {
     // Reset toolip value and marker to most recent observation
     this.chart.tooltip.hide = function () {
       if (latestSeries0 > -1 && latestSeries1 > -1) {
-        const displayMarker = series0.yData.filter(value => Number.isFinite(value));
         this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
-        series0.points[latestSeries0].setState('hover');
-      }
-      // Tooltip for charts that only displays 1 series (ex. NTA portal)
-      if (latestSeries0 > -1 && latestSeries1 === -1) {
-        // series0.visible = false;
-        const displayMarker = series0.yData.filter(value => Number.isFinite(value));
-        this.chart.tooltip.refresh([series0.points[latestSeries0]]);
-        series0.points[latestSeries0].setState('hover');
-        if (displayMarker.length <= 1) {
-          series0.points[latestSeries0].setState('');
-        }
-      }
-    };
-
-    // Display tooltip when chart loads
-    if (latestSeries0 > -1 && latestSeries1 > -1) {
-      const pointCount = series0.yData.filter(value => Number.isFinite(value));
-      this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
-      if (pointCount.length <= 1) {
-        const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
-        const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-        const percent = this.seriesData.seriesInfo.percent;
-        let series1Name;
-        if (series1.name === 'c5ma') {
-          series1Name = percent ? 'Annual Chg: ' : 'Annual % Chg: ';
-        }
-        if (series1.name === 'ytd' && this.currentFreq === 'A') {
-          series1Name = percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
-        }
-        if (series1.name === 'ytd' && this.currentFreq !== 'A') {
-          series1Name = percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
-        }
-        const date = Highcharts.dateFormat('%Y', series0.points[latestSeries0].x);
-        let dateLabel;
-        if (this.currentFreq === 'A') {
-          dateLabel = date;
-        }
-        if (this.currentFreq === 'Q') {
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Jan') {
-            dateLabel = 'Q1 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Apr') {
-            dateLabel = 'Q2 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Jul') {
-            dateLabel = 'Q3 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Oct') {
-            dateLabel = 'Q4 ' + date;
-          }
-        }
-        if (this.currentFreq === 'M' || this.currentFreq === 'S') {
-          dateLabel = Highcharts.dateFormat('%b', series0.points[latestSeries0].x) + ' ' + date;
-        }
-        series0.userOptions.states.hover.enabled = false;
-        series0.options.marker.radius = 0;
-        series0.options.marker.states.hover.enabled = false;
-        this.chart.setSubtitle({
-          text: Highcharts.numberFormat(series0.points[latestSeries0].y, decimals) + '<br><br> (' + unitsShort + ') <br>' + series1Name + '<br>' + Highcharts.numberFormat(series1.points[latestSeries1].y, decimals) + '<br>' + dateLabel,
-          verticalAlign: 'middle',
-          y: -20
-        });
         series0.points[latestSeries0].setState('');
       }
+      // If there are no YTD values
+      if (latestSeries0 > -1 && latestSeries1 === -1) {
+        this.chart.tooltip.refresh([series0.points[latestSeries0]]);
+        series0.points[latestSeries0].setState('');
+      }
+    };
+    // Display tooltip when chart loads
+    if (latestSeries0 > -1 && latestSeries1 > -1) {
+      this.chart.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
+      this.checkPointCount(series0, series0.points[latestSeries0], series1.points[latestSeries1], series1);
     }
     // If there are no YTD values
     if (latestSeries0 > -1 && latestSeries1 === -1) {
       this.chart.tooltip.refresh([series0.points[latestSeries0]]);
-      const pointCount = series0.yData.filter(value => Number.isFinite(value));
-      if (pointCount.length <= 1) {
-        const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
-        const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
-        const percent = this.seriesData.seriesInfo.percent;
-        const date = Highcharts.dateFormat('%Y', series0.points[latestSeries0].x);
-        let dateLabel;
-        if (this.currentFreq === 'A') {
-          dateLabel = date;
-        }
-        if (this.currentFreq === 'Q') {
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Jan') {
-            dateLabel = 'Q1 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Apr') {
-            dateLabel = 'Q2 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Jul') {
-            dateLabel = 'Q3 ' + date;
-          }
-          if (Highcharts.dateFormat('%b', series0.points[latestSeries0].x) === 'Oct') {
-            dateLabel = 'Q4 ' + date;
-          }
-        }
-        if (this.currentFreq === 'M' || this.currentFreq === 'S') {
-          dateLabel = Highcharts.dateFormat('%b', series0.points[latestSeries0].x) + ' ' + date;
-        }
-        this.chart.setSubtitle({
-          text: Highcharts.numberFormat(series0.points[latestSeries0].y, decimals) + '<br><br> (' + unitsShort + ') <br>' + dateLabel,
-          verticalAlign: 'middle',
-          y: -20
-        });
-        series0.userOptions.states.hover.enabled = false;
-        series0.options.marker.states.hover.enabled = false;
-        series0.points[latestSeries0].setState('');
-      }
+      this.checkPointCount(series0, series0.points[latestSeries0]);
     }
     // If no data available for a given date range, display series title and display dates where data is available for a series
     if (latestSeries0 === -1 && latestSeries1 === -1) {
+      this.chart.setClassName(undefined);
       const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
       const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
       this.chart.setTitle({ text: '<b>' + this.seriesData.seriesInfo.displayName + '</b>' });
       this.chart.setSubtitle({ text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20 });
+    }
+  }
+
+  checkPointCount(series0, point0, point1?, series1?) {
+    // Fiilter out null values
+    const pointCount = series0.yData.filter(value => Number.isFinite(value));
+    // If only 1 non-null value exists, display data value as text
+    if (pointCount.length === 1) {
+      this.addSubtitle(point0, this.currentFreq, point1, series1);
+      series0.userOptions.states.hover.enabled = false;
+      series0.options.marker.states.hover.enabled = false;
+      point0.setState('');
+    }
+  }
+
+  addSubtitle(point0, freq, point1?, series1?) {
+    const decimals = this.seriesData.seriesInfo.decimals ? this.seriesData.seriesInfo.decimals : 1;
+    const unitsShort = this.seriesData.seriesInfo.unitsLabelShort;
+    const percent = this.seriesData.seriesInfo.percent;
+    const dateLabel = this.formatDateLabel(point0.x, freq);
+    let subtitleText = '';
+    subtitleText += Highcharts.numberFormat(point0.y, decimals) + '<br> (' + unitsShort + ') <br>';
+    subtitleText += series1 ?
+      this.formatTransformLabel(series1.name, percent) + '<br>' + Highcharts.numberFormat(point1.y, decimals) + '<br>' + dateLabel :
+      dateLabel;
+    this.chart.setSubtitle({
+      text: subtitleText,
+      verticalAlign: 'middle',
+      y: -20
+    });
+  }
+
+  formatTransformLabel(transformationName, percent) {
+    if (transformationName === 'c5ma') {
+      return percent ? 'Annual Chg: ' : 'Annual % Chg: ';
+    }
+    if (transformationName === 'ytd' && this.currentFreq === 'A') {
+      return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
+    }
+    if (transformationName === 'ytd' && this.currentFreq !== 'A') {
+      return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
+    }
+  }
+
+  formatDateLabel(date, freq) {
+    const year = Highcharts.dateFormat('%Y', date);
+    if (freq === 'A') {
+      return year;
+    }
+    if (freq === 'Q') {
+      if (Highcharts.dateFormat('%b', date) === 'Jan') {
+        return 'Q1 ' + year;
+      }
+      if (Highcharts.dateFormat('%b', date) === 'Apr') {
+        return 'Q2 ' + year;
+      }
+      if (Highcharts.dateFormat('%b', date) === 'Jul') {
+        return 'Q3 ' + year;
+      }
+      if (Highcharts.dateFormat('%b', date) === 'Oct') {
+        return 'Q4 ' + year;
+      }
+    }
+    if (freq === 'M' || freq === 'S') {
+      return Highcharts.dateFormat('%b', date) + ' ' + year;
     }
   }
 
