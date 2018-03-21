@@ -96,6 +96,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         this.endDate = params['end'];
       }
       this.seriesData = this._series.getSeriesData(seriesId);
+      console.log('single series', this.seriesData);
     });
     this.cdRef.detectChanges();
   }

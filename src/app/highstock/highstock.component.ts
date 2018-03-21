@@ -381,10 +381,10 @@ export class HighstockComponent implements OnChanges {
     let xMin, xMax;
     // Selected level data
     let selectedRange = null;
-    if (chartObject.series[1].points) {
-      selectedRange = chartObject.series[1].points;
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
     }
-    if (!chartObject.series[1].points.length) {
+    if (!chartObject.series[0].points.length) {
       return { min: null, max: null };
     }
     if (selectedRange.length) {

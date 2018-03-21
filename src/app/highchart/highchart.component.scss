@@ -24,6 +24,7 @@
     .highcharts-series-0 {
         .highcharts-graph {
             stroke: $highcharts-series0;
+            stroke-width: 2.5px;
         }
     }
 
@@ -66,6 +67,16 @@
         font-size: 0.9em;
         letter-spacing: 0.05em;
         fill: $primary-text;        
+    }
+
+    .single-point {
+        .highcharts-subtitle {
+            fill: $primary;
+
+            tspan:first-of-type {
+                font-size: 2em;
+            }    
+        }
     }
 
     .highcharts-tooltip {
