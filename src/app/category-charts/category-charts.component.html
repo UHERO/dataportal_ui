@@ -1,6 +1,3 @@
-<!-- <div class="multi-charts-row" *ngIf="!data">
-	<p *ngIf="noSeries" class="no-data">No Data Available</p>
-</div> -->
 <div class="multi-charts-row" *ngIf="data">
 	<ng-template ngIf [ngIf]="noSeries">
 		<p *ngIf="noSeries && (sublist.freqs || sublist.geos)" class="no-data">Data Available for:</p>

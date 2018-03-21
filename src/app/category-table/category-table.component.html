@@ -1,7 +1,20 @@
 <div class="category-tables">
 	<div>
 		<div class="table-row" *ngIf="data">
-			<p *ngIf="noSeries">No Data Available</p>
+			<ng-template ngIf [ngIf]="noSeries">
+				<p *ngIf="noSeries && (sublist.freqs || sublist.geos)" class="no-data">Data Available for:</p>
+				<ul *ngIf="sublist.geos" class="available-geos">
+					<li *ngFor="let geo of sublist.geos">
+						{{geo.shortName}}
+					</li>
+				</ul>
+				<ul *ngIf="sublist.freqs && !sublist.geos" class="available-freqs">
+					<li *ngFor="let freq of sublist.freqs">
+						{{freq.label}}
+					</li>
+				</ul>
+				<p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
+			</ng-template>
 			<div class="table" #tableScroll *ngIf="!noSeries">
 				<table class="category-table">
 					<tr>

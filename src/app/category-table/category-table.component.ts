@@ -18,7 +18,7 @@ declare var $: any;
 export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() data;
-  @Input() subCats;
+  @Input() sublist;
   @Input() freq;
   @Input() dates;
   @Input() noSeries;

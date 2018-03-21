@@ -77,7 +77,7 @@ import { ClipboardService } from './clipboard.service';
     {
       provide: 'logo',
       useValue: {
-        altText: 'UHERO Data Portal',
+        altText: 'UHERO Data Portal Logo',
         displayImg: true,
         headerText: '',
         imgSrc: '../../assets/UHEROdata-Logo-color.svg',

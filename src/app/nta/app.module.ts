@@ -86,7 +86,7 @@ import { ClipboardService } from '../clipboard.service';
     {
       provide: 'logo',
       useValue: {
-        altText: 'NTA Data Portal',
+        altText: 'NTA Data Portal Logo',
         displayImg: true,
         headerText: '',
         imgSrc: '../../assets/nta-logo.svg',
@@ -102,7 +102,7 @@ import { ClipboardService } from '../clipboard.service';
       useValue: {
         universe: 'nta',
         title: 'NTA Data Portal',
-        favicon: '../nta-logo.png',
+        favicon: 'nta-logo.png',
         feedback: false,
         categoryTabs: false // Display subcategory navigation tabs in category chart/table view
       }
