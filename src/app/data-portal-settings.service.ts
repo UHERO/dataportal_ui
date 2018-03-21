@@ -100,8 +100,8 @@ export class DataPortalSettingsService {
     },
     coh: {
       catTable: {
-        portalSource: 'County of Hawaii: http://data.uhero.hawaii.edu/ \n ',
-        portalLink: 'http://data.uhero.hawaii.edu/#/category?id='
+        portalSource: 'County of Hawaii: http://data.uhero.hawaii.edu/coh \n ',
+        portalLink: 'http://data.uhero.hawaii.edu/coh/#/category?id='
       },
       highcharts: {
         seriesTotal: 2,
@@ -116,9 +116,9 @@ export class DataPortalSettingsService {
       highstock: {
         credits: 'data.uhero.hawaii.edu',
         labels: {
-          seriesLink: 'http://data.uhero.hawaii.edu/#/series?id=',
+          seriesLink: 'http://data.uhero.hawaii.edu/coh/#/series?id=',
           portal: 'County of Hawaii',
-          portalLink: 'Data Portal: http://data.uhero.hawaii.edu/'
+          portalLink: 'County of Hawaii Data Portal: http://data.uhero.hawaii.edu/coh'
         },
         series0Name: 'level',
         series0Type: 'line',
