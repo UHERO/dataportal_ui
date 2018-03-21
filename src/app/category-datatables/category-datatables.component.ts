@@ -221,12 +221,12 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
 
   addCategoryYtd(tableData, displaySeries) {
     this.addTransformationLabel(tableData, 'Year-to-Date');
-    this.addCategoryTransformation(displaySeries, 'ytdValue', tableData);    
+    this.addCategoryTransformation(displaySeries, 'ytdValue', tableData);
   }
 
   addAnalyzerC5ma(tableData, analyzerSeries) {
     this.addTransformationLabel(tableData, 'Annual Change');
-    this.addAnalyzerTransformation(analyzerSeries, 'c5maValue', tableData);    
+    this.addAnalyzerTransformation(analyzerSeries, 'c5maValue', tableData);
   }
 
   addCategoryC5ma(tableData, displaySeries) {
