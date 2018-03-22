@@ -17,6 +17,10 @@ const routes: Routes = [
     component: NtaLayoutComponent
   },
   {
+    path: 'search',
+    component: NtaLayoutComponent
+  },
+  {
     path: 'series',
     component: SingleSeriesComponent
   },

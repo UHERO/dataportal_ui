@@ -27,6 +27,18 @@
     position: relative;
     margin-bottom: 20px;
 
+    .no-data {
+      margin-bottom: 0;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+  
+    ul.available-geos, ul.available-freqs {
+      li {
+        font-size: 0.9em;
+      }
+    }  
+
     .table {
       overflow-x: scroll;
       overflow-y: visible;

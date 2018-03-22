@@ -45,7 +45,7 @@
 				</div>
 				<i *ngIf="!sub.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
 				<app-category-table *ngIf="routeView === 'table' && sub.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart"
-				 [tableEnd]="tableEnd" [subCats]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
+				 [tableEnd]="tableEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
 				 [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
 				<app-category-charts *ngIf="routeView !== 'table' && sub.requestComplete" [portalSettings]="portalSettings"
 				 [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq"

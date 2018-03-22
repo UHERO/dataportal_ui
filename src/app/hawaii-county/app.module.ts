@@ -77,7 +77,7 @@ import { ClipboardService } from '../clipboard.service';
     {
       provide: 'logo',
       useValue: {
-        altText: 'County of Hawaii Data Portal',
+        altText: 'County of Hawaii Data Portal Logo',
         displayImg: true,
         headerText: 'County of Hawaii Data Portal',
         imgSrc: '../../assets/hawaii-county-logo-bw.svg',
@@ -93,7 +93,7 @@ import { ClipboardService } from '../clipboard.service';
       useValue: {
         universe: 'coh',
         title: 'County of Hawaii Data Portal',
-        favicon: '../hawaii-county-seal.png',
+        favicon: 'hawaii-county-seal.png',
         feedback: false,
         categoryTabs: false // Display subcategory navigation tabs in category chart/table view
       }

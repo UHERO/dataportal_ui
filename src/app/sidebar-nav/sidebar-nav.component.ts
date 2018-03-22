@@ -122,7 +122,7 @@ export class SidebarNavComponent implements OnInit {
       units: null,
       geography: null
     };
-    this._router.navigate(['/category'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
+    this._router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
 }

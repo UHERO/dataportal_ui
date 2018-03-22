@@ -17,6 +17,10 @@ const routes: Routes = [
     component: LandingPageComponent
   },
   {
+    path: 'search',
+    component: LandingPageComponent
+  },
+  {
     path: 'series',
     component: SingleSeriesComponent
   },
