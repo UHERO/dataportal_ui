@@ -102,11 +102,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   }
 
   // Redraw series when a new measurement is selected
-  redrawSeries(event) {
+  redrawSeries(event, subId) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.m = event.name;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -119,8 +119,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.loading = true;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     });
     this.scrollToFragment();
   }
@@ -129,8 +128,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.loading = true;
     setTimeout(() => {
       this.queryParams.c5ma = e.target.checked;
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -153,8 +151,10 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     }, 10);
   }
 
-  updateRoute() {
+  updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+    this.fragment = subId === 'search' ? null : subId;
+    const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
   }

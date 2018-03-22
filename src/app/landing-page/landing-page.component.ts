@@ -135,8 +135,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     setTimeout(() => {
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -146,8 +145,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -156,8 +154,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.loading = true;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     });
     this.scrollToFragment();
   }
@@ -166,8 +163,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.loading = true;
     setTimeout(() => {
       this.queryParams.yoy = e.target.checked;
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -176,8 +172,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.loading = true;
     setTimeout(() => {
       this.queryParams.ytd = e.target.checked;
-      this.fragment = subId;
-      this.updateRoute();
+      this.updateRoute(subId);
     }, 10);
     this.scrollToFragment();
   }
@@ -187,9 +182,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.tableEnd = e.tableEnd;
     this.chartStart = e.chartStart;
     this.chartEnd = e.chartEnd;
-    // this.queryParams.start = e.start.replace(/\s|-/g, '');
-    // this.queryParams.end = e.end.replace(/\s|-/g, '');
-    // this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
   }
 
   // Work around for srolling to page anchor
@@ -199,9 +191,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     }, 10);
   }
 
-  updateRoute() {
+  updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    this.fragment = subId === 'search' ? null : subId;
+    const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
+    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
   }
 
