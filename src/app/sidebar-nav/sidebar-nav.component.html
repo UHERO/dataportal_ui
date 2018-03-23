@@ -1,6 +1,6 @@
 <nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light">
   <div>
-    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="catNavbar" aria-expanded="false" aria-labal="Toggle Category Menu">
+    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="navbar-side" aria-expanded="false" aria-label="Toggle Category Menu">
       &#9776;
     </button>
     <a class="navbar-brand" routerLink="/">
@@ -13,7 +13,7 @@
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
     <hr class="mobile-divider">
     <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category.id === selectedCategory">
-      <a (click)="navigate(category.id)">&nbsp; {{category.name}} <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fa fa-spinner fa-pulse fa-fw"></i></a>
+      <a (click)="navigate(category.id)">&nbsp; {{category.name}} <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fas fa-spinner fa-pulse fa-fw"></i></a>
     </li>
     <hr class="mobile-divider">
     <li class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"><a routerLink="/help">&nbsp; About</a></li>
