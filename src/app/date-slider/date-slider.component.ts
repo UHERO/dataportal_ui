@@ -2,7 +2,7 @@ import { Component, Input, Inject, OnChanges, AfterViewInit, EventEmitter, Outpu
 import { HelperService } from '../helper.service';
 import 'jquery';
 declare var $: any;
-import 'ion-rangeslider';
+// import 'ion-rangeslider';
 
 @Component({
   selector: 'app-date-slider',

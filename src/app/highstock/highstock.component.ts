@@ -14,12 +14,6 @@ const exporting = require('../../../node_modules/highcharts/js/modules/exporting
 const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ','
-  }
-});
-
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
@@ -266,7 +260,7 @@ export class HighstockComponent implements OnChanges {
           s = s + getFreqLabel(freq.freq, this.x);
           s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
           this.points.forEach((point) => {
-            const displayValue = Highcharts.numberFormat(point.y, decimals);
+            const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
             const seriesNameValue = point.series.name + ': ' + formattedValue;
@@ -326,7 +320,9 @@ export class HighstockComponent implements OnChanges {
       yAxis: [{
         className: 'series2',
         labels: {
-          format: '{value:,.2f}'
+          formatter: function() {
+            return Highcharts.numberFormat(this.value, decimals, '.', ',');
+          }
         },
         title: {
           text: change
@@ -341,7 +337,9 @@ export class HighstockComponent implements OnChanges {
           text: units
         },
         labels: {
-          format: '{value:,.2f}'
+          formatter: function() {
+            return Highcharts.numberFormat(this.value, decimals, '.', ',');
+          }
         },
         gridLineWidth: 0,
         minPadding: 0,

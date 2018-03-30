@@ -8,6 +8,7 @@
 /dist_staging
 /ntaDist_staging
 /cohDist_staging
+/dist-server
 
 # dependencies
 /node_modules
@@ -36,3 +37,5 @@ testem.log
 #System Files
 .DS_Store
 Thumbs.db
+
+dist-server

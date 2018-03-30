@@ -10,12 +10,6 @@ const offlineExport = require('../../../node_modules/highcharts/js/modules/offli
 const exportCSV = require('../csv-export');
 declare var $: any;
 
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ','
-  }
-});
-
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
@@ -79,7 +73,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true) ? true : false;
     chart.addAxis({
       labels: {
-        format: '{value:,.2f}'
+        formatter: function() {
+          return Highcharts.numberFormat(this.value, 2, '.', ',');
+        }
       },
       title: {
         text: seriesUnits
@@ -105,7 +101,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     yAxesGroups.forEach((axis, index) => {
       yAxes.push({
         labels: {
-          format: '{value:,.2f}'
+          formatter: function() {
+            return Highcharts.numberFormat(this.value, 2, '.', ',');
+          }
         },
         id: axis.axisId,
         title: {
@@ -485,7 +483,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     };
     const formatObsValue = function (value: number, decimals: number) {
       // Round observation to specified decimal place
-      const displayValue = Highcharts.numberFormat(value, decimals);
+      const displayValue = Highcharts.numberFormat(value, decimals, '.', ',');
       const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
       return formattedValue;
     };
