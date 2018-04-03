@@ -28,6 +28,7 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit() {
+    console.log('chart', this.sublist)
     this.data.forEach((chartSeries) => {
       if (chartSeries.seriesInfo !== 'No data available') {
         chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);

@@ -9,6 +9,8 @@
 /ntaDist_staging
 /cohDist_staging
 /dist-server
+/nta-dist-server
+/coh-dist-server
 
 # dependencies
 /node_modules

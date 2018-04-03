@@ -96,6 +96,10 @@
         "staging": "environments/environment.staging.ts",
         "prod": "environments/environment.prod.ts",
         "apiDev": "environments/environment.apiDev.ts"
+      },
+      "appShell": {
+        "app": "ngu-nta-shell",
+        "route": "app-shell-path"
       }
     },
     {
@@ -141,6 +145,10 @@
         "staging": "environments/environment.staging.ts",
         "prod": "environments/environment.prod.ts",
         "apiDev": "environments/environment.apiDev.ts"
+      },
+      "appShell": {
+        "app": "ngu-coh-shell",
+        "route": "app-shell-path"
       }
     },
     {
@@ -161,6 +169,96 @@
       "stylePreprocessorOptions": {
         "includePaths": [
           "./assets/uhero"
+        ]
+      },
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
+        "../node_modules/datatables.net-dt/css/jquery.dataTables.css",
+        "../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+        "../node_modules/primeng/resources/primeng.min.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+        "../node_modules/highcharts/css/highcharts.css",
+        "styles.scss"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+        "../node_modules/datatables.net/js/jquery.dataTables.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "staging": "environments/environment.staging.ts",
+        "prod": "environments/environment.prod.ts",
+        "apiDev": "environments/environment.apiDev.ts"
+      },
+      "platform": "server"
+    },
+    {
+      "name": "ngu-nta-shell",
+      "root": "src",
+      "outDir": "dist-nta-server",
+      "assets": [
+        "assets",
+        "nta-logo.png"
+      ],
+      "index": "index.html",
+      "main": "main.server.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.server.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "nta",
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "./assets/nta"
+        ]
+      },
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "../node_modules/primeng/resources/themes/omega/theme.css",
+        "../node_modules/datatables.net-dt/css/jquery.dataTables.css",
+        "../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+        "../node_modules/primeng/resources/primeng.min.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+        "../node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+        "../node_modules/highcharts/css/highcharts.css",
+        "styles.scss"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+        "../node_modules/datatables.net/js/jquery.dataTables.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "staging": "environments/environment.staging.ts",
+        "prod": "environments/environment.prod.ts",
+        "apiDev": "environments/environment.apiDev.ts"
+      },
+      "platform": "server"
+    },
+    {
+      "name": "ngu-coh-shell",
+      "root": "src",
+      "outDir": "dist-coh-server",
+      "assets": [
+        "assets",
+        "hawaii-county-seal.png"
+      ],
+      "index": "index.html",
+      "main": "main.server.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.server.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "coh",
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "./assets/coh"
         ]
       },
       "styles": [

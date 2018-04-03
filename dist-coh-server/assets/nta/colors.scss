@@ -1,0 +1,38 @@
+$black: #000;
+$white: #FFF;
+$blue: #0068B3;
+$green: #008b78;
+$orange: #F6A01B;
+$purple: #8064A2;
+$dark-gray: #505050;
+$gray: #E5E5E5;
+$light-gray: #FAFAFB;
+$series-gray: #9E9E9E;
+
+$primary: $blue;
+$primary-text: $dark-gray;
+$secondary: $green;
+$border: $gray;
+$tooltip: $light-gray;
+
+/* Highcharts */
+$chart-background: $light-gray;
+$highcharts-series0: $blue;
+$highcharts-series1: none;
+$highstock-series0: $blue;
+$highstock-series1: $series-gray;
+
+/* Analyzer Chart */
+$analyzer-series0: $blue;
+$analyzer-series1: $series-gray;
+$analyzer-series2: $orange;
+$analyzer-series3: $green;
+$analyzer-series4: $purple;
+
+$table-gray: rgba(212, 212, 212, 0.2);
+$table-analyze-button: rgb(212, 212, 212);
+
+/* Loading Screen */
+$img-src: '/../../assets/nta-logo.svg';
+
+$bg-src: ''
