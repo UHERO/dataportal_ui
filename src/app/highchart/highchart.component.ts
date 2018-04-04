@@ -2,12 +2,6 @@ import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ','
-  }
-});
-
 @Component({
   selector: 'app-highchart',
   templateUrl: './highchart.component.html',
@@ -165,7 +159,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             // Add year
             s = s + Highcharts.dateFormat('%Y', this.x) + '';
             this.points.forEach((point) => {
-              const displayValue = Highcharts.numberFormat(point.y, decimals);
+              const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
               const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
               const name = getLabelName(point.series.name, dataFreq, percent);
               let label = name + formattedValue;
@@ -335,9 +329,9 @@ export class HighchartComponent implements OnInit, OnChanges {
     const percent = this.seriesData.seriesInfo.percent;
     const dateLabel = this.formatDateLabel(point0.x, freq);
     let subtitleText = '';
-    subtitleText += Highcharts.numberFormat(point0.y, decimals) + '<br> (' + unitsShort + ') <br>';
+    subtitleText += Highcharts.numberFormat(point0.y, decimals, '.', ',') + '<br> (' + unitsShort + ') <br>';
     subtitleText += series1 ?
-      this.formatTransformLabel(series1.name, percent) + '<br>' + Highcharts.numberFormat(point1.y, decimals) + '<br>' + dateLabel :
+      this.formatTransformLabel(series1.name, percent) + '<br>' + Highcharts.numberFormat(point1.y, decimals, '.', ',') + '<br>' + dateLabel :
       dateLabel;
     this.chart.setSubtitle({
       text: subtitleText,

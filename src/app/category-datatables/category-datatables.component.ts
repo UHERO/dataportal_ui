@@ -67,7 +67,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       columns: tableColumns,
       buttons: [{
         extend: 'csv',
-        text: 'Download CSV <i class="fa fa-file-excel-o" aria-hidden="true"></i>',
+        text: 'Download CSV <i class="far fa-file-excel"></i>',
         filename: analyzer ? 'analyzer' : sublistName,
         customize: function (csv) {
           return analyzer ? portalSettings.catTable.portalSource + '\n\n' + csv :

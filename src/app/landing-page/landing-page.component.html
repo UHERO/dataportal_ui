@@ -3,7 +3,7 @@
 		<h2 class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fa fa-spinner fa-pulse fa-fw"></i>
+		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<ng-template ngFor let-sub [ngForOf]="data.subcategories" let-i="index">
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
 				<ul class="content-links" *ngIf="data.subcategories.length > 1" [attr.id]="'id_' + sub.id">
@@ -43,7 +43,7 @@
 					 [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates"
 					 [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
 				</div>
-				<i *ngIf="!sub.requestComplete || loading" class="fa fa-spinner fa-pulse fa-fw"></i>
+				<i *ngIf="!sub.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
 				<app-category-table *ngIf="routeView === 'table' && sub.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart"
 				 [tableEnd]="tableEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
 				 [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>

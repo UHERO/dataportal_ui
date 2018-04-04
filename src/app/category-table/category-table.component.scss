@@ -67,12 +67,14 @@
           padding: 0.4em;
           border: 1px solid $border;
           &:empty:after {
-            content: "\00a0";
+            content: " ";
+            white-space: pre;
           }
         }
 
         td:empty:after {
-          content: "\00a0";
+          content: " ";
+          white-space: pre;
         }
 
         th {

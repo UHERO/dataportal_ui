@@ -16,11 +16,6 @@ export function highchartsFactory() {
   exp(highcharts);
   offlineExport(highcharts);
   csv(highcharts);
-  highcharts.setOptions({
-    lang: {
-      thousandsSep: ','
-    }
-  });
   return (highcharts);
 }
 import { Shared } from './shared/shared.module';
@@ -37,6 +32,7 @@ import { AnalyzerService } from './analyzer.service';
 import { TableHelperService } from './table-helper.service';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 import { ClipboardService } from './clipboard.service';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -45,11 +41,12 @@ import { ClipboardService } from './clipboard.service';
   imports: [
     Shared,
     routing,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     ChartModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule
+    HttpModule,
+    RouterModule
   ],
   entryComponents: [
     UheroHelpComponent
