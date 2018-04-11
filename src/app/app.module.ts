@@ -96,6 +96,12 @@ import { RouterModule } from '@angular/router';
       }
     },
     {
+      provide: 'navigation',
+      useValue: {
+        subcategories: false
+      }
+    },
+    {
       provide: 'GoogleAnalyticsId',
       useValue: 'UA-18074519-3'
     }

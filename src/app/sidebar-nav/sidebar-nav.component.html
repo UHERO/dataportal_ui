@@ -15,15 +15,15 @@
     <hr class="mobile-divider">
     <ng-template ngFor let-category [ngForOf]="categories" let-cat="index">
       <li class="list-item" [class.selectedCategory]="category.id === selectedCategory">
-        <a (click)="navigate(category.id)" [class.collapsibleMenu]="navSettings.subcategories">
-          <ng-template ngIf [ngIf]="category.id === selectedCategory">
+        <a (click)="navigate(category.id)">
+          <ng-template ngIf [ngIf]="category.id === selectedCategory && navSettings.subcategories">
             <i (click)="toggleExpand($event)" data-toggle="collapse" href="#submenu" class="fas expand-icon" [class.fa-chevron-down]="expand" [class.fa-chevron-right]="!expand"></i>
           </ng-template>
           &nbsp; {{category.name}}
           <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fas fa-spinner fa-pulse fa-fw"></i>
         </a>
       </li>
-      <div *ngIf="category.id === selectedCategory" class="submenu collapse" [class.show]="expand" id="submenu">
+      <div *ngIf="category.id === selectedCategory && navSettings.subcategories" class="submenu collapse" [class.show]="expand" id="submenu">
         <ng-template ngFor let-data [ngForOf]="packageCatData | async">
           <ng-template ngFor let-sub [ngForOf]="data.subcategories" let-subInd="index">
             <li class="list-item" [class.selected-subcat]="sub.id === fragment" *ngIf="sub.parentId === category.id">
