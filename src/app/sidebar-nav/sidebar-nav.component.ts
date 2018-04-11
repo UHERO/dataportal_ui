@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
+import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'app-sidebar-nav',
@@ -11,7 +12,6 @@ import { UheroApiService } from '../uhero-api.service';
 export class SidebarNavComponent implements OnInit {
   public categories;
   private errorMessage: string;
-  public expand: string = null;
   public reveal = false;
   public overlay = false;
   public selectedCategory: any;
@@ -19,14 +19,19 @@ export class SidebarNavComponent implements OnInit {
   private view: string;
   private yoy: string;
   private ytd: string;
+  private fragment;
   private loading;
   public headerLogo;
   analyzerSeries;
   private defaultCategory;
+  private packageCatData;
+  private expand = true;
 
   constructor(
     @Inject('logo') private logo,
+    @Inject('navigation') private navSettings,
     private _uheroAPIService: UheroApiService,
+    private _helperService: HelperService,
     private _analyzerService: AnalyzerService,
     private route: ActivatedRoute,
     private _router: Router
@@ -41,14 +46,14 @@ export class SidebarNavComponent implements OnInit {
       },
       () => {
         this.defaultCategory = this.categories[0].id;
+        this.route.queryParams.subscribe((params) => {
+          this.id = params['id'];
+          this.view = params['view'] ? params['view'] : 'chart';
+          this.yoy = params['yoy'] ? params['yoy'] : 'false';
+          this.ytd = params['ytd'] ? params['ytd'] : 'false';
+          this.selectedCategory = this.findSelectedCategory(this.id);
+        });    
       });
-    this.route.queryParams.subscribe((params) => {
-      this.id = params['id'];
-      this.view = params['view'] ? params['view'] : 'chart';
-      this.yoy = params['yoy'] ? params['yoy'] : 'false';
-      this.ytd = params['ytd'] ? params['ytd'] : 'false';
-      this.selectedCategory = this.findSelectedCategory(this.id);
-    });
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const helpUrl = event.url === '/help';
@@ -56,6 +61,12 @@ export class SidebarNavComponent implements OnInit {
         this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
       }
     });
+    this._helperService.getCatData().subscribe(data => {
+      this.packageCatData = data;
+    });
+    this.route.fragment.subscribe((frag) => {
+      this.fragment = frag;
+    })
     this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
   }
@@ -82,7 +93,7 @@ export class SidebarNavComponent implements OnInit {
     return this.findSelectedCategory(id);
   }
 
-  navigate(catId) {
+  navigate(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
     const popover = $('.popover');
     if (popover) {
@@ -101,7 +112,7 @@ export class SidebarNavComponent implements OnInit {
         units: null,
         geography: null
       };
-      this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
+      this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: subId });
       this.loading = false;
     }, 15);
   }
@@ -109,6 +120,11 @@ export class SidebarNavComponent implements OnInit {
   mobileMenuToggle(): void {
     this.reveal = this.reveal === false ? true : false;
     this.overlay = this.overlay === false ? true : false;
+  }
+
+  toggleExpand(event) {
+    this.expand = this.expand ? false : true;
+    event.stopImmediatePropagation();
   }
 
   onSearch(event) {

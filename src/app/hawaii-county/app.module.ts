@@ -99,6 +99,12 @@ import { ClipboardService } from '../clipboard.service';
       }
     },
     {
+      provide: 'navigation',
+      useValue: {
+        subcategories: true
+      }
+    },
+    {
       provide: 'GoogleAnalyticsId',
       useValue: 'UA-18074519-5'
     }

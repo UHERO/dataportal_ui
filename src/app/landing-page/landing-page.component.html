@@ -14,9 +14,9 @@
 				<hr class="sublist-separator" *ngIf="data.subcategories.length > 1">
 			</ng-template>
 			<ng-template ngIf [ngIf]="!portal.categoryTabs">
-				<p class="category-header" *ngIf="sub.isHeader">{{sub.name}}</p>
+				<p class="category-header" *ngIf="sub.isHeader" [attr.id]="'id_' + sub.id">{{sub.name}}</p>
 				<hr class="sublist-separator" *ngIf="data.subcategories.length > 1 && sub.isHeader">
-				<p class="subcategory-header" *ngIf="!sub.isHeader">{{sub.name}}</p>
+				<p class="subcategory-header" *ngIf="!sub.isHeader" [attr.id]="'id_' + sub.id">{{sub.name}}</p>
 			</ng-template>
 			<ng-template ngIf [ngIf]="!sub.isHeader">
 				<div class="filters" *ngIf="sub.requestComplete">
