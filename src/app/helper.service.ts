@@ -2,11 +2,21 @@
 
 import { Injectable } from '@angular/core';
 import { DateWrapper } from './date-wrapper';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class HelperService {
+  private categoryData = new Subject();
 
   constructor() { }
+
+  getCatData() {
+    return this.categoryData;
+  }
+
+  updateCatData(data) {
+    this.categoryData.next(data)
+  }
 
   createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     let startYear = +dateStart.substr(0, 4);

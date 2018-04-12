@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -8,8 +8,8 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
 import 'jquery';
+import { HelperService } from '../helper.service';
 declare var $: any;
-
 
 @Component({
   selector: 'app-landing-page',
@@ -49,6 +49,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     private _uheroAPIService: UheroApiService,
     private _dataPortalSettings: DataPortalSettingsService,
     private _catHelper: CategoryHelperService,
+    private _helperService: HelperService,
     private route: ActivatedRoute,
     private _router: Router,
     private cdRef: ChangeDetectorRef
@@ -78,6 +79,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
+      this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });

@@ -57,6 +57,10 @@
   .navbar-side {
     padding-left: 0px;
 
+    .submenu {
+      background-color: $gray;
+    }
+
     .mobile-logo {
       display: block;
       max-height: 55px;
@@ -102,7 +106,7 @@
     }
     
     @media (min-width: 768px) {
-      width: fit-content;
+      width: 230px;
 
       .mobile-divider, .mobile-logo {
         display: none;
@@ -142,12 +146,11 @@
     color: $primary-text;
     font-size: 0.9em;
     cursor: pointer;
-    white-space: nowrap;
   }
 
   .list-item {
     @media (min-width: 768px) {
-      height: 35px;
+      white-space: normal;
       padding: 0 15px 0 5px;
     }
 
@@ -163,8 +166,16 @@
       }
     }
 
+    a.submenu-item {
+      padding-left: 25px;
+
+      &.nav-indent {
+        padding-left: 40px;
+      }
+    }
+
     &:hover {
-      background-color: $gray;
+      background-color: $hover-gray;
       color: $white;
     }
   }

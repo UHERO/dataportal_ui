@@ -1,6 +1,7 @@
 <nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light">
   <div>
-    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="navbar-side" aria-expanded="false" aria-label="Toggle Category Menu">
+    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse" aria-controls="navbar-side"
+      aria-expanded="false" aria-label="Toggle Category Menu">
       &#9776;
     </button>
     <a class="navbar-brand" routerLink="/">
@@ -12,13 +13,34 @@
     <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
     <hr class="mobile-divider">
-    <li class="list-item" *ngFor="let category of categories, let cat = index" [class.selectedCategory]="category.id === selectedCategory">
-      <a (click)="navigate(category.id)">&nbsp; {{category.name}} <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fas fa-spinner fa-pulse fa-fw"></i></a>
-    </li>
+    <ng-template ngFor let-category [ngForOf]="categories" let-cat="index">
+      <li class="list-item" [class.selectedCategory]="category.id === selectedCategory">
+        <a (click)="navigate(category.id)">
+          <ng-template ngIf [ngIf]="category.id === selectedCategory && navSettings.subcategories">
+            <i (click)="toggleExpand($event)" data-toggle="collapse" href="#submenu" class="fas expand-icon" [class.fa-chevron-down]="expand" [class.fa-chevron-right]="!expand"></i>
+          </ng-template>
+          &nbsp; {{category.name}}
+          <i [id]="category.id" *ngIf="loading && category.id === selectedCategory" class="fas fa-spinner fa-pulse fa-fw"></i>
+        </a>
+      </li>
+      <div *ngIf="category.id === selectedCategory && navSettings.subcategories" class="submenu collapse" [class.show]="expand" id="submenu">
+        <ng-template ngFor let-data [ngForOf]="packageCatData | async">
+          <ng-template ngFor let-sub [ngForOf]="data.subcategories" let-subInd="index">
+            <li class="list-item" [class.selected-subcat]="sub.id === fragment" *ngIf="sub.parentId === category.id">
+              <a (click)="navigate(category.id, sub.id)" class="submenu-item" [class.nav-indent]="sub.navIndent">{{sub.name}}</a>
+            </li>
+          </ng-template>
+        </ng-template>
+      </div>
+    </ng-template>
     <hr class="mobile-divider">
-    <li class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"><a routerLink="/help">&nbsp; About</a></li>
+    <li class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'">
+      <a routerLink="/help">&nbsp; About</a>
+    </li>
     <hr>
-    <li class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'"><a routerLink="/analyzer" *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a></li>
+    <li class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'">
+      <a routerLink="/analyzer" *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a>
+    </li>
   </ul>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>

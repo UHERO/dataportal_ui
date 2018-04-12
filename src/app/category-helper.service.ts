@@ -102,7 +102,13 @@ export class CategoryHelperService {
       const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
       // Merge subcats with original list of categories from /category response
       const sublistCopy = [];
+      let navIndent = false;
       subcats.forEach((sub) => {
+        // Indent subcategory in sidebar navigation if category follows a header
+        navIndent = !navIndent ? sub.isHeader : navIndent;
+        if (navIndent) {
+          sub.navIndent = !sub.isHeader ? true : false;
+        }
         const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
         sublistCopy.push(Object.assign({}, sub, subMatch));
       });
