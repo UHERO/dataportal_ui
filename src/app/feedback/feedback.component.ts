@@ -43,7 +43,7 @@ export class FeedbackComponent implements OnInit {
     feedback.data.email = this.feedbackForm.value.email;
     feedback.data.feedback = this.feedbackForm.value.feedback;
     feedback['g-recaptcha-response'] = this.feedbackForm.value.captcha;
-    return this.http.post('http://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs)
+    return this.http.post('https://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs)
       .map((res: Response) => res.json())
       .subscribe(
       data => this.successMsg = 'Submission successful.',
