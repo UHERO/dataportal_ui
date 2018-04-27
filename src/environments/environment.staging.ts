@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://uhero-bamboo.colo.hawaii.edu:3030/v1',
-  portalUrl: 'http://uhero-bamboo.colo.hawaii.edu:3060/#'
+  apiUrl: 'https://stage-api.uhero.hawaii.edu/v1',
+  portalUrl: 'https://stage-data.uhero.hawaii.edu/#'
 };
