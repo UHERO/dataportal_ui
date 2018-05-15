@@ -33,6 +33,8 @@ import { TableHelperService } from './table-helper.service';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 import { ClipboardService } from './clipboard.service';
 import { RouterModule } from '@angular/router';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { RouterModule } from '@angular/router';
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
-    RouterModule
+    RouterModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
     UheroHelpComponent
