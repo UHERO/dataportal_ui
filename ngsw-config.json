@@ -9,6 +9,10 @@
         "/index.html",
         "/*.css",
         "/*.js"
+      ],
+      "urls": [
+        "https://use.fontawesome.com/releases/v5.0.9/css/all.css",
+        "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
       ]
     }
   }, {
@@ -19,6 +23,16 @@
       "files": [
         "/assets/**"
       ]
+    }
+  }],
+  "dataGroups": [{
+    "name": "api",
+    "urls": [
+      "https://api.uhero.hawaii.edu/**"
+    ],
+    "cacheConfig": {
+      "maxSize": 100,
+      "maxAge": "1d"
     }
   }]
 }
