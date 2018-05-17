@@ -23,4 +23,6 @@ before_script:
 - npm install
 
 script: 
-- karma start karma.conf.js --single-run
+- ng test uhero --karma-config karma.conf.js --watch=false
+- ng test nta --karma-config karma.conf.js --watch=false
+- ng test coh --karma-config karma.conf.js --watch=false

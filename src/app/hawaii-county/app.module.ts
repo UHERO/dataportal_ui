@@ -37,6 +37,8 @@ import { TableHelperService } from '../table-helper.service';
 import { AppComponent } from '../app.component';
 import { CohHelpComponent } from '../coh-help/coh-help.component';
 import { ClipboardService } from '../clipboard.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../../environments/environment';
 
 @NgModule({
   declarations: [
@@ -49,7 +51,8 @@ import { ClipboardService } from '../clipboard.service';
     ChartModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule
+    HttpModule,
+    ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
     CohHelpComponent
