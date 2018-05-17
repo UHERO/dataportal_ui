@@ -62,7 +62,7 @@ import { environment } from '../../environments/environment';
     HttpModule,
     DataTableModule,
     SharedModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
     NtaHelpComponent
