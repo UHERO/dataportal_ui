@@ -28,7 +28,8 @@
   "dataGroups": [{
     "name": "api",
     "urls": [
-      "https://api.uhero.hawaii.edu/**"
+      "https://api.uhero.hawaii.edu/**",
+      "https://stage-api.uhero.hawaii.edu/**"
     ],
     "cacheConfig": {
       "maxSize": 100,
