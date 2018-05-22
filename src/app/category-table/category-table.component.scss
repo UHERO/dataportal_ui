@@ -24,9 +24,6 @@
 
   // Freeze first column
   .table-row {
-    position: relative;
-    margin-bottom: 20px;
-
     .no-data {
       margin-bottom: 0;
       margin-top: 10px;
@@ -40,56 +37,11 @@
     }  
 
     .table {
-      overflow-x: scroll;
-      overflow-y: visible;
-      width: 68%;
-      margin-left: 32%;
       margin-bottom: 40px;
-      /* Add gradient to scrollable content, based on: http://www.the-haystack.com/2013/09/24/responsive-scrollable-tables/ */
-      background-image: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to left, #ffffff, rgba(255, 255, 255, 0)), linear-gradient(to right, #E4E4E4, rgba(195, 195, 197, 0)), linear-gradient(to left, #E4E4E4, rgba(195, 195, 197, 0));
-      background-position: 0 0, 100% 0, 0 0, 100% 0;
-      background-repeat: no-repeat;
-      background-color: white;
-      background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;
-      background-attachment: local, local, scroll, scroll;
 
-
-      .category-table {
-        table-layout: fixed;
-        width: 100%;
-        *margin-left: -32%;
-
-        td, th {
-          vertical-align: top;
-          width: 125px;
-          text-align: right;
-          font-size: 0.8em;
-          padding: 0.4em;
-          border: 1px solid $border;
-          &:empty:after {
-            content: " ";
-            white-space: pre;
-          }
-        }
-
-        td:empty:after {
-          content: " ";
-          white-space: pre;
-        }
-
+      table {
         th {
-          position: absolute;
-          *position: relative;
-          left: 0;
-          width: 32%;
-          white-space: nowrap;
           border-right: 1px solid $border;
-          text-align: left;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          font-size: 0.8em;
-          font-weight: normal;
-          border-bottom: 0;
 
           .th-buttons {
             // display: inline-block;
@@ -136,14 +88,7 @@
         }
 
         .empty-header {
-          border: none;
           border-right: 1px solid $border;
-        }
-
-        tr:last-child {
-          th {
-            border: 1px solid $border;
-          }
         }
 
         .indent1 {
@@ -183,12 +128,6 @@
         }
 
         tr:nth-child(even) {
-          background-color: $table-gray;
-
-          td:first-child, th:first-child {
-            background: $table-gray;
-          }
-
           .th-buttons {
             .analyze-button {
               color: rgba(240, 240, 240, 0.6);
