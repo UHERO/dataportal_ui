@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { ClipboardService } from '../clipboard.service';
@@ -37,12 +37,14 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   shareLink;
 
   constructor(
+    @Inject('portal') private portal,
     private route: ActivatedRoute,
     private _router: Router,
     private clipboard: ClipboardService,
     private _analyzer: AnalyzerService
   ) {
-    this.baseUrl = environment['portalUrl'];
+    const portalName = this.portal.universe;
+    this.baseUrl = environment['portalUrl'][this.portal.universe];
   }
 
   ngOnInit() {
