@@ -19,31 +19,38 @@ export class HelperService {
   }
 
   createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    let startYear = +dateStart.substr(0, 4);
-    const endYear = +dateEnd.substr(0, 4);
-    let startMonth = +dateStart.substr(5, 2);
-    const endMonth = +dateEnd.substr(5, 2);
-    const m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
-    const q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-    while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+    const start = new Date(dateStart.replace(/-/g, '\/'));
+    const end = new Date(dateEnd.replace(/-/g, '\/'))
+    if (currentFreq === 'A') {
+      return this.addToDateArray(start, end, dateArray, currentFreq);
+    }
+    if (currentFreq === 'S') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 6);
+    }
+    if (currentFreq === 'Q') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 3);
+    }
+    if (currentFreq === 'M') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 1);
+    }
+    return dateArray;
+  }
+
+  addToDateArray(start: Date, end: Date, dateArray: Array<any>, currentFreq: string, monthIncrease?: number) {
+    while (start <= end) {
+      const month = start.toISOString().substr(5, 2);
+      const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
+      const tableDate = currentFreq === 'A' ?
+        start.toISOString().substr(0, 4) :
+        (currentFreq === 'S' || currentFreq === 'M') ?
+        start.toISOString().substr(0, 7) :
+        start.toISOString().substr(0, 4) + ' ' + q;
+      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate: tableDate });
       if (currentFreq === 'A') {
-        dateArray.push({ date: startYear.toString() + '-01-01', tableDate: startYear.toString() });
-        startYear += 1;
+        start.setFullYear(start.getFullYear() + 1);
       }
-      if (currentFreq === 'S') {
-        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
-        startYear = startMonth === 7 ? startYear += 1 : startYear;
-        startMonth = startMonth === 1 ? 7 : 1;
-      }
-      if (currentFreq === 'M') {
-        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + '-' + m[startMonth] });
-        startYear = startMonth === 12 ? startYear += 1 : startYear;
-        startMonth = startMonth === 12 ? 1 : startMonth += 1;
-      }
-      if (currentFreq === 'Q') {
-        dateArray.push({ date: startYear.toString() + '-' + m[startMonth] + '-01', tableDate: startYear.toString() + ' ' + q[startMonth] });
-        startYear = startMonth === 10 ? startYear += 1 : startYear;
-        startMonth = startMonth === 10 ? startMonth = 1 : startMonth += 3;
+      if (currentFreq !== 'A') {
+        start.setMonth(start.getMonth() + monthIncrease);
       }
     }
     return dateArray;

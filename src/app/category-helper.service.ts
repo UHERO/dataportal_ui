@@ -98,6 +98,7 @@ export class CategoryHelperService {
 
   getData(catId: any, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
+      console.log('categoryData', categoryData);
       this.categoryData[cacheId].results = categoryData;
       const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
       // Merge subcats with original list of categories from /category response
@@ -167,6 +168,7 @@ export class CategoryHelperService {
           sub.noData = false;
           this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
+          console.log('sub', sub)
         }
         if (!displaySeries) {
           this.setNoData(sub);
@@ -303,24 +305,22 @@ export class CategoryHelperService {
   }
 
   filterSeriesResults(results: Array<any>, freq: string) {
-    const filtered = [];
-    results.forEach((res) => {
-      let seriesDates = [], series;
-      const seriesObsStart = res.seriesObservations.observationStart;
-      const seriesObsEnd = res.seriesObservations.observationEnd;
+    const filtered = results.map((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
-      const decimals = res.decimals ? res.decimals : 1;
-      // Add series if level data is available
       if (levelData) {
+        let seriesDates = [], series;
+        const seriesObsStart = res.seriesObservations.observationStart;
+        const seriesObsEnd = res.seriesObservations.observationEnd;
+        const decimals = res.decimals ? res.decimals : 1;
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
         series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;
-        filtered.push(series);
+        return series;
       }
     });
-    return filtered;
+    return filtered
   }
 
   getDisplaySeries(allSeries, freq: string) {
@@ -353,10 +353,6 @@ export class CategoryHelperService {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
         const observations = series.seriesInfo.seriesObservations;
-        const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-        const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-        const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-        const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
         series['categoryTable'] = this._helper.createSeriesTable(dateArray, observations, decimals);
         series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
