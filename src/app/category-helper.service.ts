@@ -294,11 +294,11 @@ export class CategoryHelperService {
   getSearchDates(displaySeries) {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     displaySeries.forEach((series) => {
-      if (series.start < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-        categoryDateWrapper.firstDate = series.start;
+      if (series.seriesInfo.seriesObservations.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+        categoryDateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
       }
-      if (series.end > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-        categoryDateWrapper.endDate = series.end;
+      if (series.seriesInfo.seriesObservations.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+        categoryDateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
       }
     });
     return categoryDateWrapper;
@@ -308,12 +308,12 @@ export class CategoryHelperService {
     const filtered = results.map((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
       if (levelData) {
-        let seriesDates = [], series;
+        let seriesDates = [], series = {seriesInfo: {displayName: ''}} ;
         const seriesObsStart = res.seriesObservations.observationStart;
         const seriesObsEnd = res.seriesObservations.observationEnd;
         const decimals = res.decimals ? res.decimals : 1;
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
+        // series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;
@@ -353,8 +353,9 @@ export class CategoryHelperService {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
         const observations = series.seriesInfo.seriesObservations;
-        series['categoryTable'] = this._helper.createSeriesTable(dateArray, observations, decimals);
-        series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
+        // const transformations = this._helper.getTransformations(observations);
+        // series['categoryTable'] = this._helper.createSeriesTable(dateArray, transformations, decimals);
+        series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
   }

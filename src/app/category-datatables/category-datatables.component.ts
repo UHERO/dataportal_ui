@@ -136,7 +136,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         if (series.seriesInfo !== 'No data available') {
           const observations = {};
           const title = series.seriesInfo.displayName;
-          series.categoryTable.forEach((obs) => {
+          series.categoryDisplay.tableData.forEach((obs) => {
             observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
           });
           tableData.push({
@@ -178,7 +178,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       const percent = series.seriesInfo.percent;
       const transformLabel = percent ? ' (ch)' : ' (%)';
       const title = series.seriesInfo.displayName;
-      series.categoryTable.forEach((obs) => {
+      series.categoryDisplay.tableData.forEach((obs) => {
         transformation[obs.tableDate] = obs[transformValue] === Infinity ? null : obs[transformValue];
       });
       tableData.push({

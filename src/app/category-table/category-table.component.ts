@@ -54,7 +54,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
 
   ngOnChanges() {
     if (this.dates) {
-      const defaultRanges = this._helper.setDefaultTableRange(this.freq, this.dates, this.defaultRange);
+      const defaultRanges = this._helper.setDefaultCategoryRange(this.freq, this.dates, this.defaultRange);
       let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers
@@ -71,7 +71,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
       if (this.data) {
         this.data.forEach((series) => {
           if (series.seriesInfo !== 'No data available') {
-            series.trimCatTable = series.categoryTable.slice(start, end + 1);
+            series.trimCatTable = series.categoryDisplay.tableData.slice(start, end + 1);
           }
         });
       }

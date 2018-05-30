@@ -33,7 +33,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngOnInit() {
-    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.chartData.level.length === 0) {
+    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.categoryDisplay.chartData.level.length === 0) {
       this.noDataChart(this.seriesData);
     } else {
       this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
@@ -44,17 +44,39 @@ export class HighchartComponent implements OnInit, OnChanges {
     this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
   }
 
+  getSeriesStartAndEnd(dates, start, end) {
+    const defaultRanges = this._helper.setDefaultCategoryRange(this.currentFreq, dates, this.defaultRange);
+    let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+    dates.forEach((item, index) => {
+      if (item.date === start) {
+        startIndex = index;
+      }
+      if (item.date === end) {
+        endIndex = index;
+      }
+    });
+    return { start: startIndex, end: endIndex };
+  }
+
   drawChart(seriesData, currentFreq, portalSettings, min, max, start?, end?) {
-    let series0 = seriesData.categoryChart.chartData[portalSettings.highcharts.series0Name];
-    let series1 = seriesData.categoryChart.chartData[portalSettings.highcharts.series1Name];
-    series0 = series0 ? this.trimData(series0, start, end) : null;
-    series1 = series1 ? this.trimData(series1, start, end) : null;
+    const dates = seriesData.categoryDisplay.chartData.dates;
+    const seriesRange = this.getSeriesStartAndEnd(dates, start, end);
+    const seriesStart = seriesRange.start;
+    const seriesEnd = seriesRange.end;
+    let series0 = seriesData.categoryDisplay.chartData[portalSettings.highcharts.series0Name];
+    let series1 = seriesData.categoryDisplay.chartData[portalSettings.highcharts.series1Name];
+    series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
+    series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
+    let startDate;
+    if (!start) {
+      startDate = dates[seriesStart].date;
+    }
     // Check how many non-null points exist in level series
-    const pointCount = series0.map(x => x[1]).filter(value => Number.isFinite(value));
+    const pointCount = series0.filter(value => Number.isFinite(value));
     const chartSeries = [];
     const minValue = min;
     const maxValue = max;
-    const pseudoZones = seriesData.categoryChart.chartData.pseudoZones;
+    const pseudoZones = seriesData.categoryDisplay.chartData.pseudoZones;
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     const percent = seriesData.seriesInfo.percent;
     const title = seriesData.seriesInfo.displayName;
@@ -65,6 +87,9 @@ export class HighchartComponent implements OnInit, OnChanges {
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
       data: series0,
+      pointInterval: currentFreq === 'Q' ? 3 : 1,
+      pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
+      pointStart: start ? Date.parse(start) : Date.parse(startDate),
       states: {
         hover: {
           lineWidth: 2
@@ -82,6 +107,9 @@ export class HighchartComponent implements OnInit, OnChanges {
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
         data: series1,
+        pointInterval: currentFreq === 'Q' ? 3 : 1,
+        pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
+        pointStart: start ? Date.parse(start) : Date.parse(startDate),
         dataGrouping: {
           enabled: false
         },
@@ -304,8 +332,8 @@ export class HighchartComponent implements OnInit, OnChanges {
     // If no data available for a given date range, display series title and display dates where data is available for a series
     if (latestSeries0 === -1 && latestSeries1 === -1) {
       this.chart.setClassName(undefined);
-      const start = this._helper.formatDate(this.seriesData.start, this.seriesData.seriesInfo.frequencyShort);
-      const end = this._helper.formatDate(this.seriesData.end, this.seriesData.seriesInfo.frequencyShort);
+      const start = this._helper.formatDate(this.seriesData.categoryDisplay.start, this.seriesData.seriesInfo.frequencyShort);
+      const end = this._helper.formatDate(this.seriesData.categoryDisplay.end, this.seriesData.seriesInfo.frequencyShort);
       this.chart.setTitle({ text: '<b>' + this.seriesData.seriesInfo.displayName + '</b>' });
       this.chart.setSubtitle({ text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20 });
     }
@@ -377,7 +405,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   }
 
   trimData(dataArray, start, end) {
-    const defaultRanges = this._helper.setDefaultChartRange(this.currentFreq, dataArray, this.defaultRange);
+    const defaultRanges = this._helper.setDefaultCategoryRange(this.currentFreq, dataArray, this.defaultRange);
     let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
     dataArray.forEach((item, index) => {
       if (item[0] === start) {

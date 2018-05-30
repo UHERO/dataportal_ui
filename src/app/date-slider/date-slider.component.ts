@@ -92,17 +92,17 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
     let date;
     if (freq === 'A') {
       date = value.toString() + '-01-01';
-      return Date.parse(date);
+      return date;
     }
     if (freq === 'Q') {
       const year = value.substr(0, 4);
       const q = value.substr(5, 2);
       date = value.substr(0, 4) + '-' + quarters[q] + '-01';
-      return Date.parse(date);
+      return date;
     }
     if (freq === 'M') {
       date = value + '-01';
-      return Date.parse(date);
+      return date;
     }
   }
 }

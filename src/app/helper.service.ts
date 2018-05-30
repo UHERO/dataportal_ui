@@ -56,73 +56,107 @@ export class HelperService {
     return dateArray;
   }
 
+  getTransformations(observations) {
+    const level = [];
+    const yoy = [];
+    const ytd = [];
+    const c5ma = [];
+    observations.transformationResults.forEach((obj) => {
+      if (obj.transformation === 'lvl') {
+        level.push(obj);
+      }
+      if (obj.transformation === 'pc1') {
+        yoy.push(obj);
+      }
+      if (obj.transformation === 'ytd') {
+        ytd.push(obj);
+      }
+      if (obj.transformation === 'c5ma') {
+        c5ma.push(obj);
+      }
+    });
+    return { level: level, yoy: yoy, ytd: ytd, c5ma: c5ma };
+  }
+
   dataTransform(seriesObs, dates, decimals) {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+    const transformations = this.getTransformations(observations);
+    const level = transformations.level;
+    const yoy = transformations.yoy;
+    const ytd = transformations.ytd;
+    const c5ma = transformations.c5ma;
     const pseudoZones = [];
-    if (level.pseudoHistory) {
-      level.pseudoHistory.forEach((obs, index) => {
-        if (obs && !level.pseudoHistory[index + 1]) {
-          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+    if (level[0].pseudoHistory) {
+      level[0].pseudoHistory.forEach((obs, index) => {
+        if (obs && !level[0].pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level[0].dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
         }
       });
     }
-    const seriesTable = this.createSeriesTable(dates, observations, decimals);
-    const chart = this.createSeriesChart(dates, observations);
-    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma };
+    const combineData = this.getChartAndTable(dates, transformations, decimals);
+    const chart = combineData.chart;
+    const seriesTable = combineData.table;
+    // const seriesTable = this.createSeriesTable(dates, observations, decimals);
+    // const chart = this.createSeriesChart(dates, observations);
+    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
     const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
     return results;
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
-    const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
+    const tableEntry = valueArray[0].dates.findIndex(obs => obs === date.date || obs === date.tableDate);
     if (tableEntry > -1) {
-      tableObj[value] = +valueArray.values[tableEntry];
-      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+      tableObj[value] = +valueArray[0].values[tableEntry];
+      tableObj[formattedValue] = this.formattedValue(valueArray[0].values[tableEntry], decimals);
     }
   }
 
   formatHighchartData(dateRange, seriesData) {
     const dataArray = dateRange.map((date) => {
-      const obj = [Date.parse(date.date)];
-      const dateIndex = seriesData.dates.findIndex(obs => obs === date.date);
-      obj[1] = dateIndex > -1 ? +seriesData.values[dateIndex] : null;
-      return obj;
+      const dateIndex = seriesData[0].dates.findIndex(obs => obs === date.date);
+      return dateIndex > -1 ? +seriesData[0].values[dateIndex] : null;
     });
     return dataArray;
   }
 
-  createSeriesChart(dateRange, observations) {
-    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+  getChartAndTable(dateRange: Array<any>, transformations, decimals: number) {
+    const level = transformations.level;
+    const yoy = transformations.yoy;
+    const ytd = transformations.ytd;
+    const c5ma = transformations.c5ma;
+    const chart = this.createSeriesChart(dateRange, transformations);
+    const table = this.createSeriesTable(dateRange, transformations, decimals);
+    return { chart: chart, table: table };
+  }
+
+  createSeriesChart(dateRange, transformations) {
+    const level = transformations.level;
+    const yoy = transformations.yoy;
+    const ytd = transformations.ytd;
+    const c5ma = transformations.c5ma;
     let levelValue, yoyValue, ytdValue, c5maValue;
-    if (level && level.dates) {
+    if (level.length) {
       levelValue = this.formatHighchartData(dateRange, level);
     }
-    if (yoy && yoy.dates) {
+    if (yoy.length) {
       yoyValue = this.formatHighchartData(dateRange, yoy);
     }
-    if (ytd && ytd.dates) {
+    if (ytd.length) {
       ytdValue = this.formatHighchartData(dateRange, ytd);
     }
-    if (c5ma && c5ma.dates) {
+    if (c5ma.length) {
       c5maValue = this.formatHighchartData(dateRange, c5ma);
     }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
 
-  createSeriesTable(dateRange: Array<any>, observations, decimals: number) {
-    const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-    const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-    const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-    const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
+  createSeriesTable(dateRange: Array<any>, transformations, decimals: number) {
+    const level = transformations.level;
+    const yoy = transformations.yoy;
+    const ytd = transformations.ytd;
+    const c5ma = transformations.c5ma;
     const table = dateRange.map((date) => {
       const tableObj = {
         date: date.date,
@@ -136,16 +170,16 @@ export class HelperService {
         c5maValue: Infinity,
         formattedC5ma: ''
       };
-      if (level && level.dates) {
+      if (level.length) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
       }
-      if (yoy && yoy.dates) {
+      if (yoy.length) {
         this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', decimals);
       }
-      if (ytd && ytd.dates) {
+      if (ytd.length) {
         this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', decimals);
       }
-      if (c5ma && c5ma.dates) {
+      if (c5ma.length) {
         this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
       }
       return tableObj;
@@ -189,10 +223,10 @@ export class HelperService {
     return num === Infinity ? ' ' : num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
   }
 
-  setDefaultChartRange(freq, dataArray, defaults) {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dataArray[dataArray.length - 1][0]).toISOString().substr(0, 4);
-    let counter = dataArray.length - 1;
-    while (new Date(dataArray[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
+  setDefaultCategoryRange(freq, dateArray, defaults) {
+    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
+    let counter = dateArray.length - 1;
+    while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
     return this.getRanges(freq, counter, defaults.range);
@@ -204,15 +238,6 @@ export class HelperService {
     // https://github.com/IonDen/ion.rangeSlider/issues/298
     // Slider values being converted from strings to numbers for annual dates
     while (new Date(dateArray[counter].toString().substr(0, 4)).toISOString().substr(0, 4) > defaultEnd) {
-      counter--;
-    }
-    return this.getRanges(freq, counter, defaults.range);
-  }
-
-  setDefaultTableRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
-    let counter = dateArray.length - 1;
-    while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
     return this.getRanges(freq, counter, defaults.range);
