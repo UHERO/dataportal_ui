@@ -99,7 +99,7 @@ export class HighstockComponent implements OnChanges {
     return labelItems;
   }
 
-  formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail: Series, freq: Frequency) {
+  formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) {
     const series0 = chartData[portalSettings.highstock.series0Name];
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
@@ -107,11 +107,15 @@ export class HighstockComponent implements OnChanges {
     const ytdLabel = seriesDetail.percent ? 'YTD Change' : 'YTD % Change';
     const c5maLabel = seriesDetail.percent ? 'Annual Change' : 'Annual % Change';
     const seriesLabels = { yoy: yoyLabel, ytd: ytdLabel, c5ma: c5maLabel, none: ' ' };
+    const seriesStart = seriesDetail.seriesObservations ? seriesDetail.seriesObservations.observationStart : null;
     const series = [{
       name: 'Level',
       type: 'line',
       yAxis: 1,
       data: series0,
+      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointStart: Date.parse(seriesStart),
       states: {
         hover: {
           lineWidth: 2
@@ -128,6 +132,9 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
+      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointStart: Date.parse(seriesStart),
       showInNavigator: false,
       dataGrouping: {
         enabled: false
@@ -135,6 +142,9 @@ export class HighstockComponent implements OnChanges {
     }, {
       name: seriesLabels[portalSettings.highstock.series2Name],
       data: series2,
+      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointStart: Date.parse(seriesStart),
       includeInCSVExport: freq.freq === 'A' ? false : true,
       visible: false,
       dataGrouping: {
@@ -153,7 +163,7 @@ export class HighstockComponent implements OnChanges {
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
-    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.level, this.defaultRange) : null;
+    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
@@ -392,15 +402,15 @@ export class HighstockComponent implements OnChanges {
     }
   }
 
-  getSelectedChartRange(userStart, userEnd, levelData, defaults) {
-    const defaultEnd = defaults.end ? defaults.end : new Date(levelData[levelData.length - 1][0]).toISOString().substr(0, 4);
-    let counter = levelData.length ? levelData.length - 1 : null;
-    while (new Date(levelData[counter][0]).toISOString().substr(0, 4) > defaultEnd) {
+  getSelectedChartRange(userStart, userEnd, dates, defaults) {
+    const defaultEnd = defaults.end ? defaults.end : new Date(dates[dates.length - 1].date).toISOString().substr(0, 4);
+    let counter = dates.length ? dates.length - 1 : null;
+    while (new Date(dates[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
-    const end = userEnd ? userEnd : new Date(levelData[counter][0]).toISOString().substr(0, 10);
-    const defaultStartYear = +new Date(levelData[counter][0]).toISOString().substr(0, 4) - defaults.range;
-    const start = userStart ? userStart : defaultStartYear + new Date(levelData[counter][0]).toISOString().substr(4, 6);
+    const end = userEnd ? userEnd : new Date(dates[counter].date).toISOString().substr(0, 10);
+    const defaultStartYear = +new Date(dates[counter].date).toISOString().substr(0, 4) - defaults.range;
+    const start = userStart ? userStart : defaultStartYear + new Date(dates[counter].date).toISOString().substr(4, 6);
     return { start: start , end: end };
   }
 }

@@ -71,12 +71,12 @@
         each(this.series, function (series) {
             if (series.options.includeInCSVExport !== false) {
                 names.push(series.name);
-                each(series.options.data, function (point) {
-                    if (!rows[point[0]]) {
-                        rows[point[0]] = [];
+                each(series.xData, function(date, index) {
+                    if (!rows[date]) {
+                        rows[date] = [];
                     }
-                    rows[point[0]].x = point[0];
-                    rows[point[0]][i] = point[1];
+                    rows[date].x = date;
+                    rows[date][i] = series.yData[index];
                 });
                 i += 1;
             }

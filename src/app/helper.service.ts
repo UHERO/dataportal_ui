@@ -95,11 +95,8 @@ export class HelperService {
         }
       });
     }
-    const combineData = this.getChartAndTable(dates, transformations, decimals);
-    const chart = combineData.chart;
-    const seriesTable = combineData.table;
-    // const seriesTable = this.createSeriesTable(dates, observations, decimals);
-    // const chart = this.createSeriesChart(dates, observations);
+    const seriesTable = this.createSeriesTable(dates, transformations, decimals);
+    const chart = this.createSeriesChart(dates, transformations);
     const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
     const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
     return results;
@@ -113,22 +110,14 @@ export class HelperService {
     }
   }
 
-  formatHighchartData(dateRange, seriesData) {
-    const dataArray = dateRange.map((date) => {
-      const dateIndex = seriesData[0].dates.findIndex(obs => obs === date.date);
-      return dateIndex > -1 ? +seriesData[0].values[dateIndex] : null;
-    });
-    return dataArray;
-  }
-
-  getChartAndTable(dateRange: Array<any>, transformations, decimals: number) {
-    const level = transformations.level;
-    const yoy = transformations.yoy;
-    const ytd = transformations.ytd;
-    const c5ma = transformations.c5ma;
-    const chart = this.createSeriesChart(dateRange, transformations);
-    const table = this.createSeriesTable(dateRange, transformations, decimals);
-    return { chart: chart, table: table };
+  addChartData(valueArray: Array<any>, series: Array<any>, date) {
+    const dateIndex = series[0].dates.findIndex(obs => obs === date.date);
+    if (dateIndex > -1) {
+      valueArray.push(+series[0].values[dateIndex]);
+    }
+    if (dateIndex === -1) {
+      valueArray.push(null);
+    }
   }
 
   createSeriesChart(dateRange, transformations) {
@@ -136,19 +125,24 @@ export class HelperService {
     const yoy = transformations.yoy;
     const ytd = transformations.ytd;
     const c5ma = transformations.c5ma;
-    let levelValue, yoyValue, ytdValue, c5maValue;
-    if (level.length) {
-      levelValue = this.formatHighchartData(dateRange, level);
-    }
-    if (yoy.length) {
-      yoyValue = this.formatHighchartData(dateRange, yoy);
-    }
-    if (ytd.length) {
-      ytdValue = this.formatHighchartData(dateRange, ytd);
-    }
-    if (c5ma.length) {
-      c5maValue = this.formatHighchartData(dateRange, c5ma);
-    }
+    const levelValue = [];
+    const yoyValue = [];
+    const ytdValue = [];
+    const c5maValue = [];
+    dateRange.forEach((date) => {
+      if (level.length) {
+        this.addChartData(levelValue, level, date);
+      }
+      if (yoy.length) {
+        this.addChartData(yoyValue, yoy, date);
+      }
+      if (ytd.length) {
+        this.addChartData(ytdValue, ytd, date);
+      }
+      if (c5ma.length) {
+        this.addChartData(c5maValue, c5ma, date);
+      }
+    });
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
 
