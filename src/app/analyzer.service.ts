@@ -73,6 +73,7 @@ export class AnalyzerService {
         if (levelData) {
           // Use to format dates for table
           this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+          console.log('seriesData', seriesData)
           const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
           seriesData.chartData = data.chartData;
           seriesData.seriesTableData = data.tableData;
@@ -81,6 +82,7 @@ export class AnalyzerService {
         }
         this.analyzerData.analyzerSeries.push(seriesData);
         this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+        console.log('analyzerData', this.analyzerData)
         this.createAnalyzerTableData();
         this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
         this.checkAnalyzerChartSeries();
@@ -93,7 +95,8 @@ export class AnalyzerService {
     this.analyzerData.analyzerSeries.forEach((serie) => {
       // Array of observations using full range of dates
       if (serie.observations) {
-        serie.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, serie.observations, serie.seriesDetail.decimals);
+        const transformations = this._helper.getTransformations(serie.observations);
+        serie.analyzerTableData = this._helper.createSeriesTable(this.analyzerData.analyzerTableDates, transformations, serie.seriesDetail.decimals);
       }
     });
   }
@@ -166,54 +169,61 @@ export class AnalyzerService {
   }
 
   createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {
-    let startYear = +dateStart.substr(0, 4);
-    const endYear = +dateEnd.substr(0, 4);
-    let startMonth = +dateStart.substr(5, 2);
-    const endMonth = +dateEnd.substr(5, 2);
-    const m = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' };
-    const q = { 1: 'Q1', 4: 'Q2', 7: 'Q3', 10: 'Q4' };
-    // Annual frequency
-    const aSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'A')) > -1;
-    // Quarterly frequency
-    const qSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'Q')) > -1;
-    // Semi-annual frequency
-    const sSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'S')) > -1;
-    // Monthly frequency
-    const mSelected = frequencies.indexOf(frequencies.find(freq => freq.freq === 'M')) > -1;
-    while (startYear + '-' + m[startMonth] + '-01' <= endYear + '-' + m[endMonth] + '-01') {
+    const start = new Date(dateStart.replace(/-/g, '\/'));
+    const end = new Date(dateEnd.replace(/-/g, '\/'))
+    let aSelected = false;
+    let qSelected = false;
+    let sSelected = false;
+    let mSelected = false;
+    frequencies.forEach((freq) => {
+      if (freq.freq === 'A') {
+        aSelected = true;
+      }
+      if (freq.freq === 'Q') {
+        qSelected = true;
+      }
+      if (freq.freq === 'S') {
+        sSelected = true;
+      }
+      if (freq.freq === 'M') {
+        mSelected = true;
+      }
+    });
+    while (start <= end) {
+      const month = start.toISOString().substr(5, 2);
+      const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';  
       if (mSelected) {
         dateArray.push({
-          date: startYear.toString() + '-' + m[startMonth] + '-01',
-          tableDate: startYear.toString() + '-' + m[startMonth]
+          date: start.toISOString().substr(0, 10),
+          tableDate: start.toISOString().substr(0, 7)
         });
       }
-      // If series with a semi-annual frequency have been selected but not monthly, add months '01' & '07' to the date array
-      if (sSelected && !mSelected && (startMonth === 1 || startMonth === 7)) {
+      if (sSelected && !mSelected && (start.getMonth() === 0 || start.getMonth() === 6)) {
         dateArray.push({
-          date: startYear.toString() + '-' + m[startMonth] + '-01',
-          tableDate: startYear.toString() + '-' + m[startMonth]
+          date: start.toISOString().substr(0, 10),
+          tableDate: start.toISOString().substr(0, 7)
         });
       }
       if (qSelected) {
-        const addQuarter = this.addQuarterObs(startMonth, mSelected);
+        const addQuarter = this.addQuarterObs(start.getMonth(), mSelected);
         if (addQuarter) {
+          console.log(addQuarter)
           dateArray.push({
-            date: startYear.toString() + '-' + m[addQuarter] + '-01',
-            tableDate: startYear.toString() + ' ' + q[addQuarter]
-          });
+            date: start.toISOString().substr(0, 10),
+            tableDate: start.toISOString().substr(0, 4) + ' ' + q
+          });  
         }
       }
       if (aSelected) {
-        const addAnnual = this.addAnnualObs(startMonth, mSelected, qSelected);
+        const addAnnual = this.addAnnualObs(start.getMonth(), mSelected, qSelected);
         if (addAnnual) {
           dateArray.push({
-            date: startYear.toString() + '-01-01',
-            tableDate: startYear.toString()
-          });
+            date: start.toISOString().substr(0, 10),
+            tableDate: start.toISOString().substr(0, 4)
+          });  
         }
       }
-      startYear = startMonth === 12 ? startYear += 1 : startYear;
-      startMonth = startMonth === 12 ? 1 : startMonth += 1;
+      start.setMonth(start.getMonth() + 1);
     }
     return dateArray;
   }
@@ -228,22 +238,22 @@ export class AnalyzerService {
 
   addAnnualObs(startMonth, monthSelected, quarterSelected) {
     // If a monthly series is selected, add annual date after month 12
-    if (monthSelected && startMonth === 12) {
+    if (monthSelected && startMonth === 11) {
       return true;
     }
-    // If a quarterly series is selected (w/o monthly), add annueal date after 4th quarter
-    if (quarterSelected && !monthSelected && startMonth === 10) {
+    // If a quarterly series is selected (w/o monthly), add annual date after 4th quarter
+    if (quarterSelected && !monthSelected && startMonth === 9) {
       return true;
     }
     // If only annual is selected, add to date array
-    if (!quarterSelected && !monthSelected && startMonth === 1) {
+    if (!quarterSelected && !monthSelected && startMonth === 0) {
       return true;
     }
     return false;
   }
 
   checkStartMonth(month) {
-    if (month === 3 || month === 6 || month === 9 || month === 12) {
+    if (month === 2 || month === 5 || month === 8 || month === 11) {
       return true;
     }
     return false;
