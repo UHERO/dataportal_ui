@@ -40,11 +40,7 @@ export class HelperService {
     while (start <= end) {
       const month = start.toISOString().substr(5, 2);
       const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
-      const tableDate = currentFreq === 'A' ?
-        start.toISOString().substr(0, 4) :
-        (currentFreq === 'S' || currentFreq === 'M') ?
-        start.toISOString().substr(0, 7) :
-        start.toISOString().substr(0, 4) + ' ' + q;
+      const tableDate = this.getTableDate(start, currentFreq, q);
       dateArray.push({ date: start.toISOString().substr(0, 10), tableDate: tableDate });
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
@@ -56,23 +52,30 @@ export class HelperService {
     return dateArray;
   }
 
+  getTableDate(start, currentFreq, q) {
+    if (currentFreq === 'A') {
+      return start.toISOString().substr(0, 4);
+    }
+    if (currentFreq === 'Q') {
+      return start.toISOString().substr(0, 4) + ' ' + q;
+    }
+    return start.toISOString().substr(0, 7)
+  }
+
   getTransformations(observations) {
-    const level = [];
-    const yoy = [];
-    const ytd = [];
-    const c5ma = [];
+    let level, yoy, ytd, c5ma;
     observations.transformationResults.forEach((obj) => {
       if (obj.transformation === 'lvl') {
-        level.push(obj);
+        level = obj.dates ? obj : level;
       }
       if (obj.transformation === 'pc1') {
-        yoy.push(obj);
+        yoy = obj.dates ? obj : yoy;
       }
       if (obj.transformation === 'ytd') {
-        ytd.push(obj);
+        ytd = obj.dates ? obj : ytd;
       }
       if (obj.transformation === 'c5ma') {
-        c5ma.push(obj);
+        c5ma = obj.dates ? obj : c5ma;
       }
     });
     return { level: level, yoy: yoy, ytd: ytd, c5ma: c5ma };
@@ -88,10 +91,10 @@ export class HelperService {
     const ytd = transformations.ytd;
     const c5ma = transformations.c5ma;
     const pseudoZones = [];
-    if (level[0].pseudoHistory) {
-      level[0].pseudoHistory.forEach((obs, index) => {
-        if (obs && !level[0].pseudoHistory[index + 1]) {
-          pseudoZones.push({ value: Date.parse(level[0].dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
         }
       });
     }
@@ -103,17 +106,17 @@ export class HelperService {
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
-    const tableEntry = valueArray[0].dates.findIndex(obs => obs === date.date || obs === date.tableDate);
+    const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
     if (tableEntry > -1) {
-      tableObj[value] = +valueArray[0].values[tableEntry];
-      tableObj[formattedValue] = this.formattedValue(valueArray[0].values[tableEntry], decimals);
+      tableObj[value] = +valueArray.values[tableEntry];
+      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
     }
   }
 
-  addChartData(valueArray: Array<any>, series: Array<any>, date) {
-    const dateIndex = series[0].dates.findIndex(obs => obs === date.date);
+  addChartData(valueArray: Array<any>, series, date) {
+    const dateIndex = series.dates.findIndex(obs => obs === date.date);
     if (dateIndex > -1) {
-      valueArray.push(+series[0].values[dateIndex]);
+      valueArray.push(+series.values[dateIndex]);
     }
     if (dateIndex === -1) {
       valueArray.push(null);
@@ -130,16 +133,16 @@ export class HelperService {
     const ytdValue = [];
     const c5maValue = [];
     dateRange.forEach((date) => {
-      if (level.length) {
+      if (level) {
         this.addChartData(levelValue, level, date);
       }
-      if (yoy.length) {
+      if (yoy) {
         this.addChartData(yoyValue, yoy, date);
       }
-      if (ytd.length) {
+      if (ytd) {
         this.addChartData(ytdValue, ytd, date);
       }
-      if (c5ma.length) {
+      if (c5ma) {
         this.addChartData(c5maValue, c5ma, date);
       }
     });
@@ -164,16 +167,16 @@ export class HelperService {
         c5maValue: Infinity,
         formattedC5ma: ''
       };
-      if (level.length) {
+      if (level) {
         this.addToTable(level, date, tableObj, 'value', 'formattedValue', decimals);
       }
-      if (yoy.length) {
+      if (yoy) {
         this.addToTable(yoy, date, tableObj, 'yoyValue', 'formattedYoy', decimals);
       }
-      if (ytd.length) {
+      if (ytd) {
         this.addToTable(ytd, date, tableObj, 'ytdValue', 'formattedYtd', decimals);
       }
-      if (c5ma.length) {
+      if (c5ma) {
         this.addToTable(c5ma, date, tableObj, 'c5maValue', 'formattedC5ma', decimals);
       }
       return tableObj;

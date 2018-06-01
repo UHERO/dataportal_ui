@@ -53,9 +53,7 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
     let minValue = null;
     sublist.displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
-      const min = values.reduce(function (a, b) {
-        return Math.min(a, b);
-      }, null);
+      const min = Math.min(...values);
       if (minValue === null || min < minValue) {
         minValue = min;
       }
@@ -67,9 +65,7 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
     let maxValue = null;
     sublist.displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
-      const max = values.reduce(function (a, b) {
-        return Math.max(a, b);
-      }, null);
+      const max = Math.max(...values);
       if (maxValue === null || max > maxValue) {
         maxValue = max;
       }
@@ -78,11 +74,9 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
   }
 
   getSeriesValues(series, start, end) {
-    const startValue = series.categoryChart.chartData.level.findIndex(observation => observation[0] === start);
-    const endValue = series.categoryChart.chartData.level.findIndex(observation => observation[0] === end);
-    const trimmedData = series.categoryChart.chartData.level.slice(startValue, endValue + 1);
-    const values = trimmedData.map((observation) => observation[1]);
-    return values;
+    const dateStart = series.categoryDisplay.chartData.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
+    const dateEnd = series.categoryDisplay.chartData.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
+    return series.categoryDisplay.chartData.level.slice(dateStart, dateEnd + 1);
   }
 
   // Google Analytics: Track clicking on series

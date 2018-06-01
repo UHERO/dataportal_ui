@@ -44,7 +44,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     let selectedAnalyzerSeries;
     if (this.series.length) {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
-      console.log('this.allDates', this.allDates)
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -259,7 +258,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         pointStart: Date.parse(serie.chartData.dates[0].date),
-        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : 1,
+        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : 1,
         pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : 'month',
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,

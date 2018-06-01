@@ -87,7 +87,7 @@ export class HighchartComponent implements OnInit, OnChanges {
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
       data: series0,
-      pointInterval: currentFreq === 'Q' ? 3 : 1,
+      pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
       pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
       pointStart: start ? Date.parse(start) : Date.parse(startDate),
       states: {
@@ -107,7 +107,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
         data: series1,
-        pointInterval: currentFreq === 'Q' ? 3 : 1,
+        pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
         pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
         pointStart: start ? Date.parse(start) : Date.parse(startDate),
         dataGrouping: {
@@ -299,12 +299,11 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   render(event) {
     this.chart = event;
-    let latestSeries0, latestSeries1;
     const series0 = this.chart.series[0];
     const series1 = this.chart.series[1];
     // Get position of last non-null value
-    latestSeries0 = (series0 !== undefined) ? HighchartComponent.findLastValue(series0.points) : -1;
-    latestSeries1 = (series1 !== undefined) ? HighchartComponent.findLastValue(series1.points) : -1;
+    const latestSeries0 = (series0 !== undefined && series0.points && series0.points.length) ? HighchartComponent.findLastValue(series0.points) : -1;
+    const latestSeries1 = (series1 !== undefined && series1.points && series1.points.length) ? HighchartComponent.findLastValue(series1.points) : -1;
 
     // Prevent tooltip from being hidden on mouseleave
     // Reset toolip value and marker to most recent observation
@@ -341,7 +340,7 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   checkPointCount(series0, point0, point1?, series1?) {
     // Fiilter out null values
-    const pointCount = series0.yData.filter(value => Number.isFinite(value));
+    const pointCount = series0.points.filter(point => Number.isFinite(point.y));
     // If only 1 non-null value exists, display data value as text
     if (pointCount.length === 1) {
       this.addSubtitle(point0, this.currentFreq, point1, series1);

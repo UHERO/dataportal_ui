@@ -113,7 +113,7 @@ export class HighstockComponent implements OnChanges {
       type: 'line',
       yAxis: 1,
       data: series0,
-      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
       pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
       pointStart: Date.parse(seriesStart),
       states: {
@@ -132,7 +132,7 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
-      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
       pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
       pointStart: Date.parse(seriesStart),
       showInNavigator: false,
@@ -142,7 +142,7 @@ export class HighstockComponent implements OnChanges {
     }, {
       name: seriesLabels[portalSettings.highstock.series2Name],
       data: series2,
-      pointInterval: freq.freq === 'Q' ? 3 : 1,
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
       pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
       pointStart: Date.parse(seriesStart),
       includeInCSVExport: freq.freq === 'A' ? false : true,

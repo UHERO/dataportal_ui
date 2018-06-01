@@ -98,7 +98,6 @@ export class CategoryHelperService {
 
   getData(catId: any, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
-      console.log('categoryData', categoryData);
       this.categoryData[cacheId].results = categoryData;
       const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
       // Merge subcats with original list of categories from /category response
@@ -168,7 +167,6 @@ export class CategoryHelperService {
           sub.noData = false;
           this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
-          console.log('sub', sub)
         }
         if (!displaySeries) {
           this.setNoData(sub);
@@ -305,7 +303,8 @@ export class CategoryHelperService {
   }
 
   filterSeriesResults(results: Array<any>, freq: string) {
-    const filtered = results.map((res) => {
+    const filtered = [];
+    results.forEach((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
       if (levelData) {
         let seriesDates = [], series = {seriesInfo: {displayName: ''}} ;
@@ -313,11 +312,10 @@ export class CategoryHelperService {
         const seriesObsEnd = res.seriesObservations.observationEnd;
         const decimals = res.decimals ? res.decimals : 1;
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
-        // series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;
-        return series;
+        filtered.push(series);
       }
     });
     return filtered
@@ -353,8 +351,6 @@ export class CategoryHelperService {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
         const observations = series.seriesInfo.seriesObservations;
-        // const transformations = this._helper.getTransformations(observations);
-        // series['categoryTable'] = this._helper.createSeriesTable(dateArray, transformations, decimals);
         series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
