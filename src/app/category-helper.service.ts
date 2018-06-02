@@ -292,11 +292,11 @@ export class CategoryHelperService {
   getSearchDates(displaySeries) {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     displaySeries.forEach((series) => {
-      if (series.start < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-        categoryDateWrapper.firstDate = series.start;
+      if (series.seriesInfo.seriesObservations.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+        categoryDateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
       }
-      if (series.end > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-        categoryDateWrapper.endDate = series.end;
+      if (series.seriesInfo.seriesObservations.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+        categoryDateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
       }
     });
     return categoryDateWrapper;
@@ -305,22 +305,20 @@ export class CategoryHelperService {
   filterSeriesResults(results: Array<any>, freq: string) {
     const filtered = [];
     results.forEach((res) => {
-      let seriesDates = [], series;
-      const seriesObsStart = res.seriesObservations.observationStart;
-      const seriesObsEnd = res.seriesObservations.observationEnd;
       const levelData = res.seriesObservations.transformationResults[0].dates;
-      const decimals = res.decimals ? res.decimals : 1;
-      // Add series if level data is available
       if (levelData) {
+        let seriesDates = [], series = {seriesInfo: {displayName: ''}} ;
+        const seriesObsStart = res.seriesObservations.observationStart;
+        const seriesObsEnd = res.seriesObservations.observationEnd;
+        const decimals = res.decimals ? res.decimals : 1;
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;
         filtered.push(series);
       }
     });
-    return filtered;
+    return filtered
   }
 
   getDisplaySeries(allSeries, freq: string) {
@@ -353,12 +351,7 @@ export class CategoryHelperService {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
         const observations = series.seriesInfo.seriesObservations;
-        const level = observations.transformationResults.find(obs => obs.transformation === 'lvl');
-        const yoy = observations.transformationResults.find(obs => obs.transformation === 'pc1');
-        const ytd = observations.transformationResults.find(obs => obs.transformation === 'ytd');
-        const c5ma = observations.transformationResults.find(obs => obs.transformation === 'c5ma');
-        series['categoryTable'] = this._helper.createSeriesTable(dateArray, observations, decimals);
-        series['categoryChart'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
+        series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });
   }

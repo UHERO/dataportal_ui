@@ -221,9 +221,8 @@ export class NtaHelperService {
         subcategory.scrollSeries.push(seriesGroup);
         seriesGroup = [];
       }
-      const catData = this.formatSeriesData(series, subcategory.dateArray);
-      series.categoryTable = catData.catTable;
-      series.categoryChart = catData.catChart;
+      const decimals = series.decimals ? series.decimals : 1;
+      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, subcategory.dateArray, decimals);  
       if (s === subcategory.displaySeries.length - 1) {
         subcategory.requestComplete = true;
         category.requestComplete = true;
@@ -288,12 +287,5 @@ export class NtaHelperService {
       return observationEnd;
     }
     return dateWrapper.endDate;
-  }
-
-  formatSeriesData(series, categoryDateArray) {
-    const decimals = series.decimals ? series.decimals : 1;
-    const catTable = this._helper.createSeriesTable(categoryDateArray, series.seriesInfo.seriesObservations, decimals);
-    const catChart = this._helper.dataTransform(series.seriesInfo.seriesObservations, categoryDateArray, decimals);
-    return { catTable: catTable, catChart: catChart };
   }
 }

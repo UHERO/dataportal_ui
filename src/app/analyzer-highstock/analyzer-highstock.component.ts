@@ -128,8 +128,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       // use series with the maximum level value as the base to compare with other series
       const maxValueSeries = this.findMaxLevelSeries(unit);
       const level = maxValueSeries.chartData.level;
-      const maxValue = Math.max(...level.map(l => l[1]));
-      const minValue = Math.min(...level.map(l => l[1]));
+      const maxValue = Math.max(...level);
+      const minValue = Math.min(...level);
       yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
       this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
       return yAxesGroups;
@@ -145,7 +145,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   findMaxLevelSeries(unit) {
     let maxLevelValue, maxValueSeries;
     unit.series.forEach((s) => {
-      const max = Math.max(...s.chartData.level.map(l => l[1]));
+      const max = Math.max(...s.chartData.level);
       if (!maxLevelValue || max > maxLevelValue) {
         maxLevelValue = max;
         maxValueSeries = s;
@@ -162,8 +162,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   }
 
   calculateOverlap(level, baseMin, baseMax) {
-    const newMin = Math.min(...level.map(l => l[1]));
-    const newMax = Math.max(...level.map(l => l[1]));
+    const newMin = Math.min(...level);
+    const newMax = Math.max(...level);
     const baseRange = baseMax - baseMin;
     const newRange = newMax - newMin;
     const baseMaxNewMin = baseMax - newMin;
@@ -257,6 +257,9 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         name: serie.chartDisplayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
+        pointStart: Date.parse(serie.chartData.dates[0].date),
+        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : 1,
+        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : 'month',
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,

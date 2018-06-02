@@ -67,21 +67,16 @@ describe('Service: Helper', () => {
       { date: '1962-01-01', tableDate: '1962' }
     ];
     const decimals = 2;
-    const lvl = [
-      [Date.parse('1962-01-01'), 195.2833]
-    ];
-    const yoy = [
-      [Date.parse('1962-01-01'), null]
-    ];
-    const c5ma = [
-      [Date.parse('1962-01-01'), null]
-    ];
+    const lvl: Array<any> = [195.2833];
+    const yoy = [null];
+    const c5ma = [null];
     const chartData = {
       level: lvl,
       pseudoZones: [],
       yoy: yoy,
       ytd: yoy,
-      c5ma: c5ma
+      c5ma: c5ma,
+      dates: [{ date: '1962-01-01', tableDate: '1962' }]
     };
     const tableData = [{
       date: '1962-01-01',

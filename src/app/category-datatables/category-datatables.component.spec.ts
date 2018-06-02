@@ -8,9 +8,9 @@ describe('CategoryDatatablesComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CategoryDatatablesComponent ]
+      declarations: [CategoryDatatablesComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -25,30 +25,32 @@ describe('CategoryDatatablesComponent', () => {
 
   it('formatTable should should format category data for table download', () => {
     const displaySeries = [{
-      categoryChart: {},
-      categoryTable: [{
-        c5maValue: 3.9867,
-        date: '1972-01-01',
-        formattedC5maValue: '4.0',
-        formattedValue: '312.7',
-        formattedYoy: '3.7',
-        formattedYtd: '3.7',
-        tableDate: '1972',
-        value: 312.7,
-        yoyValue: 3.7004,
-        ytdValue: 3.7004
-      }, {
-        c5maValue: 3.9867,
-        date: '1973-01-01',
-        formattedC5maValue: '4.0',
-        formattedValue: '312.7',
-        formattedYoy: '3.7',
-        formattedYtd: '3.7',
-        tableDate: '1973',
-        value: 312.7,
-        yoyValue: 3.7004,
-        ytdValue: 3.7004
-      }],
+      categoryDisplay: {
+        chartData: {},
+        tableData: [{
+          c5maValue: 3.9867,
+          date: '1972-01-01',
+          formattedC5maValue: '4.0',
+          formattedValue: '312.7',
+          formattedYoy: '3.7',
+          formattedYtd: '3.7',
+          tableDate: '1972',
+          value: 312.7,
+          yoyValue: 3.7004,
+          ytdValue: 3.7004
+        }, {
+          c5maValue: 3.9867,
+          date: '1973-01-01',
+          formattedC5maValue: '4.0',
+          formattedValue: '312.7',
+          formattedYoy: '3.7',
+          formattedYtd: '3.7',
+          tableDate: '1973',
+          value: 312.7,
+          yoyValue: 3.7004,
+          ytdValue: 3.7004
+        }],
+      },
       seriesInfo: {
         displayName: 'Series Title'
       }
