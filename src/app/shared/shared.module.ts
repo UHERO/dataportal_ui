@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
-import { ChartModule } from 'angular2-highcharts';
+// import { ChartModule } from 'angular2-highcharts';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { AppComponent } from '../app.component';
@@ -28,6 +28,7 @@ import { AnalyzerHighstockComponent } from '../analyzer-highstock/analyzer-highs
 import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 import { ShareLinkComponent } from '../share-link/share-link.component';
+import { HighchartsChartModule } from 'highcharts-angular';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,8 @@ import { ShareLinkComponent } from '../share-link/share-link.component';
   imports: [
     CommonModule,
     BrowserModule,
-    ChartModule,
+    HighchartsChartModule,
+    // ChartModule,
     FormsModule,
     ReactiveFormsModule,
     HttpModule,

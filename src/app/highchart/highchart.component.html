@@ -1,1 +1,2 @@
-<chart class="multi-chart" [options]="options" (load)="render($event.context)"></chart>
+<!-- <chart class="multi-chart" [options]="options" (load)="render($event.context)"></chart> -->
+<highcharts-chart class="multi-chart" [Highcharts]="Highcharts" [options]="chartOptions" [(update)]="updateChart" style="width: 200px; height: 200px; display: block;"></highcharts-chart>

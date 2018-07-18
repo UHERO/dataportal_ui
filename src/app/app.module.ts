@@ -2,10 +2,10 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { ChartModule } from 'angular2-highcharts';
+// import { ChartModule } from 'angular2-highcharts';
 // Temp workaround for build errors
 // See: https://github.com/gevgeny/angular2-highcharts/issues/160
-import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
+/* import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 declare var require: any;
 export function highchartsFactory() {
   const highcharts = require('highcharts/js/highstock');
@@ -17,7 +17,8 @@ export function highchartsFactory() {
   offlineExport(highcharts);
   csv(highcharts);
   return (highcharts);
-}
+} */
+import { HighchartsChartModule } from 'highcharts-angular';
 import { Shared } from './shared/shared.module';
 import { routing } from './app.routes';
 import { AppComponent } from './app.component';
@@ -42,7 +43,8 @@ import { RouterModule } from '@angular/router';
     Shared,
     routing,
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
-    ChartModule,
+    HighchartsChartModule,
+    // ChartModule,
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
@@ -63,10 +65,10 @@ import { RouterModule } from '@angular/router';
     AnalyzerService,
     Title,
     ClipboardService,
-    {
+    /* {
       provide: HighchartsStatic,
       useFactory: highchartsFactory
-    },
+    }, */
     {
       provide: 'rootCategory',
       useValue: 59

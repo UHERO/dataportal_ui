@@ -48,6 +48,8 @@
     "datatables.net-dt": "^1.10.13",
     "datatables.net-fixedcolumns": "^3.2.2",
     "datatables.net-fixedcolumns-dt": "^3.2.2",
+    "highcharts": "^6.1.1",
+    "highcharts-angular": "^2.0.1",
     "highcharts-export-csv": "^1.4.3",
     "ion-rangeslider": "^2.1.7",
     "ng-recaptcha": "4.0.0-beta.1",
