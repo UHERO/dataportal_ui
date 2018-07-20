@@ -51,7 +51,7 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   getSeriesStartAndEnd = (dates, start, end) => {
     const defaultRanges = this._helper.setDefaultCategoryRange(this.currentFreq, dates, this.defaultRange);
-    let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+    let { startIndex, endIndex } = defaultRanges;
     dates.forEach((item, index) => {
       if (item.date === start) {
         startIndex = index;
@@ -60,7 +60,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         endIndex = index;
       }
     });
-    return { start: startIndex, end: endIndex };
+    return { seriesStart: startIndex, seriesEnd: endIndex };
   };
 
   setChartTitle = (title: string) => {
@@ -88,29 +88,31 @@ export class HighchartComponent implements OnInit, OnChanges {
     };
   };
 
-  drawChart = (seriesData, currentFreq, portalSettings, min, max, start?, end?) => {
-    const dates = seriesData.categoryDisplay.chartData.dates;
-    const seriesRange = this.getSeriesStartAndEnd(dates, start, end);
-    const seriesStart = seriesRange.start;
-    const seriesEnd = seriesRange.end;
-    let series0 = seriesData.categoryDisplay.chartData[portalSettings.highcharts.series0Name];
-    let series1 = seriesData.categoryDisplay.chartData[portalSettings.highcharts.series1Name];
-    series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
-    series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const startDate = !start ? dates[seriesStart].date : undefined;
-    const categoryDisplayStart = seriesData.categoryDisplay.start;
-    const categoryDisplayEnd = seriesData.categoryDisplay.end;
-    // Check how many non-null points exist in level series
-    const levelLength = series0.filter(value => Number.isFinite(value));
+  setYAxis = (min?: number, max?: number) => {
+    return [{
+      labels: {
+        enabled: false
+      },
+      title: {
+        text: ''
+      },
+      minTickInterval: 0.01
+    }, {
+      labels: {
+        enabled: false
+      },
+      title: {
+        text: ''
+      },
+      min: min,
+      max: max,
+      minTickInterval: 0.01,
+      opposite: true
+    }];
+  };
+
+  setChartSeries = (portalSettings, series0, currentFreq, startDate, pseudoZones, series1) => {
     const chartSeries = [];
-    const minValue = min;
-    const maxValue = max;
-    const pseudoZones = seriesData.categoryDisplay.chartData.pseudoZones;
-    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
-    const percent = seriesData.seriesInfo.percent;
-    const title = seriesData.seriesInfo.displayName;
-    const dataFreq = currentFreq;
-    const unitsShort = seriesData.seriesInfo.unitsLabelShort;
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
       type: portalSettings.highcharts.series0Type,
@@ -118,7 +120,7 @@ export class HighchartComponent implements OnInit, OnChanges {
       data: series0,
       pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
       pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
-      pointStart: start ? Date.parse(start) : Date.parse(startDate),
+      pointStart: startDate,
       states: {
         hover: {
           lineWidth: 2
@@ -138,16 +140,33 @@ export class HighchartComponent implements OnInit, OnChanges {
         data: series1,
         pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
         pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
-        pointStart: start ? Date.parse(start) : Date.parse(startDate),
+        pointStart: startDate,
         dataGrouping: {
           enabled: false
         },
       });
     }
+    return chartSeries;
+  }
+
+  drawChart = (seriesData, currentFreq: string, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
+    const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
+    const { series0Name, series1Name } = portalSettings.highcharts;
+    const { start, end } = seriesData.categoryDisplay;
+    const { decimals, percent, title, unitsLabelShort } = seriesData.seriesInfo;
+    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(dates, chartStart, chartEnd);
+    let series0 = seriesData.categoryDisplay.chartData[series0Name];
+    let series1 = seriesData.categoryDisplay.chartData[series1Name];
+    series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
+    series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
+    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
+    // Check how many non-null points exist in level series
+    const levelLength = series0.filter(value => Number.isFinite(value));
+    const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);
     const addSubtitle = (point0, freq, chart, point1?, series1?) => {
       const dateLabel = this.formatDateLabel(point0.x, freq);
       let subtitleText = '';
-      subtitleText += Highcharts.numberFormat(point0.y, decimals, '.', ',') + '<br> (' + unitsShort + ') <br>';
+      subtitleText += Highcharts.numberFormat(point0.y, decimals, '.', ',') + '<br> (' + unitsLabelShort + ') <br>';
       subtitleText += series1 ?
         this.formatTransformLabel(series1.name, percent) + '<br>' + Highcharts.numberFormat(point1.y, decimals, '.', ',') + '<br>' + dateLabel :
         dateLabel;
@@ -207,19 +226,19 @@ export class HighchartComponent implements OnInit, OnChanges {
           // Display tooltip when chart loads
           if (latestSeries0 > -1 && latestSeries1 > -1) {
             this.tooltip.refresh([series0.points[latestSeries0], series1.points[latestSeries1]]);
-            checkPointCount(dataFreq, series0, series0.points[latestSeries0], this, series1.points[latestSeries1], series1);
+            checkPointCount(currentFreq, series0, series0.points[latestSeries0], this, series1.points[latestSeries1], series1);
           }
           if (latestSeries0 > -1 && latestSeries1 === -1) {
             this.tooltip.refresh([series0.points[latestSeries0]]);
-            checkPointCount(dataFreq, series0, series0.points[latestSeries0], this);
+            checkPointCount(currentFreq, series0, series0.points[latestSeries0], this);
           }
           // If no data available for a given date range, display series title and display dates where data is available for a series
           if (latestSeries0 === -1 && latestSeries1 === -1) {
             this.setClassName(undefined);
-            const start = formatDate(categoryDisplayStart, dataFreq);
-            const end = formatDate(categoryDisplayEnd, dataFreq);
+            const categoryDisplayStart = formatDate(start, currentFreq);
+            const categoryDisplayEnd = formatDate(end, currentFreq);
             this.setTitle({ text: '<b>' + title + '</b>' });
-            this.setSubtitle({ text: 'Data Available From: ' + start + ' - ' + end, verticalAlign: 'middle', y: -20 });
+            this.setSubtitle({ text: 'Data Available From: ' + categoryDisplayStart + ' - ' + categoryDisplayEnd, verticalAlign: 'middle', y: -20 });
           }
         }
       }
@@ -236,7 +255,7 @@ export class HighchartComponent implements OnInit, OnChanges {
       borderWidth: 0,
       shared: true,
       formatter: function () {
-        const getLabelName = (seriesName, freq, precent) => {
+        const getLabelName = (seriesName, freq, percent) => {
           if (seriesName === 'level') {
             return ': ';
           }
@@ -272,26 +291,20 @@ export class HighchartComponent implements OnInit, OnChanges {
             return Highcharts.dateFormat('%b', date) + ' ';
           }
         };
-        const pseudo = 'Pseudo History ';
-        let s = '<b>' + title + '</b><br>';
-        if (levelLength.length > 1) {
-          // Get Quarter or Month for Q/M frequencies
-          s = s + getFreqLabel(dataFreq, this.x);
-          // Add year
-          s = s + Highcharts.dateFormat('%Y', this.x) + '';
-          this.points.forEach((point) => {
+        const getSeriesLabel = (points, s) => {
+          points.forEach((point) => {
             const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const name = getLabelName(point.series.name, dataFreq, percent);
+            const name = getLabelName(point.series.name, currentFreq, percent);
             let label = name + formattedValue;
             if (point.series.name === 'level') {
-              label += ' (' + unitsShort + ') <br>';
+              label += ' (' + unitsLabelShort + ') <br>';
             }
-            if (pseudoZones.length > 0) {
+            if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
                   const otherSeriesLabel = pseudo + name + formattedValue;
-                  const levelLabel = otherSeriesLabel + ' (' + unitsShort + ') <br>';
+                  const levelLabel = otherSeriesLabel + ' (' + unitsLabelShort + ') <br>';
                   s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
                   s += pseudo + name + formattedValue;
                 }
@@ -300,10 +313,20 @@ export class HighchartComponent implements OnInit, OnChanges {
                 }
               });
             }
-            if (pseudoZones.length === 0) {
+            if (pseudoZones.length === 0){
               s += label;
             }
           });
+          return s;
+        }
+        const pseudo = 'Pseudo History ';
+        let s = '<b>' + title + '</b><br>';
+        if (levelLength.length > 1) {
+          // Get Quarter or Month for Q/M frequencies
+          s = s + getFreqLabel(currentFreq, this.x);
+          // Add year
+          s = s + Highcharts.dateFormat('%Y', this.x) + '';
+          s = getSeriesLabel(this.points, s);
         }
         return s;
       },
@@ -312,26 +335,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
     this.chartOptions.xAxis = this.setXAxis();
-    this.chartOptions.yAxis = [{
-      labels: {
-        enabled: false
-      },
-      title: {
-        text: ''
-      },
-      minTickInterval: 0.01
-    }, {
-      labels: {
-        enabled: false
-      },
-      title: {
-        text: ''
-      },
-      min: minValue,
-      max: maxValue,
-      minTickInterval: 0.01,
-      opposite: true
-    }];
+    this.chartOptions.yAxis = this.setYAxis(min, max);
     this.chartOptions.plotOptions = {
       line: {
         marker: {
@@ -385,11 +389,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
-    this.chartOptions.yAxis = [{
-      title: {
-        text: ''
-      }
-    }];
+    this.chartOptions.yAxis = this.setYAxis();
     this.chartOptions.xAxis = this.setXAxis();
     this.chartOptions.series = [{
       data: []
