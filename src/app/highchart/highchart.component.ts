@@ -153,8 +153,9 @@ export class HighchartComponent implements OnInit, OnChanges {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const { series0Name, series1Name } = portalSettings.highcharts;
     const { start, end } = seriesData.categoryDisplay;
-    const { decimals, percent, title, unitsLabelShort } = seriesData.seriesInfo;
+    const { percent, title, unitsLabelShort } = seriesData.seriesInfo;
     const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(dates, chartStart, chartEnd);
+    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     let series0 = seriesData.categoryDisplay.chartData[series0Name];
     let series1 = seriesData.categoryDisplay.chartData[series1Name];
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
@@ -243,9 +244,7 @@ export class HighchartComponent implements OnInit, OnChanges {
         }
       }
     };
-    this.chartOptions.exporting = {
-      enabled: false
-    }
+    this.chartOptions.exporting = { enabled: false };
     this.chartOptions.title = this.setChartTitle('<br>');
     this.chartOptions.tooltip = {
       positioner: function () {

@@ -1,3 +1,4 @@
 <!-- <chart id="chart" type="StockChart" [options]="options" (load)="setTableExtremes($event)">
   <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
 </chart> -->
+<highcharts-chart id="chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions" [(update)]="updateChart"></highcharts-chart>
