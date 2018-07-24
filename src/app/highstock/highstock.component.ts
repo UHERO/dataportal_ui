@@ -4,19 +4,20 @@ import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
 import { Series } from '../series';
-import * as Highcharts from 'highcharts/js/highstock';
+//import * as Highcharts from 'highcharts/highstock';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
 declare var $: any;
 declare var require: any;
-const exporting = require('highcharts/modules/exporting')
-exporting(Highcharts);
+//const exporting = require('highcharts/modules/exporting')
+//exporting(Highcharts);
 // import * as highcharts from 'highcharts';
-/* declare var require: any;
+declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
-const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
-const exportCSV = require('../csv-export'); */
+exporting(Highcharts);
+//const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
+//const exportCSV = require('../csv-export'); */
 
 @Component({
   selector: 'app-highstock',
@@ -53,7 +54,7 @@ export class HighstockComponent implements OnChanges {
     const $chart = $('#chart');
     const chartExtremes = this.chartExtremes;
     const tableExtremes = this.tableExtremes;
-    $chart.bind('click', function () {
+    /* $chart.bind('click', function () {
       const xAxis = $chart.highcharts().xAxis[0];
       if (xAxis._hasSetExtremes) {
         const extremes = { minDate: xAxis._extremes.min, maxDate: xAxis._extremes.max };
@@ -61,7 +62,7 @@ export class HighstockComponent implements OnChanges {
         chartExtremes.emit(extremes);
       }
       xAxis._hasSetExtremes = false;
-    });
+    }); */
   }
 
   // Gets buttons used in Highstock Chart
@@ -172,29 +173,67 @@ export class HighstockComponent implements OnChanges {
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
+    console.log('startDate', startDate);
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
+    console.log('endDate', endDate)
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
+    console.log('series', series)
+    const tableExtremes = this.tableExtremes;
+    const getChartExtremes = (chartObject) => {
+      // Gets range of x values to emit
+      // Used to redraw table in the single series view
+      let xMin, xMax;
+      // Selected level data
+      let selectedRange = null;
+      if (chartObject.series[0].points) {
+        selectedRange = chartObject.series[0].points;
+      }
+      if (!chartObject.series[0].points.length) {
+        return { min: null, max: null };
+      }
+      if (selectedRange.length) {
+        xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+        xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+        return { min: xMin, max: xMax };
+      }
+    }
+  
+  
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
-      description: freq.freq
+      description: freq.freq,
+      events: {
+        render: function () {
+          console.log(this);
+          if (!this.chartObject || this.chartObject.series.length < 4) {
+            this.chartObject = Object.assign({}, this);
+            console.log(this.chartObject)
+          }
+          const extremes = getChartExtremes(this.chartObject);
+          console.log('extremes', extremes)
+          if (extremes) {
+            tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+          }   
+        }
+      }
     };
     this.chartOptions.labels = {
       items: labelItems,
       style: { display: 'none' }
     };
     this.chartOptions.rangeSelector = {
-      selected: !startDate && !endDate ? 2 : null,
+      selected: null,//!startDate && !endDate ? 2 : null,
+      //selected: 2,
       buttons: chartButtons,
-      buttonPosition: { x: 10, y: 10 },
+      buttonPosition: { x: 0, y: 10 },
       labelStyle: { visibility: 'hidden' },
-      inputEnabled: false
+      inputEnabled: false,
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.navigator = {
-      series: { includeInCSVExport: false }
+      series: { includeInCSVExport: false },
     };
-    console.log(Highcharts.getOptions())
     this.chartOptions.exporting = {
       buttons: {
         contextButton: { enabled: false },
@@ -286,6 +325,13 @@ export class HighstockComponent implements OnChanges {
     };
     this.chartOptions.credits = { enabled: false };
     this.chartOptions.xAxis = {
+      events: {
+        afterSetExtremes: function() {
+          //this._hasSetExtremes = true;
+          //this._extremes = getChartExtremes(this);
+          console.log('aftersetextremes', this)
+        }
+      },
       minRange: 1000 * 3600 * 24 * 30 * 12,
       min: Date.parse(startDate),
       max: Date.parse(endDate),
@@ -342,7 +388,7 @@ export class HighstockComponent implements OnChanges {
         }
       },
       gridLineWidth: 0,
-      minPadding: 0,
+      minPadding:0,
       maxPadding: 0,
       minTickInterval: 0.01,
       showLastLabel: true

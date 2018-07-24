@@ -1,6 +1,9 @@
 export interface HighstockObject {
   chart: {
     alignTicks: boolean,
+    events: {
+      render: () => void,
+    },
     zoomType: string,
     description: string, // used in xAxis label formatter
   },
@@ -77,6 +80,9 @@ export interface HighstockObject {
     enabled: boolean
   },
   xAxis: {
+    events: {
+      afterSetExtremes: () => void
+    },
     minRange: number,
     min: number,
     max: number,
