@@ -179,6 +179,7 @@ export class HighstockComponent implements OnChanges {
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
+    const formatTooltip = (args, points, x, pseudoZones, decimals, freq) => this.formatTooltip(args, points, x, pseudoZones, decimals, freq);
     const getChartExtremes = (chartObject) => {
       // Gets range of x values to emit
       // Used to redraw table in the single series view
@@ -272,54 +273,8 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.tooltip = {
       borderWidth: 0,
       shadow: false,
-      formatter: function () {
-        const getFreqLabel = function (frequency, date) {
-          if (frequency === 'A') {
-            return '';
-          }
-          if (frequency === 'Q') {
-            if (Highcharts.dateFormat('%b', date) === 'Jan') {
-              return 'Q1 ';
-            }
-            if (Highcharts.dateFormat('%b', date) === 'Apr') {
-              return 'Q2 ';
-            }
-            if (Highcharts.dateFormat('%b', date) === 'Jul') {
-              return 'Q3 ';
-            }
-            if (Highcharts.dateFormat('%b', date) === 'Oct') {
-              return 'Q4 ';
-            }
-          }
-          if (frequency === 'M' || frequency === 'S') {
-            return Highcharts.dateFormat('%b', date);
-          }
-        };
-        const pseudo = 'Pseudo History ';
-        let s = '<b>';
-        s = s + getFreqLabel(freq.freq, this.x);
-        s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
-        this.points.forEach((point) => {
-          const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
-          const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-          const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
-          const seriesNameValue = point.series.name + ': ' + formattedValue;
-          const label = seriesColor + seriesNameValue;
-          if (pseudoZones.length) {
-            pseudoZones.forEach((zone) => {
-              if (point.x < zone.value) {
-                return s += seriesColor + pseudo + seriesNameValue + '<br>';
-              }
-              if (point.x > zone.value) {
-                return s += label;
-              }
-            });
-          }
-          if (!pseudoZones.length) {
-            s += label;
-          }
-        });
-        return s;
+      formatter: function (args) {
+        return formatTooltip(args, this.points, this.x, pseudoZones, decimals, freq)
       }
     };
     this.chartOptions.credits = { enabled: false };
@@ -395,6 +350,56 @@ export class HighstockComponent implements OnChanges {
       series: { cropThreshold: 0 }
     };
     this.chartOptions.series = series;
+  }
+
+  formatTooltip(args, points, x, pseudoZones, decimals, freq) {
+    const getFreqLabel = function (frequency, date) {
+      if (frequency === 'A') {
+        return '';
+      }
+      if (frequency === 'Q') {
+        if (Highcharts.dateFormat('%b', date) === 'Jan') {
+          return 'Q1 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Apr') {
+          return 'Q2 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Jul') {
+          return 'Q3 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Oct') {
+          return 'Q4 ';
+        }
+      }
+      if (frequency === 'M' || frequency === 'S') {
+        return Highcharts.dateFormat('%b', date);
+      }
+    };
+    const pseudo = 'Pseudo History ';
+    let s = '<b>';
+    s = s + getFreqLabel(freq.freq, x);
+    s = s + ' ' + Highcharts.dateFormat('%Y', x) + '</b>';
+    points.forEach((point) => {
+      const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
+      const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+      const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
+      const seriesNameValue = point.series.name + ': ' + formattedValue;
+      const label = seriesColor + seriesNameValue;
+      if (pseudoZones.length) {
+        pseudoZones.forEach((zone) => {
+          if (point.x < zone.value) {
+            return s += seriesColor + pseudo + seriesNameValue + '<br>';
+          }
+          if (point.x > zone.value) {
+            return s += label;
+          }
+        });
+      }
+      if (!pseudoZones.length) {
+        s += label;
+      }
+    });
+    return s;
   }
 
   updateExtremes(e) {

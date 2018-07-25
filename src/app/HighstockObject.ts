@@ -28,6 +28,10 @@ export interface HighstockObject {
   lang: {
     exportKey: string
   },
+  legend?: {
+    enabled: boolean,
+    labelFormatter: () => string
+  }
   navigator: {
     series: {
       includeInCSVExport: boolean
@@ -71,13 +75,17 @@ export interface HighstockObject {
       title: {
         text: string,
         align: string
+      },
+      subtitle?: {
+        text: ''
       }
     }
   },
   tooltip: {
     borderWidth: number,
     shadow: false,
-    formatter: () => string
+    shared?: boolean,
+    formatter: (args: any) => any
   },
   credits: {
     enabled: boolean
@@ -90,7 +98,7 @@ export interface HighstockObject {
     min: number,
     max: number,
     ordinal: boolean,
-    labels: {
+    labels?: {
       formatter: () => string
     }
   },

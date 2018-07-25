@@ -309,6 +309,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
+    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
     const getChartExtremes = (chartObject) => {
       // Gets range of x values to emit
       // Used to redraw table in the single series view
@@ -392,6 +393,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
           text: 'Download'
         }
       },
+      csv: {
+        dateFormat: '%Y-%m-%d',
+      },
+      filename: 'chart',
       chartOptions: {
         events: null,
         navigator: {
@@ -406,10 +411,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         credits: {
           enabled: true,
           text: portalSettings.highstock.credits,
-          position: { align: 'right' }
+          position: { align: 'right', x: -10, y: -5 }
         },
         title: {
-          align: 'left'
+          align: 'left',
+          text: null
         },
         subtitle: {
           text: ''
@@ -421,13 +427,19 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       shadow: false,
       shared: true,
       formatter: function (args) {
-        return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
       }
     };
     this.chartOptions.credits = {
       enabled: false
     };
     this.chartOptions.xAxis = {
+      events: {
+        afterSetExtremes: function () {
+          this._hasSetExtremes = true;
+          this._extremes = getChartExtremes(this);
+        }
+      },
       minRange: 1000 * 3600 * 24 * 30 * 12,
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
@@ -440,10 +452,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
     };
     this.chartOptions.series = series;
-    // Tooltip
-    /* this.options.tooltip.formatter = function (args) {
-      return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-    }; */
     this.showChart = true;
   }
 
