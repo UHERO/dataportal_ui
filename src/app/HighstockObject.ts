@@ -44,6 +44,9 @@ export interface HighstockObject {
         menuItems: Array<any>
       }
     },
+    csv: {
+      dateFormat: string
+    },
     filename: string,
     chartOptions: {
       events: void,
