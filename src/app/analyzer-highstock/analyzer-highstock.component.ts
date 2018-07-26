@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -22,7 +22,8 @@ exportCSV(Highcharts);
   styleUrls: ['./analyzer-highstock.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerHighstockComponent implements OnInit, OnChanges {
+export class AnalyzerHighstockComponent implements OnChanges {
+  @ViewChild('chart-container') public chartEl: ElementRef;
   @Input() series;
   @Input() allDates;
   @Input() portalSettings;
@@ -38,6 +39,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   chartConstructor = 'stockChart';
   chartOptions = <HighstockObject>{};
   updateChart = false;
+  oneToOne
   chartObject;
 
   // options;
@@ -46,26 +48,64 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
 
   constructor(private _analyzer: AnalyzerService) { }
 
-  ngOnInit() { }
-
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    //console.log(changes)
     // 'destroy' chart on changes
-    // this.showChart = false;
-    this.updateChart = true;
+    this.showChart = false;
+    console.log(this.showChart)
+    if (this.chartObject) {
+      let selectedAnalyzerSeries;
+      if (this.series.length) {
+        selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
+      }
+      // Get buttons for chart
+      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+      if (selectedAnalyzerSeries) {
+        this.chartObject.update({
+          series: selectedAnalyzerSeries.series,
+          yAxis: selectedAnalyzerSeries.yAxis
+        })
+      }
+    }
+    if (!this.chartObject) {
+      let selectedAnalyzerSeries;
+      if (this.series.length) {
+        selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
+      }
+      // Get buttons for chart
+      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
+      if (selectedAnalyzerSeries) {
+        console.log(selectedAnalyzerSeries.series)
+        this.initChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.portalSettings, chartButtons);
+      }  
+    }
     // Series in the analyzer that have been selected to be displayed in the chart
-    let selectedAnalyzerSeries;
+    /* let selectedAnalyzerSeries;
+    console.log(this.series)
     if (this.series.length) {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
+      console.log(selectedAnalyzerSeries)
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
     if (selectedAnalyzerSeries) {
-      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
-    }
+      console.log('test')
+      this.initChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.portalSettings, chartButtons);
+    } */
     // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
     }
+  }
+
+  chartCallback = (chart) => {
+    if (!this.chartObject || Object.keys(this.chartObject).length === 0) {
+      this.chartObject = chart;
+    }
+  }
+
+  addSeriesToChart = (chart, series) => {
+    chart.addSeries(series);
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -79,28 +119,6 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return allButtons;
     }, []);
     return chartButtons;
-  }
-
-
-  addYAxis(chart, series, seriesUnits, y0Exist) {
-    const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true) ? true : false;
-    chart.addAxis({
-      labels: {
-        formatter: function () {
-          return Highcharts.numberFormat(this.value, 2, '.', ',');
-        }
-      },
-      title: {
-        text: seriesUnits
-      },
-      id: y0Exist ? 'yAxis1' : 'yAxis0',
-      opposite: oppositeExist ? false : true,
-      showLastLabel: true,
-      minPadding: 0,
-      maxPadding: 0,
-      minTickInterval: 0.01,
-      series: [series]
-    });
   }
 
   createYAxes(series: Array<any>, yAxes: Array<any>) {
@@ -303,45 +321,23 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     return { series: chartSeries, yAxis: yAxes };
   }
 
-  drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
+  initChart = (series, yAxis, portalSettings, buttons) => {
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
     const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    const getChartExtremes = (chartObject) => {
-      // Gets range of x values to emit
-      // Used to redraw table in the single series view
-      let xMin = null, xMax = null;
-      // Selected level data
-      let selectedRange = null;
-      if (chartObject && chartObject.series) {
-        let series, seriesLength = 0;
-        const nav = chartObject.series.find(serie => serie.name === 'Navigator');
-        chartObject.series.forEach((serie) => {
-          if (!series || seriesLength < serie.points.length) {
-            seriesLength = serie.points.length;
-            series = serie;
-          }
-        });
-        selectedRange = nav ? nav.points : series ? series.points : null;
-      }
-      if (!selectedRange) {
-        return { min: null, max: null };
-      }
-      if (selectedRange) {
-        xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-        xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-        return { min: xMin, max: xMax };
-      }
-    };
+    const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
     const tableExtremes = this.tableExtremes;
     this.chartOptions.chart = {
       alignTicks: false,
       events: {
         render: function () {
-          const extremes = getChartExtremes(this);
+          if (!this.chartObject || this.chartObject.series.length < 4) {
+            this.chartObject = Object.assign({}, this);
+          }
+          const extremes = getChartExtremes(this.chartObject);
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
           }
