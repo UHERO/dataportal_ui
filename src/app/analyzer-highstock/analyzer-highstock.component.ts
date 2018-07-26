@@ -51,36 +51,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     //console.log(changes)
     // 'destroy' chart on changes
-    this.showChart = false;
-    console.log(this.showChart)
-    if (this.chartObject) {
-      let selectedAnalyzerSeries;
-      if (this.series.length) {
-        selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
-      }
-      // Get buttons for chart
-      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      if (selectedAnalyzerSeries) {
-        this.chartObject.update({
-          series: selectedAnalyzerSeries.series,
-          yAxis: selectedAnalyzerSeries.yAxis
-        })
-      }
-    }
-    if (!this.chartObject) {
-      let selectedAnalyzerSeries;
-      if (this.series.length) {
-        selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
-      }
-      // Get buttons for chart
-      const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      if (selectedAnalyzerSeries) {
-        console.log(selectedAnalyzerSeries.series)
-        this.initChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.portalSettings, chartButtons);
-      }  
-    }
+    //this.showChart = false;
     // Series in the analyzer that have been selected to be displayed in the chart
-    /* let selectedAnalyzerSeries;
+    let selectedAnalyzerSeries;
     console.log(this.series)
     if (this.series.length) {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
@@ -91,7 +64,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (selectedAnalyzerSeries) {
       console.log('test')
       this.initChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.portalSettings, chartButtons);
-    } */
+      this.updateChart = true;
+      this.oneToOne = true;
+      console.log('chartoptions', this.chartOptions)
+    }
     // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
@@ -294,6 +270,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
+        showInLegend: true,
         showInNavigator: false,
         events: {
           legendItemClick: function () {
@@ -314,8 +291,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
-      index: -1,
-      colorIndex: -1,
+      // index: -1,
+      //colorIndex: -1,
       name: 'Navigator'
     });
     return { series: chartSeries, yAxis: yAxes };
