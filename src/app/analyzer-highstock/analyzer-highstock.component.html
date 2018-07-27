@@ -1,10 +1,6 @@
 <div *ngIf="alertMessage" class="alert alert-info alert-message" role="alert">
     <i class="material-icons">&#xE001;</i> {{alertMessage}}
 </div>
-<!-- <p *ngIf="alertMessage" class="alert-message">{{alertMessage}}</p> -->
-<!-- <chart id="analyzer-chart" type="StockChart" *ngIf="showChart" [options]="options" (load)="saveInstance($event.context)">
-    <xAxis (afterSetExtremes)="updateExtremes($event)"></xAxis>
-</chart> -->
 <highcharts-chart *ngIf="showChart" id="analyzer-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
     [(update)]="updateChart" [callbackFunction]="chartCallback" style="width: 100%; display: block;"></highcharts-chart>
 <div class="customize-tooltip">

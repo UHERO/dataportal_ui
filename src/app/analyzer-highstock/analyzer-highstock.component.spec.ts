@@ -13,6 +13,7 @@ class ChartStubComponent {
   @Input() constructorType;
   @Input() options;
   @Input() update;
+  @Input() callbackFunction;
 }
  
 describe('AnalyzerHighstockComponent', () => {
