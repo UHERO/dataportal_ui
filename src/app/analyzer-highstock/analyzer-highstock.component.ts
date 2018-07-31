@@ -4,9 +4,6 @@ import { HighstockObject } from '../HighstockObject';
 import 'jquery';
 declare var $: any;
 declare var require: any;
-//const exporting = require('highcharts/modules/exporting')
-//exporting(Highcharts);
-// import * as highcharts from 'highcharts';
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
@@ -38,28 +35,22 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartConstructor = 'stockChart';
   chartOptions = <HighstockObject>{};
   updateChart = false;
-  oneToOne
   chartObject;
-
-  // options;
-  // chart;
-  showChart;
 
   constructor(private _analyzer: AnalyzerService) { }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
-    let selectedAnalyzerSeries;
+    let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
+      yAxes = this.setYAxes(this.series);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
     if (selectedAnalyzerSeries) {
-      this.initChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.portalSettings, chartButtons);
-      this.chartOptions.yAxis = selectedAnalyzerSeries.yAxis
+      this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons);
       this.updateChart = true;
-      //this.oneToOne = true;
     }
     // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
     if (this.alertMessage) {
@@ -67,30 +58,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     }
   }
 
-  chartCallback = (chart) => {
-    if (!this.chartObject) {
-      this.chartObject = chart;
-    }
-  }
-
-  addSeriesToChart = (chart, series) => {
-    chart.addSeries(series);
-  }
-
-  formatChartButtons(buttons: Array<any>) {
-    const chartButtons = buttons.reduce((allButtons, button) => {
-      if (button !== 'all') {
-        allButtons.push({ type: 'year', count: button, text: button + 'Y' });
-      }
-      if (button === 'all') {
-        allButtons.push({ type: 'all', text: 'All' });
-      }
-      return allButtons;
-    }, []);
-    return chartButtons;
-  }
-
-  createYAxes(series: Array<any>, yAxes: Array<any>) {
+  setYAxes = (series) => {
+    const yAxes = [];
     // Group series by their units
     const unitGroups = this.groupByUnits(series);
     // Create y-axis groups based on units available
@@ -113,11 +82,29 @@ export class AnalyzerHighstockComponent implements OnChanges {
         minPadding: 0,
         maxPadding: 0,
         minTickInterval: 0.01,
-        series: axis.series
+        series: axis.series,
+        showEmpty: false
       });
     });
     return yAxes;
   }
+
+  addSeriesToChart = (chart, series) => {
+    chart.addSeries(series);
+  }
+
+  formatChartButtons(buttons: Array<any>) {
+    const chartButtons = buttons.reduce((allButtons, button) => {
+      if (button !== 'all') {
+        allButtons.push({ type: 'year', count: button, text: button + 'Y' });
+      }
+      if (button === 'all') {
+        allButtons.push({ type: 'all', text: 'All' });
+      }
+      return allButtons;
+    }, []);
+    return chartButtons;
+  };
 
   setYAxesGroups(unitGroups) {
     // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
@@ -140,7 +127,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       });
       return yAxesGroups;
     }
-  }
+  };
 
   findMaxLevelSeries(unit) {
     let maxLevelValue, maxValueSeries;
@@ -152,14 +139,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     });
     return maxValueSeries;
-  }
+  };
 
   // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
   isOverlapSufficient(level, baseMin, baseMax) {
     const sufficientOverlap = 0.5;
     const overlap = this.calculateOverlap(level, baseMin, baseMax);
     return overlap >= sufficientOverlap;
-  }
+  };
 
   calculateOverlap(level, baseMin, baseMax) {
     const newMin = Math.min(...level);
@@ -169,7 +156,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const baseMaxNewMin = baseMax - newMin;
     const newMaxBaseMin = newMax - baseMin;
     return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
-  }
+  };
 
   findHighestOverlap(yAxesGroups, baseMin, baseMax) {
     const y0Series = yAxesGroups[0].series;
@@ -192,7 +179,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     });
     return highestOverlapAxis;
-  }
+  };
 
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
     unit.series.forEach((serie) => {
@@ -217,7 +204,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     });
     return yAxesGroups;
-  }
+  };
 
   groupByUnits(series) {
     const units = series.reduce((obj, serie) => {
@@ -230,7 +217,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       return { units: key, series: units[key] };
     });
     return groups;
-  }
+  };
 
   createNavigatorDates(dates) {
     // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
@@ -244,12 +231,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
       return obs;
     });
     return navigatorDates;
-  }
+  };
 
-  formatSeriesData(series, dates) {
+  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>) {
     const chartSeries = [];
-    let yAxes;
-    yAxes = this.createYAxes(series, []);
     series.forEach((serie, index) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
@@ -282,13 +267,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
       data: navDates,
+      yAxis: 0,
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
       name: 'Navigator'
     });
-    return { series: chartSeries, yAxis: yAxes };
-  }
+    return chartSeries;
+  };
 
   initChart = (series, yAxis, portalSettings, buttons) => {
     const startDate = this.start ? this.start : null;
@@ -303,9 +289,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       alignTicks: false,
       events: {
         render: function () {
-          if (!this.chartObject || this.chartObject.series.length < 4) {
-            //this.chartObject = Object.assign({}, this);
-          }
           const extremes = getChartExtremes(this);
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
@@ -411,21 +394,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
       ordinal: false
     };
     this.chartOptions.yAxis = yAxis;
-    console.log('yAxis', yAxis);
-    console.log('chart options y axis', this.chartOptions);
-    console.log('chartObject', this.chartObject)
     this.chartOptions.plotOptions = {
       series: {
         cropThreshold: 0
       }
     };
     this.chartOptions.series = series;
-    this.showChart = true;
-  }
+  };
 
   saveInstance(chartInstance) {
     this.setTableExtremes(chartInstance);
-  }
+  };
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
@@ -548,22 +527,22 @@ export class AnalyzerHighstockComponent implements OnChanges {
       tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
-  }
+  };
 
   nameActive(e, chart, tooltipFormatter) {
     this.nameChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-  }
+  };
 
   unitsActive(e, chart, tooltipFormatter) {
     this.unitsChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
-  }
+  };
 
   geoActive(e, chart, tooltipFormatter) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-  }
+  };
 
   setTableExtremes(e) {
     // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
@@ -572,7 +551,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (extremes) {
       this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     }
-  }
+  };
 
   getChartExtremes(chartObject) {
     // Gets range of x values to emit
@@ -599,11 +578,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
-  }
+  };
 
   updateExtremes(e) {
     e.context._hasSetExtremes = true;
     e.context._extremes = this.getChartExtremes(e.context);
     this.setTableExtremes(e.context);
-  }
+  };
 }
