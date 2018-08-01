@@ -380,7 +380,7 @@
 				sourceDescription = ['Source Description: ' + chartLabels[0].html];
 			};
 			if (chartLabels[1].html) {
-				sourceLinnk = ['Source Link: ' + chartLabels[2].html];
+				sourceLink = ['Source Link: ' + chartLabels[2].html];
 			}
 			if (chartLabels[2].html) {
 				sourceDetails = ['Source Details: ' + chartLabels[2].html];
@@ -613,6 +613,7 @@
 		 *          CSV representation of the data
 		 */
 		Highcharts.Chart.prototype.getCSV = function (useLocalDecimalPoint) {
+			console.log('getcsv options', this.options)
 			var csv = '',
 				rows = this.getDataRows(),
 				csvOptions = this.options.exporting.csv,

@@ -4,14 +4,9 @@ import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
 import { Series } from '../series';
-//import * as Highcharts from 'highcharts/highstock';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
 declare var $: any;
-declare var require: any;
-//const exporting = require('highcharts/modules/exporting')
-//exporting(Highcharts);
-// import * as highcharts from 'highcharts';
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
@@ -20,7 +15,6 @@ const exportCSV = require('../csv-export');
 exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
-//const exportCSV = require('../csv-export'); */
 
 @Component({
   selector: 'app-highstock',
@@ -47,25 +41,16 @@ export class HighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
+  showChart = false;
 
   constructor(@Inject('defaultRange') private defaultRange) { }
 
   ngOnChanges() {
-    this.updateChart = true;
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
-    // Emit dates when user selects a new range
-    const $chart = $('#single-series-chart');
-    const chartExtremes = this.chartExtremes;
-    const tableExtremes = this.tableExtremes;
-    $chart.bind('click', function () {
-      const xAxis = $chart.highcharts().xAxis[0];
-      if (xAxis._hasSetExtremes) {
-        const extremes = { minDate: xAxis._extremes.min, maxDate: xAxis._extremes.max };
-        tableExtremes.emit(extremes);
-        chartExtremes.emit(extremes);
-      }
-      xAxis._hasSetExtremes = false;
-    });
+    if (Object.keys(this.seriesDetail).length) {
+      this.showChart = true;
+      this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
+      this.updateChart = true;
+    }
   }
 
   // Gets buttons used in Highstock Chart
@@ -105,9 +90,9 @@ export class HighstockComponent implements OnChanges {
     }, {
       html: portalSettings.highstock.labels.portalLink
     }, {
-      html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
+      html: 'Series: ' + seriesDetail.title + ' (' + geo.name + ', ' + freq.label + ')'
     }];
-    return labelItems;
+    return { items: labelItems, style: { display: 'none' } };
   }
 
   formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) {
@@ -179,6 +164,7 @@ export class HighstockComponent implements OnChanges {
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
+    const chartExtremes = this.chartExtremes;
     const formatTooltip = (args, points, x, pseudoZones, decimals, freq) => this.formatTooltip(args, points, x, pseudoZones, decimals, freq);
     const getChartExtremes = (chartObject) => {
       // Gets range of x values to emit
@@ -212,19 +198,14 @@ export class HighstockComponent implements OnChanges {
           const extremes = getChartExtremes(this.chartObject);
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+            chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max })
           }
         }
       }
     };
-    this.chartOptions.labels = {
-      items: labelItems,
-      style: { display: 'none' }
-    };
-    console.log('startDate', startDate);
-    console.log('endDate', endDate);
+    this.chartOptions.labels = labelItems;
     this.chartOptions.rangeSelector = {
-      selected: null,//!startDate && !endDate ? 2 : null,
-      //selected: 2,
+      selected: null,
       buttons: chartButtons,
       buttonPosition: { x: 0, y: 10 },
       labelStyle: { visibility: 'hidden' },

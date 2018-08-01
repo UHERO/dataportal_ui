@@ -1,91 +1,97 @@
 @import 'app_colors';
 
 .multi-chart {
-    width: 200px;
-    height: 200px;
-    display: block;
+  width: 200px;
+  height: 200px;
+  display: block;
 
     /* @media (max-width: 991px) {
         width: 100%;
         height: 150px;
     } */
 
-    .highcharts-tooltip {
-        filter: none !important;
+  .highcharts-tooltip {
+    filter: none !important;
+  }
+
+  .highcharts-background {
+    fill: $chart-background;
+  }
+
+  .highcharts-grid-line, .highcharts-axis-line, .highcharts-color-0 {
+    stroke: none;
+  }
+
+  .highcharts-series-0 {
+    .highcharts-graph {
+      stroke: $highcharts-series0;
+      stroke-width: 2.5px;
+    }
+  }
+
+  .highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
+    stroke: #7CB5EC;
+    color: #7CB5EC;
+    stroke-dasharray: 5;
+  }
+
+  .highcharts-series-1 {
+    .highcharts-graph {
+      stroke: $highcharts-series1;
     }
 
-    .highcharts-background {
-        fill: $chart-background;
+    // Transparent column charts for UHERO data portal
+    rect.highcharts-point {
+      stroke: none;
+      fill: none;
     }
+  }
 
-    .highcharts-grid-line, .highcharts-axis-line, .highcharts-color-0 {
-        stroke: none;
+  .highcharts-markers.highcharts-series-0 {
+    path {
+      fill: $highcharts-series0;
     }
-
-    .highcharts-series-0 {
-        .highcharts-graph {
-            stroke: $highcharts-series0;
-            stroke-width: 2.5px;
-        }
-    }
-
-    .highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
-        stroke: #7CB5EC;
-        color: #7CB5EC;
-        stroke-dasharray: 5;
-    }
-
-    .highcharts-series-1 {
-        .highcharts-graph {
-            stroke: $highcharts-series1;
-        }
-
-        // Transparent column charts for UHERO data portal
-        rect.highcharts-point {
-            stroke: none;
-            fill: none;
-        }
-    }
-
-    .highcharts-markers.highcharts-series-0 {
-        path {
-            fill: $highcharts-series0;
-        }
-    }
+  }
     
-    .highcharts-markers.highcharts-series-1 {
-        path {
-            fill: $highcharts-series1;
-        }
+  .highcharts-markers.highcharts-series-1 {
+    path {
+      fill: $highcharts-series1;
     }
+  }
 
-    .highcharts-no-data {
-        color: $primary-text !important;
-        font-size: 0.85em !important;
+  .highcharts-no-data {
+    color: $primary-text !important;
+    font-size: 0.85em !important;
+  }
+
+  .highcharts-title, .highcharts-subtitle {
+    font-size: 0.9em;
+    letter-spacing: 0.05em;
+    fill: $primary-text;        
+  }
+
+  .single-point {
+    .highcharts-subtitle {
+      fill: $primary;
+
+      tspan:first-of-type {
+        font-size: 2em;
+      }    
     }
+  }
 
-    .highcharts-title, .highcharts-subtitle {
-        font-size: 0.9em;
-        letter-spacing: 0.05em;
-        fill: $primary-text;        
-    }
-
-    .single-point {
-        .highcharts-subtitle {
-            fill: $primary;
-
-            tspan:first-of-type {
-                font-size: 2em;
-            }    
-        }
-    }
-
-    .highcharts-tooltip {
-        font-size: 0.9em;
-        line-height: 1.25em;
+  .highcharts-tooltip {
+    filter: none !important;
+    font-size: 0.9em;
+    line-height: 1.25em;
         
-        .highcharts-tooltip-box {
-            fill: none;
-        }
+    span {
+      white-space: normal !important;
+      width: 180px;
     }
+
+    .highcharts-tooltip-box {
+      fill: none;
+    }
+  }
 }

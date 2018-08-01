@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
-// import { ChartModule } from 'angular2-highcharts';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { AppComponent } from '../app.component';
@@ -58,7 +57,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
     CommonModule,
     BrowserModule,
     HighchartsChartModule,
-    // ChartModule,
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
