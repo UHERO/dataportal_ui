@@ -76,7 +76,7 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
 
   findDefaultRange() {
     const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.dates, this.defaultRange);
-    let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+    let { startIndex, endIndex } = defaultRanges;
     // Range slider is converting annual year strings to numbers
     const dateFromExists = this.dates.findIndex(date => date == this.dateFrom);
     const dateToExists = this.dates.findIndex(date => date == this.dateTo);

@@ -1,4 +1,4 @@
-@import 'colors';
+@import 'app_colors';
 
 .share {
     display: inline-block;
@@ -7,9 +7,14 @@
 
     span.input-group-addon {
         background-color: $light-gray;
+        border: 1px solid #CED4DA;
+        border-right: 0;
+        border-radius: 0.25em;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
         cursor: pointer;
         padding: 0.175rem;
-        height: calc(1.75rem - 2px); 
+        height: calc(1.75rem - 2px);
 
         .share-link {
             color: $primary;

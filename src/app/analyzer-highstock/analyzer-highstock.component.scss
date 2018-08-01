@@ -1,4 +1,4 @@
-@import 'colors';
+@import 'app_colors';
 
 .customize-tooltip {
   display: block;
@@ -7,6 +7,7 @@
     display:  inline-block;
     font-size: 0.85em;
     margin-top: 1rem;
+    margin-right: 0.75em;
     vertical-align: middle;
   }
 }
@@ -28,10 +29,13 @@
     }
 }
 
-#analyzer-chart, #chart {
+#analyzer-chart, #single-series-chart {
     box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
     -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
+    display: block;
+    margin-top: 2%;
+    width: 100%;
 }
 
 .highcharts-background {
@@ -128,6 +132,10 @@
     .highcharts-area {
         fill: $highstock-series1;
     }
+}
+
+.highcharts-column-series rect.highcharts-point {
+    stroke: none;
 }
 
 .highcharts-title {
