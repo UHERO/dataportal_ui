@@ -5,7 +5,6 @@ import { DebugElement } from '@angular/core';
 import { Component } from '@angular/core';
 
 import { HighchartComponent } from './highchart.component';
-import { ChartModule } from 'angular2-highcharts';
 
 let comp: HighchartComponent;
 let fixture: ComponentFixture<HighchartComponent>;
@@ -14,7 +13,7 @@ describe('HighchartComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ HighchartComponent ],
-      imports: [ ChartModule ]
+      imports: [ ]
     })
     .compileComponents()
     .then(() => {

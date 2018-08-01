@@ -529,17 +529,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return tooltip;
   };
 
-  nameActive(e, chart, tooltipFormatter) {
+  nameActive(e) {
     this.nameChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
   };
 
-  unitsActive(e, chart, tooltipFormatter) {
+  unitsActive(e) {
     this.unitsChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
   };
 
-  geoActive(e, chart, tooltipFormatter) {
+  geoActive(e) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
   };
