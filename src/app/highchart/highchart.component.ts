@@ -153,7 +153,7 @@ export class HighchartComponent implements OnInit, OnChanges {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const { series0Name, series1Name } = portalSettings.highcharts;
     const { start, end } = seriesData.categoryDisplay;
-    const { percent, title, unitsLabelShort } = seriesData.seriesInfo;
+    const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
     const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(dates, chartStart, chartEnd);
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     let series0 = seriesData.categoryDisplay.chartData[series0Name];
@@ -319,7 +319,7 @@ export class HighchartComponent implements OnInit, OnChanges {
           return s;
         }
         const pseudo = 'Pseudo History ';
-        let s = '<b>' + title + '</b><br>';
+        let s = '<b>' + displayName + '</b><br>';
         if (levelLength.length > 1) {
           // Get Quarter or Month for Q/M frequencies
           s = s + getFreqLabel(currentFreq, this.x);
@@ -383,7 +383,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   }
 
   noDataChart = (seriesData) => {
-    const title = seriesData.seriesInfo.title === undefined ? seriesData.seriesInfo.name : seriesData.seriesInfo.title;
+    const title = seriesData.seriesInfo.displayName;
     this.chartOptions.title = this.setChartTitle('<b>' + title + '</b><br>No Data Available');
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };
