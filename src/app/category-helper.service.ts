@@ -350,7 +350,6 @@ export class CategoryHelperService {
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
-        const observations = series.seriesInfo.seriesObservations;
         series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, dateArray, decimals);
       }
     });

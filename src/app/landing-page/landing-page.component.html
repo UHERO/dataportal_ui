@@ -39,16 +39,16 @@
 					<app-date-slider *ngIf="!sub.noData" class="sliders" [portalSettings]="portalSettings" [dates]="data.sliderDates" [sublist]="data.subcategories"
 					 [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq"
 					 (updateRange)="changeRange($event)"></app-date-slider>
-					<app-category-datatables *ngIf="routeView === 'table' && !sub.noData" [portalSettings]="portalSettings" [geo]="data.currentGeo"
+					<!-- <app-category-datatables *ngIf="routeView === 'table' && !sub.noData" [portalSettings]="portalSettings" [geo]="data.currentGeo"
 					 [freq]="data.currentFreq" [yoy]="queryParams.yoy === 'true'" [ytd]="queryParams.ytd === 'true'" [categoryDates]="data.categoryDates"
-					 [sublist]="sub" [tableId]="sub.id"></app-category-datatables>
+					 [sublist]="sub" [tableId]="sub.id"></app-category-datatables> -->
 				</div>
 				<i *ngIf="!sub.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
 				<app-category-table *ngIf="routeView === 'table' && sub.requestComplete" [dates]="data.categoryDates" [tableStart]="tableStart"
 				 [tableEnd]="tableEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
 				 [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="sub.noData" [params]="queryParams"></app-category-table>
 				<app-category-charts *ngIf="routeView !== 'table' && sub.requestComplete" [portalSettings]="portalSettings"
-				 [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq"
+				 [chartStart]="chartStart" [chartEnd]="chartEnd" [sublist]="sub" [data]="sub.displaySeries" [dates]="data.categoryDates" [freq]="data.currentFreq?.freq"
 				 [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 			</ng-template>
 		</ng-template>

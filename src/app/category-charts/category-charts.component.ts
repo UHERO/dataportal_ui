@@ -1,13 +1,14 @@
-import { Component, OnInit, Input, OnChanges, Inject } from '@angular/core';
+import { Component, Input, OnChanges, Inject } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
+import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'app-category-charts',
   templateUrl: './category-charts.component.html',
   styleUrls: ['./category-charts.component.scss']
 })
-export class CategoryChartsComponent implements OnInit, OnChanges {
+export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
   @Input() sublist;
   @Input() data;
@@ -20,22 +21,35 @@ export class CategoryChartsComponent implements OnInit, OnChanges {
   @Input() chartStart;
   @Input() chartEnd;
   @Input() search;
+  @Input() dates;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
+    private _helper: HelperService,
     private googleAES: GoogleAnalyticsEventsService,
     private _analyzer: AnalyzerService
   ) { }
 
-  ngOnInit() {
+  ngOnChanges() {
     this.data.forEach((chartSeries) => {
-      if (chartSeries.seriesInfo !== 'No data available') {
+      if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
+        const transformations = this._helper.getTransformations(chartSeries.seriesInfo.seriesObservations);
+        const chart = this._helper.createSeriesChart(this.dates, transformations);
+        const pseudoZones = [];
+        const level = transformations.level;
+        if (level.pseudoHistory) {
+          level.pseudoHistory.forEach((obs, index) => {
+            if (obs && !level.pseudoHistory[index + 1]) {
+              pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+            }
+          });
+        }
+        //chartSeries.categoryDisplay.test = chartData;
+        const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: this.dates };
+        chartSeries.categoryDisplay.chartData = chartData
         chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
       }
     });
-  }
-
-  ngOnChanges() {
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {

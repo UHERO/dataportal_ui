@@ -73,8 +73,8 @@ export class AnalyzerService {
           // Use to format dates for table
           this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
           const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-          seriesData.chartData = data.chartData;
-          seriesData.seriesTableData = data.tableData;
+          // seriesData.chartData = data.chartData;
+          // seriesData.seriesTableData = data.tableData;
         } else {
           seriesData.noData = 'Data not available';
         }

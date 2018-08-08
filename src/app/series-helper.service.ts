@@ -66,7 +66,7 @@ export class SeriesHelperService {
       if (levelData && levelData.length) {
         // Use to format dates for table
         this._helper.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
-        const formattedData = this._helper.dataTransform(obs, dateArray, decimals);
+        const formattedData = this.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = formattedData.chartData;
         this.seriesData.seriesTableData = formattedData.tableData;
       } else {
@@ -79,6 +79,28 @@ export class SeriesHelperService {
       });
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
+
+  dataTransform(seriesObs, dates, decimals) {
+    const observations = seriesObs;
+    const start = observations.observationStart;
+    const end = observations.observationEnd;
+    const transformations = this._helper.getTransformations(observations);
+    const level = transformations.level;
+    const pseudoZones = [];
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+        }
+      });
+    }
+    const seriesTable = this._helper.createSeriesTable(dates, transformations, decimals);
+    const chart = this._helper.createSeriesChart(dates, transformations);
+    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
+    const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
+    return results;
+  }
+
 
   // Find series siblings for a particular geo-frequency combination
   findGeoFreqSibling(seriesSiblings, geo, freq) {

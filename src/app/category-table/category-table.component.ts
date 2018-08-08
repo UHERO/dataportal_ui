@@ -70,10 +70,14 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
       this.tableHeader = this.dates.slice(start, end + 1);
       if (this.data) {
         this.data.forEach((series) => {
-          if (series.seriesInfo !== 'No data available') {
+          if (series.seriesInfo !== 'No data available' && this.dates) {
+            const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
+            const seriesTable = this._helper.createSeriesTable(this.dates, transformations, series.seriesInfo.decimals);
+            series.categoryDisplay.tableData = seriesTable;
             series.trimCatTable = series.categoryDisplay.tableData.slice(start, end + 1);
           }
         });
+        console.log('cat table', this.data)
       }
     }
   }
