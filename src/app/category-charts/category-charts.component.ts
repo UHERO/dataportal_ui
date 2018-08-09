@@ -31,25 +31,14 @@ export class CategoryChartsComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    this.data.forEach((chartSeries) => {
-      if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
-        const transformations = this._helper.getTransformations(chartSeries.seriesInfo.seriesObservations);
-        const chart = this._helper.createSeriesChart(this.dates, transformations);
-        const pseudoZones = [];
-        const level = transformations.level;
-        if (level.pseudoHistory) {
-          level.pseudoHistory.forEach((obs, index) => {
-            if (obs && !level.pseudoHistory[index + 1]) {
-              pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-            }
-          });
+    if (this.data) {
+      this.data.forEach((chartSeries) => {
+        if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
+          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates);
+          chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
         }
-        //chartSeries.categoryDisplay.test = chartData;
-        const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: this.dates };
-        chartSeries.categoryDisplay.chartData = chartData
-        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
-      }
-    });
+      });
+    }
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {
@@ -61,6 +50,24 @@ export class CategoryChartsComponent implements OnChanges {
         this.sublist.maxValue = this.findMax(this.sublist, start, end);
       }
     }
+  }
+
+  formatCategoryChartData = (observations, dates) => {
+    const transformations = this._helper.getTransformations(observations);
+    const start = observations.observationStart;
+    const end = observations.observationEnd;
+    const chart = this._helper.createSeriesChart(this.dates, transformations);
+    const pseudoZones = [];
+    const level = transformations.level;
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+        }
+      });
+    }
+    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
+    return { start: start, end: end, chartData: chartData };
   }
 
   findMin(sublist, start, end) {
