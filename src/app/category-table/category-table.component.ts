@@ -55,7 +55,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   ngOnChanges() {
     if (this.dates) {
       const defaultRanges = this._helper.setDefaultCategoryRange(this.freq, this.dates, this.defaultRange);
-      let startIndex = defaultRanges.start, endIndex = defaultRanges.end;
+      let { startIndex, endIndex } = defaultRanges;
       this.dates.forEach((date, index) => {
         // Range slider is converting annual year strings to numbers
         if (date.tableDate == this.tableStart) {

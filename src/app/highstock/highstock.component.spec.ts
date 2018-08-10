@@ -5,7 +5,6 @@ import { DebugElement } from '@angular/core';
 import { Component } from '@angular/core';
 
 import { HighstockComponent } from './highstock.component';
-import { ChartModule } from 'angular2-highcharts';
 
 let comp: HighstockComponent;
 let fixture: ComponentFixture<HighstockComponent>;
@@ -14,7 +13,7 @@ describe('HighstockComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ HighstockComponent ],
-      imports: [ ChartModule ],
+      imports: [ ],
       providers: [
         { provide: 'seriesType', useValue: 'line' }
       ]

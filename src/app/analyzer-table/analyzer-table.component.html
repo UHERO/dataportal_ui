@@ -28,7 +28,7 @@
             <th title="{{serie.seriesDetail.title}}">
               <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
               <i class="material-icons analyze-chart color{{serie.seriesDetail.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
-              <a *ngIf="serie.seriesDetail.geography" [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.saParam }" queryParamsHandling='merge' (click)="hideInfo(serie.seriesDetail.id)">
+              <a *ngIf="serie.seriesDetail.geography" [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.saParam }" (click)="hideInfo(serie.seriesDetail.id)">
                 {{serie.displayName}}
               </a>
               <a tabindex="0" id="{{serie.seriesDetail.id}}" class="info" (click)="showPopover(serie.seriesDetail)" role="button" data-animation='false' data-toggle="popover">

@@ -249,17 +249,22 @@ export class HelperService {
   getRanges(freq, counter, range) {
     // Range = default amount of years to display
     if (freq === 'A') {
-      return { start: counter - 1 * range, end: counter };
+      return { startIndex: this.getRangeStart(counter, range, 1), endIndex: counter };
     }
     if (freq === 'Q') {
-      return { start: counter - 4 * range, end: counter };
+      return { startIndex: this.getRangeStart(counter, range, 4), endIndex: counter };
     }
     if (freq === 'S') {
-      return { start: counter - 2 * range, end: counter };
+      return { startIndex: this.getRangeStart(counter, range, 2), endIndex: counter };
     }
     if (freq === 'M') {
-      return { start: counter - 12 * range, end: counter };
+      return { startIndex: this.getRangeStart(counter, range, 12), endIndex: counter };
     }
+  }
+
+  getRangeStart = (counter, range, multiplier) => {
+    const index = counter - multiplier * range;
+    return index < 0 ? 0 : index;
   }
 
   getTableDates(dateArray: Array<any>) {
