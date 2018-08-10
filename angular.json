@@ -1,0 +1,577 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "uhero": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": "src/polyfills.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/uhero"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/manoa.jpg"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ]
+          },
+          "configurations": {
+            "staging": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.apiDev.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "uhero:build"
+          },
+          "configurations": {
+            "staging": {
+              "browserTarget": "uhero:build:staging"
+            },
+            "production": {
+              "browserTarget": "uhero:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "uhero:build:apiDev"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "uhero:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/uhero"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/manoa.jpg"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": []
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist-server",
+            "main": "main.server.ts",
+            "tsConfig": "tsconfig.server.json"
+          }
+        }
+      }
+    },
+    "uhero-e2e": {
+      "root": "",
+      "sourceRoot": "e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "uhero:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "nta": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "ntaDist",
+            "index": "src/index.html",
+            "main": "src/ntaMain.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": "src/polyfills.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/nta"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/nta-logo.png"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ]
+          },
+          "configurations": {
+            "staging": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.apiDev.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "nta:build"
+          },
+          "configurations": {
+            "staging": {
+              "browserTarget": "nta:build:staging"
+            },
+            "production": {
+              "browserTarget": "nta:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "nta:build:apiDev"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "nta:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/nta"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/nta-logo.png"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": []
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist-server",
+            "main": "main.server.ts",
+            "tsConfig": "tsconfig.server.json"
+          }
+        }
+      }
+    },
+    "nta-e2e": {
+      "root": "",
+      "sourceRoot": "e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "nta:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": []
+          }
+        }
+      }
+    },
+    "coh": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "cohDist",
+            "index": "src/index.html",
+            "main": "src/hawaiiMain.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": "src/polyfills.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/coh"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/hawaii-county-seal.png"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ]
+          },
+          "configurations": {
+            "staging": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.apiDev.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "coh:build"
+          },
+          "configurations": {
+            "staging": {
+              "browserTarget": "coh:build:staging"
+            },
+            "production": {
+              "browserTarget": "coh:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "coh:build:apiDev"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "coh:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "karmaConfig": "./karma.conf.js",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/datatables.net/js/jquery.dataTables.js",
+              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/omega/theme.css",
+              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
+              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
+              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/coh"
+              ]
+            },
+            "assets": [
+              "src/assets",
+              "src/hawaii-county-seal.png"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": []
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist-server",
+            "main": "main.server.ts",
+            "tsConfig": "tsconfig.server.json"
+          }
+        }
+      }
+    },
+    "coh-e2e": {
+      "root": "",
+      "sourceRoot": "e2e",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "coh:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": []
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "uhero",
+  "schematics": {
+    "@schematics/angular:component": {
+      "inlineTemplate": false,
+      "spec": true,
+      "prefix": "app",
+      "styleext": "scss"
+    },
+    "@schematics/angular:directive": {
+      "prefix": "app"
+    }
+  }
+}
