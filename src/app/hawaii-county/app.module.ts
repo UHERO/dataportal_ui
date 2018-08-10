@@ -2,27 +2,7 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { ChartModule } from 'angular2-highcharts';
-// Temp workaround for build errors
-// See: https://github.com/gevgeny/angular2-highcharts/issues/160
-import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
-declare var require: any;
-export function highchartsFactory() {
-  const highcharts = require('highcharts/js/highstock');
-  const exp = require('highcharts/js/modules/exporting');
-  const offlineExport = require('highcharts/js/modules/offline-exporting');
-  const csv = require('../csv-export');
-
-  exp(highcharts);
-  offlineExport(highcharts);
-  csv(highcharts);
-  highcharts.setOptions({
-    lang: {
-      thousandsSep: ','
-    }
-  });
-  return (highcharts);
-}
+import { HighchartsChartModule } from 'highcharts-angular';
 import { Shared } from '../shared/shared.module';
 import { routing } from '../app.routes';
 import { UheroApiService } from '../uhero-api.service';
@@ -46,7 +26,7 @@ import { ClipboardService } from '../clipboard.service';
     Shared,
     routing,
     BrowserModule,
-    ChartModule,
+    HighchartsChartModule,
     FormsModule,
     ReactiveFormsModule,
     HttpModule
@@ -66,10 +46,6 @@ import { ClipboardService } from '../clipboard.service';
     AnalyzerService,
     Title,
     ClipboardService,
-    {
-      provide: HighchartsStatic,
-      useFactory: highchartsFactory
-    },
     {
       provide: 'rootCategory',
       useValue: 4429

@@ -4,15 +4,17 @@ import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
 import { Series } from '../series';
+import { HighstockObject } from '../HighstockObject';
 import 'jquery';
 declare var $: any;
-
-// import * as highcharts from 'highcharts';
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
 const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
+exporting(Highcharts);
+offlineExport(Highcharts);
+exportCSV(Highcharts);
 
 @Component({
   selector: 'app-highstock',
@@ -34,27 +36,21 @@ export class HighstockComponent implements OnChanges {
   @Output() tableExtremes = new EventEmitter(true);
   // When user updates range selected, emit chartExtremes to update URL params
   @Output() chartExtremes = new EventEmitter(true);
-  public options: Object;
-  private extremes;
-  private chartObject;
+  Highcharts = Highcharts;
+  chartConstructor = 'stockChart';
+  chartOptions = <HighstockObject>{};
+  updateChart = false;
+  chartObject;
+  showChart = false;
 
   constructor(@Inject('defaultRange') private defaultRange) { }
 
   ngOnChanges() {
-    this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
-    // Emit dates when user selects a new range
-    const $chart = $('#chart');
-    const chartExtremes = this.chartExtremes;
-    const tableExtremes = this.tableExtremes;
-    $chart.bind('click', function () {
-      const xAxis = $chart.highcharts().xAxis[0];
-      if (xAxis._hasSetExtremes) {
-        const extremes = { minDate: xAxis._extremes.min, maxDate: xAxis._extremes.max };
-        tableExtremes.emit(extremes);
-        chartExtremes.emit(extremes);
-      }
-      xAxis._hasSetExtremes = false;
-    });
+    if (Object.keys(this.seriesDetail).length) {
+      this.showChart = true;
+      this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
+      this.updateChart = true;
+    }
   }
 
   // Gets buttons used in Highstock Chart
@@ -94,9 +90,9 @@ export class HighstockComponent implements OnChanges {
     }, {
       html: portalSettings.highstock.labels.portalLink
     }, {
-      html: 'Series: ' + name + ' (' + geo.name + ', ' + freq.label + ')'
+      html: 'Series: ' + seriesDetail.title + ' (' + geo.name + ', ' + freq.label + ')'
     }];
-    return labelItems;
+    return { items: labelItems, style: { display: 'none' } };
   }
 
   formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) {
@@ -167,215 +163,224 @@ export class HighstockComponent implements OnChanges {
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
+    const tableExtremes = this.tableExtremes;
+    const chartExtremes = this.chartExtremes;
+    const formatTooltip = (args, points, x, pseudoZones, decimals, freq) => this.formatTooltip(args, points, x, pseudoZones, decimals, freq);
+    const getChartExtremes = (chartObject) => {
+      // Gets range of x values to emit
+      // Used to redraw table in the single series view
+      let xMin, xMax;
+      // Selected level data
+      let selectedRange = null;
+      if (chartObject.series[0].points) {
+        selectedRange = chartObject.series[0].points;
+      }
+      if (!chartObject.series[0].points.length) {
+        return { min: null, max: null };
+      }
+      if (selectedRange.length) {
+        xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+        xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+        return { min: xMin, max: xMax };
+      }
+    }
 
-    this.options = {
-      chart: {
-        alignTicks: false,
-        zoomType: 'x',
-        // Description used in xAxis label formatter
-        description: freq.freq
+
+    this.chartOptions.chart = {
+      alignTicks: false,
+      zoomType: 'x',
+      description: freq.freq,
+      events: {
+        render: function () {
+          if (!this.chartObject || this.chartObject.series.length < 4) {
+            this.chartObject = Object.assign({}, this);
+          }
+          const extremes = getChartExtremes(this.chartObject);
+          if (extremes) {
+            tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+            chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max })
+          }
+        }
+      }
+    };
+    this.chartOptions.labels = labelItems;
+    this.chartOptions.rangeSelector = {
+      selected: null,
+      buttons: chartButtons,
+      buttonPosition: { x: 0, y: 10 },
+      labelStyle: { visibility: 'hidden' },
+      inputEnabled: false,
+    };
+    this.chartOptions.lang = { exportKey: 'Download Chart' };
+    this.chartOptions.exporting = {
+      buttons: {
+        contextButton: { enabled: false },
+        exportButton: {
+          menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
+          text: 'Download',
+          _titleKey: 'exportKey',
+        }
       },
+      csv: {
+        dateFormat: '%Y-%m-%d',
+      },
+      filename: name + '_' + geo.name + '_' + freq.label,
+      chartOptions: {
+        events: null,
+        navigator: {
+          enabled: false
+        },
+        scrollbar: {
+          enabled: false
+        },
+        rangeSelector: {
+          enabled: false
+        },
+        credits: {
+          enabled: true,
+          text: portalSettings.highstock.credits,
+          position: {
+            align: 'right',
+            x: -115,
+            y: -41
+          }
+        },
+        title: {
+          text: name + ' (' + geo.name + ', ' + freq.label + ')',
+          align: 'left'
+        }
+      }
+    };
+    this.chartOptions.tooltip = {
+      borderWidth: 0,
+      shadow: false,
+      formatter: function (args) {
+        return formatTooltip(args, this.points, this.x, pseudoZones, decimals, freq)
+      }
+    };
+    this.chartOptions.credits = { enabled: false };
+    this.chartOptions.xAxis = {
+      events: {
+        afterSetExtremes: function () {
+          this._hasSetExtremes = true;
+          this._extremes = getChartExtremes(this);
+        }
+      },
+      minRange: 1000 * 3600 * 24 * 30 * 12,
+      min: Date.parse(startDate),
+      max: Date.parse(endDate),
+      ordinal: false,
       labels: {
-        items: labelItems,
-        style: {
-          display: 'none'
-        }
-      },
-      rangeSelector: {
-        selected: !startDate && !endDate ? 2 : null,
-        buttons: chartButtons,
-        buttonPosition: {
-          x: 10,
-          y: 10
-        },
-        labelStyle: {
-          visibility: 'hidden'
-        },
-        inputEnabled: false
-      },
-      lang: {
-        exportKey: 'Download Chart'
-      },
-      navigator: {
-        series: {
-          includeInCSVExport: false
-        }
-      },
-      exporting: {
-        buttons: {
-          contextButton: {
-            enabled: false
-          },
-          exportButton: {
-            text: 'Download',
-            _titleKey: 'exportKey',
-            menuItems: Highcharts.getOptions().exporting.buttons.contextButton.menuItems.slice(2),
-          }
-        },
-        filename: name + '_' + geo.name + '_' + freq.label,
-        chartOptions: {
-          events: null,
-          navigator: {
-            enabled: false
-          },
-          scrollbar: {
-            enabled: false
-          },
-          rangeSelector: {
-            enabled: false
-          },
-          credits: {
-            enabled: true,
-            text: portalSettings.highstock.credits,
-            position: {
-              align: 'right',
-              x: -115,
-              y: -41
-            }
-          },
-          title: {
-            text: name + ' (' + geo.name + ', ' + freq.label + ')',
-            align: 'left'
-          }
-        }
-      },
-      tooltip: {
-        borderWidth: 0,
-        shadow: false,
         formatter: function () {
-          const getFreqLabel = function(frequency, date) {
-            if (frequency === 'A') {
-              return '';
+          const getQLabel = function (month) {
+            if (month === 'Jan') {
+              return 'Q1 ';
             }
-            if (frequency === 'Q') {
-              if (Highcharts.dateFormat('%b', date) === 'Jan') {
-                return 'Q1 ';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Apr') {
-                return 'Q2 ';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Jul') {
-                return 'Q3 ';
-              }
-              if (Highcharts.dateFormat('%b', date) === 'Oct') {
-                return 'Q4 ';
-              }
+            if (month === 'Apr') {
+              return 'Q2 ';
             }
-            if (frequency === 'M' || frequency === 'S') {
-              return Highcharts.dateFormat('%b', date);
+            if (month === 'Jul') {
+              return 'Q3 ';
+            }
+            if (month === 'Oct') {
+              return 'Q4 ';
             }
           };
-          const pseudo = 'Pseudo History ';
-          let s = '<b>';
-          s = s + getFreqLabel(freq.freq, this.x);
-          s = s + ' ' + Highcharts.dateFormat('%Y', this.x) + '</b>';
-          this.points.forEach((point) => {
-            const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
-            const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
-            const seriesNameValue = point.series.name + ': ' + formattedValue;
-            const label = seriesColor + seriesNameValue;
-            if (pseudoZones.length) {
-              pseudoZones.forEach((zone) => {
-                if (point.x < zone.value) {
-                  return s += seriesColor + pseudo + seriesNameValue + '<br>';
-                }
-                if (point.x > zone.value) {
-                  return s += label;
-                }
-              });
-            }
-            if (!pseudoZones.length) {
-              s += label;
-            }
-          });
-          return s;
+          let s = '';
+          const month = Highcharts.dateFormat('%b', this.value);
+          const frequency = this.chart.options.chart.description;
+          const first = Highcharts.dateFormat('%Y', this.axis.userMin);
+          const last = Highcharts.dateFormat('%Y', this.axis.userMax);
+          s = ((last - first) <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
+          s = s + Highcharts.dateFormat('%Y', this.value);
+          return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
         }
-      },
-      credits: {
-        enabled: false
-      },
-      xAxis: {
-        minRange: 1000 * 3600 * 24 * 30 * 12,
-        min: Date.parse(startDate),
-        max: Date.parse(endDate),
-        ordinal: false,
-        labels: {
-          formatter: function() {
-            const getQLabel = function(month) {
-              if (month === 'Jan') {
-                return 'Q1 ';
-              }
-              if (month === 'Apr') {
-                return 'Q2 ';
-              }
-              if (month === 'Jul') {
-                return 'Q3 ';
-              }
-              if (month === 'Oct') {
-                return 'Q4 ';
-              }
-            };
-            let s = '';
-            const month = Highcharts.dateFormat('%b', this.value);
-            const frequency = this.chart.options.chart.description;
-            const first = Highcharts.dateFormat('%Y', this.axis.userMin);
-            const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-            s = (last - first <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
-            s = s + Highcharts.dateFormat('%Y', this.value);
-            return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
-          }
-        }
-      },
-      yAxis: [{
-        className: 'series2',
-        labels: {
-          formatter: function() {
-            return Highcharts.numberFormat(this.value, decimals, '.', ',');
-          }
-        },
-        title: {
-          text: change
-        },
-        opposite: false,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01
-      }, {
-        className: 'series1',
-        title: {
-          text: units
-        },
-        labels: {
-          formatter: function() {
-            return Highcharts.numberFormat(this.value, decimals, '.', ',');
-          }
-        },
-        gridLineWidth: 0,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01,
-        showLastLabel: true
-      }],
-      plotOptions: {
-        series: {
-          cropThreshold: 0,
-        }
-      },
-      series: series
+      }
     };
+    this.chartOptions.yAxis = [{
+      className: 'series2',
+      labels: {
+        formatter: function () {
+          return Highcharts.numberFormat(this.value, decimals, '.', ',');
+        }
+      },
+      title: {
+        text: change
+      },
+      opposite: false,
+      minPadding: 0,
+      maxPadding: 0,
+      minTickInterval: 0.01
+    }, {
+      className: 'series1',
+      title: {
+        text: units
+      },
+      labels: {
+        formatter: function () {
+          return Highcharts.numberFormat(this.value, decimals, '.', ',');
+        }
+      },
+      gridLineWidth: 0,
+      minPadding: 0,
+      maxPadding: 0,
+      minTickInterval: 0.01,
+      showLastLabel: true
+    }];
+    this.chartOptions.plotOptions = {
+      series: { cropThreshold: 0 }
+    };
+    this.chartOptions.series = series;
   }
 
-  setTableExtremes(e) {
-    // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
-    // Exporting calls load event and creates empty e.context object, emitting wrong values to series table
-    if (!this.chartObject || this.chartObject.series.length < 4) {
-      this.chartObject = Object.assign({}, e.context);
-    }
-    const extremes = this.getChartExtremes(this.chartObject);
-    if (extremes) {
-      this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-    }
+  formatTooltip(args, points, x, pseudoZones, decimals, freq) {
+    const getFreqLabel = function (frequency, date) {
+      if (frequency === 'A') {
+        return '';
+      }
+      if (frequency === 'Q') {
+        if (Highcharts.dateFormat('%b', date) === 'Jan') {
+          return 'Q1 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Apr') {
+          return 'Q2 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Jul') {
+          return 'Q3 ';
+        }
+        if (Highcharts.dateFormat('%b', date) === 'Oct') {
+          return 'Q4 ';
+        }
+      }
+      if (frequency === 'M' || frequency === 'S') {
+        return Highcharts.dateFormat('%b', date);
+      }
+    };
+    const pseudo = 'Pseudo History ';
+    let s = '<b>';
+    s = s + getFreqLabel(freq.freq, x);
+    s = s + ' ' + Highcharts.dateFormat('%Y', x) + '</b>';
+    points.forEach((point) => {
+      const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
+      const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
+      const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
+      const seriesNameValue = point.series.name + ': ' + formattedValue;
+      const label = seriesColor + seriesNameValue;
+      if (pseudoZones.length) {
+        pseudoZones.forEach((zone) => {
+          if (point.x < zone.value) {
+            return s += seriesColor + pseudo + seriesNameValue + '<br>';
+          }
+          if (point.x > zone.value) {
+            return s += label;
+          }
+        });
+      }
+      if (!pseudoZones.length) {
+        s += label;
+      }
+    });
+    return s;
   }
 
   updateExtremes(e) {
@@ -411,6 +416,6 @@ export class HighstockComponent implements OnChanges {
     const end = userEnd ? userEnd : new Date(dates[counter].date).toISOString().substr(0, 10);
     const defaultStartYear = +new Date(dates[counter].date).toISOString().substr(0, 4) - defaults.range;
     const start = userStart ? userStart : defaultStartYear + new Date(dates[counter].date).toISOString().substr(4, 6);
-    return { start: start , end: end };
+    return { start: start, end: end };
   }
 }
