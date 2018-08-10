@@ -1,14 +1,17 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
-import { HighchartComponent } from 'app/highchart/highchart.component';
-
-// import * as highcharts from 'highcharts';
+import { HighstockObject } from '../HighstockObject';
+import 'jquery';
+declare var $: any;
+declare var require: any;
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
 const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
 const exportCSV = require('../csv-export');
-declare var $: any;
+exporting(Highcharts);
+offlineExport(Highcharts);
+exportCSV(Highcharts);
 
 @Component({
   selector: 'app-analyzer-highstock',
@@ -16,7 +19,7 @@ declare var $: any;
   styleUrls: ['./analyzer-highstock.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerHighstockComponent implements OnInit, OnChanges {
+export class AnalyzerHighstockComponent implements OnChanges {
   @Input() series;
   @Input() allDates;
   @Input() portalSettings;
@@ -28,32 +31,66 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
   @Input() geoChecked;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
-  options;
-  chart;
-  showChart;
+  Highcharts = Highcharts;
+  chartConstructor = 'stockChart';
+  chartOptions = <HighstockObject>{};
+  updateChart = false;
+  chartObject;
 
   constructor(private _analyzer: AnalyzerService) { }
 
-  ngOnInit() {
-  }
-
   ngOnChanges() {
-    // 'destroy' chart on changes
-    this.showChart = false;
     // Series in the analyzer that have been selected to be displayed in the chart
-    let selectedAnalyzerSeries;
+    let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates);
+      yAxes = this.setYAxes(this.series);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
     if (selectedAnalyzerSeries) {
-      this.drawChart(selectedAnalyzerSeries.series, selectedAnalyzerSeries.yAxis, this.formatTooltip, this.portalSettings, chartButtons);
+      this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons);
+      this.updateChart = true;
     }
     // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
     }
+  }
+
+  setYAxes = (series) => {
+    const yAxes = [];
+    // Group series by their units
+    const unitGroups = this.groupByUnits(series);
+    // Create y-axis groups based on units available
+    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
+    // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
+    // If yes, draw series on separate y axes
+    const yAxesGroups = this.setYAxesGroups(unitGroups);
+    yAxesGroups.forEach((axis, index) => {
+      yAxes.push({
+        labels: {
+          formatter: function () {
+            return Highcharts.numberFormat(this.value, 2, '.', ',');
+          }
+        },
+        id: axis.axisId,
+        title: {
+          text: axis.units
+        },
+        opposite: index === 0 ? false : true,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01,
+        series: axis.series,
+        showEmpty: false
+      });
+    });
+    return yAxes;
+  }
+
+  addSeriesToChart = (chart, series) => {
+    chart.addSeries(series);
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -67,57 +104,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return allButtons;
     }, []);
     return chartButtons;
-  }
-
-  addYAxis(chart, series, seriesUnits, y0Exist) {
-    const oppositeExist = chart.yAxis.find(axis => axis.userOptions.opposite === true) ? true : false;
-    chart.addAxis({
-      labels: {
-        formatter: function() {
-          return Highcharts.numberFormat(this.value, 2, '.', ',');
-        }
-      },
-      title: {
-        text: seriesUnits
-      },
-      id: y0Exist ? 'yAxis1' : 'yAxis0',
-      opposite: oppositeExist ? false : true,
-      showLastLabel: true,
-      minPadding: 0,
-      maxPadding: 0,
-      minTickInterval: 0.01,
-      series: [series]
-    });
-  }
-
-  createYAxes(series: Array<any>, yAxes: Array<any>) {
-    // Group series by their units
-    const unitGroups = this.groupByUnits(series);
-    // Create y-axis groups based on units available
-    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
-    // If yes, draw series on separate y axes
-    const yAxesGroups = this.setYAxesGroups(unitGroups);
-    yAxesGroups.forEach((axis, index) => {
-      yAxes.push({
-        labels: {
-          formatter: function() {
-            return Highcharts.numberFormat(this.value, 2, '.', ',');
-          }
-        },
-        id: axis.axisId,
-        title: {
-          text: axis.units
-        },
-        opposite: index === 0 ? false : true,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01,
-        series: axis.series
-      });
-    });
-    return yAxes;
-  }
+  };
 
   setYAxesGroups(unitGroups) {
     // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
@@ -140,7 +127,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       });
       return yAxesGroups;
     }
-  }
+  };
 
   findMaxLevelSeries(unit) {
     let maxLevelValue, maxValueSeries;
@@ -152,14 +139,14 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
     });
     return maxValueSeries;
-  }
+  };
 
   // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
   isOverlapSufficient(level, baseMin, baseMax) {
     const sufficientOverlap = 0.5;
     const overlap = this.calculateOverlap(level, baseMin, baseMax);
     return overlap >= sufficientOverlap;
-  }
+  };
 
   calculateOverlap(level, baseMin, baseMax) {
     const newMin = Math.min(...level);
@@ -169,7 +156,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const baseMaxNewMin = baseMax - newMin;
     const newMaxBaseMin = newMax - baseMin;
     return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
-  }
+  };
 
   findHighestOverlap(yAxesGroups, baseMin, baseMax) {
     const y0Series = yAxesGroups[0].series;
@@ -192,7 +179,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
     });
     return highestOverlapAxis;
-  }
+  };
 
   checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
     unit.series.forEach((serie) => {
@@ -217,7 +204,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       }
     });
     return yAxesGroups;
-  }
+  };
 
   groupByUnits(series) {
     const units = series.reduce((obj, serie) => {
@@ -230,7 +217,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return { units: key, series: units[key] };
     });
     return groups;
-  }
+  };
 
   createNavigatorDates(dates) {
     // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
@@ -244,12 +231,10 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       return obs;
     });
     return navigatorDates;
-  }
+  };
 
-  formatSeriesData(series, dates) {
+  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>) {
     const chartSeries = [];
-    let yAxes;
-    yAxes = this.createYAxes(series, []);
     series.forEach((serie, index) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       chartSeries.push({
@@ -263,6 +248,8 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
+        includeInCSVExport: true,
+        showInLegend: true,
         showInNavigator: false,
         events: {
           legendItemClick: function () {
@@ -280,175 +267,144 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
       data: navDates,
+      yAxis: 0,
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
-      index: -1,
-      colorIndex: -1,
       name: 'Navigator'
     });
-    return { series: chartSeries, yAxis: yAxes };
-  }
+    return chartSeries;
+  };
 
-  drawChart(series, yAxis, tooltipFormatter, portalSettings, buttons) {
+  initChart = (series, yAxis, portalSettings, buttons) => {
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
-
-    this.options = {
-      chart: {},
-      labels: {
-        style: {}
+    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
+    const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
+    const tableExtremes = this.tableExtremes;
+    this.chartOptions.chart = {
+      alignTicks: false,
+      events: {
+        render: function () {
+          const extremes = getChartExtremes(this);
+          if (extremes) {
+            tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
+          }
+        }
       },
-      legend: {},
-      rangeSelector: {
-        labelStyle: {}
+      description: undefined,
+      zoomType: 'x'
+    };
+    this.chartOptions.labels = {
+      items: [
+        { html: '' },
+        { html: '' },
+        { html: '' },
+        { html: '' },
+        { html: portalSettings.highstock.labels.portal },
+        { html: portalSettings.highstock.labels.portalLink },
+        { html: '' }
+      ],
+      style: {
+        display: 'none'
+      }
+    };
+    this.chartOptions.legend = {
+      enabled: true,
+      labelFormatter: function () {
+        return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
+      }
+    };
+    this.chartOptions.rangeSelector = {
+      selected: !startDate && !endDate ? 3 : null,
+      buttons: buttons,
+      buttonPosition: { x: 10, y: 10 },
+      labelStyle: {
+        visibility: 'hidden'
       },
-      lang: {},
-      exporting: {
-        buttons: {
-          contextButton: {},
-          exportButton: {}
+      inputEnabled: false
+    };
+    this.chartOptions.lang = {
+      exportKey: 'Download Chart'
+    };
+    this.chartOptions.exporting = {
+      buttons: {
+        contextButton: {
+          enabled: false
         },
-        chartOptions: {
-          navigator: {},
-          scrollbar: {},
-          rangeSelector: {},
-          credits: {},
-          title: {},
-          subtitle: {}
+        exportButton: {
+          _titleKey: 'exportKey',
+          menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'downloadCSV'],
+          text: 'Download'
         }
       },
-      tooltip: {},
-      credits: {},
-      xAxis: {},
-      yAxis: [],
-      plotOptions: {
-        series: {}
+      csv: {
+        dateFormat: '%Y-%m-%d',
       },
-      series: []
-    };
-
-    // Chart Options
-    this.options.chart.alignTicks = false;
-    this.options.zoomType = 'x';
-
-    // Labels
-    this.options.labels.items = [
-      {
-        html: ''
-      }, {
-        html: ''
-      }, {
-        html: ''
-      }, {
-        html: ''
-      }, {
-        html: portalSettings.highstock.labels.portal,
-      }, {
-        html: portalSettings.highstock.labels.portalLink
-      }, {
-        html: ''
-      }
-    ];
-    this.options.labels.style.display = 'none';
-
-    // Legend
-    this.options.legend.enabled = true;
-    this.options.legend.labelFormatter = function () {
-      return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
-    };
-
-    // Range Selector
-    this.options.rangeSelector.selected = !startDate && !endDate ? 3 : null;
-    this.options.rangeSelector.buttons = buttons;
-    this.options.rangeSelector.buttonPosition = { x: 10, y: 10 };
-    this.options.rangeSelector.labelStyle.visibility = 'hidden';
-    this.options.rangeSelector.inputEnabled = false;
-    this.options.lang.exportKey = 'Download Chart';
-
-    // Exporting
-    this.options.exporting.buttons.contextButton.enabled = false;
-    this.options.exporting.buttons.exportButton.text = 'Download';
-    this.options.exporting.buttons.exportButton._titleKey = 'exportKey';
-    this.options.exporting.buttons.exportButton.menuItems = [
-      {
-        textKey: 'downloadPNG',
-        onclick: function () {
-          this.exportChart();
-        }
-      }, {
-        textKey: 'downloadJPEG',
-        onclick: function () {
-          this.exportChart({
-            type: 'image/jpeg'
-          });
-        }
-      }, {
-        textKey: 'downloadPDF',
-        onclick: function () {
-          this.exportChart({
-            type: 'application/pdf'
-          });
-        }
-      }, {
-        textKey: 'downloadSVG',
-        onclick: function () {
-          this.exportChart({
-            type: 'image/svg+xml'
-          });
-        }
-      }, {
-        textKey: 'downloadCSV',
-        onclick: function () {
-          this.downloadCSV();
+      filename: 'chart',
+      chartOptions: {
+        events: null,
+        navigator: {
+          enabled: false
+        },
+        scrollbar: {
+          enabled: false
+        },
+        rangeSelector: {
+          enabled: false
+        },
+        credits: {
+          enabled: true,
+          text: portalSettings.highstock.credits,
+          position: { align: 'right', x: -10, y: -5 }
+        },
+        title: {
+          align: 'left',
+          text: null
+        },
+        subtitle: {
+          text: ''
         }
       }
-    ];
-    this.options.exporting.chartOptions.events = null;
-    this.options.exporting.chartOptions.navigator.enabled = false;
-    this.options.exporting.chartOptions.scrollbar.enabled = false;
-    this.options.exporting.chartOptions.rangeSelector.enabled = false;
-    this.options.exporting.chartOptions.credits.enabled = true;
-    this.options.exporting.chartOptions.credits.text = portalSettings.highstock.credits;
-    this.options.exporting.chartOptions.credits.position = { align: 'right' };
-    this.options.exporting.chartOptions.title.align = 'left';
-    this.options.exporting.chartOptions.subtitle.text = '';
-
-    // Tooltip
-    this.options.tooltip.borderWidth = 0;
-    this.options.tooltip.shadow = false;
-    this.options.tooltip.shared = true;
-    this.options.tooltip.formatter = function (args) {
-      return tooltipFormatter(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
     };
-
-    // Credits
-    this.options.credits.enabled = false;
-
-    // xAxis
-    this.options.xAxis.minRange = 1000 * 3600 * 24 * 30 * 12;
-    this.options.xAxis.min = startDate ? Date.parse(startDate) : undefined;
-    this.options.xAxis.max = endDate ? Date.parse(endDate) : undefined;
-    this.options.xAxis.ordinal = false;
-
-    // yAxis
-    this.options.yAxis = yAxis;
-
-    // Plot Options
-    this.options.plotOptions.series.cropThreshold = 0;
-
-    // Series
-    this.options.series = series;
-
-    this.showChart = true;
-  }
+    this.chartOptions.tooltip = {
+      borderWidth: 0,
+      shadow: false,
+      shared: true,
+      formatter: function (args) {
+        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+      }
+    };
+    this.chartOptions.credits = {
+      enabled: false
+    };
+    this.chartOptions.xAxis = {
+      events: {
+        afterSetExtremes: function () {
+          this._hasSetExtremes = true;
+          this._extremes = getChartExtremes(this);
+        }
+      },
+      minRange: 1000 * 3600 * 24 * 30 * 12,
+      min: startDate ? Date.parse(startDate) : undefined,
+      max: endDate ? Date.parse(endDate) : undefined,
+      ordinal: false
+    };
+    this.chartOptions.yAxis = yAxis;
+    this.chartOptions.plotOptions = {
+      series: {
+        cropThreshold: 0
+      }
+    };
+    this.chartOptions.series = series;
+  };
 
   saveInstance(chartInstance) {
     this.setTableExtremes(chartInstance);
-  }
+  };
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
@@ -571,22 +527,22 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
-  }
+  };
 
-  nameActive(e, chart, tooltipFormatter) {
+  nameActive(e) {
     this.nameChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-  }
+  };
 
-  unitsActive(e, chart, tooltipFormatter) {
+  unitsActive(e) {
     this.unitsChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
-  }
+  };
 
-  geoActive(e, chart, tooltipFormatter) {
+  geoActive(e) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-  }
+  };
 
   setTableExtremes(e) {
     // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
@@ -595,7 +551,7 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
     if (extremes) {
       this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
     }
-  }
+  };
 
   getChartExtremes(chartObject) {
     // Gets range of x values to emit
@@ -622,11 +578,11 @@ export class AnalyzerHighstockComponent implements OnInit, OnChanges {
       xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
-  }
+  };
 
   updateExtremes(e) {
     e.context._hasSetExtremes = true;
     e.context._extremes = this.getChartExtremes(e.context);
     this.setTableExtremes(e.context);
-  }
+  };
 }

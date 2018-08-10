@@ -7,22 +7,21 @@ import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 
 // Create stub for chart component
-@Component({selector: 'chart', template: ''})
+@Component({selector: 'highcharts-chart', template: ''})
 class ChartStubComponent {
+  @Input() Highcharts;
+  @Input() constructorType;
   @Input() options;
+  @Input() update;
 }
-
-// Create stub for xAxis component
-@Component({selector: 'xAxis', template: ''})
-class XAxisStubComponent {}
-
+ 
 describe('AnalyzerHighstockComponent', () => {
   let component: AnalyzerHighstockComponent;
   let fixture: ComponentFixture<AnalyzerHighstockComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerHighstockComponent, XAxisStubComponent, ChartStubComponent ],
+      declarations: [ AnalyzerHighstockComponent, ChartStubComponent ],
       providers: [
         AnalyzerService,
         UheroApiService,
