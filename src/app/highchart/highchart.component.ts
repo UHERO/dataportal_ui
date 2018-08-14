@@ -17,6 +17,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   @Input() chartEnd;
   @Input() minValue;
   @Input() maxValue;
+  @Input() categoryDates;
   Highcharts = Highcharts;
   chartOptions = <HighchartsObject>{};
   updateChart = false;
@@ -35,18 +36,19 @@ export class HighchartComponent implements OnInit, OnChanges {
   constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngOnInit() {
-    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.categoryDisplay.chartData.level.length === 0) {
-      this.updateChart = true;
-      this.noDataChart(this.seriesData);
-    } else {
-      this.updateChart = true;
-      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
-    }
   }
 
   ngOnChanges() {
-    this.updateChart = true;
-    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+    //this.updateChart = true;
+    //this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+    if (this.seriesData.seriesInfo === 'No data available') {
+      this.noDataChart(this.seriesData);
+      this.updateChart = true;
+    } else {
+      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+      this.updateChart = true;
+    }
+
   }
 
   getSeriesStartAndEnd = (dates, start, end) => {
@@ -149,18 +151,51 @@ export class HighchartComponent implements OnInit, OnChanges {
     return chartSeries;
   }
 
+  formatSeriesData = (transformation, dates: Array<any>) => {
+    if (transformation) {
+      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      const transformationValues = [];
+      if (!dateDiff.length) {
+        return transformation.values.map(Number);
+      }
+      if (dateDiff.length) {
+        dates.forEach((sDate) => {
+          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
+        });
+        return transformationValues;
+      }  
+    }
+  }
+
   drawChart = (seriesData, currentFreq: string, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
-    const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
+    const transformations = this._helper.getTransformations(seriesData.seriesInfo.seriesObservations);
+    const level = transformations.level;
+    const pseudoZones = [];
+    if (level.pseudoHistory) {
+      level.pseudoHistory.forEach((obs, index) => {
+        if (obs && !level.pseudoHistory[index + 1]) {
+          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+        }
+      });
+    }
+    const { observationEnd, observationStart} = seriesData.seriesInfo.seriesObservations;
+    //const levelDatePair = this.compareDates(transformations, seriesData.categoryDisplay.chartData.dates);
+    // const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const { series0Name, series1Name } = portalSettings.highcharts;
-    const { start, end } = seriesData.categoryDisplay;
+    // const { start, end } = seriesData.categoryDisplay;
+    const start = seriesData.seriesInfo.seriesObservations.observationStart;
+    const end = seriesData.seriesInfo.seriesObservations.observationEnd;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
-    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(dates, chartStart, chartEnd);
+    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd);
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
-    let series0 = seriesData.categoryDisplay.chartData[series0Name];
-    let series1 = seriesData.categoryDisplay.chartData[series1Name];
+    //let series0 = seriesData.categoryDisplay.chartData[series0Name];
+    let series0 = this.formatSeriesData(transformations[series0Name], this.categoryDates);
+    //let series1 = seriesData.categoryDisplay.chartData[series1Name];
+    let series1 = this.formatSeriesData(transformations[series1Name], this.categoryDates);
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
     series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
+    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
     // Check how many non-null points exist in level series
     const levelLength = series0.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);

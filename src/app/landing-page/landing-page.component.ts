@@ -79,10 +79,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
-      console.log('landing page component data', this.categoryData)
       this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
+      console.log('landing page component data', this.getData(this.id, this.routeGeo, this.routeFreq))
     });
   }
 

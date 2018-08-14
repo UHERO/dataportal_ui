@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, Inject } from '@angular/core';
+import { Component, Input, OnChanges, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
@@ -6,7 +6,8 @@ import { HelperService } from '../helper.service';
 @Component({
   selector: 'app-category-charts',
   templateUrl: './category-charts.component.html',
-  styleUrls: ['./category-charts.component.scss']
+  styleUrls: ['./category-charts.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
@@ -22,6 +23,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() chartEnd;
   @Input() search;
   @Input() dates;
+  @Input() dateWrapper;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -34,7 +36,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
-          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates);
+          //chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates);
           chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
         }
       });
@@ -95,9 +97,9 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   getSeriesValues(series, start, end) {
-    const dateStart = series.categoryDisplay.chartData.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
-    const dateEnd = series.categoryDisplay.chartData.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
-    return series.categoryDisplay.chartData.level.slice(dateStart, dateEnd + 1);
+    const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
+    const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
+    return series.seriesInfo.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
   // Google Analytics: Track clicking on series

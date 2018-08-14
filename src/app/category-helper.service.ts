@@ -165,7 +165,7 @@ export class CategoryHelperService {
         if (displaySeries) {
           sub.displaySeries = displaySeries;
           sub.noData = false;
-          this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
+          // this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
         }
         if (!displaySeries) {
@@ -307,11 +307,7 @@ export class CategoryHelperService {
     results.forEach((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
       if (levelData) {
-        let seriesDates = [], series = {seriesInfo: {displayName: ''}} ;
-        const seriesObsStart = res.seriesObservations.observationStart;
-        const seriesObsEnd = res.seriesObservations.observationEnd;
-        const decimals = res.decimals ? res.decimals : 1;
-        seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, freq, seriesDates);
+        let series = {seriesInfo: {displayName: ''}} ;
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;

@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 @Injectable()
 export class HelperService {
   private categoryData = new Subject();
-
+  
   constructor() { }
 
   getCatData() {

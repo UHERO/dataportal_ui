@@ -1,4 +1,4 @@
-import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
+import { Component, Inject, Input, ViewChildren, ViewEncapsulation, OnInit, OnChanges, AfterViewChecked, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
@@ -13,7 +13,8 @@ declare var $: any;
   selector: 'app-category-table',
   templateUrl: './category-table.component.html',
   styleUrls: ['./category-table.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
@@ -73,11 +74,11 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
           if (series.seriesInfo !== 'No data available' && this.dates) {
             const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
             const seriesTable = this._helper.createSeriesTable(this.dates, transformations, series.seriesInfo.decimals);
+            series.categoryDisplay = {};
             series.categoryDisplay.tableData = seriesTable;
             series.trimCatTable = series.categoryDisplay.tableData.slice(start, end + 1);
           }
         });
-        console.log('cat table', this.data)
       }
     }
   }
