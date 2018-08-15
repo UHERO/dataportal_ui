@@ -36,7 +36,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
-          //chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates);
+          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
           chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
         }
       });
@@ -54,10 +54,13 @@ export class CategoryChartsComponent implements OnChanges {
     }
   }
 
-  formatCategoryChartData = (observations, dates) => {
+  formatCategoryChartData = (observations, dates, portalSettings) => {
     const transformations = this._helper.getTransformations(observations);
+    const { series0Name, series1Name } = portalSettings.highcharts;
     const start = observations.observationStart;
     const end = observations.observationEnd;
+    let series0 = this.formatSeriesData(transformations[series0Name], dates);
+    let series1 = this.formatSeriesData(transformations[series1Name], dates);
     const chart = this._helper.createSeriesChart(this.dates, transformations);
     const pseudoZones = [];
     const level = transformations.level;
@@ -68,8 +71,25 @@ export class CategoryChartsComponent implements OnChanges {
         }
       });
     }
-    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
+    const chartData = { series0: series0, series1: series1, pseudoZones: pseudoZones, dates: dates };
     return { start: start, end: end, chartData: chartData };
+  }
+
+  formatSeriesData = (transformation, dates: Array<any>) => {
+    if (transformation) {
+      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      const transformationValues = [];
+      if (!dateDiff.length) {
+        return transformation.values.map(Number);
+      }
+      if (dateDiff.length) {
+        dates.forEach((sDate) => {
+          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
+        });
+        return transformationValues;
+      }  
+    }
   }
 
   findMin(sublist, start, end) {
@@ -112,5 +132,9 @@ export class CategoryChartsComponent implements OnChanges {
     this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
     // Update analyze button on chart
     seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
+  }
+
+  trackBySeries(index, item) {
+    return item.seriesInfo.id;
   }
 }

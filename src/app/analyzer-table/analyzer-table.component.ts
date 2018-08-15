@@ -53,6 +53,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
+      console.log(series)
       series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);

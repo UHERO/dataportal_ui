@@ -72,11 +72,8 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
       if (this.data) {
         this.data.forEach((series) => {
           if (series.seriesInfo !== 'No data available' && this.dates) {
-            const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
-            const seriesTable = this._helper.createSeriesTable(this.dates, transformations, series.seriesInfo.decimals);
-            series.categoryDisplay = {};
-            series.categoryDisplay.tableData = seriesTable;
-            series.trimCatTable = series.categoryDisplay.tableData.slice(start, end + 1);
+            const decimal = series.seriesInfo.decimals;
+            series.categoryTable = this.createSeriesTable(series.seriesInfo.seriesObservations.transformationResults, this.dates, start, end, decimal);
           }
         });
       }
@@ -97,12 +94,33 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
     return this._table.checkTableWidth(this.tableWidths);
   }
 
+  createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
+    const categoryTable = {};
+    transformations.forEach((t) => {
+      const { transformation, dates, values, pseudoHistory } = t;
+      if (dates && values) {
+        const transformationValues = [];
+        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
+        if (!dateDiff.length) {
+          categoryTable[transformation + 'CategoryTable'] = values.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+        }
+        if (dateDiff.length) {
+          categoryDates.forEach((sDate) => {
+            const dateExists = this._helper.binarySearch(dates, sDate.date);
+            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
+          });
+          categoryTable[transformation + 'CategoryTable'] = transformationValues.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+        }  
+      }
+    });
+    return categoryTable;
+  }
+
   showTooltip() {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
   hideInfo(seriesId) {
-    // this.submitGAEvent(seriesId);
     return this._table.hideInfo(seriesId);
   }
 
@@ -113,5 +131,9 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   updateAnalyze(seriesInfo, tableData, chartData) {
     this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
     seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
+  }
+
+  trackBySeries(index, item) {
+    return item.seriesInfo.id;
   }
 }

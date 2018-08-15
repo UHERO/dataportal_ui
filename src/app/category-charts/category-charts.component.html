@@ -1,4 +1,3 @@
-<i *ngIf="!data" class="fas fa-spinner fa-pulse fa-fw"></i>
 <div class="multi-charts-row">
 	<ng-template ngIf [ngIf]="noSeries">
 		<p *ngIf="noSeries && (sublist.freqs || sublist.geos)" class="no-data">Data Available for:</p>
@@ -14,7 +13,7 @@
 		</ul>
 		<p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
 	</ng-template>
-	<ng-template ngFor let-serie [ngForOf]="data">
+	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="!noSeries" class="multi-charts">
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" queryParamsHandling='merge'
 			 *ngIf="serie.seriesInfo.id" (click)="submitGAEvent(serie.seriesInfo.id)">

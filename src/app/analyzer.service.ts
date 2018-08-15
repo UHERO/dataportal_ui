@@ -73,20 +73,46 @@ export class AnalyzerService {
           // Use to format dates for table
           this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
           const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-          // seriesData.chartData = data.chartData;
-          // seriesData.seriesTableData = data.tableData;
+          seriesData.chartData = data.chartData;
+          seriesData.seriesTableData = data.tableData;
         } else {
           seriesData.noData = 'Data not available';
         }
         this.analyzerData.analyzerSeries.push(seriesData);
       });
       this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-      this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
+      this.analyzerData.analyzerSeries.forEach((aSeries) => {
+        console.log(aSeries)
+      })
+      // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
       this.checkAnalyzerChartSeries();
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
+
+  createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
+    const categoryTable = {};
+    transformations.forEach((t) => {
+      const { transformation, dates, values, pseudoHistory } = t;
+      if (dates && values) {
+        const transformationValues = [];
+        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
+        if (!dateDiff.length) {
+          categoryTable[transformation + 'CategoryTable'] = values.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+        }
+        if (dateDiff.length) {
+          categoryDates.forEach((sDate) => {
+            const dateExists = this._helper.binarySearch(dates, sDate.date);
+            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
+          });
+          categoryTable[transformation + 'CategoryTable'] = transformationValues.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+        }  
+      }
+    });
+    return categoryTable;
+  }
+
 
   createAnalyzerTableData(analyzerSeries, tableDates) {
     analyzerSeries.forEach((serie) => {
