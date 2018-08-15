@@ -215,6 +215,7 @@ export class SeriesHelperService {
   }
 
   getStartValue(seriesData: Array<any>, startDate: string) {
+    console.log('getStartValue', seriesData)
     // Find observations in seriesData that match the selected minimum date (duplicate dates may show up in analyzer table data)
     const startDateObs = seriesData.filter(obs => obs.date === startDate);
     // Select observation where value is not Infinity

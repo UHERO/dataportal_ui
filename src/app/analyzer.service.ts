@@ -81,8 +81,23 @@ export class AnalyzerService {
         this.analyzerData.analyzerSeries.push(seriesData);
       });
       this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+      console.log(this.analyzerData.analyzerTableDates)
       this.analyzerData.analyzerSeries.forEach((aSeries) => {
         console.log(aSeries)
+        const decimal = aSeries.seriesDetail.decimals;
+        aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, this.analyzerData.analyzerTableDates, decimal);
+        const transformations = this._helper.getTransformations(aSeries.observations);
+        const pseudoZones = [];
+        const level = transformations.level;
+        if (level.pseudoHistory) {
+          level.pseudoHistory.forEach((obs, index) => {
+            if (obs && !level.pseudoHistory[index + 1]) {
+              pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+            }
+          });
+        }  
+        aSeries.chartData = { level: this.createSeriesChartData(aSeries.observations.transformationResults[0], this.analyzerData.analyzerTableDates), pseudoZones: pseudoZones, dates: this.analyzerData.analyzerTableDates}
+        console.log(this.createSeriesTable(aSeries.observations.transformationResults, this.analyzerData.analyzerTableDates, decimal))
       })
       // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
@@ -91,7 +106,7 @@ export class AnalyzerService {
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
-  createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
+  createSeriesTable = (transformations, categoryDates, decimal) => {
     const categoryTable = {};
     transformations.forEach((t) => {
       const { transformation, dates, values, pseudoHistory } = t;
@@ -99,18 +114,35 @@ export class AnalyzerService {
         const transformationValues = [];
         const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
         if (!dateDiff.length) {
-          categoryTable[transformation + 'CategoryTable'] = values.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+          categoryTable[`${transformation}CategoryTable`] = values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
         }
         if (dateDiff.length) {
           categoryDates.forEach((sDate) => {
             const dateExists = this._helper.binarySearch(dates, sDate.date);
             dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
           });
-          categoryTable[transformation + 'CategoryTable'] = transformationValues.slice(start, end + 1).map(Number).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+          categoryTable[`${transformation}CategoryTable`] = transformationValues.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
         }  
       }
     });
     return categoryTable;
+  }
+
+  createSeriesChartData = (transformation, dates) => {
+    if (transformation) {
+      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      const transformationValues = [];
+      if (!dateDiff.length) {
+        return transformation.values.map(Number);
+      }
+      if (dateDiff.length) {
+        dates.forEach((sDate) => {
+          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
+        });
+        return transformationValues;
+      }  
+    }
   }
 
 

@@ -35,15 +35,15 @@
                 <i class="material-icons info-icon">&#xE88F;</i>
               </a>
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
-              <td>{{item.formattedValue}}</td>
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay.lvlCategoryTable">
+              <td>{{item}}</td>
             </ng-template>
           </tr>
           <tr *ngIf="yoyChecked">
             <th>
               {{(serie.percent) ? '&emsp; YOY (ch.)' : '&emsp; YOY (%)'}}
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay.pc1CategoryTable">
               <td>{{item.formattedYoy}}</td>
             </ng-template>
           </tr>
@@ -51,7 +51,7 @@
             <th>
               {{(serie.percent)? '&emsp; Annual (ch.)' : '&emsp; Annual (%)'}}
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay.c5maCategoryTable">
               <td>{{item.formattedC5ma}}</td>
             </ng-template>
           </tr>
@@ -59,7 +59,7 @@
             <th>
               {{(serie.percent)? '&emsp; YTD (ch.)' : '&emsp; YTD (%)'}}
             </th>
-            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay">
+            <ng-template ngFor let-item [ngForOf]="serie.analyzerTableDisplay.ytdCategoryTable">
               <td>{{item.formattedYtd}}</td>
             </ng-template>
           </tr>
@@ -68,7 +68,7 @@
     </div>
   </div>
 </div>
-<div class="analyzer-table">
+<!-- <div class="analyzer-table">
   <div class="table-row">
     <div class="table">
       <table>
@@ -110,4 +110,4 @@
       </ng-template>  
     </p>
   </div>
-</div>
+</div> -->
