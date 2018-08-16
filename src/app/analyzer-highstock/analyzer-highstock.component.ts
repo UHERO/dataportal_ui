@@ -1,4 +1,4 @@
-import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -17,7 +17,8 @@ exportCSV(Highcharts);
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
   styleUrls: ['./analyzer-highstock.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzerHighstockComponent implements OnChanges {
   @Input() series;
@@ -230,6 +231,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       obs[1] = null;
       return obs;
     });
+    console.log('navigatordates', navigatorDates);
     return navigatorDates;
   };
 
@@ -290,6 +292,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         render: function () {
           const extremes = getChartExtremes(this);
+          console.log('extremes', this)
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
           }
@@ -400,10 +403,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     };
     this.chartOptions.series = series;
-  };
-
-  saveInstance(chartInstance) {
-    this.setTableExtremes(chartInstance);
   };
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
@@ -568,21 +567,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
           series = serie;
         }
       });
-      selectedRange = nav ? nav.points : series ? series.points : null;
+      selectedRange = nav ? nav.xData : series ? series.points : null;
     }
     if (!selectedRange) {
       return { min: null, max: null };
     }
     if (selectedRange) {
-      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
+      console.log('chartObject', chartObject);
+      console.log('selectedRange', selectedRange)
+      xMin = selectedRange[0].x ? new Date(selectedRange[0].x).toISOString().split('T')[0] : new Date(selectedRange[0]).toISOString().split('T')[0];
+      xMax = selectedRange[selectedRange.length - 1].x ? new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0] : new Date(selectedRange[selectedRange.length - 1]).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
   };
-
-  updateExtremes(e) {
-    e.context._hasSetExtremes = true;
-    e.context._extremes = this.getChartExtremes(e.context);
-    this.setTableExtremes(e.context);
-  };
-}
+ }

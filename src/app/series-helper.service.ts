@@ -5,6 +5,7 @@ import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
+import { CHIPS_VALUE_ACCESSOR } from 'primeng/primeng';
 
 
 @Injectable()
@@ -123,7 +124,7 @@ export class SeriesHelperService {
 
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
-  summaryStats(seriesData: Array<any>, freq: Frequency, decimals: number, startDate: string, endDate: string) {
+  summaryStats(seriesData, freq: Frequency, decimals: number, startDate: string, endDate: string) {
     const stats = {
       minValue: Infinity,
       minValueDate: '',
@@ -151,19 +152,21 @@ export class SeriesHelperService {
     };
 
     // Values of the selected starting and ending dates
-    stats.tableStartValue = this.getStartValue(seriesData, startDate);
-    stats.tableEndValue = this.getEndValue(seriesData, endDate);
+    stats.tableStartValue = this.getStartValue(seriesData.lvlCategoryTable, startDate);
+    stats.tableEndValue = this.getEndValue(seriesData.lvlCategoryTable, endDate);
     const firstValue = stats.tableStartValue;
     const lastValue = stats.tableEndValue;
-    const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);
+    // const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);
+    const selectedRangeData = seriesData.lvlCategoryTable;
     const missingValues = this.checkMissingValues(selectedRangeData, freq.freq, firstValue, lastValue);
+    console.log('missingValues', missingValues)
     if (selectedRangeData.length && !missingValues) {
       const periods = selectedRangeData.length - 1;
-      stats.minValue = this.getMinMax(seriesData).minValue;
+      //stats.minValue = this.getMinMax(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,''))).minValue;
       stats.minValueDate = this.getMinMax(seriesData).minValueDate;
-      stats.maxValue = this.getMinMax(seriesData).maxValue;
+      //stats.maxValue = this.getMinMax(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,''))).maxValue;
       stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
-      stats.total = this.getTotalValue(selectedRangeData);
+      stats.total = this.getTotalValue(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,'')));
       stats.avg = stats.total !== Infinity ? stats.total / selectedRangeData.length : Infinity;
       stats.cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, periods);
     }
@@ -184,50 +187,56 @@ export class SeriesHelperService {
     formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
     formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
     formatStats.missing = Boolean(missingValues);
+    console.log('stats', stats);
+    console.log('formatStats', formatStats)
     return formatStats;
   }
 
   checkMissingValues(selectedRange: Array<any>, freq: string, firstValue, lastValue) {
+    console.log('checkMissingValues', selectedRange)
     let missing = false;
     if (firstValue === Infinity || lastValue === Infinity) {
       return missing = true;
     }
     if (freq === 'A') {
-      missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === Infinity) ? true : false;
+      missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === '') ? true : false;
     }
     if (freq === 'Q') {
-      missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === Infinity) ? true : false;
+      console.log('Q missing', selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === ''))
+      missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === '') ? true : false;
     }
     if (freq === 'S') {
-      missing = selectedRange.find(obs => (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) ? true : false;
+      missing = selectedRange.find(obs => (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === '') ? true : false;
     }
     if (freq === 'M') {
-      missing = selectedRange.find(obs => obs.tableDate.includes('-') && obs.value === Infinity) ? true : false;
+      missing = selectedRange.find(obs => obs.tableDate.includes('-') && obs.value === '') ? true : false;
     }
     return missing;
   }
 
   getTotalValue(selectedRangeData: Array<any>) {
-    const sum = selectedRangeData.reduce((total, data) => {
+    /* const sum = selectedRangeData.reduce((total, data) => {
       return data.value === Infinity ? total : total + +data.value;
     }, 0);
-    return sum;
+    return sum; */
+    return selectedRangeData.reduce((total, data) => {
+      return data === '' ? total : total + +data;
+    }, 0);
   }
 
-  getStartValue(seriesData: Array<any>, startDate: string) {
-    console.log('getStartValue', seriesData)
+  getStartValue(seriesData, startDate: string) {
     // Find observations in seriesData that match the selected minimum date (duplicate dates may show up in analyzer table data)
     const startDateObs = seriesData.filter(obs => obs.date === startDate);
     // Select observation where value is not Infinity
-    const startDateData = startDateObs.find(obs => obs.value !== Infinity);
+    const startDateData = startDateObs.find(obs => obs.value !== '');
     return startDateData ? startDateData.value : Infinity;
   }
 
-  getEndValue(seriesData: Array<any>, endDate: string) {
+  getEndValue(seriesData, endDate: string) {
     // Find observations in seriesData that match the selected maximum date (duplicate dates may show up in analyzer table data)
     const endDateObs = seriesData.filter(obs => obs.date === endDate);
     // Select observation where value is not Infinity
-    const endDateData = endDateObs.find(obs => obs.value !== Infinity);
+    const endDateData = endDateObs.find(obs => obs.value !== '');
     return endDateData ? endDateData.value : Infinity;
   }
 
@@ -256,9 +265,10 @@ export class SeriesHelperService {
     }
   }
 
-  getMinMax(seriesData: Array<any>) {
+  getMinMax(seriesData) {
+    console.log(seriesData)
     let minValue = Infinity, minValueDate = '', maxValue = Infinity, maxValueDate = '';
-    seriesData.forEach((item, index) => {
+    seriesData.lvlCategoryTable.forEach((item, index) => {
       if (minValue === Infinity || item.value < minValue) {
         minValue = item.value;
         minValueDate = item.tableDate;

@@ -55,12 +55,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      console.log(series)
       const decimal = series.seriesDetail.decimals;
       // series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
-      series.analyzerTableDisplay = this.createSeriesTable(series.observations.transformationResults, this.allTableDates, tableStart, tableEnd, decimal)
+      series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      //series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      console.log(series)
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
@@ -72,31 +72,40 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       }
     });
     // Check if the summary statistics for a series has NA values
-    //this.missingSummaryStat = this.isSummaryStatMissing();
+    this.missingSummaryStat = this.isSummaryStatMissing();
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
 
   createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
     const categoryTable = {};
-    transformations.forEach((t) => {
-      const { transformation, dates, values, pseudoHistory } = t;
-      if (dates && values) {
-        const transformationValues = [];
-        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
-        if (!dateDiff.length) {
-          categoryTable[`${transformation}CategoryTable`] = values.slice(start, end + 1).map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
-        }
-        if (dateDiff.length) {
-          categoryDates.forEach((sDate) => {
-            const dateExists = this._helper.binarySearch(dates, sDate.date);
-            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
-          });
-          categoryTable[`${transformation}CategoryTable`] = transformationValues.slice(start, end + 1).map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
-        }  
-      }
+    Object.keys(transformations).forEach((transform) => {
+      const transformationValues = [];
+      categoryDates.forEach((catDate) => {
+        const dateExists = this.binarySearch(transformations[transform], catDate.tableDate);
+        dateExists > -1 ? transformationValues.push(transformations[transform][dateExists]) : transformationValues.push({ date: catDate.date, tableDate: catDate.tableDate, value: '' });
+      });
+      categoryTable[`${transform}`] = transformationValues.slice(start, end + 1).map((i) => {
+        return i.value === '' ? { date: i.date, tableDate: i.tableDate, value: '' } : { date: i.date, tableDate: i.tableDate, value: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
+      });
     });
     return categoryTable;
   }
+
+  binarySearch = (valueList, date) => {
+    let start = 0;
+    let end = valueList.length - 1;
+    let middle = Math.floor((start + end) / 2);
+    while (valueList[middle] && valueList[middle].tableDate !== date && start < end) {
+      if (date < valueList[middle].tableDate) {
+        end = middle - 1;
+      } else {
+        start = middle + 1;
+      }
+      middle = Math.floor((start + end) / 2);
+    }
+    return (!valueList[middle] || valueList[middle].tableDate !== date) ? -1 : middle;
+  }
+
 
   ngAfterViewChecked() {
     // Check height of content and scroll tables to the right

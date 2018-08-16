@@ -102,19 +102,21 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
         const transformationValues = [];
         const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
         if (!dateDiff.length) {
-          categoryTable[`${transformation}CategoryTable`] = values.slice(start, end + 1).map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+          categoryTable[`${transformation}CategoryTable`] = this.formatValues(values.slice(start, end + 1), decimal);
         }
         if (dateDiff.length) {
           categoryDates.forEach((sDate) => {
             const dateExists = this._helper.binarySearch(dates, sDate.date);
             dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
           });
-          categoryTable[`${transformation}CategoryTable`] = transformationValues.slice(start, end + 1).map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
+          categoryTable[`${transformation}CategoryTable`] = this.formatValues(transformationValues.slice(start, end + 1), decimal);
         }  
       }
     });
     return categoryTable;
   }
+
+  formatValues = (values, decimal) => values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
 
   showTooltip() {
     $('[data-toggle="tooltip"]').tooltip();

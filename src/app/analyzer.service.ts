@@ -70,34 +70,31 @@ export class AnalyzerService {
         const obsEnd = seriesData.observations.observationEnd;
         const dateArray = [];
         if (levelData) {
+          const pseudoZones = [];
+          const level = seriesData.observations.transformationResults[0].values;
+          if (level.pseudoHistory) {
+            level.pseudoHistory.forEach((obs, index) => {
+              if (obs && !level.pseudoHistory[index + 1]) {
+                pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+              }
+            });
+          } 
           // Use to format dates for table
           this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
           const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-          seriesData.chartData = data.chartData;
-          seriesData.seriesTableData = data.tableData;
+          seriesData.chartData = { level: this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray), dates: dateArray, pseudoZones: pseudoZones }
+          //seriesData.seriesTableData = data.tableData;
         } else {
           seriesData.noData = 'Data not available';
         }
         this.analyzerData.analyzerSeries.push(seriesData);
       });
       this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-      console.log(this.analyzerData.analyzerTableDates)
       this.analyzerData.analyzerSeries.forEach((aSeries) => {
-        console.log(aSeries)
         const decimal = aSeries.seriesDetail.decimals;
-        aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, this.analyzerData.analyzerTableDates, decimal);
-        const transformations = this._helper.getTransformations(aSeries.observations);
-        const pseudoZones = [];
-        const level = transformations.level;
-        if (level.pseudoHistory) {
-          level.pseudoHistory.forEach((obs, index) => {
-            if (obs && !level.pseudoHistory[index + 1]) {
-              pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-            }
-          });
-        }  
-        aSeries.chartData = { level: this.createSeriesChartData(aSeries.observations.transformationResults[0], this.analyzerData.analyzerTableDates), pseudoZones: pseudoZones, dates: this.analyzerData.analyzerTableDates}
-        console.log(this.createSeriesTable(aSeries.observations.transformationResults, this.analyzerData.analyzerTableDates, decimal))
+        const dateArray = [];
+        this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+        aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
       })
       // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
@@ -106,23 +103,27 @@ export class AnalyzerService {
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
-  createSeriesTable = (transformations, categoryDates, decimal) => {
+  createSeriesTable = (transformations, tableDates, decimal) => {
     const categoryTable = {};
     transformations.forEach((t) => {
       const { transformation, dates, values, pseudoHistory } = t;
       if (dates && values) {
-        const transformationValues = [];
-        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
+        categoryTable[`${transformation}CategoryTable`] = tableDates.map((date) => {
+          const dateExists = this._helper.binarySearch(dates, date.date);
+          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: values[dateExists] } : { date: date.date, tableDate: date.tableDate, level: Infinity };
+        });
+        /* const transformationValues = [];
+        const dateDiff = tableDates.filter(date => !dates.includes(date.date));
         if (!dateDiff.length) {
           categoryTable[`${transformation}CategoryTable`] = values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
         }
         if (dateDiff.length) {
-          categoryDates.forEach((sDate) => {
-            const dateExists = this._helper.binarySearch(dates, sDate.date);
+          tableDates.forEach((date) => {
+            const dateExists = this._helper.binarySearch(dates, date.date);
             dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
           });
-          categoryTable[`${transformation}CategoryTable`] = transformationValues.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
-        }  
+          categoryTable[`${transformation}CategoryTable`] = transformationValues.map(i => i === '' ? '' : +i).map(i => i.toLocaleString());
+        } */
       }
     });
     return categoryTable;
@@ -148,7 +149,7 @@ export class AnalyzerService {
 
   createAnalyzerTableData(analyzerSeries, tableDates) {
     analyzerSeries.forEach((serie) => {
-      if (serie.observations) {
+      /* if (serie.observations) {
         serie.analyzerTableData = tableDates.map((date) => {
           const tableObj = {
             date: date.date,
@@ -175,7 +176,7 @@ export class AnalyzerService {
           }
           return tableObj;
         });
-      }
+      } */
     });
   }
 
