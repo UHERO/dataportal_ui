@@ -151,49 +151,46 @@ export class SeriesHelperService {
       missing: null
     };
 
-    // Values of the selected starting and ending dates
-    stats.tableStartValue = this.getStartValue(seriesData.lvlCategoryTable, startDate);
-    stats.tableEndValue = this.getEndValue(seriesData.lvlCategoryTable, endDate);
-    const firstValue = stats.tableStartValue;
-    const lastValue = stats.tableEndValue;
-    // const selectedRangeData = this.getSelectedRange(seriesData, startDate, endDate, firstValue, lastValue);
-    const selectedRangeData = seriesData.lvlCategoryTable;
-    const missingValues = this.checkMissingValues(selectedRangeData, freq.freq, firstValue, lastValue);
-    console.log('missingValues', missingValues)
-    if (selectedRangeData.length && !missingValues) {
-      const periods = selectedRangeData.length - 1;
-      //stats.minValue = this.getMinMax(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,''))).minValue;
-      stats.minValueDate = this.getMinMax(seriesData).minValueDate;
-      //stats.maxValue = this.getMinMax(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,''))).maxValue;
-      stats.maxValueDate = this.getMinMax(seriesData).maxValueDate;
-      stats.total = this.getTotalValue(selectedRangeData.map(i => i.value === '' ? Infinity : +i.value.replace(/\,/g,'')));
-      stats.avg = stats.total !== Infinity ? stats.total / selectedRangeData.length : Infinity;
-      stats.cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, periods);
-    }
+    if (seriesData.lvlCategoryTable.length) {
+      // Values of the selected starting and ending dates
+      stats.tableStartValue = this.getStartValue(seriesData.lvlCategoryTable, startDate);
+      stats.tableEndValue = this.getEndValue(seriesData.lvlCategoryTable, endDate);
+      const firstValue = stats.tableStartValue;
+      const lastValue = stats.tableEndValue;
+      const selectedRangeData = this.getSelectedRange(seriesData.lvlCategoryTable, startDate, endDate, firstValue, lastValue);
+      const missingValues = this.checkMissingValues(selectedRangeData, freq.freq, firstValue, lastValue);
+      if (selectedRangeData.length && !missingValues) {
+        const periods = selectedRangeData.length - 1;
+        stats.minValue = this.getMinMax(selectedRangeData).minValue;
+        stats.minValueDate = this.getMinMax(selectedRangeData).minValueDate;
+        stats.maxValue = this.getMinMax(selectedRangeData).maxValue;
+        stats.maxValueDate = this.getMinMax(selectedRangeData).maxValueDate;
+        stats.total = this.getTotalValue(selectedRangeData);
+        stats.avg = stats.total !== Infinity ? stats.total / selectedRangeData.length : Infinity;
+        stats.cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, periods);
+      }
 
-    if (firstValue !== Infinity && lastValue !== Infinity) {
-      stats.percChange = ((lastValue - firstValue) / firstValue) * 100;
-      stats.levelChange = lastValue - firstValue;
-    }
+      if (firstValue !== Infinity && lastValue !== Infinity) {
+        stats.percChange = ((lastValue - firstValue) / firstValue) * 100;
+        stats.levelChange = lastValue - firstValue;
+      }
 
-    // Format numbers
-    formatStats.minValue = stats.minValue === Infinity ? 'N/A' : this._helper.formatNum(stats.minValue, decimals);
-    formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + stats.minValueDate + ')';
-    formatStats.maxValue = stats.maxValue === Infinity ? 'N/A' : this._helper.formatNum(stats.maxValue, decimals);
-    formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + stats.maxValueDate + ')';
-    formatStats.percChange = stats.percChange === Infinity ? 'N/A' : this._helper.formatNum(stats.percChange, decimals);
-    formatStats.levelChange = stats.levelChange === Infinity ? 'N/A' : this._helper.formatNum(stats.levelChange, decimals);
-    formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
-    formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
-    formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
-    formatStats.missing = Boolean(missingValues);
-    console.log('stats', stats);
-    console.log('formatStats', formatStats)
-    return formatStats;
+      // Format numbers
+      formatStats.minValue = stats.minValue === Infinity ? 'N/A' : this._helper.formatNum(stats.minValue, decimals);
+      formatStats.minValueDate = stats.minValueDate === '' ? ' ' : '(' + stats.minValueDate + ')';
+      formatStats.maxValue = stats.maxValue === Infinity ? 'N/A' : this._helper.formatNum(stats.maxValue, decimals);
+      formatStats.maxValueDate = stats.maxValueDate === '' ? ' ' : '(' + stats.maxValueDate + ')';
+      formatStats.percChange = stats.percChange === Infinity ? 'N/A' : this._helper.formatNum(stats.percChange, decimals);
+      formatStats.levelChange = stats.levelChange === Infinity ? 'N/A' : this._helper.formatNum(stats.levelChange, decimals);
+      formatStats.total = stats.total === Infinity ? 'N/A' : this._helper.formatNum(stats.total, decimals);
+      formatStats.avg = stats.avg === Infinity ? 'N/A' : this._helper.formatNum(stats.avg, decimals);
+      formatStats.cagr = stats.cagr === Infinity ? 'N/A' : this._helper.formatNum(stats.cagr, decimals);
+      formatStats.missing = Boolean(missingValues);
+      return formatStats;
+    }
   }
 
   checkMissingValues(selectedRange: Array<any>, freq: string, firstValue, lastValue) {
-    console.log('checkMissingValues', selectedRange)
     let missing = false;
     if (firstValue === Infinity || lastValue === Infinity) {
       return missing = true;
@@ -202,7 +199,6 @@ export class SeriesHelperService {
       missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === '') ? true : false;
     }
     if (freq === 'Q') {
-      console.log('Q missing', selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === ''))
       missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === '') ? true : false;
     }
     if (freq === 'S') {
@@ -215,13 +211,10 @@ export class SeriesHelperService {
   }
 
   getTotalValue(selectedRangeData: Array<any>) {
-    /* const sum = selectedRangeData.reduce((total, data) => {
+    const sum = selectedRangeData.reduce((total, data) => {
       return data.value === Infinity ? total : total + +data.value;
     }, 0);
-    return sum; */
-    return selectedRangeData.reduce((total, data) => {
-      return data === '' ? total : total + +data;
-    }, 0);
+    return sum;
   }
 
   getStartValue(seriesData, startDate: string) {
@@ -266,9 +259,8 @@ export class SeriesHelperService {
   }
 
   getMinMax(seriesData) {
-    console.log(seriesData)
     let minValue = Infinity, minValueDate = '', maxValue = Infinity, maxValueDate = '';
-    seriesData.lvlCategoryTable.forEach((item, index) => {
+    seriesData.forEach((item, index) => {
       if (minValue === Infinity || item.value < minValue) {
         minValue = item.value;
         minValueDate = item.tableDate;

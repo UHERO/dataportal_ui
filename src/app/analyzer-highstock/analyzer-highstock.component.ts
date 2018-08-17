@@ -30,6 +30,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
+  @Input() analyzerFreq;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
@@ -45,7 +46,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.analyzerFreq);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -231,11 +232,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
       obs[1] = null;
       return obs;
     });
-    console.log('navigatordates', navigatorDates);
     return navigatorDates;
   };
 
-  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>) {
+  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, analyzerFreq: string) {
     const chartSeries = [];
     series.forEach((serie, index) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
@@ -268,7 +268,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     });
     const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
-      data: navDates,
+      data: new Array(Math.max(...series.map(s => s.chartData.level.length))).fill(null),
+      pointStart: Date.parse(dates[0].date),
+      pointInterval: analyzerFreq === 'Q' ? 3 : analyzerFreq === 'S' ? 6 : 1,
+      pointIntervalUnit: analyzerFreq === 'A' ? 'year' : 'month',
       yAxis: 0,
       showInLegend: false,
       showInNavigator: true,
@@ -292,7 +295,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       events: {
         render: function () {
           const extremes = getChartExtremes(this);
-          console.log('extremes', this)
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
           }
@@ -389,6 +391,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         afterSetExtremes: function () {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
         }
       },
       minRange: 1000 * 3600 * 24 * 30 * 12,
@@ -560,23 +563,20 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let selectedRange = null;
     if (chartObject && chartObject.series) {
       let series, seriesLength = 0;
-      const nav = chartObject.series.find(serie => serie.name === 'Navigator');
       chartObject.series.forEach((serie) => {
         if (!series || seriesLength < serie.points.length) {
           seriesLength = serie.points.length;
           series = serie;
         }
       });
-      selectedRange = nav ? nav.xData : series ? series.points : null;
+      selectedRange = series ? series.points : null;
     }
     if (!selectedRange) {
       return { min: null, max: null };
     }
     if (selectedRange) {
-      console.log('chartObject', chartObject);
-      console.log('selectedRange', selectedRange)
-      xMin = selectedRange[0].x ? new Date(selectedRange[0].x).toISOString().split('T')[0] : new Date(selectedRange[0]).toISOString().split('T')[0];
-      xMax = selectedRange[selectedRange.length - 1].x ? new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0] : new Date(selectedRange[selectedRange.length - 1]).toISOString().split('T')[0];
+      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
+      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
       return { min: xMin, max: xMax };
     }
   };

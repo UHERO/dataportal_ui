@@ -14,7 +14,8 @@ export class AnalyzerService {
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
-    analyzerChartSeries: []
+    analyzerChartSeries: [],
+    analyzerFrequency: ''
   };
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
@@ -98,9 +99,29 @@ export class AnalyzerService {
       })
       // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+      // Get highest frequency of all series in analyzer
+      this.analyzerData.analyzerFrequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
     });
+    console.log('observable', this.analyzerData)
     return Observable.forkJoin(Observable.of(this.analyzerData));
+  }
+  
+  checkFrequencies = (series) => {
+    console.log(series);
+    let freq = 'A';
+    series.forEach((s) => {
+      if (s.currentFreq.freq === 'M') {
+        freq = 'M';
+      }
+      if (s.currentFreq.freq === 'Q') {
+        freq = 'Q';
+      }
+      if (s.currentFreq.freq === 'S') {
+        freq = 'S';
+      }
+    });
+    return freq;
   }
 
   createSeriesTable = (transformations, tableDates, decimal) => {
@@ -110,7 +131,7 @@ export class AnalyzerService {
       if (dates && values) {
         categoryTable[`${transformation}CategoryTable`] = tableDates.map((date) => {
           const dateExists = this._helper.binarySearch(dates, date.date);
-          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: values[dateExists] } : { date: date.date, tableDate: date.tableDate, level: Infinity };
+          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } : { date: date.date, tableDate: date.tableDate, level: Infinity, formattedValue: '' };
         });
         /* const transformationValues = [];
         const dateDiff = tableDates.filter(date => !dates.includes(date.date));
@@ -335,11 +356,6 @@ export class AnalyzerService {
     }
     return false;
   }
-
-  checkStartMonth(month) {
-    if (month === 0 || month === 3 || month === 6 || month === 9) {
-      return true;
-    }
-    return false;
-  }
+  
+  checkStartMonth = (month) => month % 3 === 0 ? true : false;
 }

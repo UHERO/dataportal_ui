@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
@@ -10,7 +10,8 @@ declare var $: any;
 @Component({
   selector: 'app-analyzer-table',
   templateUrl: './analyzer-table.component.html',
-  styleUrls: ['./analyzer-table.component.scss']
+  styleUrls: ['./analyzer-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewChecked {
   @ViewChildren('tableScroll') private tableEl;
@@ -85,7 +86,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
         dateExists > -1 ? transformationValues.push(transformations[transform][dateExists]) : transformationValues.push({ date: catDate.date, tableDate: catDate.tableDate, value: '' });
       });
       categoryTable[`${transform}`] = transformationValues.slice(start, end + 1).map((i) => {
-        return i.value === '' ? { date: i.date, tableDate: i.tableDate, value: '' } : { date: i.date, tableDate: i.tableDate, value: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
+        return i.value === '' ? { date: i.date, tableDate: i.tableDate, value: Infinity, formattedValue: '' } : { date: i.date, tableDate: i.tableDate, value: +i.value, formattedValue: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
       });
     });
     return categoryTable;
@@ -122,7 +123,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   }
 
   isSummaryStatMissing() {
-    return this.series.some((s) => s.summaryStats.missing);
+    return this.series.some((s) => s.summaryStats ? s.summaryStats.missing : null);
   }
 
   showPopover(seriesInfo) {
