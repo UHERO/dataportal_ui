@@ -15,7 +15,8 @@ export class AnalyzerService {
     analyzerTableDates: [],
     analyzerSeries: [],
     analyzerChartSeries: [],
-    analyzerFrequency: ''
+    analyzerFrequency: '',
+    chartNavigator: { frequency: '', dateStart: '', numberOfObservations: null }
   };
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
@@ -83,7 +84,8 @@ export class AnalyzerService {
           // Use to format dates for table
           this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
           const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-          seriesData.chartData = { level: this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray), dates: dateArray, pseudoZones: pseudoZones }
+          const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray)
+          seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones: pseudoZones }
           //seriesData.seriesTableData = data.tableData;
         } else {
           seriesData.noData = 'Data not available';
@@ -96,11 +98,13 @@ export class AnalyzerService {
         const dateArray = [];
         this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
         aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
-      })
+      });
       // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
       // Get highest frequency of all series in analyzer
-      this.analyzerData.analyzerFrequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
+      this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
+      this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
+      this.analyzerData.chartNavigator.numberOfObservations = Math.max(...this.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
       this.checkAnalyzerChartSeries();
     });
     console.log('observable', this.analyzerData)

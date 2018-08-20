@@ -30,7 +30,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
-  @Input() analyzerFreq;
+  @Input() navigator;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
@@ -46,7 +46,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.analyzerFreq);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -235,7 +235,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return navigatorDates;
   };
 
-  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, analyzerFreq: string) {
+  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) {
     const chartSeries = [];
     series.forEach((serie, index) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
@@ -268,11 +268,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
     });
     const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
-      data: new Array(Math.max(...series.map(s => s.chartData.level.length))).fill(null),
-      pointStart: Date.parse(dates[0].date),
-      pointInterval: analyzerFreq === 'Q' ? 3 : analyzerFreq === 'S' ? 6 : 1,
-      pointIntervalUnit: analyzerFreq === 'A' ? 'year' : 'month',
+      data: new Array(navigatorOptions.numberOfObservations).fill(null),
+      pointStart: Date.parse(navigatorOptions.dateStart),
+      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
+      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',
       yAxis: 0,
+      dataGrouping: {
+        enabled: false
+      },
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
