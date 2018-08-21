@@ -30,7 +30,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
   @Input() subcatIndex;
   @Input() tableStart;
   @Input() tableEnd;
-
+  @Input() portalSettings;
   private tableHeader;
   private previousHeight;
   private tableWidths = [];
@@ -102,7 +102,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
         const transformationValues = [];
         const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
         if (!dateDiff.length) {
-          //categoryTable[`${transformation}DownloadTable`] = this.formatValues(values, decimal);
+          categoryTable[`${transformation}DownloadTable`] = this.formatValues(values, decimal);
           categoryTable[`${transformation}CategoryTable`] = this.formatValues(values.slice(start, end + 1), decimal);
         }
         if (dateDiff.length) {
@@ -110,7 +110,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
             const dateExists = this._helper.binarySearch(dates, sDate.date);
             dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
           });
-          //categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
+          categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
           categoryTable[`${transformation}CategoryTable`] = this.formatValues(transformationValues.slice(start, end + 1), decimal);
         }  
       }

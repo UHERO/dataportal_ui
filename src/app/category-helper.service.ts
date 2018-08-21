@@ -165,7 +165,7 @@ export class CategoryHelperService {
         if (displaySeries) {
           sub.displaySeries = displaySeries;
           sub.noData = false;
-          this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
+          //this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
         }
         if (!displaySeries) {

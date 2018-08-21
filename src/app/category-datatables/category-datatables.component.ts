@@ -136,8 +136,8 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         if (series.seriesInfo !== 'No data available') {
           const observations = {};
           const title = series.seriesInfo.displayName;
-          series.tableDownload.lvlDownloadTable.forEach((obs) => {
-            observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
+          tableDates.forEach((date, index) => {
+            observations[date.tableDate] = series.categoryTable.lvlDownloadTable[index] === '' ? null : series.categoryTable.lvlDownloadTable[index];
           });
           tableData.push({
             series: title,
