@@ -266,7 +266,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
       data: new Array(navigatorOptions.numberOfObservations).fill(null),
       pointStart: Date.parse(navigatorOptions.dateStart),
@@ -394,7 +393,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
         afterSetExtremes: function () {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
-          tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+          if (this._extremes) {
+            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+          }
         }
       },
       minRange: 1000 * 3600 * 24 * 30 * 12,
@@ -564,18 +565,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let xMin = null, xMax = null;
     // Selected level data
     let selectedRange = null;
-    if (chartObject && chartObject.series) {
-      let series, seriesLength = 0;
-      chartObject.series.forEach((serie) => {
-        if (!series || seriesLength < serie.points.length) {
-          seriesLength = serie.points.length;
-          series = serie;
-        }
-      });
-      selectedRange = series ? series.points : null;
-    }
-    if (!selectedRange) {
-      return { min: null, max: null };
+    if (chartObject && chartObject.navigator) {
+      selectedRange = chartObject.navigator.baseSeries[0] ? chartObject.navigator.baseSeries[0].points : null;
     }
     if (selectedRange) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];

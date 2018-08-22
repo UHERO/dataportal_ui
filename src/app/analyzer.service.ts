@@ -97,6 +97,7 @@ export class AnalyzerService {
         const decimal = aSeries.seriesDetail.decimals;
         const dateArray = [];
         this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+        // aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
         aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
       });
       // /this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
@@ -107,12 +108,10 @@ export class AnalyzerService {
       this.analyzerData.chartNavigator.numberOfObservations = Math.max(...this.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
       this.checkAnalyzerChartSeries();
     });
-    console.log('observable', this.analyzerData)
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
   
   checkFrequencies = (series) => {
-    console.log(series);
     let freq = 'A';
     series.forEach((s) => {
       if (s.currentFreq.freq === 'M') {
@@ -133,22 +132,10 @@ export class AnalyzerService {
     transformations.forEach((t) => {
       const { transformation, dates, values, pseudoHistory } = t;
       if (dates && values) {
-        categoryTable[`${transformation}CategoryTable`] = tableDates.map((date) => {
+        categoryTable[`${transformation}`] = tableDates.map((date) => {
           const dateExists = this._helper.binarySearch(dates, date.date);
-          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } : { date: date.date, tableDate: date.tableDate, level: Infinity, formattedValue: '' };
+          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } : { date: date.date, tableDate: date.tableDate, value: Infinity, formattedValue: '' };
         });
-        /* const transformationValues = [];
-        const dateDiff = tableDates.filter(date => !dates.includes(date.date));
-        if (!dateDiff.length) {
-          categoryTable[`${transformation}CategoryTable`] = values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
-        }
-        if (dateDiff.length) {
-          tableDates.forEach((date) => {
-            const dateExists = this._helper.binarySearch(dates, date.date);
-            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
-          });
-          categoryTable[`${transformation}CategoryTable`] = transformationValues.map(i => i === '' ? '' : +i).map(i => i.toLocaleString());
-        } */
       }
     });
     return categoryTable;

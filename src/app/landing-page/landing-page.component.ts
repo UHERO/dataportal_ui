@@ -82,7 +82,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
-      console.log('landing page component data', this.getData(this.id, this.routeGeo, this.routeFreq))
     });
   }
 

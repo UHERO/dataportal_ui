@@ -21,17 +21,19 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
   @Output() updateRange = new EventEmitter(true);
   private start;
   private end;
+  private sliderDates;
 
   constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
   ngAfterViewInit() {
+    this.sliderDates = this.dates.map(date => date.tableDate);
     const that = this;
     const freq = this.freq;
     $('#' + this.subCat.id).ionRangeSlider({
       min: 0,
       from: this.start,
       to: this.end,
-      values: this.dates,
+      values: this.sliderDates,
       prettify_enabled: false,
       hide_min_max: true,
       keyboard: true,
@@ -75,7 +77,8 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
   }
 
   findDefaultRange() {
-    const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.dates, this.defaultRange);
+    this.sliderDates = this.dates.map(date => date.tableDate);
+    const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.sliderDates, this.defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     // Range slider is converting annual year strings to numbers
     const dateFromExists = this.dates.findIndex(date => date == this.dateFrom);

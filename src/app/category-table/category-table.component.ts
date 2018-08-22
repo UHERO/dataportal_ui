@@ -103,7 +103,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
         const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
         if (!dateDiff.length) {
           categoryTable[`${transformation}DownloadTable`] = this.formatValues(values, decimal);
-          categoryTable[`${transformation}CategoryTable`] = this.formatValues(values.slice(start, end + 1), decimal);
+          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
         }
         if (dateDiff.length) {
           categoryDates.forEach((sDate) => {
@@ -111,7 +111,7 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
             dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
           });
           categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
-          categoryTable[`${transformation}CategoryTable`] = this.formatValues(transformationValues.slice(start, end + 1), decimal);
+          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
         }  
       }
     });

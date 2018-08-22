@@ -109,9 +109,9 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       analyzerSeries.forEach((series) => {
         const observations = {};
         const title = series.displayName;
-        if (series.analyzerTableData) {
-          series.analyzerTableData.forEach((obs) => {
-            observations[obs.tableDate] = obs.value === Infinity ? null : obs.value;
+        if (series.analyzerTableDisplay) {
+          tableDates.forEach((date, index) => {
+            observations[date.tableDate] = series.analyzerTableDisplay.lvlDownloadTable[index].value === Infinity ? null : series.analyzerTableDisplay.lvlDownloadTable[index].value;
           });
         }
         tableData.push({
@@ -120,13 +120,13 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         });
       });
       if (yoySelected) {
-        this.addAnalyzerYoy(tableData, analyzerSeries);
+        this.addAnalyzerYoy(tableData, analyzerSeries, tableDates);
       }
       if (ytdSelected) {
-        this.addAnalyzerYtd(tableData, analyzerSeries);
+        this.addAnalyzerYtd(tableData, analyzerSeries, tableDates);
       }
       if (c5maSelected) {
-        this.addAnalyzerC5ma(tableData, analyzerSeries);
+        this.addAnalyzerC5ma(tableData, analyzerSeries, tableDates);
       }
       return { tableColumns: tableColumns, tableData: tableData };
     }
@@ -146,13 +146,13 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         }
       });
       if (yoySelected) {
-        this.addCategoryYoy(tableData, displaySeries);
+        this.addCategoryYoy(tableData, displaySeries, tableDates);
       }
       if (ytdSelected) {
-        this.addCategoryYtd(tableData, displaySeries);
+        this.addCategoryYtd(tableData, displaySeries, tableDates);
       }
       if (c5maSelected) {
-        this.addCategoryC5ma(tableData, displaySeries);
+        this.addCategoryC5ma(tableData, displaySeries, tableDates);
       }
       return { tableColumns: tableColumns, tableData: tableData };
     }
@@ -172,14 +172,14 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       });
   }
 
-  addCategoryTransformation(displaySeries: Array<any>, transformValue: string, tableData: Array<any>) {
+  addCategoryTransformation(displaySeries: Array<any>, transformValue: string, tableData: Array<any>, tableDates) {
     displaySeries.forEach((series) => {
       const transformation = {};
       const percent = series.seriesInfo.percent;
       const transformLabel = percent ? ' (ch)' : ' (%)';
       const title = series.seriesInfo.displayName;
-      series.categoryDisplay.tableData.forEach((obs) => {
-        transformation[obs.tableDate] = obs[transformValue] === Infinity ? null : obs[transformValue];
+      tableDates.forEach((date, index) => {
+        transformation[date.tableDate] = series.categoryTable[transformValue][index] === '' ? null : series.categoryTable[transformValue][index];
       });
       tableData.push({
         series: title + transformLabel,
@@ -188,14 +188,14 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     });
   }
 
-  addAnalyzerTransformation(analyzerSeries: Array<any>, transformValue: string, tableData: Array<any>) {
+  addAnalyzerTransformation(analyzerSeries: Array<any>, transformValue: string, tableData: Array<any>, tableDates) {
     analyzerSeries.forEach((series) => {
       const transformation = {};
       const percent = series.seriesDetail.percent;
       const transformLabel = percent ? ' (ch)' : ' (%)';
       const title = series.displayName;
-      series.analyzerTableData.forEach((obs) => {
-        transformation[obs.tableDate] = obs[transformValue] === Infinity ? null : obs[transformValue];
+      tableDates.forEach((date, index) => {
+        transformation[date.tableDate] = series.analyzerTableDisplay[transformValue][index].value === Infinity ? null : series.analyzerTableDisplay[transformValue][index].value;
       });
       tableData.push({
         series: title + transformLabel,
@@ -204,33 +204,33 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     });
   }
 
-  addAnalyzerYoy(tableData, analyzerSeries) {
+  addAnalyzerYoy(tableData, analyzerSeries, tableDates) {
     this.addTransformationLabel(tableData, 'Year/Year');
-    this.addAnalyzerTransformation(analyzerSeries, 'yoyValue', tableData);
+    this.addAnalyzerTransformation(analyzerSeries, 'pc1DownloadTable', tableData, tableDates);
   }
 
-  addCategoryYoy(tableData, displaySeries) {
+  addCategoryYoy(tableData, displaySeries, tableDates) {
     this.addTransformationLabel(tableData, 'Year/Year');
-    this.addCategoryTransformation(displaySeries, 'yoyValue', tableData);
+    this.addCategoryTransformation(displaySeries, 'pc1DownloadTable', tableData, tableDates);
   }
 
-  addAnalyzerYtd(tableData, analyzerSeries) {
+  addAnalyzerYtd(tableData, analyzerSeries, tableDates) {
     this.addTransformationLabel(tableData, 'Year-to-Date');
-    this.addAnalyzerTransformation(analyzerSeries, 'ytdValue', tableData);
+    this.addAnalyzerTransformation(analyzerSeries, 'ytdDownloadTable', tableData, tableDates);
   }
 
-  addCategoryYtd(tableData, displaySeries) {
+  addCategoryYtd(tableData, displaySeries, tableDates) {
     this.addTransformationLabel(tableData, 'Year-to-Date');
-    this.addCategoryTransformation(displaySeries, 'ytdValue', tableData);
+    this.addCategoryTransformation(displaySeries, 'ytdDownloadTable', tableData, tableDates);
   }
 
-  addAnalyzerC5ma(tableData, analyzerSeries) {
+  addAnalyzerC5ma(tableData, analyzerSeries, tableDates) {
     this.addTransformationLabel(tableData, 'Annual Change');
-    this.addAnalyzerTransformation(analyzerSeries, 'c5maValue', tableData);
+    this.addAnalyzerTransformation(analyzerSeries, 'c5maDownloadTable', tableData, tableDates);
   }
 
-  addCategoryC5ma(tableData, displaySeries) {
+  addCategoryC5ma(tableData, displaySeries, tableDates) {
     this.addTransformationLabel(tableData, 'Annual Change');
-    this.addCategoryTransformation(displaySeries, 'c5maValue', tableData);
+    this.addCategoryTransformation(displaySeries, 'c5maDownloadTable', tableData, tableDates);
   }
 }

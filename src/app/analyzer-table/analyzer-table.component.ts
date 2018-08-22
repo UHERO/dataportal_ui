@@ -61,7 +61,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
       series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
-      console.log(series)
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
@@ -83,11 +82,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       const transformationValues = [];
       categoryDates.forEach((catDate) => {
         const dateExists = this.binarySearch(transformations[transform], catDate.tableDate);
-        dateExists > -1 ? transformationValues.push(transformations[transform][dateExists]) : transformationValues.push({ date: catDate.date, tableDate: catDate.tableDate, value: '' });
+        dateExists > -1 ? transformationValues.push(transformations[transform][dateExists]) : transformationValues.push({ date: catDate.date, tableDate: catDate.tableDate, value: '', formattedValue: '' });
       });
-      categoryTable[`${transform}`] = transformationValues.slice(start, end + 1).map((i) => {
-        return i.value === '' ? { date: i.date, tableDate: i.tableDate, value: Infinity, formattedValue: '' } : { date: i.date, tableDate: i.tableDate, value: +i.value, formattedValue: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
+      categoryTable[`${transform}DownloadTable`] = transformationValues.map((i) => {
+        return (i.value === Infinity || i.value === '') ? { date: i.date, tableDate: i.tableDate, value: Infinity, formattedValue: '' } : { date: i.date, tableDate: i.tableDate, value: +i.value, formattedValue: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
       });
+      categoryTable[`${transform}CategoryTable`] = categoryTable[`${transform}DownloadTable`].slice(start, end + 1);
     });
     return categoryTable;
   }

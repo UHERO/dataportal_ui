@@ -280,7 +280,7 @@ export class CategoryHelperService {
       this.categoryData[cacheId].subcategories = [sublist];
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
-      this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
+      //this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
       this.categoryData[cacheId].requestComplete = true;
       sublist.requestComplete = true;
     }
@@ -346,45 +346,7 @@ export class CategoryHelperService {
     displaySeries.forEach((series) => {
       if (series.seriesInfo !== 'No data available') {
         const decimals = series.decimals ? series.decimals : 1;
-        series['tableDownload'] = this.createSeriesTable(series.seriesInfo.seriesObservations.transformationResults, dateArray, decimals);
       }
     });
-  }
-
-  createSeriesTable = (transformations, categoryDates, decimal) => {
-    const categoryTable = {};
-    transformations.forEach((t) => {
-      const { transformation, dates, values, pseudoHistory } = t;
-      if (dates && values) {
-        const transformationValues = [];
-        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
-        categoryDates.forEach((sDate) => {
-          const dateExists = this._helper.binarySearch(dates, sDate.date);
-          dateExists > -1 ? transformationValues.push({ date: sDate.date, tableDate: sDate.tableDate, value: values[dateExists] }) : transformationValues.push({ date: sDate.date, tableDate: sDate.tableDate, value: '' });
-        });
-        categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
-        //categoryTable[`${transformation}CategoryTable`] = this.formatValues(transformationValues.slice(start, end + 1), decimal);
-      }
-    });
-    return categoryTable;
-  }
-
-  formatValues = (values, decimal) => values.map((i) => {
-    return i.value === '' ? { date: i.date, tableDate: i.tableDate, value: Infinity, formattedValue: '' } : { date: i.date, tableDate: i.tableDate, value: +i.value, formattedValue: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) };
-  });
-
-  binarySearch = (valueList, date) => {
-    let start = 0;
-    let end = valueList.length - 1;
-    let middle = Math.floor((start + end) / 2);
-    while (valueList[middle] && valueList[middle].tableDate !== date && start < end) {
-      if (date < valueList[middle].tableDate) {
-        end = middle - 1;
-      } else {
-        start = middle + 1;
-      }
-      middle = Math.floor((start + end) / 2);
-    }
-    return (!valueList[middle] || valueList[middle].tableDate !== date) ? -1 : middle;
   }
 }
