@@ -78,6 +78,7 @@ export class SeriesHelperService {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
       });
+      console.log('seriesData', this.seriesData)
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 

@@ -162,7 +162,6 @@ export class AnalyzerComponent implements OnInit {
     this._analyzer.createAnalyzerTableData(analyzerSeries, this._analyzer.analyzerData.analyzerTableDates);
     this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
     this._analyzer.analyzerData.chartNavigator.frequency = this._analyzer.checkFrequencies(this._analyzer.analyzerData.analyzerSeries);
-    console.log('updateChartSeries tableDates', this._analyzer.analyzerData);
     this._analyzer.analyzerData.chartNavigator.dateStart = this._analyzer.analyzerData.analyzerTableDates[0].date;
     this._analyzer.analyzerData.chartNavigator.numberOfObservations = Math.max(...this._analyzer.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
 
