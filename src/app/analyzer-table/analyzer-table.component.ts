@@ -60,7 +60,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       // series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      console.log('series.analyzerTableDisplay', series.analyzerTableDisplay);
+      //series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
+      series.summaryStats = this._series.newSummaryStats(series.analyzerTableDisplay.lvlCategoryTable, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate)
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph

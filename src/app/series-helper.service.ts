@@ -123,6 +123,56 @@ export class SeriesHelperService {
     return false;
   }
 
+  newSummaryStats(seriesData, freq: Frequency, decimals: number, startDate: string, endDate: string) {
+    const formattedStats = {
+      minValue: '',
+      minValueDate: '',
+      maxValue: '',
+      maxValueDate: '',
+      percChange: '',
+      levelChange: '',
+      total: '',
+      avg: '',
+      cagr: '',
+      missing: null
+    };
+
+    const firstValue = this.getStartValue(seriesData, startDate);
+    const lastValue = this.getEndValue(seriesData, endDate);
+    if (this.checkMissingValues(seriesData, freq.freq, firstValue, lastValue)) {
+      formattedStats.minValue = 'N/A';
+      formattedStats.minValueDate = ' ';
+      formattedStats.maxValue = 'N/A';
+      formattedStats.maxValueDate = ' ';
+      formattedStats.percChange = 'N/A';
+      formattedStats.levelChange = 'N/A';
+      formattedStats.total = 'N/A';
+      formattedStats.avg = 'N/A';
+      formattedStats.cagr = 'N/A';
+      formattedStats.missing = true;
+      return formattedStats; 
+    }
+    const minAndMax = this.getMinMax(seriesData);
+    const total = this.getTotalValue(seriesData);
+    const cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, seriesData.length - 1);
+    formattedStats.minValue = this._helper.formatNum(minAndMax.minValue, decimals);
+    formattedStats.minValueDate = `(${minAndMax.minValueDate})`;
+    formattedStats.maxValue = this._helper.formatNum(minAndMax.maxValue, decimals);
+    formattedStats.maxValueDate = `(${minAndMax.maxValueDate})`;
+    formattedStats.percChange = this._helper.formatNum(((lastValue - firstValue) / firstValue) * 100, decimals);
+    formattedStats.levelChange = this._helper.formatNum(lastValue - firstValue, decimals);
+    formattedStats.total = this._helper.formatNum(total, decimals);
+    formattedStats.avg = this._helper.formatNum(total / seriesData.length, decimals);
+    formattedStats.cagr = this._helper.formatNum(cagr, decimals);
+    return formattedStats;
+  }
+
+  newCheckMissingValues = (seriesData) => {
+    const missing = seriesData.find(d => d.value === Infinity);
+    return missing ? true : false;
+  }
+
+
   // Get summary statistics for single series displays
   // Min & Max values (and their dates) for the selected date range; (%) change from selected range; level change from selected range
   summaryStats(seriesData, freq: Frequency, decimals: number, startDate: string, endDate: string) {
@@ -196,17 +246,19 @@ export class SeriesHelperService {
     if (firstValue === Infinity || lastValue === Infinity) {
       return missing = true;
     }
+    console.log(freq)
     if (freq === 'A') {
-      missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === '') ? true : false;
+      console.log('A', selectedRange)
+      missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === Infinity) ? true : false;
     }
     if (freq === 'Q') {
-      missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === '') ? true : false;
+      missing = selectedRange.find(obs => obs.tableDate.includes('Q') && obs.values === Infinity) ? true : false;
     }
     if (freq === 'S') {
-      missing = selectedRange.find(obs => (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === '') ? true : false;
+      missing = selectedRange.find(obs => (obs.tableDate.includes('-01') || obs.tableDate.includes('-07')) && obs.value === Infinity) ? true : false;
     }
     if (freq === 'M') {
-      missing = selectedRange.find(obs => obs.tableDate.includes('-') && obs.value === '') ? true : false;
+      missing = selectedRange.find(obs => obs.tableDate.includes('-') && obs.value === Infinity) ? true : false;
     }
     return missing;
   }
@@ -222,7 +274,7 @@ export class SeriesHelperService {
     // Find observations in seriesData that match the selected minimum date (duplicate dates may show up in analyzer table data)
     const startDateObs = seriesData.filter(obs => obs.date === startDate);
     // Select observation where value is not Infinity
-    const startDateData = startDateObs.find(obs => obs.value !== '');
+    const startDateData = startDateObs.find(obs => obs.value !== Infinity);
     return startDateData ? startDateData.value : Infinity;
   }
 
@@ -230,7 +282,7 @@ export class SeriesHelperService {
     // Find observations in seriesData that match the selected maximum date (duplicate dates may show up in analyzer table data)
     const endDateObs = seriesData.filter(obs => obs.date === endDate);
     // Select observation where value is not Infinity
-    const endDateData = endDateObs.find(obs => obs.value !== '');
+    const endDateData = endDateObs.find(obs => obs.value !== Infinity);
     return endDateData ? endDateData.value : Infinity;
   }
 

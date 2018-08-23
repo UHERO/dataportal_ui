@@ -148,10 +148,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         tableEnd = i;
       }
     }
-    console.log(this.createSeriesTable(seriesDetail.seriesObservations.transformationResults, tableStart, tableEnd))
+    // console.log(this.createSeriesTable(seriesDetail.seriesObservations.transformationResults, tableStart, tableEnd))
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     console.log('newTableData', this.newTableData);
-    this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
+    //this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
+    this.summaryStats = this._series.newSummaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
   }
 
   createSeriesTable = (transformations, start, end) => {
