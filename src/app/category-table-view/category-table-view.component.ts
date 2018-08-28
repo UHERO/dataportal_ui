@@ -1,10 +1,11 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'app-category-table-view',
   templateUrl: './category-table-view.component.html',
-  styleUrls: ['./category-table-view.component.scss']
+  styleUrls: ['./category-table-view.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CategoryTableViewComponent implements OnInit, OnChanges {
   @Input() data;
@@ -41,8 +42,14 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     if (this.data) {
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
+          console.log('series', series)
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
-          const seriesData = { 'series': series.seriesInfo.displayName };
+          const seriesData = {
+            analyze: series.seriesInfo.analyze,
+            id: series.seriesInfo.id,
+            series: series.seriesInfo.displayName,
+            saParam: series.seriesInfo.saParam
+          };
           transformations.level.dates.forEach((d, index) => {
             seriesData[d] = transformations.level.values[index];
           });

@@ -1,12 +1,37 @@
-<p-table [columns]="scrollableColumns" [frozenColumns]="frozenColumns" [value]="categoryTableData" [scrollable]="true" frozenWidth="320px">
+<p-table #catTable [columns]="scrollableColumns" [frozenColumns]="frozenColumns" [value]="categoryTableData" [scrollable]="true" frozenWidth="320px">
+  <ng-template pTemplate="caption">
+    <div class="ui-helper-clearfix">
+      <button type="button" pButton icon="fa fa-file-o" iconPos="left" label="Download CSV" (click)="catTable.exportCSV()" style="float:left"></button>
+    </div>
+  </ng-template>
   <ng-template pTemplate="header" let-columns>
     <tr>
-      <th *ngFor="let col of columns"  style="width:150px">{{col.header}}</th>
+      <th *ngFor="let col of columns" style="width:150px">{{col.header}}</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-category let-columns="columns">
     <tr>
-      <td *ngFor="let col of columns"  style="width:150px">{{category[col.field]}}</td>
+      <ng-template ngFor let-col [ngForOf]="columns">
+        <ng-template ngIf [ngIf]="col.field === 'series'">
+          <td>
+            <a [routerLink]="['/series']" [queryParams]="{id: category.id, saParam: category.saParam}" queryParamsHandling='merge'>
+              {{category[col.field]}}
+            </a>
+            <div class="th-buttons">
+              <i [title]="category.analyze ? 'Remove from Analyzer' : 'Add to Analyzer'" [class.add-button]="!category.analyze"
+                [class.remove-button]="category.analyze" class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
+              <a tabindex="0" id="{{subcatIndex + category.id}}" class="info" (click)="showPopover(serie.seriesInfo, subcatIndex)"
+                role="button" data-animation='false' data-toggle="popover">
+                <i class="material-icons info-icon">&#xE88F;</i>
+              </a>
+            </div>
+          </td>
+        </ng-template>
+        <ng-template ngIf [ngIf]="col.field !== 'series'">
+          <td style="width:150px">{{category[col.field]}}</td>
+        </ng-template>
+      </ng-template>
+      <!-- <td *ngFor="let col of columns"  style="width:150px">{{category[col.field]}}</td> -->
     </tr>
   </ng-template>
-</p-table> 
+</p-table>
