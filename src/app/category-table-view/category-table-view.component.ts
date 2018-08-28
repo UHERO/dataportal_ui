@@ -21,9 +21,11 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
-  private frozenColumns;
+  /* private frozenColumns;
   private scrollableColumns;
-  private categoryTableData;
+  private categoryTableData; */
+  private columnDefs;
+  private rows;
 
   constructor(
     private _helper: HelperService,
@@ -33,7 +35,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.frozenColumns = [{ field: 'series', header: 'Series' }];
+    /* this.frozenColumns = [{ field: 'series', header: 'Series' }];
     this.scrollableColumns = [];
     this.dates.forEach((date) => {
       this.scrollableColumns.push({ field: date.date, header: date.tableDate });
@@ -54,6 +56,29 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
             seriesData[d] = transformations.level.values[index];
           });
           this.categoryTableData.push(seriesData);
+        }
+      });
+    } */
+    this.columnDefs = [{ field: 'series', headerName: 'Series', pinned: 'left' }];
+    this.dates.forEach((date) => {
+      this.columnDefs.push({ field: date.date, headerName: date.tableDate });
+    });
+    this.rows = [];
+    if (this.data) {
+      this.data.forEach((series) => {
+        if (series.seriesInfo !== 'No data available' && this.dates) {
+          console.log('series', series)
+          const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
+          const seriesData = {
+            analyze: series.seriesInfo.analyze,
+            id: series.seriesInfo.id,
+            series: series.seriesInfo.displayName,
+            saParam: series.seriesInfo.saParam
+          };
+          transformations.level.dates.forEach((d, index) => {
+            seriesData[d] = transformations.level.values[index];
+          });
+          this.rows.push(seriesData);
         }
       });
     }

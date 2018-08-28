@@ -1,4 +1,4 @@
-<p-table #catTable [columns]="scrollableColumns" [frozenColumns]="frozenColumns" [value]="categoryTableData" [scrollable]="true" frozenWidth="320px">
+<!-- <p-table #catTable [columns]="scrollableColumns" [frozenColumns]="frozenColumns" [value]="categoryTableData" [scrollable]="true" frozenWidth="320px">
   <ng-template pTemplate="caption">
     <div class="ui-helper-clearfix">
       <button type="button" pButton icon="fa fa-file-o" iconPos="left" label="Download CSV" (click)="catTable.exportCSV()" style="float:left"></button>
@@ -31,7 +31,13 @@
           <td style="width:150px">{{category[col.field]}}</td>
         </ng-template>
       </ng-template>
-      <!-- <td *ngFor="let col of columns"  style="width:150px">{{category[col.field]}}</td> -->
     </tr>
   </ng-template>
-</p-table>
+</p-table> -->
+<ag-grid-angular
+  style="width: 100%;height: 500px;"
+  class="ag-theme-balham"
+  [rowData]="rows"
+  [columnDefs]="columnDefs"
+>
+</ag-grid-angular>

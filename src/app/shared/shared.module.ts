@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
+import { AgGridModule } from 'ag-grid-angular';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { AppComponent } from '../app.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
@@ -66,7 +67,8 @@ import { CategoryTableViewComponent } from '../category-table-view/category-tabl
     RouterModule,
     DataTableModule, SharedModule,
     TableModule,
-    RecaptchaModule.forRoot()
+    RecaptchaModule.forRoot(),
+    AgGridModule.withComponents([])
   ],
   exports: [
     FormsModule,
