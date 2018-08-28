@@ -1,0 +1,12 @@
+<p-table [columns]="scrollableColumns" [frozenColumns]="frozenColumns" [value]="categoryTableData" [scrollable]="true" frozenWidth="320px">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns"  style="width:150px">{{col.header}}</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-category let-columns="columns">
+    <tr>
+      <td *ngFor="let col of columns"  style="width:150px">{{category[col.field]}}</td>
+    </tr>
+  </ng-template>
+</p-table> 

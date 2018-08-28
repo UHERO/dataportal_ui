@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { TableModule } from 'primeng/table';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { AppComponent } from '../app.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
@@ -28,6 +29,7 @@ import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 import { ShareLinkComponent } from '../share-link/share-link.component';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { CategoryTableViewComponent } from '../category-table-view/category-table-view.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
     AnalyzerTableComponent,
     HelpComponent,
     HelpDirective,
-    ShareLinkComponent
+    ShareLinkComponent,
+    CategoryTableViewComponent
   ],
   imports: [
     CommonModule,
@@ -62,6 +65,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     HttpModule,
     RouterModule,
     DataTableModule, SharedModule,
+    TableModule,
     RecaptchaModule.forRoot()
   ],
   exports: [
