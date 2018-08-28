@@ -15,8 +15,8 @@
 				</ul>
 				<p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
 			</ng-template>
-			<app-category-datatables *ngIf="!noSeries" [portalSettings]="portalSettings" [geo]="data.currentGeo" [freq]="freq" [yoy]="yoyActive"
-			[ytd]="ytdActive" [categoryDates]="dates" [sublist]="sublist" [tableId]="sublist.id"></app-category-datatables>
+			<!-- <app-category-datatables *ngIf="!noSeries" [portalSettings]="portalSettings" [geo]="data.currentGeo" [freq]="freq" [yoy]="yoyActive"
+			[ytd]="ytdActive" [categoryDates]="dates" [sublist]="sublist" [tableId]="sublist.id"></app-category-datatables> -->
 			<div class="table" #tableScroll *ngIf="!noSeries">
 				<table class="category-table">
 					<tr>

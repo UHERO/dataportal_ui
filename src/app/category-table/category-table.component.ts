@@ -99,20 +99,17 @@ export class CategoryTableComponent implements OnInit, AfterViewChecked, OnChang
     transformations.forEach((t) => {
       const { transformation, dates, values, pseudoHistory } = t;
       if (dates && values) {
-        const transformationValues = [];
-        const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
-        if (!dateDiff.length) {
-          categoryTable[`${transformation}DownloadTable`] = this.formatValues(values, decimal);
-          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
-        }
-        if (dateDiff.length) {
-          categoryDates.forEach((sDate) => {
-            const dateExists = this._helper.binarySearch(dates, sDate.date);
-            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
-          });
-          categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
-          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
-        }  
+        const dateDictionary = {};
+        categoryDates.forEach((cDate) => {
+          dateDictionary[cDate.date] = '';
+        });
+        dates.forEach((seriesDate, index) => {
+          if (seriesDate in dateDictionary) {
+            dateDictionary[seriesDate] = (+values[index]).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal });
+          }
+        });
+        categoryTable[`${transformation}DownloadTable`] = Object.keys(dateDictionary).map(v => dateDictionary[v]);
+        categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1);
       }
     });
     return categoryTable;
