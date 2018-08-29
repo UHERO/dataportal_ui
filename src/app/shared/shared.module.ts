@@ -31,6 +31,7 @@ import { HelpDirective } from '../help.directive';
 import { ShareLinkComponent } from '../share-link/share-link.component';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { CategoryTableViewComponent } from '../category-table-view/category-table-view.component';
+import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { CategoryTableViewComponent } from '../category-table-view/category-tabl
     HelpComponent,
     HelpDirective,
     ShareLinkComponent,
-    CategoryTableViewComponent
+    CategoryTableViewComponent,
+    CategoryTableRendererComponent
   ],
   imports: [
     CommonModule,
@@ -68,7 +70,7 @@ import { CategoryTableViewComponent } from '../category-table-view/category-tabl
     DataTableModule, SharedModule,
     TableModule,
     RecaptchaModule.forRoot(),
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([CategoryTableRendererComponent])
   ],
   exports: [
     FormsModule,

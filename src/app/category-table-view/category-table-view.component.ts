@@ -1,5 +1,6 @@
 import { Component, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
+import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 
 @Component({
   selector: 'app-category-table-view',
@@ -26,10 +27,15 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   private categoryTableData; */
   private columnDefs;
   private rows;
+  private frameworkComponents;
 
   constructor(
     private _helper: HelperService,
-  ) { }
+  ) {
+    this.frameworkComponents = {
+      categoryTableRenderer: CategoryTableRendererComponent
+    }
+  }
 
   ngOnInit() {
   }
@@ -59,9 +65,18 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
         }
       });
     } */
-    this.columnDefs = [{ field: 'series', headerName: 'Series', pinned: 'left' }];
+    this.columnDefs = [{
+      field: 'series',
+      headerName: 'Series',
+      pinned: 'left',
+      cellRenderer: "categoryTableRenderer",
+      tooltip: function(params) {
+        console.log('params', params);
+        return params.value;
+      }
+    }];
     this.dates.forEach((date) => {
-      this.columnDefs.push({ field: date.date, headerName: date.tableDate });
+      this.columnDefs.push({ field: date.date, headerName: date.tableDate, width: 125 });
     });
     this.rows = [];
     if (this.data) {
@@ -73,7 +88,8 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
             analyze: series.seriesInfo.analyze,
             id: series.seriesInfo.id,
             series: series.seriesInfo.displayName,
-            saParam: series.seriesInfo.saParam
+            saParam: series.seriesInfo.saParam,
+            indent: series.seriesInfo.indent
           };
           transformations.level.dates.forEach((d, index) => {
             seriesData[d] = transformations.level.values[index];
@@ -83,5 +99,10 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
       });
     }
   }
+
+  showPopover() {
+    console.log('showPopover')
+  }
+
 
 }

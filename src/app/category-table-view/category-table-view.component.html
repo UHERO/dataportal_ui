@@ -35,9 +35,11 @@
   </ng-template>
 </p-table> -->
 <ag-grid-angular
-  style="width: 100%;height: 500px;"
+  style="width: 100%;"
   class="ag-theme-balham"
   [rowData]="rows"
   [columnDefs]="columnDefs"
+  [gridAutoHeight]="true"
+  [frameworkComponents]="frameworkComponents"
 >
 </ag-grid-angular>
