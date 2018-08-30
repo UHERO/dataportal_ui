@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
+import { AnalyzerService } from '../analyzer.service';
 
 @Component({
   selector: 'app-category-table-view',
@@ -12,6 +13,8 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   @Input() data;
   @Input() sublist;
   @Input() freq;
+  @Input() geo;
+  @Input() tableId;
   @Input() dates;
   @Input() noSeries;
   @Input() yoyActive;
@@ -22,9 +25,6 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
-  /* private frozenColumns;
-  private scrollableColumns;
-  private categoryTableData; */
   private gridApi;
   private columnDefs;
   private rows;
@@ -32,6 +32,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
 
   constructor(
     @Inject('defaultRange') private defaultRange,
+    private _analyzer: AnalyzerService,
     private _helper: HelperService,
   ) {
     this.frameworkComponents = {
@@ -40,6 +41,11 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.data.forEach((chartSeries) => {
+      if (chartSeries.seriesInfo !== 'No data available') {
+        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+      }
+    });
   }
 
   ngOnChanges() {
@@ -50,7 +56,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.formatLvlData(series, level);
+          const seriesData = this.formatLvlData(series, level, this.subcatIndex);
           this.rows.push(seriesData);
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy);
@@ -70,7 +76,8 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   }
 
   setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
-    const columns = [{
+    const columns: Array<any> = [];
+    columns.push({
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
@@ -78,7 +85,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
       tooltip: function (params) {
         return params.value;
       }
-    }];
+    });
     const defaultRanges = this._helper.setDefaultCategoryRange(this.freq, this.dates, this.defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     this.dates.forEach((date, index) => {
@@ -100,16 +107,17 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     return columns;
   }
 
-  formatLvlData = (series, level) => {
+  formatLvlData = (series, level, subcatIndex) => {
     const { dates, values } = level;
     const seriesData = {
       series: series.seriesInfo.displayName,
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
-      lvlData: true
+      lvlData: true,
+      subcatIndex: subcatIndex
     }
     dates.forEach((d, index) => {
-      seriesData[d] = values[index];
+      seriesData[d] = this._helper.formatNum(+values[index], series.seriesInfo.decimal);
     });
     return seriesData;
   }
@@ -143,11 +151,22 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
+    const parentName = this.sublist && this.sublist.parentName ? this.sublist.parentName + ' - ' : '';
+    const sublistName = this.sublist ? this.sublist.name : '';
+    const geoName = this.geo ? this.geo.name + ' - ' : '';
+    const catId = this.sublist ? this.sublist.parentId : '';
+    const tableId = this.tableId;
     for (let i = allColumns.length - 1; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
     const params = {
-      columnKeys: exportColumns
+      columnKeys: exportColumns,
+      fileName: sublistName,
+      customHeader: this.portalSettings.catTable.portalSource +
+        parentName + sublistName + ' (' + geoName + this.freq + ')' +
+      ': ' + this.portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
+      '\n\n'
+
     }
     this.gridApi.exportDataAsCsv(params);
   }
