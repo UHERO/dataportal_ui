@@ -1,72 +1,76 @@
 @import 'app_colors';
 
 a {
-    width: 74%;
+  display: inline-block;
+  direction: ltr;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 74%;
 }
 
 div.th-buttons {
+  float: right;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+
+  .info {
     float: right;
-    display: flex;
-    align-content: center;
-    justify-content: center;
+    cursor: pointer;
+    width: initial;
+    margin: auto;
 
-    .info {
-        float: right;
-        cursor: pointer;
-        width: initial;
-        margin: auto;
-
-        &:focus {
-          outline: 0;
-        }
-
-        .info-icon {
-          font-size: 1.2em;
-          vertical-align: middle;
-          margin-left: 5px;
-        }
+    &:focus {
+      outline: 0;
     }
 
-    .analyze-button {
-        color: rgba(240, 240, 240, 0.65);
-        cursor: pointer;
-        vertical-align: middle;
-        font-size: inherit;
-        font-weight: bold;
-        float: left;
-        margin: auto;
+    .info-icon {
+      font-size: 1.2em;
+      vertical-align: middle;
+      margin-left: 5px;
     }
+  }
 
-    .add-button {
-        text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
-    }
+  .analyze-button {
+    color: rgba(240, 240, 240, 0.65);
+    cursor: pointer;
+    vertical-align: middle;
+    font-size: inherit;
+    font-weight: bold;
+    float: left;
+    margin: auto;
+  }
 
-    .remove-button {
-        color: $secondary;
-    }               
+  .add-button {
+    text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
+  }
+
+  .remove-button {
+    color: $secondary;
+  }               
 }
 
 .indent1 {
-    padding-left: 30px;
-    width: 68%;
+  padding-left: 30px;
+  width: 68%;
 
-    .info {
-      width: initial;
-    }
+  .info {
+    width: initial;
   }
+}
 
-  .indent2 {
-    padding-left: 50px;
+.indent2 {
+  padding-left: 50px;
     
-    .info {
-      width: initial;
-    }
+  .info {
+    width: initial;
   }
+}
 
-  .indent3 {
-    padding-left: 70px;
+.indent3 {
+  padding-left: 70px;
   
-    .info {
-      width: initial;
-    }
+  .info {
+    width: initial;
   }
+}

@@ -34,6 +34,7 @@
     </tr>
   </ng-template>
 </p-table> -->
+<button (click)="onExport()">Download CSV</button>
 <ag-grid-angular
   style="width: 100%;"
   class="ag-theme-balham"
@@ -41,5 +42,7 @@
   [columnDefs]="columnDefs"
   [gridAutoHeight]="true"
   [frameworkComponents]="frameworkComponents"
+  [enableRtl]="true"
+  (gridReady)="onGridReady($event)"
 >
 </ag-grid-angular>

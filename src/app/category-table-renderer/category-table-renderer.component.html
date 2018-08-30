@@ -1,8 +1,16 @@
-<div class="th-buttons">
-  <i class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
-  <a tabindex="0" class="info" (click)="showPopover(serie.seriesInfo, subcatIndex)"
-   role="button" data-animation='false' data-toggle="popover">
-    <i class="material-icons info-icon">&#xE88F;</i>
-  </a>
-</div>
-<a class="{{params.data.indent ? 'indent' + params.data.indent : ''}}" [routerLink]="['/series']" [queryParams]="{ id: params.data.id, sa: params.data.saParam }" queryParamsHandling='merge'>{{params.value}}</a>
+<ng-template ngIf [ngIf]="params.data.lvlData">
+  <span>
+    <a class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}" [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }"
+      queryParamsHandling='merge'>{{params.value}}</a>
+  </span>
+  <div class="th-buttons">
+    <i class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
+    <a tabindex="0" class="info" (click)="showPopover(serie.seriesInfo, subcatIndex)" role="button" data-animation='false' data-toggle="popover">
+      <i class="material-icons info-icon">&#xE88F;</i>
+    </a>
+  </div>
+
+</ng-template>
+<ng-template ngIf [ngIf]="!params.data.lvlData">
+  {{params.value}}
+</ng-template>
