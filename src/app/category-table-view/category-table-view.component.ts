@@ -41,11 +41,13 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.data.forEach((chartSeries) => {
-      if (chartSeries.seriesInfo !== 'No data available') {
-        chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
-      }
-    });
+    if (this.data) {
+      this.data.forEach((chartSeries) => {
+        if (chartSeries.seriesInfo !== 'No data available') {
+          chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+        }
+      });  
+    }
   }
 
   ngOnChanges() {
@@ -173,6 +175,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
 
   onGridReady = (params) => {
     this.gridApi = params.api;
+    console.log(this.gridApi)
   }
 
 }

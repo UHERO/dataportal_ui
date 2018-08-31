@@ -30,7 +30,7 @@ describe('Service: Helper', () => {
     expect(service.createDateArray(startDate, endDate, freq, dateArray)).toEqual(expected);
   }));
 
-  it('dataTransform should format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
+  /* it('dataTransform should format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
     const seriesObservations = {
       observationStart: '1960-01-01',
       observationEnd: '1962-01-01',
@@ -97,7 +97,7 @@ describe('Service: Helper', () => {
       end: '1962-01-01'
     };
     expect(service.dataTransform(seriesObservations, dates, decimals)).toEqual(expected);
-  }));
+  })); */
 
   it('formatDate should return a formatted date string', inject([HelperService], (service: HelperService) => {
     const freqs = ['A', 'Q', 'M', 'S'];

@@ -17,7 +17,6 @@ import { HighchartComponent } from '../highchart/highchart.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
 import { HighstockComponent } from '../highstock/highstock.component';
-import { CategoryTableComponent } from '../category-table/category-table.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { FeedbackComponent } from '../feedback/feedback.component';
 import { CategoryDatatablesComponent } from '../category-datatables/category-datatables.component';
@@ -43,7 +42,6 @@ import { CategoryTableRendererComponent } from '../category-table-renderer/categ
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
-    CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
     CategoryDatatablesComponent,
@@ -81,13 +79,14 @@ import { CategoryTableRendererComponent } from '../category-table-renderer/categ
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
-    CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
     CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
-    GeoSelectorComponent
+    GeoSelectorComponent,
+    CategoryTableViewComponent,
+    CategoryTableRendererComponent
   ]
 })
 export class Shared { }

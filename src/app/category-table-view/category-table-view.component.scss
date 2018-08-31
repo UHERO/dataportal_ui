@@ -1,9 +1,25 @@
 @import 'app_colors';
 
+.no-data {
+  margin-bottom: 0;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+ul.available-geos, ul.available-freqs {
+  li {
+    font-size: 0.9em;
+  }
+}
+
 .ag-pinned-left-header {
   .ag-header-cell-text {
     display: none;
   }
+}
+
+.ag-body-container.ag-layout-auto-height {
+  display: block;
 }
 
 .ag-root-wrapper {
