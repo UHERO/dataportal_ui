@@ -4,6 +4,7 @@ import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
+import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import 'jquery';
 declare var $: any;
 
@@ -31,6 +32,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   missingSummaryStat = false;
   tableDates;
 
+  private gridApi;
+  private columnDefs;
+  private rows;
+  private frameworkComponents;
+
   constructor(
     @Inject('portal') private portal,
     private _dataPortalSettings: DataPortalSettingsService,
@@ -38,7 +44,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     private _series: SeriesHelperService,
     private _table: TableHelperService,
     private _helper: HelperService,
-  ) { }
+  ) {
+    this.frameworkComponents = {
+      categoryTableRenderer: CategoryTableRendererComponent
+    }
+  }
 
   ngOnInit() {
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
@@ -54,13 +64,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       }
     }
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
+    this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
+    this.rows = [];
     // Display values in the range of dates selected
     this.series.forEach((series) => {
+      console.log('series', series);
+      const transformations = this._helper.getTransformations(series.observations);
+      const { level, yoy, ytd, c5ma } = transformations;
+      const seriesData = this.formatLvlData(series, level);
+      this.rows.push(seriesData);
       const decimal = series.seriesDetail.decimals;
       // series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
       series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      console.log('series.analyzerTableDisplay', series.analyzerTableDisplay);
       //series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
       series.summaryStats = this._series.newSummaryStats(series.analyzerTableDisplay.lvlCategoryTable, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate)
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
@@ -77,6 +93,40 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     this.missingSummaryStat = this.isSummaryStatMissing();
     this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
   }
+
+  setTableColumns = (dates, tableStart, tableEnd) => {
+    const columns: Array<any> = [];
+    columns.push({
+      field: 'series',
+      headerName: 'Series',
+      pinned: 'left',
+      cellRenderer: "categoryTableRenderer",
+      tooltip: function (params) {
+        return params.value;
+      }
+    });
+    const tableDates = dates.slice(tableStart, tableEnd + 1);
+    // Reverse dates for right-to-left scrolling on tables
+    for (let i = tableDates.length - 1; i >= 0; i--) {
+      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125 });
+    }
+    return columns;
+  }
+
+  formatLvlData = (series, level) => {
+    const { dates, values } = level;
+    const seriesData = {
+      series: series.displayName,
+      saParam: series.saParam,
+      seriesInfo: series.seriesDetail,
+      lvlData: true,
+    }
+    dates.forEach((d, index) => {
+      seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
+    });
+    return seriesData;
+  }
+
 
   createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
     const categoryTable = {};
@@ -109,6 +159,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     return (!valueList[middle] || valueList[middle].tableDate !== date) ? -1 : middle;
   }
 
+  onGridReady = (params) => {
+    this.gridApi = params.api;
+  }
 
   ngAfterViewChecked() {
     // Check height of content and scroll tables to the right

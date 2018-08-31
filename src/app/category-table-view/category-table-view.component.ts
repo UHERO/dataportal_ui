@@ -88,20 +88,20 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
         return params.value;
       }
     });
-    const defaultRanges = this._helper.setDefaultCategoryRange(this.freq, this.dates, this.defaultRange);
+    const defaultRanges = this._helper.setDefaultCategoryRange(freq, dates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
-    this.dates.forEach((date, index) => {
+    dates.forEach((date, index) => {
       // Range slider is converting annual year strings to numbers
-      if (date.tableDate == this.tableStart) {
+      if (date.tableDate == tableStart) {
         startIndex = index;
       }
-      if (date.tableDate == this.tableEnd) {
+      if (date.tableDate == tableEnd) {
         endIndex = index;
       }
     });
     const start = startIndex;
     const end = endIndex;
-    const tableDates = this.dates.slice(start, end + 1);
+    const tableDates = dates.slice(start, end + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
       columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125 });
@@ -175,7 +175,6 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
 
   onGridReady = (params) => {
     this.gridApi = params.api;
-    console.log(this.gridApi)
   }
 
 }

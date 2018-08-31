@@ -9,9 +9,15 @@
     <input type="checkbox" (change)="c5maActive($event)" [checked]="c5maChecked">Annual Change
   </label>
 </div>
-<app-category-datatables *ngIf="series && series.length" [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked" [c5ma]="c5maChecked" [categoryDates]="tableDates"
-  [analyzerSeries]="series" [analyzer]="true" [tableId]="'analyzer-table'"></app-category-datatables>
-<div class="analyzer-table">
+<app-category-datatables *ngIf="series && series.length" [portalSettings]="portalSettings" [yoy]="yoyChecked" [ytd]="ytdChecked"
+  [c5ma]="c5maChecked" [categoryDates]="tableDates" [analyzerSeries]="series" [analyzer]="true" [tableId]="'analyzer-table'"></app-category-datatables>
+<ng-template ngIf [ngIf]="series && series.length">
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" [gridAutoHeight]="true"
+    [frameworkComponents]="frameworkComponents" [enableRtl]="true" (gridReady)="onGridReady($event)">
+  </ag-grid-angular>
+</ng-template>
+
+<!-- <div class="analyzer-table">
   <div class="table-row">
     <div class="table" #tableScroll>
       <table *ngIf="series && series.length">
@@ -28,10 +34,12 @@
             <th title="{{serie.seriesDetail.title}}">
               <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="updateAnalyze(serie)">&#xE872;</i>
               <i class="material-icons analyze-chart color{{serie.seriesDetail.id}}" (click)="updateChart(serie)">{{ serie.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
-              <a *ngIf="serie.seriesDetail.geography" [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.saParam }" (click)="hideInfo(serie.seriesDetail.id)">
+              <a *ngIf="serie.seriesDetail.geography" [routerLink]="['/series']" [queryParams]="{ id: serie.seriesDetail.id, sa: serie.saParam }"
+                (click)="hideInfo(serie.seriesDetail.id)">
                 {{serie.displayName}}
               </a>
-              <a tabindex="0" id="{{serie.seriesDetail.id}}" class="info" (click)="showPopover(serie.seriesDetail)" role="button" data-animation='false' data-toggle="popover">
+              <a tabindex="0" id="{{serie.seriesDetail.id}}" class="info" (click)="showPopover(serie.seriesDetail)" role="button" data-animation='false'
+                data-toggle="popover">
                 <i class="material-icons info-icon">&#xE88F;</i>
               </a>
             </th>
@@ -67,7 +75,7 @@
       </table>
     </div>
   </div>
-</div>
+</div> -->
 <div class="analyzer-table">
   <div class="table-row">
     <div class="table">
@@ -102,12 +110,13 @@
         </ng-template>
       </table>
     </div>
-    <p *ngIf="missingSummaryStat" class="stat-warning"><i class="material-icons text-danger">&#xE001;</i> The following series contain N/As due to missing values included in the selected range: 
+    <p *ngIf="missingSummaryStat" class="stat-warning">
+      <i class="material-icons text-danger">&#xE001;</i> The following series contain N/As due to missing values included in the selected range:
       <ng-template ngFor let-serie [ngForOf]="series">
         <ul>
           <li *ngIf="serie.summaryStats && serie.summaryStats.missing">{{serie.displayName}}</li>
         </ul>
-      </ng-template>  
+      </ng-template>
     </p>
   </div>
 </div>
