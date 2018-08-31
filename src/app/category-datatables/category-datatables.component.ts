@@ -105,7 +105,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     tableDates.forEach((date) => {
       tableColumns.push({ title: date.tableDate, data: 'observations.' + date.tableDate });
     });
-    if (analyzer) {
+    if (analyzer && analyzerSeries) {
       analyzerSeries.forEach((series) => {
         const observations = {};
         const title = series.displayName;
@@ -128,38 +128,7 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
       if (c5maSelected) {
         this.addAnalyzerC5ma(tableData, analyzerSeries, tableDates);
       }
-      return { tableColumns: tableColumns, tableData: tableData };
-    }
-    if (!analyzer) {
-      const displaySeries = sublist.displaySeries;
-      displaySeries.forEach((series) => {
-        if (series.seriesInfo !== 'No data available') {
-          const { dates, pseudoHistory, transformation, values } = series.seriesInfo.seriesObservations.transformationResults[0];
-          const observations = {};
-          const title = series.seriesInfo.displayName;
-          tableDates.forEach((date, index) => {
-            observations[date.tableDate] = null;
-            const seriesDateIndex = dates.indexOf(date.date);
-            if (seriesDateIndex > -1) {
-              observations[date.tableDate] = series.seriesInfo.seriesObservations.transformationResults[0].values[seriesDateIndex];
-            }
-            //observations[date.tableDate] = series.categoryTable.lvlDownloadTable[index] === '' ? null : series.categoryTable.lvlDownloadTable[index];
-          });
-          tableData.push({
-            series: title,
-            observations: observations
-          });
-        }
-      });
-      if (yoySelected) {
-        this.addCategoryYoy(tableData, displaySeries, tableDates);
-      }
-      if (ytdSelected) {
-        this.addCategoryYtd(tableData, displaySeries, tableDates);
-      }
-      if (c5maSelected) {
-        this.addCategoryC5ma(tableData, displaySeries, tableDates);
-      }
+      console.log('tableData', tableData)
       return { tableColumns: tableColumns, tableData: tableData };
     }
   }
@@ -176,22 +145,6 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
         series: transformLabel,
         observations: ''
       });
-  }
-
-  addCategoryTransformation(displaySeries: Array<any>, transformValue: string, tableData: Array<any>, tableDates) {
-    displaySeries.forEach((series) => {
-      const transformation = {};
-      const percent = series.seriesInfo.percent;
-      const transformLabel = percent ? ' (ch)' : ' (%)';
-      const title = series.seriesInfo.displayName;
-      tableDates.forEach((date, index) => {
-        transformation[date.tableDate] = series.categoryTable[transformValue][index] === '' ? null : series.categoryTable[transformValue][index];
-      });
-      tableData.push({
-        series: title + transformLabel,
-        observations: transformation
-      });
-    });
   }
 
   addAnalyzerTransformation(analyzerSeries: Array<any>, transformValue: string, tableData: Array<any>, tableDates) {
@@ -215,28 +168,13 @@ export class CategoryDatatablesComponent implements OnInit, AfterViewInit, OnCha
     this.addAnalyzerTransformation(analyzerSeries, 'pc1DownloadTable', tableData, tableDates);
   }
 
-  addCategoryYoy(tableData, displaySeries, tableDates) {
-    this.addTransformationLabel(tableData, 'Year/Year');
-    this.addCategoryTransformation(displaySeries, 'pc1DownloadTable', tableData, tableDates);
-  }
-
   addAnalyzerYtd(tableData, analyzerSeries, tableDates) {
     this.addTransformationLabel(tableData, 'Year-to-Date');
     this.addAnalyzerTransformation(analyzerSeries, 'ytdDownloadTable', tableData, tableDates);
   }
 
-  addCategoryYtd(tableData, displaySeries, tableDates) {
-    this.addTransformationLabel(tableData, 'Year-to-Date');
-    this.addCategoryTransformation(displaySeries, 'ytdDownloadTable', tableData, tableDates);
-  }
-
   addAnalyzerC5ma(tableData, analyzerSeries, tableDates) {
     this.addTransformationLabel(tableData, 'Annual Change');
     this.addAnalyzerTransformation(analyzerSeries, 'c5maDownloadTable', tableData, tableDates);
-  }
-
-  addCategoryC5ma(tableData, displaySeries, tableDates) {
-    this.addTransformationLabel(tableData, 'Annual Change');
-    this.addCategoryTransformation(displaySeries, 'c5maDownloadTable', tableData, tableDates);
   }
 }
