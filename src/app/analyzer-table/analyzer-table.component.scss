@@ -32,6 +32,40 @@
   }
 }
 
+.ag-root-wrapper {
+  margin-bottom: 40px;
+}
+
+.ag-pinned-left-header {
+  .ag-header-cell-text {
+    display: none;
+  }
+}
+
+.ag-cell {
+  direction: ltr;
+  text-align: right;
+}
+
+.ag-cell-last-left-pinned {
+  text-align: left;
+}
+
+.csv-export-button {
+  display: inline-block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $primary;
+  text-decoration: none;
+  font-size: 0.85em;
+  
+  .material-icons {
+      font-size: 18px;
+      vertical-align: middle;
+  }
+}
+
 .analyzer-table {
     vertical-align: top;
     display: inline-block;

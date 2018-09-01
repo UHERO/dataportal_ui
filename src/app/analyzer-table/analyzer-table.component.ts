@@ -1,10 +1,10 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, AfterViewChecked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
+import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import 'jquery';
 declare var $: any;
 
@@ -12,9 +12,10 @@ declare var $: any;
   selector: 'app-analyzer-table',
   templateUrl: './analyzer-table.component.html',
   styleUrls: ['./analyzer-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewChecked {
+export class AnalyzerTableComponent implements OnInit, OnChanges {
   @ViewChildren('tableScroll') private tableEl;
   @Input() series;
   @Input() minDate;
@@ -36,6 +37,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
   private columnDefs;
   private rows;
   private frameworkComponents;
+  private summaryColumns;
+  private summaryRows;
 
   constructor(
     @Inject('portal') private portal,
@@ -46,7 +49,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     private _helper: HelperService,
   ) {
     this.frameworkComponents = {
-      categoryTableRenderer: CategoryTableRendererComponent
+      analyzerTableRenderer: AnalyzerTableRendererComponent
     }
   }
 
@@ -66,19 +69,33 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];
+    this.summaryColumns = this.setSummaryStatColumns();
+    this.summaryRows = this._series.newSummaryStats(this.series, this.minDate, this.maxDate);
+    //console.log('summaryStats', summaryStats)
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      console.log('series', series);
       const transformations = this._helper.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level);
       this.rows.push(seriesData);
+      if (this.yoyChecked) {
+        const yoyData = this.formatTransformationData(series, yoy);
+        this.rows.push(yoyData)
+      }
+      if (this.ytdChecked) {
+        const ytdData = this.formatTransformationData(series, ytd);
+        this.rows.push(ytdData)
+      }
+      if (this.c5maChecked) {
+        console.log('c5maactive', this.c5maChecked)
+        const c5maData = this.formatTransformationData(series, c5ma);
+        this.rows.push(c5maData)
+      }
+
       const decimal = series.seriesDetail.decimals;
-      // series.analyzerTableDisplay =  series.analyzerTableData ? series.analyzerTableData.slice(tableStart, tableEnd + 1) : [];
-      series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
+      //series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      //series.summaryStats = this._series.summaryStats(series.analyzerTableDisplay, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate);
-      series.summaryStats = this._series.newSummaryStats(series.analyzerTableDisplay.lvlCategoryTable, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate)
+      //series.summaryStats = this._series.newSummaryStats(series, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate)
       const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
       if (seriesInChart) {
         // Match color of show_chart icon for a series with its respective color in the graph
@@ -90,8 +107,41 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       }
     });
     // Check if the summary statistics for a series has NA values
-    this.missingSummaryStat = this.isSummaryStatMissing();
-    this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
+    // this.missingSummaryStat = this.isSummaryStatMissing();
+    //this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
+  }
+
+  setSummaryStatColumns = () => {
+    return [{
+      field: 'series',
+      headerName: 'Series',
+      pinned: 'left',
+      width: 275,
+      tooltip: function (params) {
+        return params.value;
+      }
+    }, {
+      field: 'minValue',
+      headerName: 'Minimum Value'
+    }, {
+      field: 'maxValue',
+      headerName: 'Maximum Value'
+    }, {
+      field: 'percChange',
+      headerName: '% Change'
+    }, {
+      field: 'levelChange',
+      headerName: 'Change'
+    }, {
+      field: 'total',
+      headerName: 'Total'
+    }, {
+      field: 'avg',
+      headerName: 'Avg'
+    }, {
+      field: 'cagr',
+      headerName: 'Compound Annual Growth Rate'
+    }];
   }
 
   setTableColumns = (dates, tableStart, tableEnd) => {
@@ -100,7 +150,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
-      cellRenderer: "categoryTableRenderer",
+      width: 275,
+      cellRenderer: 'analyzerTableRenderer',
       tooltip: function (params) {
         return params.value;
       }
@@ -108,74 +159,72 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, AfterViewCheck
     const tableDates = dates.slice(tableStart, tableEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
-      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125 });
+      columns.push({ field: tableDates[i].tableDate, headerName: tableDates[i].tableDate, width: 125 });
     }
     return columns;
   }
 
   formatLvlData = (series, level) => {
     const { dates, values } = level;
+    const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
     const seriesData = {
       series: series.displayName,
       saParam: series.saParam,
       seriesInfo: series.seriesDetail,
       lvlData: true,
     }
-    dates.forEach((d, index) => {
+    formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
     return seriesData;
   }
 
-
-  createSeriesTable = (transformations, categoryDates, start, end, decimal) => {
-    const categoryTable = {};
-    Object.keys(transformations).forEach((transform) => {
-      const transformationValues = [];
-      categoryDates.forEach((catDate) => {
-        const dateExists = this.binarySearch(transformations[transform], catDate.tableDate);
-        dateExists > -1 ? transformationValues.push(transformations[transform][dateExists]) : transformationValues.push({ date: catDate.date, tableDate: catDate.tableDate, value: '', formattedValue: '' });
-      });
-      categoryTable[`${transform}DownloadTable`] = transformationValues.map((i) => {
-        return (i.value === Infinity || i.value === '') ? { date: i.date, tableDate: i.tableDate, value: Infinity, formattedValue: '' } : { date: i.date, tableDate: i.tableDate, value: +i.value, formattedValue: (+i.value).toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }) }
-      });
-      categoryTable[`${transform}CategoryTable`] = categoryTable[`${transform}DownloadTable`].slice(start, end + 1);
+  formatTransformationData = (series, transformation) => {
+    const { dates, values } = transformation;
+    const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
+    const displayName = this.formatTransformationName(transformation.transformation, series.seriesDetail.percent);
+    const data = {
+      series: displayName,
+      seriesInfo: series.seriesDetail,
+      lvlData: false
+    }
+    formattedDates.forEach((d, index) => {
+      data[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
-    return categoryTable;
+    return data;
   }
 
-  binarySearch = (valueList, date) => {
-    let start = 0;
-    let end = valueList.length - 1;
-    let middle = Math.floor((start + end) / 2);
-    while (valueList[middle] && valueList[middle].tableDate !== date && start < end) {
-      if (date < valueList[middle].tableDate) {
-        end = middle - 1;
-      } else {
-        start = middle + 1;
-      }
-      middle = Math.floor((start + end) / 2);
+  formatTransformationName = (transformation, percent) => {
+    if (transformation === 'pc1') {
+      return percent ? 'YOY (ch.)' : 'YOY (%)';
     }
-    return (!valueList[middle] || valueList[middle].tableDate !== date) ? -1 : middle;
+    if (transformation === 'ytd') {
+      return percent ? 'YTD (ch.)' : 'YTD (%)';
+    }
+    if (transformation === 'c5ma') {
+      return percent ? 'Annual (ch.)' : 'Annual (%)';
+    }
   }
 
   onGridReady = (params) => {
     this.gridApi = params.api;
   }
 
-  ngAfterViewChecked() {
-    // Check height of content and scroll tables to the right
-    // If true, height is changing, i.e. content still loading
-    const container = this._table.checkContainerHeight(this.previousHeight);
-    this.previousHeight = container.previousHeight;
-    if (container.scroll) {
-      // On load, table scrollbars should start at the right -- showing most recent data
-      return this._table.tableScroll(this.tableEl);
+  onExport = () => {
+    const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
+    const exportColumns = [];
+    for (let i = allColumns.length - 1; i >= 0; i--) {
+      exportColumns.push(allColumns[i]);
     }
+    const params = {
+      columnKeys: exportColumns,
+      fileName: 'analyzer',
+      customHeader: this.portalSettings.catTable.portalSource + '\n\n'
 
-    // Scroll tables to the right when table widths changes, i.e. changing frequency from A to Q | M
-    return this._table.checkTableWidth(this.tableWidths);
+    }
+    this.gridApi.exportDataAsCsv(params);
   }
+
 
   isSummaryStatMissing() {
     return this.series.some((s) => s.summaryStats ? s.summaryStats.missing : null);

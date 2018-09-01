@@ -215,7 +215,7 @@ export class HelperService {
     }
     if (freq === 'Q') {
       const monthIndex = qMonth.indexOf(month);
-      return quarter[monthIndex] + ' ' + year;
+      return  year + ' ' + quarter[monthIndex];
     }
     if (freq === 'M' || freq === 'S') {
       return month + '-' + year;

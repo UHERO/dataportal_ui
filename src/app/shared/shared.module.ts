@@ -31,6 +31,7 @@ import { ShareLinkComponent } from '../share-link/share-link.component';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { CategoryTableViewComponent } from '../category-table-view/category-table-view.component';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
+import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { CategoryTableRendererComponent } from '../category-table-renderer/categ
     HelpDirective,
     ShareLinkComponent,
     CategoryTableViewComponent,
-    CategoryTableRendererComponent
+    CategoryTableRendererComponent,
+    AnalyzerTableRendererComponent
   ],
   imports: [
     CommonModule,
@@ -68,7 +70,8 @@ import { CategoryTableRendererComponent } from '../category-table-renderer/categ
     DataTableModule, SharedModule,
     TableModule,
     RecaptchaModule.forRoot(),
-    AgGridModule.withComponents([CategoryTableRendererComponent])
+    AgGridModule.withComponents([CategoryTableRendererComponent, AnalyzerTableRendererComponent
+    ])
   ],
   exports: [
     FormsModule,
@@ -86,7 +89,8 @@ import { CategoryTableRendererComponent } from '../category-table-renderer/categ
     DateSliderComponent,
     GeoSelectorComponent,
     CategoryTableViewComponent,
-    CategoryTableRendererComponent
+    CategoryTableRendererComponent,
+    AnalyzerTableRendererComponent
   ]
 })
 export class Shared { }

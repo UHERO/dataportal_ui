@@ -5,7 +5,6 @@ import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
-import { CHIPS_VALUE_ACCESSOR } from 'primeng/primeng';
 
 
 @Injectable()
@@ -123,8 +122,58 @@ export class SeriesHelperService {
     return false;
   }
 
-  newSummaryStats(seriesData, freq: Frequency, decimals: number, startDate: string, endDate: string) {
-    const formattedStats = {
+  newSummaryStats(series, startDate: string, endDate: string) {
+    let seriesStartDate = startDate;
+    let seriesEndDate = endDate;
+    series.forEach((s) => {
+      if (s.observations.observationStart > seriesStartDate) {
+        seriesStartDate = s.observations.observationStart;
+      }
+      if (s.observations.observationEnd < seriesEndDate) {
+        seriesEndDate = s.observations.observationEnd;
+      }
+    });
+    const tableRows = [];
+    series.forEach((s) => {
+      const formattedStats = {
+        series: s.displayName,
+        minValue: '',
+        maxValue: '',
+        percChange: '',
+        levelChange: '',
+        total: '',
+        avg: '',
+        cagr: '',
+        missing: null
+      };
+      const decimals = s.seriesDetail.decimals;
+      const transformations = this._helper.getTransformations(s.observations);
+      const level = transformations.level;
+      const { dates, pseudoHistory, transformation, values } = level;
+      const start = dates.find(d => d >= seriesStartDate && d <= seriesEndDate);
+      const end = dates.slice().reverse().find(d => d >= seriesStartDate && d <= seriesEndDate);
+      const startIndex = dates.indexOf(start);
+      const endIndex = dates.indexOf(end);
+      const datesInRange = dates.slice(startIndex, endIndex + 1);
+      const valuesInRange = values.slice(startIndex, endIndex + 1).map(Number);
+      const minValue = Math.min(...valuesInRange);
+      const minValueIndex = valuesInRange.indexOf(minValue);
+      formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' +  datesInRange[minValueIndex] + ')';
+      const maxValue = Math.max(...valuesInRange);
+      const maxValueIndex = valuesInRange.indexOf(maxValue);
+      formattedStats.maxValue = this._helper.formatNum(Math.max(...valuesInRange), decimals) + ' (' +  datesInRange[maxValueIndex] + ')';
+      formattedStats.percChange = this._helper.formatNum(((valuesInRange[valuesInRange.length - 1] - valuesInRange[0]) / valuesInRange[0]) * 100, decimals);
+      formattedStats.levelChange = this._helper.formatNum(valuesInRange[valuesInRange.length - 1] - valuesInRange[0], decimals);
+      const sum = valuesInRange.reduce((a, b) => a + b, 0)
+      formattedStats.total = this._helper.formatNum(sum, decimals);
+      formattedStats.avg = this._helper.formatNum(sum / valuesInRange.length, decimals);
+      const periods = valuesInRange.length - 1;
+      const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], s.currentFreq.freq, periods);
+      formattedStats.cagr = this._helper.formatNum(cagr, decimals);
+      tableRows.push(formattedStats);
+    });
+    return tableRows;
+    /* const formattedStats = {
       minValue: '',
       minValueDate: '',
       maxValue: '',
@@ -164,7 +213,7 @@ export class SeriesHelperService {
     formattedStats.total = this._helper.formatNum(total, decimals);
     formattedStats.avg = this._helper.formatNum(total / seriesData.length, decimals);
     formattedStats.cagr = this._helper.formatNum(cagr, decimals);
-    return formattedStats;
+    return formattedStats; */
   }
 
   newCheckMissingValues = (seriesData) => {
