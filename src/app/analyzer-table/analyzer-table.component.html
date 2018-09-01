@@ -14,7 +14,7 @@
     <i class="far fa-file-excel"></i>
   </button>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" [gridAutoHeight]="true"
-    [frameworkComponents]="frameworkComponents" [enableRtl]="true" (gridReady)="onGridReady($event)">
+    [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" (gridReady)="onGridReady($event)">
   </ag-grid-angular>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="summaryRows" [columnDefs]="summaryColumns" [gridAutoHeight]="true"
     [frameworkComponents]="frameworkComponents">

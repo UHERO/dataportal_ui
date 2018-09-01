@@ -23,18 +23,17 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
     this.params = params;
   }
 
+  invokeParentMethod() {
+    console.log('this.params', this.params)
+    this.params.context.componentParent.updateAnalyzer(this.params.data.seriesInfo)
+  }
+
   refresh(): boolean {
     return false;
   }
 
   showPopover = (seriesInfo) => {
     return this._table.showPopover(seriesInfo);
-  }
-
-  updateAnalyze(series) {
-    console.log('series', series)
-    this._analyzer.updateAnalyzer(series.id);
-    this.updateChartSeries.emit(series);
   }
 
 

@@ -127,7 +127,9 @@ export class AnalyzerComponent implements OnInit {
 
   updateAnalyzerChart(event, chartSeries) {
     // Check if series is in the chart
-    const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesDetail.id);
+    console.log('event', event);
+    console.log('chartSeries', chartSeries)
+    const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.id);
     const seriesSelected = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
     if (this._analyzer.analyzerData.analyzerSeries.length && !seriesSelected) {
@@ -148,7 +150,7 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
       // toggle showInChart in list of analyzer series
-      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesDetail.id);
+      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.id);
       if (aSeries) {
         aSeries.showInChart = !aSeries.showInChart;
       }

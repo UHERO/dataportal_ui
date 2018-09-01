@@ -6,6 +6,7 @@ import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import 'jquery';
+import { GridOptions } from 'ag-grid';
 declare var $: any;
 
 @Component({
@@ -39,6 +40,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   private frameworkComponents;
   private summaryColumns;
   private summaryRows;
+  public gridOptions: GridOptions;
 
   constructor(
     @Inject('portal') private portal,
@@ -50,6 +52,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   ) {
     this.frameworkComponents = {
       analyzerTableRenderer: AnalyzerTableRendererComponent
+    };
+    this.gridOptions = <GridOptions>{
+      context: {
+        componentParent: this
+      }
     }
   }
 
@@ -109,6 +116,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     // Check if the summary statistics for a series has NA values
     // this.missingSummaryStat = this.isSummaryStatMissing();
     //this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
+  }
+
+  updateAnalyzer = (series) => {
+    this.updateAnalyze(series);
   }
 
   setSummaryStatColumns = () => {
@@ -256,7 +267,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
 
   updateAnalyze(series) {
-    this._analyzer.updateAnalyzer(series.seriesDetail.id);
+    this._analyzer.updateAnalyzer(series.id);
     this.updateChartSeries.emit(series);
   }
 

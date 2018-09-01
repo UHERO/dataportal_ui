@@ -152,7 +152,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     console.log('newTableData', this.newTableData);
     //this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
-    this.summaryStats = this._series.newSummaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
+    this.summaryStats = this._series.newSummaryStats(this.newTableData, minDate, maxDate);
   }
 
   createSeriesTable = (transformations, start, end) => {
