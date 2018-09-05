@@ -108,6 +108,7 @@ export class AnalyzerService {
       this.analyzerData.chartNavigator.numberOfObservations = Math.max(...this.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
       this.checkAnalyzerChartSeries();
     });
+    console.log('analyzerData', Observable.of(this.analyzerData))
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
   

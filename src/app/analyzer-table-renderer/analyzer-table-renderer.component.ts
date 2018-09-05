@@ -1,32 +1,31 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { TableHelperService } from '../table-helper.service';
-import { AnalyzerService } from '../analyzer.service';
-import 'jquery';
-declare var $: any;
 
 @Component({
   selector: 'app-analyzer-table-renderer',
   templateUrl: './analyzer-table-renderer.component.html',
-  styleUrls: ['./analyzer-table-renderer.component.scss']
+  styleUrls: ['./analyzer-table-renderer.component.scss'],
 })
 export class AnalyzerTableRendererComponent implements ICellRendererAngularComp {
   public params: any;
-  @Output() updateChartSeries = new EventEmitter();
 
   constructor(
-    private _table: TableHelperService,
-    private _analyzer: AnalyzerService
+    private _table: TableHelperService
   ) { }
 
   agInit(params: any): void {
     this.params = params;
   }
 
-  invokeParentMethod() {
-    console.log('this.params', this.params)
-    this.params.context.componentParent.updateAnalyzer(this.params.data.seriesInfo)
+  invokeParentUpdateAnalyzer() {
+    this.params.context.componentParent.updateAnalyzer(this.params.data);
   }
+
+  invokeParentUpdateChart() {
+    this.params.context.componentParent.updateChart(this.params.data);
+  }
+
 
   refresh(): boolean {
     return false;
@@ -35,10 +34,4 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
   showPopover = (seriesInfo) => {
     return this._table.showPopover(seriesInfo);
   }
-
-
-  /* updateAnalyze = (seriesInfo) => {
-    this._analyzer.updateAnalyzer(seriesInfo.id);
-    seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
-  } */
 }

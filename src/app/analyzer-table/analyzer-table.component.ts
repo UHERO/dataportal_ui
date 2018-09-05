@@ -65,6 +65,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log('table component on changes')
     // Update table as minDate & maxDate change
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
@@ -94,7 +95,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(ytdData)
       }
       if (this.c5maChecked) {
-        console.log('c5maactive', this.c5maChecked)
         const c5maData = this.formatTransformationData(series, c5ma);
         this.rows.push(c5maData)
       }
@@ -116,10 +116,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     // Check if the summary statistics for a series has NA values
     // this.missingSummaryStat = this.isSummaryStatMissing();
     //this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
-  }
-
-  updateAnalyzer = (series) => {
-    this.updateAnalyze(series);
   }
 
   setSummaryStatColumns = () => {
@@ -180,8 +176,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
     const seriesData = {
       series: series.displayName,
+      lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series.seriesDetail,
+      showInChart: series.showInChart,
       lvlData: true,
     }
     formattedDates.forEach((d, index) => {
@@ -266,12 +264,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
 
-  updateAnalyze(series) {
-    this._analyzer.updateAnalyzer(series.id);
+  updateAnalyzer = (series) =>{
+    this._analyzer.updateAnalyzer(series.seriesInfo.id);
     this.updateChartSeries.emit(series);
   }
 
-  updateChart(series) {
+  updateChart = (series) => {
     this.updateChartSeries.emit(series);
   }
 }
