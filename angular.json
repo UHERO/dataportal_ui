@@ -28,8 +28,6 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -39,7 +37,6 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ]
           },
@@ -121,14 +118,11 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -214,8 +208,6 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -225,7 +217,6 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ]
           },
@@ -307,14 +298,11 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -400,8 +388,6 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -411,7 +397,6 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ]
           },
@@ -493,14 +478,11 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js",
               "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/omega/theme.css",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css",
-              "node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",

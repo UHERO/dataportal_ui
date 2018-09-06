@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, ViewChildren, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
@@ -15,7 +15,6 @@ import { GridOptions } from 'ag-grid';
   encapsulation: ViewEncapsulation.None
 })
 export class AnalyzerTableComponent implements OnInit, OnChanges {
-  @ViewChildren('tableScroll') private tableEl;
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
@@ -27,11 +26,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() ytdChecked;
   @Input() c5maChecked;
   portalSettings;
-  private previousHeight;
-  private tableWidths = [];
   missingSummaryStat = false;
   tableDates;
-
   private gridApi;
   private columnDefs;
   private rows;
@@ -45,7 +41,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     private _dataPortalSettings: DataPortalSettingsService,
     private _analyzer: AnalyzerService,
     private _series: SeriesHelperService,
-    private _table: TableHelperService,
     private _helper: HelperService,
   ) {
     this.frameworkComponents = {
@@ -75,8 +70,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    this.summaryRows = this._series.newSummaryStats(this.series, this.minDate, this.maxDate);
-    console.log('summaryRows', this.summaryRows)
+    this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
@@ -95,9 +89,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         const c5maData = this.formatTransformationData(series, c5ma);
         this.rows.push(c5maData)
       }
-
-      const decimal = series.seriesDetail.decimals;
-      const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
     });
     // Check if the summary statistics for a series has NA values
     this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);

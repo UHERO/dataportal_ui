@@ -40,11 +40,9 @@ export class AnalyzerService {
       // Get highest frequency of all series in analyzer
       this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
       this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
-      // this.analyzerData.chartNavigator.numberOfObservations = Math.max(...this.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
       this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
       this.checkAnalyzerChartSeries();
     });
-    console.log(Observable.of(this.analyzerData))
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 

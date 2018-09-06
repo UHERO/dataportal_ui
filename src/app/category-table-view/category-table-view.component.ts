@@ -119,7 +119,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
       subcatIndex: subcatIndex
     }
     dates.forEach((d, index) => {
-      seriesData[d] = this._helper.formatNum(+values[index], series.seriesInfo.decimal);
+      seriesData[d] = this._helper.formatNum(+values[index], series.seriesInfo.decimals);
     });
     return seriesData;
   }

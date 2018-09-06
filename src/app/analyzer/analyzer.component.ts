@@ -99,10 +99,6 @@ export class AnalyzerComponent implements OnInit {
   }
 
   updateAnalyzerChart = (event, chartSeries) => {
-    console.log('event', event);
-    console.log('chartSeries', chartSeries);
-    console.log('analyzerSeries', this._analyzer.analyzerSeries);
-    console.log('analyzerData', this._analyzer.analyzerData);
     const seriesDrawn = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesInfo.id);
     const seriesInChart = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
@@ -119,23 +115,18 @@ export class AnalyzerComponent implements OnInit {
     }
     // Allow up to 2 different units to be displayed in chart
     const toggleChartDisplay = this.checkSeriesUnits(chartSeries, event);
-    console.log('toggleChartDisplay', toggleChartDisplay)
     if (toggleChartDisplay) {
       this.alertUser = false;
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
-      console.log('toggle event', event)
       // toggle showInChart in list of analyzer series
-      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesInfo.id);
-      const aSeries2 = this._analyzer.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === event.seriesInfo.id);
-      if (aSeries && aSeries2) {
-        console.log('aSeries2', aSeries2)
-        aSeries.showInChart = !aSeries.showInChart;
-        aSeries2.showInChart = !aSeries2.showInChart;
-        console.log('aSeries2 2', aSeries2)
+      const seriesInAnalyzerList = this._analyzer.analyzerSeries.find(series => series.id === event.seriesInfo.id);
+      const seriesInAnalyzerData = this._analyzer.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === event.seriesInfo.id);
+      if (seriesInAnalyzerList && seriesInAnalyzerData) {
+        seriesInAnalyzerList.showInChart = !seriesInAnalyzerList.showInChart;
+        seriesInAnalyzerData.showInChart = !seriesInAnalyzerData.showInChart;
 
       }
-      console.log('analyzerSeries', this._analyzer.analyzerSeries)
     }
     this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
 
@@ -145,7 +136,6 @@ export class AnalyzerComponent implements OnInit {
     // Update series drawn in chart and dates in analyzer table
     this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
     this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
-    console.log('analyzerChartSeries', this._analyzer.analyzerData.analyzerChartSeries)
     this._analyzer.analyzerData.chartNavigator.frequency = this._analyzer.checkFrequencies(this._analyzer.analyzerData.analyzerSeries);
     this._analyzer.analyzerData.chartNavigator.dateStart = this._analyzer.analyzerData.analyzerTableDates[0].date;
     this._analyzer.analyzerData.chartNavigator.numberOfObservations = this._analyzer.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;

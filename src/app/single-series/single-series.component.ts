@@ -133,9 +133,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Update table when selecting new ranges in the chart
-  redrawTable(e, seriesDetail, tableData, freq) {
-    console.log('tableData', tableData);
-    console.log('seriesDetail', seriesDetail)
+  redrawTable = (e, seriesDetail, tableData, freq, chartData) => {
     const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
     let minDate, maxDate, tableStart, tableEnd;
     minDate = e.minDate;
@@ -148,36 +146,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         tableEnd = i;
       }
     }
-    // console.log(this.createSeriesTable(seriesDetail.seriesObservations.transformationResults, tableStart, tableEnd))
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
-    console.log('newTableData', this.newTableData);
-    //this.summaryStats = this._series.summaryStats(this.newTableData, freq, deciamls, minDate, maxDate);
-    this.summaryStats = this._series.newSummaryStats(this.newTableData, minDate, maxDate);
-  }
-
-  createSeriesTable = (transformations, start, end) => {
-    const categoryTable = {};
-    transformations.forEach((t) => {
-      const { transformation, dates, values, pseudoHistory } = t;
-      if (dates && values) {
-        const transformationValues = [];
-        categoryTable[`${transformation}CategoryTable`] = values.slice(end, start + 1).reverse();
-        /* const dateDiff = categoryDates.filter(date => !dates.includes(date.date));
-        if (!dateDiff.length) {
-          categoryTable[`${transformation}DownloadTable`] = this.formatValues(values, decimal);
-          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
-        }
-        if (dateDiff.length) {
-          categoryDates.forEach((sDate) => {
-            const dateExists = this._helper.binarySearch(dates, sDate.date);
-            dateExists > -1 ? transformationValues.push(values[dateExists]) : transformationValues.push('');
-          });
-          categoryTable[`${transformation}DownloadTable`] = this.formatValues(transformationValues, decimal);
-          categoryTable[`${transformation}CategoryTable`] = categoryTable[`${transformation}DownloadTable`].slice(start, end + 1)
-        } */
-      }
-    });
-    return categoryTable;
+    seriesDetail.observations = seriesDetail.seriesObservations;
+    seriesDetail.currentFreq = { freq: seriesDetail.frequencyShort };
+    this.summaryStats = this._series.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate);
   }
 
   formatValues = (values, decimal) => values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
