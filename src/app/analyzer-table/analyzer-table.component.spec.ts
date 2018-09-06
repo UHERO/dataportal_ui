@@ -11,26 +11,13 @@ import { UheroApiService } from '../uhero-api.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableComponent } from './analyzer-table.component';
 
-// Create stub for datatable component
-@Component({selector: 'app-category-datatables', template: ''})
-class ChartStubComponent {
-  @Input() portalSettings;
-  @Input() yoy;
-  @Input() ytd;
-  @Input() c5ma;
-  @Input() categoryDates;
-  @Input() analyzerSeries;
-  @Input() analyzer;
-  @Input() tableId;
-}
-
 describe('AnalyzerTableComponent', () => {
   let component: AnalyzerTableComponent;
   let fixture: ComponentFixture<AnalyzerTableComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerTableComponent, ChartStubComponent ],
+      declarations: [ AnalyzerTableComponent ],
       providers: [
         AnalyzerService,
         DataPortalSettingsService,

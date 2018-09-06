@@ -5,9 +5,7 @@ import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
-import 'jquery';
 import { GridOptions } from 'ag-grid';
-declare var $: any;
 
 @Component({
   selector: 'app-analyzer-table',
@@ -65,7 +63,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log('table component on changes')
     // Update table as minDate & maxDate change
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
@@ -79,7 +76,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = this._series.newSummaryStats(this.series, this.minDate, this.maxDate);
-    //console.log('summaryStats', summaryStats)
+    console.log('summaryRows', this.summaryRows)
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
@@ -100,22 +97,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       }
 
       const decimal = series.seriesDetail.decimals;
-      //series.analyzerTableDisplay = this.createSeriesTable(series.seriesTableData, this.allTableDates, tableStart, tableEnd, decimal)
       const seriesFreq = { freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency };
-      //series.summaryStats = this._series.newSummaryStats(series, seriesFreq, series.seriesDetail.decimals, this.minDate, this.maxDate)
-      const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
-      if (seriesInChart) {
-        // Match color of show_chart icon for a series with its respective color in the graph
-        $('.color' + series.seriesDetail.id).css('color', seriesInChart.css('stroke'));
-      }
-      if (!seriesInChart.length) {
-        // If series is not selected for the chart, reset color of show_chart icon
-        $('.color' + series.seriesDetail.id).css('color', '#000');
-      }
     });
     // Check if the summary statistics for a series has NA values
-    // this.missingSummaryStat = this.isSummaryStatMissing();
-    //this.tableDates = this.allTableDates.slice(tableStart, tableEnd + 1);
+    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
   }
 
   setSummaryStatColumns = () => {
@@ -127,6 +112,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       tooltip: function (params) {
         return params.value;
       }
+    }, {
+      field: 'range',
+      headerName: 'Date Range'
     }, {
       field: 'minValue',
       headerName: 'Minimum Value'
@@ -147,7 +135,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       headerName: 'Avg'
     }, {
       field: 'cagr',
-      headerName: 'Compound Annual Growth Rate'
+      headerName: 'CAGR'
     }];
   }
 
@@ -172,6 +160,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   formatLvlData = (series, level) => {
+    const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
     const seriesData = {
@@ -181,6 +170,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       seriesInfo: series.seriesDetail,
       showInChart: series.showInChart,
       lvlData: true,
+      color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000'
     }
     formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
@@ -235,18 +225,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
 
-  isSummaryStatMissing() {
-    return this.series.some((s) => s.summaryStats ? s.summaryStats.missing : null);
+  isSummaryStatMissing = (series) => {
+    return series.some((s) => s ? s.missing : null);
   }
-
-  showPopover(seriesInfo) {
-    return this._table.showPopover(seriesInfo);
-  }
-
-  hideInfo(seriesId) {
-    return this._table.hideInfo(seriesId);
-  }
-
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;

@@ -19,7 +19,6 @@ import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
 import { HighstockComponent } from '../highstock/highstock.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { FeedbackComponent } from '../feedback/feedback.component';
-import { CategoryDatatablesComponent } from '../category-datatables/category-datatables.component';
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
 import { AnalyzerComponent } from '../analyzer/analyzer.component';
@@ -45,7 +44,6 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
     HighstockComponent,
     SearchBarComponent,
     FeedbackComponent,
-    CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
     GeoSelectorComponent,
@@ -84,7 +82,6 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
     HighstockComponent,
     SearchBarComponent,
     FeedbackComponent,
-    CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
     GeoSelectorComponent,

@@ -5,6 +5,7 @@ import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
 import { Geography } from './geography';
+import { ADDRCONFIG } from 'dns';
 
 
 @Injectable()
@@ -77,7 +78,6 @@ export class SeriesHelperService {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
       });
-      console.log('seriesData', this.seriesData)
     return Observable.forkJoin(Observable.of(this.seriesData));
   }
 
@@ -137,32 +137,37 @@ export class SeriesHelperService {
     series.forEach((s) => {
       const formattedStats = {
         series: s.displayName,
-        minValue: '',
-        maxValue: '',
-        percChange: '',
-        levelChange: '',
-        total: '',
-        avg: '',
-        cagr: '',
-        missing: null
+        minValue: 'N/A',
+        maxValue: 'N/A',
+        percChange: 'N/A',
+        levelChange: 'N/A',
+        total: 'N/A',
+        avg: 'N/A',
+        cagr: 'N/A',
+        missing: null,
+        range: this._helper.formatDate(seriesStartDate, s.currentFreq.freq) + ' - ' + this._helper.formatDate(seriesEndDate, s.currentFreq.freq)
       };
       const decimals = s.seriesDetail.decimals;
       const transformations = this._helper.getTransformations(s.observations);
-      const level = transformations.level;
-      const { dates, pseudoHistory, transformation, values } = level;
-      const start = dates.find(d => d >= seriesStartDate && d <= seriesEndDate);
-      const end = dates.slice().reverse().find(d => d >= seriesStartDate && d <= seriesEndDate);
+      const { dates, level } = s.chartData; 
+      const start = dates.find(d => d.date >= seriesStartDate && d.date <= seriesEndDate);
+      const end = dates.slice().reverse().find(d => d.date >= seriesStartDate && d.date <= seriesEndDate);
       const startIndex = dates.indexOf(start);
       const endIndex = dates.indexOf(end);
       const datesInRange = dates.slice(startIndex, endIndex + 1);
-      const valuesInRange = values.slice(startIndex, endIndex + 1).map(Number);
+      const valuesInRange = level.slice(startIndex, endIndex + 1);
+      if (valuesInRange.includes(null)) {
+        formattedStats.missing = true;
+        tableRows.push(formattedStats);
+        return;
+      }
       const minValue = Math.min(...valuesInRange);
       const minValueIndex = valuesInRange.indexOf(minValue);
-      formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' +  datesInRange[minValueIndex] + ')';
+      formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' +  this._helper.formatDate(datesInRange[minValueIndex].date, s.currentFreq.freq) + ')';
       const maxValue = Math.max(...valuesInRange);
       const maxValueIndex = valuesInRange.indexOf(maxValue);
-      formattedStats.maxValue = this._helper.formatNum(Math.max(...valuesInRange), decimals) + ' (' +  datesInRange[maxValueIndex] + ')';
-      formattedStats.percChange = this._helper.formatNum(((valuesInRange[valuesInRange.length - 1] - valuesInRange[0]) / valuesInRange[0]) * 100, decimals);
+      formattedStats.maxValue = this._helper.formatNum(Math.max(...valuesInRange), decimals) + ' (' +  this._helper.formatDate(datesInRange[maxValueIndex].date, s.currentFreq.freq) + ')';
+      formattedStats.percChange = s.seriesDetail.percent ? null : this._helper.formatNum(((valuesInRange[valuesInRange.length - 1] - valuesInRange[0]) / valuesInRange[0]) * 100, decimals);
       formattedStats.levelChange = this._helper.formatNum(valuesInRange[valuesInRange.length - 1] - valuesInRange[0], decimals);
       const sum = valuesInRange.reduce((a, b) => a + b, 0)
       formattedStats.total = this._helper.formatNum(sum, decimals);
@@ -173,47 +178,6 @@ export class SeriesHelperService {
       tableRows.push(formattedStats);
     });
     return tableRows;
-    /* const formattedStats = {
-      minValue: '',
-      minValueDate: '',
-      maxValue: '',
-      maxValueDate: '',
-      percChange: '',
-      levelChange: '',
-      total: '',
-      avg: '',
-      cagr: '',
-      missing: null
-    };
-
-    const firstValue = this.getStartValue(seriesData, startDate);
-    const lastValue = this.getEndValue(seriesData, endDate);
-    if (this.checkMissingValues(seriesData, freq.freq, firstValue, lastValue)) {
-      formattedStats.minValue = 'N/A';
-      formattedStats.minValueDate = ' ';
-      formattedStats.maxValue = 'N/A';
-      formattedStats.maxValueDate = ' ';
-      formattedStats.percChange = 'N/A';
-      formattedStats.levelChange = 'N/A';
-      formattedStats.total = 'N/A';
-      formattedStats.avg = 'N/A';
-      formattedStats.cagr = 'N/A';
-      formattedStats.missing = true;
-      return formattedStats; 
-    }
-    const minAndMax = this.getMinMax(seriesData);
-    const total = this.getTotalValue(seriesData);
-    const cagr = this.calculateCAGR(firstValue, lastValue, freq.freq, seriesData.length - 1);
-    formattedStats.minValue = this._helper.formatNum(minAndMax.minValue, decimals);
-    formattedStats.minValueDate = `(${minAndMax.minValueDate})`;
-    formattedStats.maxValue = this._helper.formatNum(minAndMax.maxValue, decimals);
-    formattedStats.maxValueDate = `(${minAndMax.maxValueDate})`;
-    formattedStats.percChange = this._helper.formatNum(((lastValue - firstValue) / firstValue) * 100, decimals);
-    formattedStats.levelChange = this._helper.formatNum(lastValue - firstValue, decimals);
-    formattedStats.total = this._helper.formatNum(total, decimals);
-    formattedStats.avg = this._helper.formatNum(total / seriesData.length, decimals);
-    formattedStats.cagr = this._helper.formatNum(cagr, decimals);
-    return formattedStats; */
   }
 
   newCheckMissingValues = (seriesData) => {
@@ -295,9 +259,7 @@ export class SeriesHelperService {
     if (firstValue === Infinity || lastValue === Infinity) {
       return missing = true;
     }
-    console.log(freq)
     if (freq === 'A') {
-      console.log('A', selectedRange)
       missing = selectedRange.find(obs => obs.tableDate.length === 4 && obs.value === Infinity) ? true : false;
     }
     if (freq === 'Q') {

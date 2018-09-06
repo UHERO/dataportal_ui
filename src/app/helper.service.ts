@@ -218,7 +218,7 @@ export class HelperService {
       return  year + ' ' + quarter[monthIndex];
     }
     if (freq === 'M' || freq === 'S') {
-      return month + '-' + year;
+      return  year + '-' + month;
     }
   }
 

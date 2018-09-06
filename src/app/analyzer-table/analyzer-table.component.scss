@@ -51,6 +51,15 @@
   text-align: left;
 }
 
+.ag-theme-balham .ag-header-cell-label {
+  display: block;
+  float: right;
+
+  span {
+    float: right;
+  }
+}
+
 .csv-export-button {
   display: inline-block;
   background: none;
@@ -64,80 +73,4 @@
       font-size: 18px;
       vertical-align: middle;
   }
-}
-
-.analyzer-table {
-    vertical-align: top;
-    display: inline-block;
-    min-height: 100%;
-    overflow: auto;
-    overflow-y: hidden;
-    width: 100%;
-    position: relative;
-    margin-bottom: 40px;
-  
-    @media (min-width: 768px) {
-      margin-top: 10px;
-    }
-  
-    @media (max-width: 767px) {
-      margin-top: 50px;
-    }
-
-    .table-row {
-      .table {
-        margin-bottom: 0;
-        border-left: 1px solid $gray;
-
-        table {    
-          th {
-            border-right: 0;
-
-            a {
-              display: inline-block;
-              max-width: 80%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              color: $primary-text;
-              vertical-align: top;
-            }
-
-            &:hover {
-              .analyze-button {
-                visibility: visible;
-              }
-            }
-          }
-    
-          .info-icon {
-            font-size: 1.2em;
-            vertical-align: text-top;
-          }
-
-          tr:first-child {
-            td {
-              vertical-align: middle;
-              font-weight: bold;
-            }
-          }
-    
-          tr:last-child {
-            th {
-              border-right: 0;
-            }
-          }
-                
-          .info {
-            cursor: pointer;
-            width: initial;
-            right: 5px;
-            position: absolute;
-    
-            &:focus {
-              outline: 0;
-            }
-          }
-        }
-      }
-    }
 }

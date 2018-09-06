@@ -98,32 +98,21 @@ export class AnalyzerComponent implements OnInit {
     });
   }
 
-  findLongestSeriesIndex(series) {
-    let longestSeries, seriesLength = 0;
-    series.forEach((serie, index) => {
-      if (!longestSeries || seriesLength < serie.chartData.level.length) {
-        seriesLength = serie.chartData.level.length;
-        longestSeries = index;
-      }
-    });
-    return longestSeries;
-  }
-
   updateAnalyzerChart = (event, chartSeries) => {
     console.log('event', event);
     console.log('chartSeries', chartSeries);
     console.log('analyzerSeries', this._analyzer.analyzerSeries);
     console.log('analyzerData', this._analyzer.analyzerData);
-    const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesInfo.id);
-    const seriesSelected = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
+    const seriesDrawn = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesInfo.id);
+    const seriesInChart = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
-    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesSelected) {
+    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesInChart) {
       this._analyzer.analyzerData.analyzerSeries[0].showInChart = true;
       this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
       return;
     }
     // At least one series must be selected
-    if (chartSeries.length === 1 && seriesExist) {
+    if (chartSeries.length === 1 && seriesDrawn) {
       this.alertUser = true;
       this.alertMessage = 'At least one series must be selected.';
       return;
@@ -142,7 +131,9 @@ export class AnalyzerComponent implements OnInit {
       if (aSeries && aSeries2) {
         console.log('aSeries2', aSeries2)
         aSeries.showInChart = !aSeries.showInChart;
-        aSeries2.showInChart = !aSeries.showInChart;
+        aSeries2.showInChart = !aSeries2.showInChart;
+        console.log('aSeries2 2', aSeries2)
+
       }
       console.log('analyzerSeries', this._analyzer.analyzerSeries)
     }
@@ -153,12 +144,11 @@ export class AnalyzerComponent implements OnInit {
   updateChartSeries(analyzerSeries: Array<any>) {
     // Update series drawn in chart and dates in analyzer table
     this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
-    this._analyzer.createAnalyzerTableData(analyzerSeries, this._analyzer.analyzerData.analyzerTableDates);
     this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
     console.log('analyzerChartSeries', this._analyzer.analyzerData.analyzerChartSeries)
     this._analyzer.analyzerData.chartNavigator.frequency = this._analyzer.checkFrequencies(this._analyzer.analyzerData.analyzerSeries);
     this._analyzer.analyzerData.chartNavigator.dateStart = this._analyzer.analyzerData.analyzerTableDates[0].date;
-    this._analyzer.analyzerData.chartNavigator.numberOfObservations = Math.max(...this._analyzer.analyzerData.analyzerSeries.map(s => s.chartData.level.length));
+    this._analyzer.analyzerData.chartNavigator.numberOfObservations = this._analyzer.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
