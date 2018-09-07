@@ -296,6 +296,7 @@ export class HighchartComponent implements OnInit, OnChanges {
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
             const name = getLabelName(point.series.name, currentFreq, percent);
             let label = name + formattedValue;
+            const pseudo = ' Pseudo History ';
             if (point.series.name === 'level') {
               label += ' (' + unitsLabelShort + ') <br>';
             }
@@ -305,7 +306,7 @@ export class HighchartComponent implements OnInit, OnChanges {
                   const otherSeriesLabel = pseudo + name + formattedValue;
                   const levelLabel = otherSeriesLabel + ' (' + unitsLabelShort + ') <br>';
                   s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
-                  s += pseudo + name + formattedValue;
+                  // s += pseudo + name + formattedValue;
                 }
                 if (point.x >= zone.value) {
                   s += label;
@@ -318,7 +319,6 @@ export class HighchartComponent implements OnInit, OnChanges {
           });
           return s;
         }
-        const pseudo = 'Pseudo History ';
         let s = '<b>' + displayName + '</b><br>';
         if (levelLength.length > 1) {
           // Get Quarter or Month for Q/M frequencies
