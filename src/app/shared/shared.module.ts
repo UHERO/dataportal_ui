@@ -5,6 +5,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { TableModule } from 'primeng/table';
+import { AgGridModule } from 'ag-grid-angular';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { AppComponent } from '../app.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
@@ -15,10 +17,8 @@ import { HighchartComponent } from '../highchart/highchart.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
 import { HighstockComponent } from '../highstock/highstock.component';
-import { CategoryTableComponent } from '../category-table/category-table.component';
 import { SearchBarComponent } from '../search-bar/search-bar.component';
 import { FeedbackComponent } from '../feedback/feedback.component';
-import { CategoryDatatablesComponent } from '../category-datatables/category-datatables.component';
 import { CategoryChartsComponent } from '../category-charts/category-charts.component';
 import { DateSliderComponent } from '../date-slider/date-slider.component';
 import { AnalyzerComponent } from '../analyzer/analyzer.component';
@@ -28,6 +28,10 @@ import { HelpComponent } from '../help/help.component';
 import { HelpDirective } from '../help.directive';
 import { ShareLinkComponent } from '../share-link/share-link.component';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { CategoryTableViewComponent } from '../category-table-view/category-table-view.component';
+import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
+import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
+import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
 
 @NgModule({
   declarations: [
@@ -39,10 +43,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
-    CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
-    CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
     GeoSelectorComponent,
@@ -51,7 +53,11 @@ import { HighchartsChartModule } from 'highcharts-angular';
     AnalyzerTableComponent,
     HelpComponent,
     HelpDirective,
-    ShareLinkComponent
+    ShareLinkComponent,
+    CategoryTableViewComponent,
+    CategoryTableRendererComponent,
+    AnalyzerTableRendererComponent,
+    AnalyzerStatsRendererComponent
   ],
   imports: [
     CommonModule,
@@ -62,7 +68,13 @@ import { HighchartsChartModule } from 'highcharts-angular';
     HttpModule,
     RouterModule,
     DataTableModule, SharedModule,
-    RecaptchaModule.forRoot()
+    TableModule,
+    RecaptchaModule.forRoot(),
+    AgGridModule.withComponents([
+      CategoryTableRendererComponent,
+      AnalyzerTableRendererComponent,
+      AnalyzerStatsRendererComponent
+    ])
   ],
   exports: [
     FormsModule,
@@ -73,13 +85,15 @@ import { HighchartsChartModule } from 'highcharts-angular';
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
-    CategoryTableComponent,
     SearchBarComponent,
     FeedbackComponent,
-    CategoryDatatablesComponent,
     CategoryChartsComponent,
     DateSliderComponent,
-    GeoSelectorComponent
+    GeoSelectorComponent,
+    CategoryTableViewComponent,
+    CategoryTableRendererComponent,
+    AnalyzerTableRendererComponent,
+    AnalyzerStatsRendererComponent
   ]
 })
 export class Shared { }

@@ -11,17 +11,17 @@ import { UheroApiService } from '../uhero-api.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableComponent } from './analyzer-table.component';
 
-// Create stub for datatable component
-@Component({selector: 'app-category-datatables', template: ''})
-class ChartStubComponent {
-  @Input() portalSettings;
-  @Input() yoy;
-  @Input() ytd;
-  @Input() c5ma;
-  @Input() categoryDates;
-  @Input() analyzerSeries;
-  @Input() analyzer;
-  @Input() tableId;
+// Create stub for ag-grid component
+@Component({selector: 'ag-grid-angular', template: ''})
+class agGridStubComponent {
+  @Input() rowData;
+  @Input() columnDefs;
+  @Input() gridAutoHeight;
+  @Input() frameworkComponents;
+  @Input() enableRtl;
+  @Input() gridReady;
+  @Input() gridOptions;
+  @Input() suppressDragLeaveHidesColumns;
 }
 
 describe('AnalyzerTableComponent', () => {
@@ -30,7 +30,7 @@ describe('AnalyzerTableComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerTableComponent, ChartStubComponent ],
+      declarations: [ AnalyzerTableComponent, agGridStubComponent ],
       providers: [
         AnalyzerService,
         DataPortalSettingsService,

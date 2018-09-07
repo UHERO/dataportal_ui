@@ -98,45 +98,17 @@ export class AnalyzerComponent implements OnInit {
     });
   }
 
-  setInitialChartSeries(analyzerSeries: Array<any>) {
-    let chartSeries = analyzerSeries.filter(series => series.showInChart === true);
-    let counter = 0;
-    while (chartSeries.length < 2) {
-      if (analyzerSeries[counter]) {
-        analyzerSeries[counter].showInChart = true;
-        counter++;
-        chartSeries = analyzerSeries.filter(series => series.showInChart === true);
-      }
-      if (!analyzerSeries[counter]) {
-        break;
-      }
-    }
-    return chartSeries;
-  }
-
-  findLongestSeriesIndex(series) {
-    let longestSeries, seriesLength = 0;
-    series.forEach((serie, index) => {
-      if (!longestSeries || seriesLength < serie.chartData.level.length) {
-        seriesLength = serie.chartData.level.length;
-        longestSeries = index;
-      }
-    });
-    return longestSeries;
-  }
-
-  updateAnalyzerChart(event, chartSeries) {
-    // Check if series is in the chart
-    const seriesExist = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesDetail.id);
-    const seriesSelected = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
+  updateAnalyzerChart = (event, chartSeries) => {
+    const seriesDrawn = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesInfo.id);
+    const seriesInChart = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
     // If remaining series drawn in chart is removed from analyzer, draw next series in table
-    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesSelected) {
+    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesInChart) {
       this._analyzer.analyzerData.analyzerSeries[0].showInChart = true;
       this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
       return;
     }
     // At least one series must be selected
-    if (chartSeries.length === 1 && seriesExist) {
+    if (chartSeries.length === 1 && seriesDrawn) {
       this.alertUser = true;
       this.alertMessage = 'At least one series must be selected.';
       return;
@@ -148,19 +120,25 @@ export class AnalyzerComponent implements OnInit {
       this.alertMessage = '';
       event.showInChart = !event.showInChart;
       // toggle showInChart in list of analyzer series
-      const aSeries = this._analyzer.analyzerSeries.find(series => series.id === event.seriesDetail.id);
-      if (aSeries) {
-        aSeries.showInChart = !aSeries.showInChart;
+      const seriesInAnalyzerList = this._analyzer.analyzerSeries.find(series => series.id === event.seriesInfo.id);
+      const seriesInAnalyzerData = this._analyzer.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === event.seriesInfo.id);
+      if (seriesInAnalyzerList && seriesInAnalyzerData) {
+        seriesInAnalyzerList.showInChart = !seriesInAnalyzerList.showInChart;
+        seriesInAnalyzerData.showInChart = !seriesInAnalyzerData.showInChart;
+
       }
     }
     this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
+
   }
 
   updateChartSeries(analyzerSeries: Array<any>) {
     // Update series drawn in chart and dates in analyzer table
     this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
-    this._analyzer.createAnalyzerTableData(analyzerSeries, this._analyzer.analyzerData.analyzerTableDates);
     this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    this._analyzer.analyzerData.chartNavigator.frequency = this._analyzer.checkFrequencies(this._analyzer.analyzerData.analyzerSeries);
+    this._analyzer.analyzerData.chartNavigator.dateStart = this._analyzer.analyzerData.analyzerTableDates[0].date;
+    this._analyzer.analyzerData.chartNavigator.numberOfObservations = this._analyzer.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
   }
 
   checkSeriesUnits(chartSeries, currentSeries) {
@@ -169,7 +147,7 @@ export class AnalyzerComponent implements OnInit {
     const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
     if (uniqueUnits.length === 2) {
       // If two different units are already in use, check if the current series unit is in the list
-      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === currentSeries.seriesDetail.unitsLabelShort);
+      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === currentSeries.seriesInfo.unitsLabelShort);
       this.alertUser = unitsExist ? false : true;
       this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
       return unitsExist ? true : false;

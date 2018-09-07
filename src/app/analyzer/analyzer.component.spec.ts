@@ -22,6 +22,7 @@ class AnalyzerHighstockStubComponent {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
+  @Input() navigator;
 }
 
 // Create stub for analyzer-table
