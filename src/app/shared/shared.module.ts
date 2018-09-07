@@ -31,6 +31,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { CategoryTableViewComponent } from '../category-table-view/category-table-view.component';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
+import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
     ShareLinkComponent,
     CategoryTableViewComponent,
     CategoryTableRendererComponent,
-    AnalyzerTableRendererComponent
+    AnalyzerTableRendererComponent,
+    AnalyzerStatsRendererComponent
   ],
   imports: [
     CommonModule,
@@ -68,7 +70,10 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
     DataTableModule, SharedModule,
     TableModule,
     RecaptchaModule.forRoot(),
-    AgGridModule.withComponents([CategoryTableRendererComponent, AnalyzerTableRendererComponent
+    AgGridModule.withComponents([
+      CategoryTableRendererComponent,
+      AnalyzerTableRendererComponent,
+      AnalyzerStatsRendererComponent
     ])
   ],
   exports: [
@@ -87,7 +92,8 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
     GeoSelectorComponent,
     CategoryTableViewComponent,
     CategoryTableRendererComponent,
-    AnalyzerTableRendererComponent
+    AnalyzerTableRendererComponent,
+    AnalyzerStatsRendererComponent
   ]
 })
 export class Shared { }

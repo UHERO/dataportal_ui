@@ -30,79 +30,10 @@ describe('Service: Helper', () => {
     expect(service.createDateArray(startDate, endDate, freq, dateArray)).toEqual(expected);
   }));
 
-  /* it('dataTransform should format series observation data for charts and tables', inject([HelperService], (service: HelperService) => {
-    const seriesObservations = {
-      observationStart: '1960-01-01',
-      observationEnd: '1962-01-01',
-      orderBy: '',
-      sortOrder: '',
-      transformationResults: [
-        {
-          transformation: 'lvl',
-          dates: [
-            '1962-01-01'
-          ],
-          values: [
-            '195.2833',
-          ],
-          pseudoHistory: [
-            false
-          ]
-        }, {
-          transformation: 'pc1',
-          dates: [],
-          pseudoHistory: []
-        }, {
-          transformation: 'ytd',
-          dates: [],
-          pseudoHistory: []
-        }, {
-          transformation: 'c5ma',
-          dates: [],
-          pseudoHistory: []
-        }
-      ]
-    };
-    const dates = [
-      { date: '1962-01-01', tableDate: '1962' }
-    ];
-    const decimals = 2;
-    const lvl: Array<any> = [195.2833];
-    const yoy = [null];
-    const c5ma = [null];
-    const chartData = {
-      level: lvl,
-      pseudoZones: [],
-      yoy: yoy,
-      ytd: yoy,
-      c5ma: c5ma,
-      dates: [{ date: '1962-01-01', tableDate: '1962' }]
-    };
-    const tableData = [{
-      date: '1962-01-01',
-      tableDate: '1962',
-      value: 195.2833,
-      formattedValue: '195.28',
-      yoyValue: Infinity,
-      formattedYoy: '',
-      ytdValue: Infinity,
-      formattedYtd: '',
-      c5maValue: Infinity,
-      formattedC5ma: ''
-    }];
-    const expected = {
-      chartData: chartData,
-      tableData: tableData,
-      start: '1960-01-01',
-      end: '1962-01-01'
-    };
-    expect(service.dataTransform(seriesObservations, dates, decimals)).toEqual(expected);
-  })); */
-
   it('formatDate should return a formatted date string', inject([HelperService], (service: HelperService) => {
     const freqs = ['A', 'Q', 'M', 'S'];
     const date = '2000-01-01';
-    const expected = ['2000', 'Q1 2000', '01-2000', '01-2000'];
+    const expected = ['2000', '2000 Q1', '2000-01', '2000-01'];
     freqs.forEach((freq, index) => {
       expect(service.formatDate(date, freq)).toEqual(expected[index]);
     });

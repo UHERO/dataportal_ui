@@ -5,6 +5,7 @@ import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
+import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component'
 import { GridOptions } from 'ag-grid';
 
 @Component({
@@ -35,6 +36,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   private summaryColumns;
   private summaryRows;
   public gridOptions: GridOptions;
+  public statGridOptions: GridOptions;
 
   constructor(
     @Inject('portal') private portal,
@@ -44,9 +46,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     private _helper: HelperService,
   ) {
     this.frameworkComponents = {
-      analyzerTableRenderer: AnalyzerTableRendererComponent
+      analyzerTableRenderer: AnalyzerTableRendererComponent,
+      analyzerStatsRenderer: AnalyzerStatsRendererComponent
     };
     this.gridOptions = <GridOptions>{
+      context: {
+        componentParent: this
+      }
+    };
+    this.statGridOptions = <GridOptions>{
       context: {
         componentParent: this
       }
@@ -71,6 +79,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
+    this.summaryRows.forEach((statRow) => {
+      const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
+      statRow.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
+    });
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
@@ -100,6 +112,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       headerName: 'Series',
       pinned: 'left',
       width: 275,
+      cellRenderer: 'analyzerStatsRenderer',
       tooltip: function (params) {
         return params.value;
       }

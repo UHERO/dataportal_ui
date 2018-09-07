@@ -11,13 +11,26 @@ import { UheroApiService } from '../uhero-api.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableComponent } from './analyzer-table.component';
 
+// Create stub for ag-grid component
+@Component({selector: 'ag-grid-angular', template: ''})
+class agGridStubComponent {
+  @Input() rowData;
+  @Input() columnDefs;
+  @Input() gridAutoHeight;
+  @Input() frameworkComponents;
+  @Input() enableRtl;
+  @Input() gridReady;
+  @Input() gridOptions;
+  @Input() suppressDragLeaveHidesColumns;
+}
+
 describe('AnalyzerTableComponent', () => {
   let component: AnalyzerTableComponent;
   let fixture: ComponentFixture<AnalyzerTableComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerTableComponent ],
+      declarations: [ AnalyzerTableComponent, agGridStubComponent ],
       providers: [
         AnalyzerService,
         DataPortalSettingsService,

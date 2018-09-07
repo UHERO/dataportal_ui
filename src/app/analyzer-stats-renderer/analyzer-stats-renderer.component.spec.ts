@@ -2,17 +2,17 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterLinkStubDirective, ActivatedRouteStub, ActivatedRoute } from '../../testing/router-stubs';
 import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
 import { RouterTestingModule } from '@angular/router/testing';
-import { AnalyzerTableRendererComponent } from './analyzer-table-renderer.component';
+import { AnalyzerStatsRendererComponent } from './analyzer-stats-renderer.component';
 import { TableHelperService } from '../table-helper.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 
-describe('AnalyzerTableRendererComponent', () => {
-  let component: AnalyzerTableRendererComponent;
-  let fixture: ComponentFixture<AnalyzerTableRendererComponent>;
+describe('AnalyzerStatsRendererComponent', () => {
+  let component: AnalyzerStatsRendererComponent;
+  let fixture: ComponentFixture<AnalyzerStatsRendererComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnalyzerTableRendererComponent ],
+      declarations: [ AnalyzerStatsRendererComponent ],
       providers: [
         TableHelperService,
         GoogleAnalyticsEventsService
@@ -23,7 +23,7 @@ describe('AnalyzerTableRendererComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AnalyzerTableRendererComponent);
+    fixture = TestBed.createComponent(AnalyzerStatsRendererComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
