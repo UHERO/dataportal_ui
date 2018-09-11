@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts/js/highcharts';
 import { HighchartsObject } from '../HighchartsObject';
@@ -9,7 +9,7 @@ import { HighchartsObject } from '../HighchartsObject';
   styleUrls: ['./highchart.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HighchartComponent implements OnInit, OnChanges {
+export class HighchartComponent implements OnChanges {
   @Input() portalSettings;
   @Input() seriesData;
   @Input() currentFreq;
@@ -17,6 +17,7 @@ export class HighchartComponent implements OnInit, OnChanges {
   @Input() chartEnd;
   @Input() minValue;
   @Input() maxValue;
+  @Input() categoryDates;
   Highcharts = Highcharts;
   chartOptions = <HighchartsObject>{};
   updateChart = false;
@@ -34,19 +35,15 @@ export class HighchartComponent implements OnInit, OnChanges {
 
   constructor(@Inject('defaultRange') private defaultRange, private _helper: HelperService) { }
 
-  ngOnInit() {
-    if (this.seriesData.seriesInfo === 'No data available' || this.seriesData.categoryDisplay.chartData.level.length === 0) {
-      this.updateChart = true;
-      this.noDataChart(this.seriesData);
-    } else {
-      this.updateChart = true;
-      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
-    }
-  }
-
   ngOnChanges() {
-    this.updateChart = true;
-    this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+    if (this.seriesData.seriesInfo === 'No data available') {
+      this.noDataChart(this.seriesData);
+      this.updateChart = true;
+    } else {
+      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+      this.updateChart = true;
+    }
+
   }
 
   getSeriesStartAndEnd = (dates, start, end) => {
@@ -154,13 +151,13 @@ export class HighchartComponent implements OnInit, OnChanges {
     const { series0Name, series1Name } = portalSettings.highcharts;
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
-    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(dates, chartStart, chartEnd);
+    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd);
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
-    let series0 = seriesData.categoryDisplay.chartData[series0Name];
-    let series1 = seriesData.categoryDisplay.chartData[series1Name];
+    let series0 = seriesData.categoryDisplay.chartData.series0;
+    let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
     series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
+    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
     // Check how many non-null points exist in level series
     const levelLength = series0.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);

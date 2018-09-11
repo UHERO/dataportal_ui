@@ -45,6 +45,7 @@ export class TableHelperService {
     const popover = $(popoverId).popover({
       trigger: 'manual',
       html: true,
+      placement: 'left',
       title: function () {
         let title = seriesInfo.title;
         title += ' (' + seriesInfo.geography.shortName + '; ' + seriesInfo.frequency + ')';

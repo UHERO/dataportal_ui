@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 @Injectable()
 export class HelperService {
   private categoryData = new Subject();
-
+  
   constructor() { }
 
   getCatData() {
@@ -87,9 +87,6 @@ export class HelperService {
     const end = observations.observationEnd;
     const transformations = this.getTransformations(observations);
     const level = transformations.level;
-    const yoy = transformations.yoy;
-    const ytd = transformations.ytd;
-    const c5ma = transformations.c5ma;
     const pseudoZones = [];
     if (level.pseudoHistory) {
       level.pseudoHistory.forEach((obs, index) => {
@@ -98,29 +95,26 @@ export class HelperService {
         }
       });
     }
-    const seriesTable = this.createSeriesTable(dates, transformations, decimals);
-    const chart = this.createSeriesChart(dates, transformations);
-    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
-    const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
+    // const seriesTable = this.createSeriesTable(dates, transformations, decimals);
+    //const chart = this.createSeriesChart(dates, transformations);
+    // const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
+    const results = { start: start, end: end };
     return results;
   }
 
-  addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
-    const tableEntry = valueArray.dates.findIndex(obs => obs === date.date || obs === date.tableDate);
-    if (tableEntry > -1) {
-      tableObj[value] = +valueArray.values[tableEntry];
-      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+  binarySearch = (valueList, date) => {
+    let start = 0;
+    let end = valueList.length - 1;
+    let middle = Math.floor((start + end) / 2);
+    while (valueList[middle] !== date && start < end) {
+      if (date < valueList[middle]) {
+        end = middle - 1;
+      } else {
+        start = middle + 1;
+      }
+      middle = Math.floor((start + end) / 2);
     }
-  }
-
-  addChartData(valueArray: Array<any>, series, date) {
-    const dateIndex = series.dates.findIndex(obs => obs === date.date);
-    if (dateIndex > -1) {
-      valueArray.push(+series.values[dateIndex]);
-    }
-    if (dateIndex === -1) {
-      valueArray.push(null);
-    }
+    return (valueList[middle] !== date) ? -1 : middle;
   }
 
   createSeriesChart(dateRange, transformations) {
@@ -134,19 +128,31 @@ export class HelperService {
     const c5maValue = [];
     dateRange.forEach((date) => {
       if (level) {
-        this.addChartData(levelValue, level, date);
+        const levelIndex = this.binarySearch(level.dates, date.date);
+        levelIndex > -1 ? levelValue.push(+level.values[levelIndex]) : levelValue.push(null);
       }
       if (yoy) {
-        this.addChartData(yoyValue, yoy, date);
+        const yoyIndex = this.binarySearch(yoy.dates, date.date);
+        yoyIndex > -1 ? yoyValue.push(+yoy.values[yoyIndex]) : yoyValue.push(null);
       }
       if (ytd) {
-        this.addChartData(ytdValue, ytd, date);
+        const ytdIndex = this.binarySearch(ytd.dates, date.date);
+        ytdIndex > -1 ? ytdValue.push(+ytd.values[ytdIndex]) : ytdValue.push(null);
       }
       if (c5ma) {
-        this.addChartData(c5maValue, c5ma, date);
+        const c5maIndex = this.binarySearch(c5ma.dates, date.date);
+        c5maIndex > -1 ? c5maValue.push(+c5ma.values[c5maIndex]) : c5maValue.push(null);
       }
     });
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
+  }
+
+  addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
+    const tableEntry = this.binarySearch(valueArray.dates, date.date);
+    if (tableEntry > -1) {
+      tableObj[value] = +valueArray.values[tableEntry];
+      tableObj[formattedValue] = this.formattedValue(valueArray.values[tableEntry], decimals);
+    }
   }
 
   createSeriesTable(dateRange: Array<any>, transformations, decimals: number) {
@@ -209,15 +215,15 @@ export class HelperService {
     }
     if (freq === 'Q') {
       const monthIndex = qMonth.indexOf(month);
-      return quarter[monthIndex] + ' ' + year;
+      return  year + ' ' + quarter[monthIndex];
     }
     if (freq === 'M' || freq === 'S') {
-      return month + '-' + year;
+      return  year + '-' + month;
     }
   }
 
   formatNum(num: number, decimal: number) {
-    return num === Infinity ? ' ' : num.toLocaleString('en-US', {minimumFractionDigits: decimal, maximumFractionDigits: decimal});
+    return num === Infinity ? ' ' : num.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal });
   }
 
   setDefaultCategoryRange(freq, dateArray, defaults) {

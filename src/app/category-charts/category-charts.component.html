@@ -1,4 +1,4 @@
-<div class="multi-charts-row" *ngIf="data">
+<div class="multi-charts-row">
 	<ng-template ngIf [ngIf]="noSeries">
 		<p *ngIf="noSeries && (sublist.freqs || sublist.geos)" class="no-data">Data Available for:</p>
 		<ul *ngIf="sublist.geos" class="available-geos">
@@ -13,12 +13,15 @@
 		</ul>
 		<p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
 	</ng-template>
-	<ng-template ngFor let-serie [ngForOf]="data">
+	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="!noSeries" class="multi-charts">
-			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" queryParamsHandling='merge' *ngIf="serie.seriesInfo.id" (click)="submitGAEvent(serie.seriesInfo.id)">
-				<app-highchart [minValue]="sublist.minValue" [maxValue]="sublist.maxValue" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [currentFreq]="freq"></app-highchart>
+			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" queryParamsHandling='merge'
+			 *ngIf="serie.seriesInfo.id" (click)="submitGAEvent(serie.seriesInfo.id)">
+				<app-highchart [minValue]="sublist.minValue" [maxValue]="sublist.maxValue" [portalSettings]="portalSettings" [chartStart]="chartStart"
+				 [chartEnd]="chartEnd" [seriesData]="serie" [categoryDates]="dates" [currentFreq]="freq"></app-highchart>
 			</a>
-			<i [class.add-button]="!serie.seriesInfo.analyze" [class.remove-button]="serie.seriesInfo.analyze" class="material-icons analyze-button remove-button" (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
+			<i [class.add-analyze-button]="!serie.seriesInfo.analyze" [class.remove-analyze-button]="serie.seriesInfo.analyze" class="material-icons analyzer-toggle remove-button"
+			 (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
 		</div>
 	</ng-template>
 </div>

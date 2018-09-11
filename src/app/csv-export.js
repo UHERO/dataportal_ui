@@ -613,7 +613,6 @@
 		 *          CSV representation of the data
 		 */
 		Highcharts.Chart.prototype.getCSV = function (useLocalDecimalPoint) {
-			console.log('getcsv options', this.options)
 			var csv = '',
 				rows = this.getDataRows(),
 				csvOptions = this.options.exporting.csv,

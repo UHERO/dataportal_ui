@@ -14,7 +14,9 @@ export class AnalyzerService {
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
-    analyzerChartSeries: []
+    analyzerChartSeries: [],
+    analyzerFrequency: '',
+    chartNavigator: { frequency: '', dateStart: '', numberOfObservations: null }
   };
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
@@ -30,95 +32,135 @@ export class AnalyzerService {
     this._uheroAPIService.fetchPackageAnalyzer(ids).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
-        let decimals;
-        const aSeriesMatch = aSeries.find(a => a.id === s.id);
-        const seriesData = {
-          seriesDetail: s,
-          currentGeo: <Geography>{},
-          currentFreq: <Frequency>{},
-          chartData: {},
-          displayName: '',
-          chartDisplayName: '',
-          seriesTableData: [],
-          error: null,
-          saParam: false,
-          noData: '',
-          observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-          showInChart: aSeriesMatch.showInChart
-        };
-        const abbreviatedNameDetails = {
-          title: s.title,
-          geography: s.geography.handle,
-          frequency: s.frequencyShort,
-          seasonalAdjustment: s.seasonalAdjustment
-        };
-        const chartNameDetails = {
-          title: s.title,
-          geography: s.geography.shortName,
-          frequency: s.frequency,
-          seasonalAdjustment: s.seasonalAdjustment
-        };
-        seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
-        seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
-        seriesData.saParam = s.seasonalAdjustment !== 'not_seasonally_adjusted';
-        decimals = s.decimals ? s.decimals : 1;
-        seriesData.currentGeo = s.geography;
-        seriesData.currentFreq = { freq: s.frequencyShort, label: s.frequency };
-        seriesData.observations = s.seriesObservations;
-        const levelData = seriesData.observations.transformationResults[0].dates;
-        const obsStart = seriesData.observations.observationStart;
-        const obsEnd = seriesData.observations.observationEnd;
-        const dateArray = [];
-        if (levelData) {
-          // Use to format dates for table
-          this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-          const data = this._helper.dataTransform(seriesData.observations, dateArray, decimals);
-          seriesData.chartData = data.chartData;
-          seriesData.seriesTableData = data.tableData;
-        } else {
-          seriesData.noData = 'Data not available';
-        }
+        const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
         this.analyzerData.analyzerSeries.push(seriesData);
       });
-      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-      this.createAnalyzerTableData(this.analyzerData.analyzerSeries, this.analyzerData.analyzerTableDates);
+      this.createAnalyzerTable(this.analyzerData.analyzerSeries)
       this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+      // Get highest frequency of all series in analyzer
+      this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
+      this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
+      this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
       this.checkAnalyzerChartSeries();
     });
     return Observable.forkJoin(Observable.of(this.analyzerData));
   }
 
-  createAnalyzerTableData(analyzerSeries, tableDates) {
-    analyzerSeries.forEach((serie) => {
-      if (serie.observations) {
-        serie.analyzerTableData = tableDates.map((date) => {
-          const tableObj = {
-            date: date.date,
-            tableDate: date.tableDate,
-            value: Infinity,
-            formattedValue: '',
-            yoyValue: Infinity,
-            formattedYoy: '',
-            ytdValue: Infinity,
-            formattedYtd: '',
-            c5maValue: Infinity,
-            formattedC5ma: ''
-          };
-          const entry = serie.seriesTableData.findIndex(obs => obs.tableDate === date.tableDate);
-          if (entry > -1) {
-            tableObj.value = serie.seriesTableData[entry].value;
-            tableObj.formattedValue = serie.seriesTableData[entry].formattedValue;
-            tableObj.yoyValue = serie.seriesTableData[entry].yoyValue;
-            tableObj.formattedYoy = serie.seriesTableData[entry].formattedYoy;
-            tableObj.ytdValue = serie.seriesTableData[entry].ytdValue;
-            tableObj.formattedYtd = serie.seriesTableData[entry].formattedYtd;
-            tableObj.c5maValue = serie.seriesTableData[entry].c5maValue;
-            tableObj.formattedC5ma = serie.seriesTableData[entry].formattedC5ma;
+  formatSeriesForAnalyzer = (series, aSeries) => {
+    let decimals;
+    const aSeriesMatch = aSeries.find(a => a.id === series.id);
+    const seriesData = {
+      seriesDetail: series,
+      currentGeo: <Geography>{},
+      currentFreq: <Frequency>{},
+      chartData: {},
+      displayName: '',
+      chartDisplayName: '',
+      seriesTableData: [],
+      error: null,
+      saParam: false,
+      noData: '',
+      observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+      showInChart: aSeriesMatch.showInChart
+    };
+    const abbreviatedNameDetails = {
+      title: series.title,
+      geography: series.geography.handle,
+      frequency: series.frequencyShort,
+      seasonalAdjustment: series.seasonalAdjustment
+    };
+    const chartNameDetails = {
+      title: series.title,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
+      seasonalAdjustment: series.seasonalAdjustment
+    };
+    seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
+    seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
+    seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
+    decimals = series.decimals ? series.decimals : 1;
+    seriesData.currentGeo = series.geography;
+    seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
+    seriesData.observations = series.seriesObservations;
+    const levelDates = seriesData.observations.transformationResults[0].dates;
+    const obsStart = seriesData.observations.observationStart;
+    const obsEnd = seriesData.observations.observationEnd;
+    const dateArray = [];
+    if (levelDates) {
+      const pseudoZones = [];
+      const level = seriesData.observations.transformationResults[0].values;
+      if (level.pseudoHistory) {
+        level.pseudoHistory.forEach((obs, index) => {
+          if (obs && !level.pseudoHistory[index + 1]) {
+            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
           }
-          return tableObj;
+        });
+      }
+      // Use to format dates for table
+      this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+      const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray)
+      seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones: pseudoZones }
+    } else {
+      seriesData.noData = 'Data not available';
+    }
+    return seriesData;
+  }
+
+  checkFrequencies = (series) => {
+    let freq = 'A';
+    series.forEach((s) => {
+      if (s.currentFreq.freq === 'M') {
+        freq = 'M';
+      }
+      if (s.currentFreq.freq === 'Q') {
+        freq = 'Q';
+      }
+      if (s.currentFreq.freq === 'S') {
+        freq = 'S';
+      }
+    });
+    return freq;
+  }
+
+  createAnalyzerTable = (analyzerSeries) => {
+    this.analyzerData.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    analyzerSeries.forEach((aSeries) => {
+      const decimal = aSeries.seriesDetail.decimals;
+      const dateArray = [];
+      this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+      aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
+    });
+  }
+
+  createSeriesTable = (transformations, tableDates, decimal) => {
+    const categoryTable = {};
+    transformations.forEach((t) => {
+      const { transformation, dates, values, pseudoHistory } = t;
+      if (dates && values) {
+        categoryTable[`${transformation}`] = tableDates.map((date) => {
+          const dateExists = this._helper.binarySearch(dates, date.date);
+          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } : { date: date.date, tableDate: date.tableDate, value: Infinity, formattedValue: '' };
         });
       }
     });
+    return categoryTable;
+  }
+
+  createSeriesChartData = (transformation, dates) => {
+    if (transformation) {
+      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      const transformationValues = [];
+      if (!dateDiff.length) {
+        return transformation.values.map(Number);
+      }
+      if (dateDiff.length) {
+        dates.forEach((sDate) => {
+          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
+        });
+        return transformationValues;
+      }
+    }
   }
 
   checkAnalyzerChartSeries() {
@@ -136,7 +178,7 @@ export class AnalyzerService {
     if (seasonalAdjustment === 'seasonally_adjusted') {
       ending = '; Seasonally Adjusted';
     }
-    if (seasonalAdjustment === 'not_seasonall_adjusted') {
+    if (seasonalAdjustment === 'not_seasonally_adjusted') {
       ending = '; Not Seasonally Adjusted';
     }
     return `${title} (${geography}; ${frequency}${ending})`;
@@ -164,17 +206,6 @@ export class AnalyzerService {
     if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
       dateWrapper.endDate = seriesEnd;
     }
-  }
-
-  findLongestSeriesIndex(series) {
-    let longestSeries, seriesLength = 0;
-    series.forEach((serie, index) => {
-      if (!longestSeries || seriesLength < serie.chartData.level.length) {
-        seriesLength = serie.chartData.level.length;
-        longestSeries = index;
-      }
-    });
-    return longestSeries;
   }
 
   updateAnalyzer(seriesId, tableData?, chartData?) {
@@ -277,10 +308,5 @@ export class AnalyzerService {
     return false;
   }
 
-  checkStartMonth(month) {
-    if (month === 0 || month === 3 || month === 6 || month === 9) {
-      return true;
-    }
-    return false;
-  }
+  checkStartMonth = (month) => month % 3 === 0 ? true : false;
 }

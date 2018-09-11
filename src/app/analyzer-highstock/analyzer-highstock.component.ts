@@ -1,4 +1,4 @@
-import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -17,7 +17,8 @@ exportCSV(Highcharts);
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
   styleUrls: ['./analyzer-highstock.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzerHighstockComponent implements OnChanges {
   @Input() series;
@@ -29,6 +30,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
+  @Input() navigator;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
@@ -44,7 +46,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -233,7 +235,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return navigatorDates;
   };
 
-  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>) {
+  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) {
     const chartSeries = [];
     series.forEach((serie, index) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
@@ -264,10 +266,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
-    const navDates = this.createNavigatorDates(dates);
     chartSeries.push({
-      data: navDates,
+      data: new Array(navigatorOptions.numberOfObservations).fill(null),
+      pointStart: Date.parse(navigatorOptions.dateStart),
+      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
+      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',
       yAxis: 0,
+      dataGrouping: {
+        enabled: false
+      },
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
@@ -386,6 +393,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
         afterSetExtremes: function () {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          if (this._extremes) {
+            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+          }
         }
       },
       minRange: 1000 * 3600 * 24 * 30 * 12,
@@ -400,10 +410,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     };
     this.chartOptions.series = series;
-  };
-
-  saveInstance(chartInstance) {
-    this.setTableExtremes(chartInstance);
   };
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
@@ -559,19 +565,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     let xMin = null, xMax = null;
     // Selected level data
     let selectedRange = null;
-    if (chartObject && chartObject.series) {
-      let series, seriesLength = 0;
-      const nav = chartObject.series.find(serie => serie.name === 'Navigator');
-      chartObject.series.forEach((serie) => {
-        if (!series || seriesLength < serie.points.length) {
-          seriesLength = serie.points.length;
-          series = serie;
-        }
-      });
-      selectedRange = nav ? nav.points : series ? series.points : null;
-    }
-    if (!selectedRange) {
-      return { min: null, max: null };
+    if (chartObject && chartObject.navigator) {
+      selectedRange = chartObject.navigator.baseSeries[0] ? chartObject.navigator.baseSeries[0].points : null;
     }
     if (selectedRange) {
       xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
@@ -579,10 +574,4 @@ export class AnalyzerHighstockComponent implements OnChanges {
       return { min: xMin, max: xMax };
     }
   };
-
-  updateExtremes(e) {
-    e.context._hasSetExtremes = true;
-    e.context._extremes = this.getChartExtremes(e.context);
-    this.setTableExtremes(e.context);
-  };
-}
+ }

@@ -15,8 +15,8 @@ export class DataPortalSettingsService {
         series0Name: 'level',
         series0Type: 'line',
         series0Data: true,
-        series1Name: '',
-        series1Type: '',
+        series1Name: 'c5ma',
+        series1Type: 'column',
         series1Data: false,
         setYAxes: true
       },

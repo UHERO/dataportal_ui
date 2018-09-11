@@ -1,4 +1,6 @@
 @import 'app_colors';
+@import '~ag-grid-community/dist/styles/ag-grid.css';
+@import '~ag-grid-community/dist/styles/ag-theme-balham.css';
 
 /* You can add global styles to this file, and also import other style files */
 html, body {
@@ -90,6 +92,10 @@ body {
   }
 
   .popover {
+    .arrow {
+      display: none;
+    }
+
     .popover-header {
       font-size: 0.85em;
       font-weight: bold;
