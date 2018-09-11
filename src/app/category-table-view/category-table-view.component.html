@@ -16,7 +16,7 @@
   <button class="csv-export-button" (click)="onExport()">Download CSV
     <i class="far fa-file-excel"></i>
   </button>
-  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" [gridAutoHeight]="true"
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
     [frameworkComponents]="frameworkComponents" [enableRtl]="true" (gridReady)="onGridReady($event)">
   </ag-grid-angular>
 </ng-template>

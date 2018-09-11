@@ -60,6 +60,10 @@
   }
 }
 
+.ag-body-viewport.ag-layout-auto-height {
+  overflow-y: hidden;
+}
+
 .csv-export-button {
   display: inline-block;
   background: none;

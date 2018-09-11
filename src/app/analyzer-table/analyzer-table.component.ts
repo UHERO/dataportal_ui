@@ -6,7 +6,7 @@ import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component'
-import { GridOptions } from 'ag-grid';
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
   selector: 'app-analyzer-table',
