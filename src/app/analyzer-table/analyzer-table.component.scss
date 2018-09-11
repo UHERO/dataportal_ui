@@ -36,7 +36,7 @@
   margin-bottom: 40px;
 }
 
-/* .ag-pinned-left-header {
+.ag-pinned-left-header {
   .ag-header-cell-text {
     display: none;
   }
@@ -58,7 +58,11 @@
   span {
     float: right;
   }
-} */
+}
+
+.ag-body-viewport.ag-layout-auto-height {
+  overflow-y: hidden;
+}
 
 .csv-export-button {
   display: inline-block;

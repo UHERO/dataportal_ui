@@ -6,7 +6,12 @@ a {
   direction: ltr;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 74%;
+  width: 100%;
+}
+
+span {
+  float: left;
+  width: 75%;
 }
 
 div.th-buttons {
@@ -27,7 +32,7 @@ div.th-buttons {
 
     .info-icon {
       font-size: 1.2em;
-      vertical-align: middle;
+      vertical-align: sub;
       margin-left: 5px;
     }
   }
