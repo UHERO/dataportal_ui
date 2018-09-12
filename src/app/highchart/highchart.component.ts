@@ -303,7 +303,6 @@ export class HighchartComponent implements OnChanges {
                   const otherSeriesLabel = pseudo + name + formattedValue;
                   const levelLabel = otherSeriesLabel + ' (' + unitsLabelShort + ') <br>';
                   s += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
-                  // s += pseudo + name + formattedValue;
                 }
                 if (point.x >= zone.value) {
                   s += label;

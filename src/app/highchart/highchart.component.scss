@@ -29,9 +29,14 @@
     }
   }
 
-  .highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
+  path.highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
     stroke: #7CB5EC;
+  }
+
+  path.highcharts-color-0.highcharts-point.pseudoHistory {
     color: #7CB5EC;
+    fill: #7CB5EC;
+    stroke: #7CB5EC;
     stroke-dasharray: 5;
   }
 
