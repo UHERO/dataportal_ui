@@ -118,12 +118,11 @@ export class UheroApiService {
     }
   }
 
-  fetchPackageSeries(id: number) {
+  fetchPackageSeries(id: number, catId?: number) {
     if (this.cachedPackageSeries[id]) {
       return Observable.of(this.cachedPackageSeries[id]);
     } else {
-      let series$ = this.http.get(`${this.baseUrl}/package/series?id=` + id + `&u=` + this.portal.universe, this.requestOptionsArgs)
-        .map(mapData)
+      let series$ = this.http.get(`${this.baseUrl}/package/series?id=` + id + `&u=` + this.portal.universe + `&cat=` + catId, this.requestOptionsArgs).map(mapData)
         .do(val => {
           this.cachedPackageSeries[id] = val;
           series$ = null;

@@ -83,11 +83,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
       const seriesId = Number.parseInt(params['id']);
+      let categoryId;
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
       }
-      if (params['category']) {
-        this.category = params['category'];
+      if (params['seriesCat']) {
+        categoryId = Number.parseInt(params['seriesCat']);
       }
       if (params['start']) {
         this.startDate = params['start'];
@@ -95,7 +96,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['end']) {
         this.endDate = params['end'];
       }
-      this.seriesData = this._series.getSeriesData(seriesId);
+      this.seriesData = this._series.getSeriesData(seriesId, categoryId);
     });
     this.cdRef.detectChanges();
   }

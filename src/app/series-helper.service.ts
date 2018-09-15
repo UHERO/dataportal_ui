@@ -20,7 +20,7 @@ export class SeriesHelperService {
     private _helper: HelperService
   ) { }
 
-  getSeriesData(id: number): Observable<any> {
+  getSeriesData(id: number, catId?: number): Observable<any> {
     let currentFreq, currentGeo, decimals;
     this.seriesData = {
       seriesDetail: {},
@@ -37,7 +37,7 @@ export class SeriesHelperService {
     };
     const dateArray = [];
     const analyzerSeries = this._analyzer.analyzerSeries;
-    this._uheroAPIService.fetchPackageSeries(id).subscribe((data) => {
+    this._uheroAPIService.fetchPackageSeries(id, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
       // Check if series is in the analyzer
       const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);

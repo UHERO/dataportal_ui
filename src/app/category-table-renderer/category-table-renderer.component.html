@@ -1,6 +1,6 @@
 <ng-template ngIf [ngIf]="params.data.lvlData">
   <span>
-    <a class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}" [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }"
+    <a class="{{params.data.seriesInfo.indent ? 'indent' + params.data.seriesInfo.indent : ''}}" [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam, seriesCat: params.data.categoryId }"
       queryParamsHandling='merge'>{{params.value}}</a>
   </span>
   <div class="th-buttons">
