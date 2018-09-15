@@ -31,6 +31,7 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   private id;
   private geo;
   private freq;
+  private seriesCat;
   private sa;
 
   private baseUrl;
@@ -54,6 +55,7 @@ export class ShareLinkComponent implements OnInit, OnChanges {
         this.geo = params['geo'] ? params['geo'] : null;
         this.freq = params['freq'] ? params['freq'] : null;
         this.sa = params['sa'] ? params['sa'] : null;
+        this.seriesCat = params['seriesCat'] ? params['seriesCat'] : null;
         this.shareLink = this.createSeriesShareLink();
       });
     }
@@ -117,6 +119,9 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     }
     if (this.freq) {
       seriesUrl += '&freq=' + this.freq;
+    }
+    if (this.seriesCat)  {
+      seriesUrl += '&seriesCat=' + this.seriesCat;
     }
     if (start) {
       seriesUrl += '&start=' + start;

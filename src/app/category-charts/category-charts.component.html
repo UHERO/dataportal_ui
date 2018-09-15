@@ -15,7 +15,7 @@
 	</ng-template>
 	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="!noSeries" class="multi-charts">
-			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam}" queryParamsHandling='merge'
+			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.seriesInfo.id, sa: serie.seriesInfo.saParam, seriesCat: sublist.parentId}" queryParamsHandling='merge'
 			 *ngIf="serie.seriesInfo.id" (click)="submitGAEvent(serie.seriesInfo.id)">
 				<app-highchart [minValue]="sublist.minValue" [maxValue]="sublist.maxValue" [portalSettings]="portalSettings" [chartStart]="chartStart"
 				 [chartEnd]="chartEnd" [seriesData]="serie" [categoryDates]="dates" [currentFreq]="freq"></app-highchart>

@@ -58,7 +58,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.formatLvlData(series, level, this.subcatIndex);
+          const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.sublist.parentId);
           this.rows.push(seriesData);
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy);
@@ -109,14 +109,15 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     return columns;
   }
 
-  formatLvlData = (series, level, subcatIndex) => {
+  formatLvlData = (series, level, subcatIndex, parentId) => {
     const { dates, values } = level;
     const seriesData = {
       series: series.seriesInfo.displayName,
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
-      subcatIndex: subcatIndex
+      subcatIndex: subcatIndex,
+      categoryId: parentId
     }
     dates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesInfo.decimals);
