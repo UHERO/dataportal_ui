@@ -39,14 +39,30 @@ export class AnalyzerHighstockComponent implements OnChanges {
   updateChart = false;
   chartObject;
 
-  constructor(private _analyzer: AnalyzerService) { }
+  constructor() { }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
+    console.log('changes', this)
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
+      console.log('yAxes', yAxes)
+    }
+    if (this.chartObject) {
+      const y0 = this.chartObject.get('yAxis0');
+      const y1 = this.chartObject.get('yAxis1');
+      if (y0) {
+        y0.remove();
+      }
+      if (y1) {
+        y1.remove();
+      }
+      yAxes.forEach((y) => {
+        console.log('y', y)
+        this.chartObject.addAxis(y);
+      })
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -64,6 +80,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const yAxes = [];
     // Group series by their units
     const unitGroups = this.groupByUnits(series);
+    console.log('unit groups', unitGroups)
     // Create y-axis groups based on units available
     // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
     // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
@@ -89,10 +106,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       });
     });
     return yAxes;
-  }
-
-  addSeriesToChart = (chart, series) => {
-    chart.addSeries(series);
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -121,6 +134,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       const minValue = Math.min(...level);
       yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
       this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
+      console.log('yAxesGroups', yAxesGroups)
       return yAxesGroups;
     }
     if (unitGroups.length > 1) {
@@ -214,10 +228,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
       obj[serie.seriesDetail.unitsLabelShort].push(serie);
       return obj;
     }, {});
-
     const groups = Object.keys(units).map((key) => {
       return { units: key, series: units[key] };
     });
+    console.log('groups', groups)
     return groups;
   };
 
@@ -237,13 +251,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
 
   formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) {
     const chartSeries = [];
-    series.forEach((serie, index) => {
+    series.forEach((serie) => {
+      console.log('yAxes', yAxes)
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
+      console.log('axis', axis)
       chartSeries.push({
         className: serie.seriesDetail.id,
         name: serie.chartDisplayName,
         data: serie.chartData.level,
-        yAxis: axis ? axis.id : null,
+        //yAxis: axis ? axis.id : null,
         pointStart: Date.parse(serie.chartData.dates[0].date),
         pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : 1,
         pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : 'month',
@@ -266,6 +282,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         pseudoZones: serie.chartData.pseudoZones
       });
     });
+    console.log('chartSeries', chartSeries)
     chartSeries.push({
       data: new Array(navigatorOptions.numberOfObservations).fill(null),
       pointStart: Date.parse(navigatorOptions.dateStart),
@@ -292,6 +309,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
     const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
     const tableExtremes = this.tableExtremes;
+    const chartComponent = this;
     this.chartOptions.chart = {
       alignTicks: false,
       events: {
@@ -300,6 +318,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
           }
+        },
+        load: function() {
+          console.log('load', this) // expose chart object to component in order to  properly add and remove axes
+          chartComponent.chartObject = this;
         }
       },
       description: undefined,
@@ -403,6 +425,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false
     };
+    console.log('yAxis', yAxis)
     this.chartOptions.yAxis = yAxis;
     this.chartOptions.plotOptions = {
       series: {
