@@ -38,12 +38,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
-
   constructor() { }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
-    console.log('changes', this)
+    console.log('changes', this.chartObject)
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
@@ -51,14 +50,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       console.log('yAxes', yAxes)
     }
     if (this.chartObject) {
-      const y0 = this.chartObject.get('yAxis0');
-      const y1 = this.chartObject.get('yAxis1');
-      if (y0) {
-        y0.remove();
-      }
-      if (y1) {
-        y1.remove();
-      }
       yAxes.forEach((y) => {
         console.log('y', y)
         this.chartObject.addAxis(y);
@@ -74,6 +65,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
     }
+  }
+
+  chartCallback = (chart) => {
+    console.log('chartCallback', chart);
+    this.chartObject = chart;
   }
 
   setYAxes = (series) => {
@@ -318,10 +314,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
           }
-        },
-        load: function() {
-          console.log('load', this) // expose chart object to component in order to  properly add and remove axes
-          chartComponent.chartObject = this;
         }
       },
       description: undefined,
