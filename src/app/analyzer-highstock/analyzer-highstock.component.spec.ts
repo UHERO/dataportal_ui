@@ -14,6 +14,7 @@ class ChartStubComponent {
   @Input() options;
   @Input() update;
   @Input() navigator;
+  @Input() callbackFunction;
 }
  
 describe('AnalyzerHighstockComponent', () => {
