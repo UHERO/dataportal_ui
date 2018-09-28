@@ -115,9 +115,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return chartButtons;
   };
 
-  setYAxesGroups(unitGroups) {
+  setYAxesGroups = (unitGroups) => {
     // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
-    const yAxesGroups = [];
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
@@ -126,71 +125,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
       const level = maxValueSeries.chartData.level;
       const maxValue = Math.max(...level);
       const minValue = Math.min(...level);
-      yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
-      this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
-      return yAxesGroups;
+      return this.checkMaxValues(unit, minValue, maxValue);
     }
     if (unitGroups.length > 1) {
-      unitGroups.forEach((unit, unitIndex) => {
-        yAxesGroups.push({ axisId: 'yAxis' + unitIndex, units: unit.units, series: unit.series });
+      return unitGroups.map((unit, index) => {
+        return { axisId: 'yAxis' + index, units: unit.units, series: unit.series };
       });
-      return yAxesGroups;
     }
   };
 
-  findMaxLevelSeries(unit) {
-    let maxLevelValue, maxValueSeries;
-    unit.series.forEach((s) => {
-      const max = Math.max(...s.chartData.level);
-      if (!maxLevelValue || max > maxLevelValue) {
-        maxLevelValue = max;
-        maxValueSeries = s;
-      }
-    });
-    return maxValueSeries;
-  };
-
-  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
-  isOverlapSufficient(level, baseMin, baseMax) {
-    const sufficientOverlap = 0.5;
-    const overlap = this.calculateOverlap(level, baseMin, baseMax);
-    return overlap >= sufficientOverlap;
-  };
-
-  calculateOverlap(level, baseMin, baseMax) {
-    const newMin = Math.min(...level);
-    const newMax = Math.max(...level);
-    const baseRange = baseMax - baseMin;
-    const newRange = newMax - newMin;
-    const baseMaxNewMin = baseMax - newMin;
-    const newMaxBaseMin = newMax - baseMin;
-    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
-  };
-
-  findHighestOverlap(yAxesGroups, baseMin, baseMax) {
-    const y0Series = yAxesGroups[0].series;
-    const y1Series = yAxesGroups[1].series;
-    let highestOverlap, highestOverlapAxis;
-    y0Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y0Series;
-      }
-    });
-    y1Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y1Series;
-      }
-    });
-    return highestOverlapAxis;
-  };
-
-  checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
+  checkMaxValues = (unit, baseMin, baseMax) => {
+  const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
@@ -215,7 +160,59 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return yAxesGroups;
   };
 
-  groupByUnits(series) {
+  findMaxLevelSeries = (unit) => {
+    let maxLevelValue, maxValueSeries;
+    unit.series.forEach((s) => {
+      const max = Math.max(...s.chartData.level);
+      if (!maxLevelValue || max > maxLevelValue) {
+        maxLevelValue = max;
+        maxValueSeries = s;
+      }
+    });
+    return maxValueSeries;
+  };
+
+  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
+  isOverlapSufficient = (level, baseMin, baseMax) => {
+    const sufficientOverlap = 0.5;
+    const overlap = this.calculateOverlap(level, baseMin, baseMax);
+    return overlap >= sufficientOverlap;
+  };
+
+  calculateOverlap = (level, baseMin, baseMax) => {
+    const newMin = Math.min(...level);
+    const newMax = Math.max(...level);
+    const baseRange = baseMax - baseMin;
+    const newRange = newMax - newMin;
+    const baseMaxNewMin = baseMax - newMin;
+    const newMaxBaseMin = newMax - baseMin;
+    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
+  };
+
+  findHighestOverlap = (yAxesGroups, baseMin, baseMax) => {
+    const y0Series = yAxesGroups[0].series;
+    const y1Series = yAxesGroups[1].series;
+    let highestOverlap, highestOverlapAxis;
+    y0Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y0Series;
+      }
+    });
+    y1Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y1Series;
+      }
+    });
+    return highestOverlapAxis;
+  };
+
+  groupByUnits = (series) => {
     const units = series.reduce((obj, serie) => {
       obj[serie.seriesDetail.unitsLabelShort] = obj[serie.seriesDetail.unitsLabelShort] || [];
       obj[serie.seriesDetail.unitsLabelShort].push(serie);
@@ -227,7 +224,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return groups;
   };
 
-  createNavigatorDates(dates) {
+  createNavigatorDates = (dates) => {
     // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
     const uniqueDates = dates.filter((date, index, self) =>
       self.findIndex(d => d.date === date.date) === index
@@ -241,7 +238,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return navigatorDates;
   };
 
-  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) {
+  formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) => {
     const chartSeries = series.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       return {

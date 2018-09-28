@@ -78,11 +78,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
-    this.summaryRows.forEach((statRow) => {
-      const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
-      statRow.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
-    });
+    if (this.minDate && this.maxDate) {
+      this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
+      this.summaryRows.forEach((statRow) => {
+        const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
+        statRow.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
+      });
+      // Check if the summary statistics for a series has NA values
+      this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
+    }
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
@@ -102,8 +106,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(c5maData)
       }
     });
-    // Check if the summary statistics for a series has NA values
-    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
   }
 
   setSummaryStatColumns = () => {
