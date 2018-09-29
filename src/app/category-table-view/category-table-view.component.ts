@@ -83,6 +83,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
+      width: 275,
       cellRenderer: "categoryTableRenderer",
       tooltip: function (params) {
         return params.value;

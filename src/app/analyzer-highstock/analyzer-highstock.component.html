@@ -2,7 +2,7 @@
     <i class="material-icons">&#xE001;</i> {{alertMessage}}
 </div>
 <highcharts-chart id="analyzer-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
-    [(update)]="updateChart"></highcharts-chart>
+    [(update)]="updateChart" [callbackFunction]="chartCallback"></highcharts-chart>
 <div class="customize-tooltip">
     <p>Tooltip Display:</p>
     <label class="form-check-inline">

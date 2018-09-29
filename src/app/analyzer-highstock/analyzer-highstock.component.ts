@@ -38,8 +38,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
-
-  constructor(private _analyzer: AnalyzerService) { }
+  constructor() { }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
@@ -47,6 +46,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
+    }
+    if (this.chartObject) {
+      // If the chart has already been drawn, check to see if another y-axis needs to be added
+      yAxes.forEach((y) => {
+        const axisExists = this.chartObject.yAxis.findIndex(a => a.userOptions.id === y.id)
+        if (axisExists === -1) {
+          this.chartObject.addAxis(y);
+        }
+      });
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -60,8 +68,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     }
   }
 
+  chartCallback = (chart) => {
+    this.chartObject = chart;
+  }
+
   setYAxes = (series) => {
-    const yAxes = [];
     // Group series by their units
     const unitGroups = this.groupByUnits(series);
     // Create y-axis groups based on units available
@@ -69,8 +80,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
     // If yes, draw series on separate y axes
     const yAxesGroups = this.setYAxesGroups(unitGroups);
-    yAxesGroups.forEach((axis, index) => {
-      yAxes.push({
+    const yAxes = yAxesGroups.map((axis, index) => {
+      return {
         labels: {
           formatter: function () {
             return Highcharts.numberFormat(this.value, 2, '.', ',');
@@ -86,13 +97,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
         minTickInterval: 0.01,
         series: axis.series,
         showEmpty: false
-      });
+      }
     });
     return yAxes;
-  }
-
-  addSeriesToChart = (chart, series) => {
-    chart.addSeries(series);
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -108,9 +115,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return chartButtons;
   };
 
-  setYAxesGroups(unitGroups) {
+  setYAxesGroups = (unitGroups) => {
     // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
-    const yAxesGroups = [];
     if (unitGroups.length === 1) {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
@@ -119,71 +125,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
       const level = maxValueSeries.chartData.level;
       const maxValue = Math.max(...level);
       const minValue = Math.min(...level);
-      yAxesGroups.push({ axisId: 'yAxis0', units: unit.units, series: [] });
-      this.checkMaxValues(unit, minValue, maxValue, yAxesGroups);
-      return yAxesGroups;
+      return this.checkMaxValues(unit, minValue, maxValue);
     }
     if (unitGroups.length > 1) {
-      unitGroups.forEach((unit, unitIndex) => {
-        yAxesGroups.push({ axisId: 'yAxis' + unitIndex, units: unit.units, series: unit.series });
+      return unitGroups.map((unit, index) => {
+        return { axisId: 'yAxis' + index, units: unit.units, series: unit.series };
       });
-      return yAxesGroups;
     }
   };
 
-  findMaxLevelSeries(unit) {
-    let maxLevelValue, maxValueSeries;
-    unit.series.forEach((s) => {
-      const max = Math.max(...s.chartData.level);
-      if (!maxLevelValue || max > maxLevelValue) {
-        maxLevelValue = max;
-        maxValueSeries = s;
-      }
-    });
-    return maxValueSeries;
-  };
-
-  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
-  isOverlapSufficient(level, baseMin, baseMax) {
-    const sufficientOverlap = 0.5;
-    const overlap = this.calculateOverlap(level, baseMin, baseMax);
-    return overlap >= sufficientOverlap;
-  };
-
-  calculateOverlap(level, baseMin, baseMax) {
-    const newMin = Math.min(...level);
-    const newMax = Math.max(...level);
-    const baseRange = baseMax - baseMin;
-    const newRange = newMax - newMin;
-    const baseMaxNewMin = baseMax - newMin;
-    const newMaxBaseMin = newMax - baseMin;
-    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
-  };
-
-  findHighestOverlap(yAxesGroups, baseMin, baseMax) {
-    const y0Series = yAxesGroups[0].series;
-    const y1Series = yAxesGroups[1].series;
-    let highestOverlap, highestOverlapAxis;
-    y0Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y0Series;
-      }
-    });
-    y1Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y1Series;
-      }
-    });
-    return highestOverlapAxis;
-  };
-
-  checkMaxValues(unit, baseMin, baseMax, yAxesGroups) {
+  checkMaxValues = (unit, baseMin, baseMax) => {
+  const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
@@ -208,20 +160,71 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return yAxesGroups;
   };
 
-  groupByUnits(series) {
+  findMaxLevelSeries = (unit) => {
+    let maxLevelValue, maxValueSeries;
+    unit.series.forEach((s) => {
+      const max = Math.max(...s.chartData.level);
+      if (!maxLevelValue || max > maxLevelValue) {
+        maxLevelValue = max;
+        maxValueSeries = s;
+      }
+    });
+    return maxValueSeries;
+  };
+
+  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
+  isOverlapSufficient = (level, baseMin, baseMax) => {
+    const sufficientOverlap = 0.5;
+    const overlap = this.calculateOverlap(level, baseMin, baseMax);
+    return overlap >= sufficientOverlap;
+  };
+
+  calculateOverlap = (level, baseMin, baseMax) => {
+    const newMin = Math.min(...level);
+    const newMax = Math.max(...level);
+    const baseRange = baseMax - baseMin;
+    const newRange = newMax - newMin;
+    const baseMaxNewMin = baseMax - newMin;
+    const newMaxBaseMin = newMax - baseMin;
+    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
+  };
+
+  findHighestOverlap = (yAxesGroups, baseMin, baseMax) => {
+    const y0Series = yAxesGroups[0].series;
+    const y1Series = yAxesGroups[1].series;
+    let highestOverlap, highestOverlapAxis;
+    y0Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y0Series;
+      }
+    });
+    y1Series.forEach((s) => {
+      const level = s.chartData.level;
+      const overlap = this.calculateOverlap(level, baseMin, baseMax);
+      if (!highestOverlap || overlap >= highestOverlap) {
+        highestOverlap = overlap;
+        highestOverlapAxis = y1Series;
+      }
+    });
+    return highestOverlapAxis;
+  };
+
+  groupByUnits = (series) => {
     const units = series.reduce((obj, serie) => {
       obj[serie.seriesDetail.unitsLabelShort] = obj[serie.seriesDetail.unitsLabelShort] || [];
       obj[serie.seriesDetail.unitsLabelShort].push(serie);
       return obj;
     }, {});
-
     const groups = Object.keys(units).map((key) => {
       return { units: key, series: units[key] };
     });
     return groups;
   };
 
-  createNavigatorDates(dates) {
+  createNavigatorDates = (dates) => {
     // Dates include duplicates when annual is mixed with higher frequencies, causes highcharts error
     const uniqueDates = dates.filter((date, index, self) =>
       self.findIndex(d => d.date === date.date) === index
@@ -235,11 +238,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return navigatorDates;
   };
 
-  formatSeriesData(series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) {
-    const chartSeries = [];
-    series.forEach((serie, index) => {
+  formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) => {
+    const chartSeries = series.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
-      chartSeries.push({
+      return {
         className: serie.seriesDetail.id,
         name: serie.chartDisplayName,
         data: serie.chartData.level,
@@ -264,13 +266,17 @@ export class AnalyzerHighstockComponent implements OnChanges {
           enabled: false
         },
         pseudoZones: serie.chartData.pseudoZones
-      });
+      };
     });
     chartSeries.push({
+      className: 'navigator',
       data: new Array(navigatorOptions.numberOfObservations).fill(null),
       pointStart: Date.parse(navigatorOptions.dateStart),
       pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
       pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',
+      decimals: null,
+      frequency: null,
+      geography: null,
       yAxis: 0,
       dataGrouping: {
         enabled: false
@@ -278,7 +284,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
       showInLegend: false,
       showInNavigator: true,
       includeInCSVExport: false,
-      name: 'Navigator'
+      name: 'Navigator',
+      events: {
+        legendItemClick: function () {
+          return false;
+        }
+      },
+      unitsLabelShort: null,
+      seasonallyAdjusted: null,
+      pseudoZones: null
     });
     return chartSeries;
   };
@@ -574,4 +588,4 @@ export class AnalyzerHighstockComponent implements OnChanges {
       return { min: xMin, max: xMax };
     }
   };
- }
+}
