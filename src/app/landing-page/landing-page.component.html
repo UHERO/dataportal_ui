@@ -8,7 +8,7 @@
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
 				<ul class="content-links" *ngIf="data.subcategories.length > 1" [attr.id]="'id_' + sub.id">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
-						<a [routerLink]="['/category']" [fragment]="sub.id" [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
+						<a [routerLink]="['/category']" [fragment]="'id_' + sub.id" [queryParams]="queryParams" [class.current-sub]="subInd === i">{{sub.name}}</a>
 					</li>
 				</ul>
 				<hr class="sublist-separator" *ngIf="data.subcategories.length > 1">

@@ -195,7 +195,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.fragment = subId === 'search' ? null : subId;
+    this.fragment = subId === 'search' ? null : 'id_' + subId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
@@ -203,7 +203,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   scrollTo(): void {
     this.route.fragment.subscribe((frag) => {
-      const el = document.querySelector('#id_' + frag);
+      const el = document.querySelector('#' + frag);
       if (el) {
         el.scrollIntoView();
         const scrolledY = window.scrollY;

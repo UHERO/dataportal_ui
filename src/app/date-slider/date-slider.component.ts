@@ -29,7 +29,7 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
     this.sliderDates = this.dates.map(date => date.tableDate);
     const that = this;
     const freq = this.freq;
-    $('#' + this.subCat.id).ionRangeSlider({
+    $('#slider_' + this.subCat.id).ionRangeSlider({
       min: 0,
       from: this.start,
       to: this.end,
@@ -66,7 +66,7 @@ export class DateSliderComponent implements OnChanges, AfterViewInit {
 
   updateOtherSliders(sublist, subcatId, from, to) {
     sublist.forEach((sub) => {
-      const slider = sub.id !== subcatId ? $('#' + sub.id).data('ionRangeSlider') : null;
+      const slider = sub.id !== subcatId ? $('#slider_' + sub.id).data('ionRangeSlider') : null;
       if (slider) {
         slider.update({
           from: from,
