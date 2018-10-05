@@ -112,7 +112,12 @@ export class SidebarNavComponent implements OnInit {
         units: null,
         geography: null
       };
-      this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + subId });
+      if (subId) {
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + subId });
+      }
+      if (!subId) {
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
+      }
       this.loading = false;
     }, 15);
   }
