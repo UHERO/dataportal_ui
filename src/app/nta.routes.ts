@@ -34,4 +34,4 @@ const routes: Routes = [
   }
 ];
 
-export const routing = RouterModule.forRoot(routes, { useHash: true });
+export const routing = RouterModule.forRoot(routes, { useHash: true, anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled', scrollOffset: [0, 75] });

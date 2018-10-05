@@ -12,8 +12,8 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
 					<div class="dropdown-menu">
-						<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item" [routerLink]="['/category']" [fragment]="sub.id"
-						 [queryParams]="queryParams" (click)="scrollTo()" [class.current-sub]="subInd === i">{{sub.name}}</a>
+						<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item" [routerLink]="['/category']" [fragment]="'id_' + sub.id"
+						 [queryParams]="queryParams" [class.current-sub]="subInd === i">{{sub.name}}</a>
 					</div>
 				</li>
 			</ul>

@@ -161,7 +161,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
 
   scrollTo(): void {
     this.route.fragment.subscribe((frag) => {
-      const el = document.querySelector('#id_' + frag);
+      const el = document.querySelector('#' + frag);
       if (el) {
         el.scrollIntoView();
         const scrolledY = window.scrollY;

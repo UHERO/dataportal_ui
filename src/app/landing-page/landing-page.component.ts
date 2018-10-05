@@ -203,7 +203,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   scrollTo(): void {
     this.route.fragment.subscribe((frag) => {
-      const el = document.querySelector('#id_' + frag);
+      const el = document.querySelector('#' + frag);
       if (el) {
         el.scrollIntoView();
         const scrolledY = window.scrollY;
