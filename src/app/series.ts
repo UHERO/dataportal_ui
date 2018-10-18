@@ -1,4 +1,4 @@
-import {Geography} from './geography';
+import { Geography } from './geography';
 
 export interface Series {
   id: string;
@@ -16,6 +16,10 @@ export interface Series {
   geography: Geography;
   geoFreqs: Array<any>;
   geos?: Array<any>;
+  seriesObservations?: {
+    observationStart: string,
+    observationEnd: string
+  };
   seasonalAdjustment: string;
   source?: string;
   sourceDescription?: string;

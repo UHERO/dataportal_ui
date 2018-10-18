@@ -151,6 +151,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
+    console.log('this.end', this.end)
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
@@ -185,7 +186,6 @@ export class HighstockComponent implements OnChanges {
       }
     }
 
-
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -195,10 +195,13 @@ export class HighstockComponent implements OnChanges {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
+          console.log('seriesDetail', seriesDetail)
           const extremes = getChartExtremes(this.chartObject);
+          const lastDate = seriesDetail.seriesObservations.observationEnd;
+          console.log('extremes', extremes)
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-            chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max })
+            chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max, endOfSample: lastDate === extremes.max ? true : false })
           }
         }
       }
