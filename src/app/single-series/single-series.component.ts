@@ -102,7 +102,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries(siblings: Array<any>, freq: string, geo: string, sa: boolean) {
+  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean) => {
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
@@ -132,7 +132,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
-    this.chartEnd = e.endOfSample ? null : e.maxDate;
+    this.chartEnd = e.endOfSample ? null : e.maxDate.substr(0, 4);
   }
 
   // Update table when selecting new ranges in the chart

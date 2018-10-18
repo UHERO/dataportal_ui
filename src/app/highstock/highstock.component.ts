@@ -150,8 +150,20 @@ export class HighstockComponent implements OnChanges {
     return series;
   }
 
-  drawChart(chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) {
-    console.log('this.end', this.end)
+  setEndDate = (end: string, chartRange, chartData: HighchartChartData) => {
+    // Check if end is only a year. This should occur when switching between geos/freqs for a particular series.
+    // (Ex: If the max date selected in an annual series is 2015, switching to the quarterly frequency should select up to 2015 Q4 rather than 2015 Q1)
+    if (end && end.length === 4) {
+      const dateExists = chartData.dates.slice().reverse().find(date => date.date.includes(end));
+      return dateExists ? dateExists.date : null;
+    }
+    if (end && end.length !== 4) {
+      return end;
+    }
+    return chartRange ? chartRange.end : null;
+  }
+
+  drawChart = (chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) => {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
@@ -162,7 +174,7 @@ export class HighstockComponent implements OnChanges {
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
-    const endDate = this.end ? this.end : chartRange ? chartRange.end : null;
+    const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
@@ -180,6 +192,7 @@ export class HighstockComponent implements OnChanges {
         return { min: null, max: null };
       }
       if (selectedRange.length) {
+        console.log('selectedRange', selectedRange)
         xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
         xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
         return { min: xMin, max: xMax };
@@ -195,10 +208,8 @@ export class HighstockComponent implements OnChanges {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
-          console.log('seriesDetail', seriesDetail)
           const extremes = getChartExtremes(this.chartObject);
           const lastDate = seriesDetail.seriesObservations.observationEnd;
-          console.log('extremes', extremes)
           if (extremes) {
             tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
             chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max, endOfSample: lastDate === extremes.max ? true : false })
