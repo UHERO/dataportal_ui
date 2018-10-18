@@ -59,7 +59,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
     if (selectedAnalyzerSeries) {
-      this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons);
+      this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons, this.navigator);
       this.updateChart = true;
     }
     // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
@@ -297,7 +297,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     return chartSeries;
   };
 
-  initChart = (series, yAxis, portalSettings, buttons) => {
+  initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
@@ -415,7 +415,33 @@ export class AnalyzerHighstockComponent implements OnChanges {
       minRange: 1000 * 3600 * 24 * 30 * 12,
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
-      ordinal: false
+      ordinal: false,
+      labels: {
+        formatter: function () {
+          const getQLabel = function (month) {
+            if (month === 'Jan') {
+              return 'Q1 ';
+            }
+            if (month === 'Apr') {
+              return 'Q2 ';
+            }
+            if (month === 'Jul') {
+              return 'Q3 ';
+            }
+            if (month === 'Oct') {
+              return 'Q4 ';
+            }
+          };
+          let s = '';
+          const month = Highcharts.dateFormat('%b', this.value);
+          const frequency = navigatorOptions.frequency;
+          const first = Highcharts.dateFormat('%Y', this.axis.userMin);
+          const last = Highcharts.dateFormat('%Y', this.axis.userMax);
+          s = ((last - first) <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
+          s = s + Highcharts.dateFormat('%Y', this.value);
+          return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
+        }
+      }
     };
     this.chartOptions.yAxis = yAxis;
     this.chartOptions.plotOptions = {
@@ -434,20 +460,20 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
       if (frequency === 'Q') {
         if (Highcharts.dateFormat('%b', date) === 'Jan') {
-          return ' Q1';
+          return 'Q1 ';
         }
         if (Highcharts.dateFormat('%b', date) === 'Apr') {
-          return ' Q2';
+          return 'Q2 ';
         }
         if (Highcharts.dateFormat('%b', date) === 'Jul') {
-          return ' Q3';
+          return 'Q3 ';
         }
         if (Highcharts.dateFormat('%b', date) === 'Oct') {
-          return ' Q4';
+          return 'Q4 ';
         }
       }
       if (frequency === 'M' || frequency === 'S') {
-        return ' ' + Highcharts.dateFormat('%b', date);
+        return Highcharts.dateFormat('%b', date) + ' ';
       }
     };
     const filterFrequency = function (chartSeries: Array<any>, freq: string) {
@@ -507,7 +533,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
         // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
         const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
         if (obsDate) {
-          const qDate = Highcharts.dateFormat('%Y', obsDate.x) + ' ' + pointQuarter;
+          const qDate = pointQuarter + ' ' + Highcharts.dateFormat('%Y', obsDate.x);
           label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');
         }
       });
@@ -543,7 +569,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
           tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
         }
       }
-      const dateLabel = Highcharts.dateFormat('%Y', x) + getFreqLabel(point.series.userOptions.frequency, point.x);
+      const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x) + Highcharts.dateFormat('%Y', x);
       tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
