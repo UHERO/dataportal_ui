@@ -117,8 +117,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       };
       this.startDate = this.chartStart;
       this.endDate = this.chartEnd;
-      console.log('goToSeries startDate', this.startDate);
-      console.log('goToSeries endDate', this.endDate)
       this._router.navigate(['/series/'], { queryParams: queryParams, queryParamsHandling: 'merge' });
     } else {
       this.noSelection = 'Selection Not Available';
