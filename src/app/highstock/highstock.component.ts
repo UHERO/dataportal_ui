@@ -54,7 +54,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   // Gets buttons used in Highstock Chart
-  formatChartButtons(freq: string, buttons: Array<any>) {
+  formatChartButtons = (freq: string, buttons: Array<any>) => {
     const chartButtons = buttons.reduce((allButtons, button) => {
       if (freq === 'A') {
         // Do not display 1Year button for series with an annual frequency
@@ -76,7 +76,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   // Labels used for metadata in CSV download
-  formatChartLabels(seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) {
+  formatChartLabels = (seriesDetail: Series, portalSettings, geo: Geography, freq: Frequency) => {
     const labelItems = [{
       html: seriesDetail.sourceDescription
     }, {
@@ -95,7 +95,7 @@ export class HighstockComponent implements OnChanges {
     return { items: labelItems, style: { display: 'none' } };
   }
 
-  formatChartSeries(chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) {
+  formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) => {
     const series0 = chartData[portalSettings.highstock.series0Name];
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
@@ -178,26 +178,8 @@ export class HighstockComponent implements OnChanges {
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
-    const formatTooltip = (args, points, x, pseudoZones, decimals, freq) => this.formatTooltip(args, points, x, pseudoZones, decimals, freq);
-    const getChartExtremes = (chartObject) => {
-      // Gets range of x values to emit
-      // Used to redraw table in the single series view
-      let xMin, xMax;
-      // Selected level data
-      let selectedRange = null;
-      if (chartObject.series[0].points) {
-        selectedRange = chartObject.series[0].points;
-      }
-      if (!chartObject.series[0].points.length) {
-        return { min: null, max: null };
-      }
-      if (selectedRange.length) {
-        console.log('selectedRange', selectedRange)
-        xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-        xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-        return { min: xMin, max: xMax };
-      }
-    }
+    const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
+    const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -207,12 +189,6 @@ export class HighstockComponent implements OnChanges {
         render: function () {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
-          }
-          const extremes = getChartExtremes(this.chartObject);
-          const lastDate = seriesDetail.seriesObservations.observationEnd;
-          if (extremes) {
-            tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-            chartExtremes.emit({ minDate: extremes.min, maxDate: extremes.max, endOfSample: lastDate === extremes.max ? true : false })
           }
         }
       }
@@ -269,15 +245,24 @@ export class HighstockComponent implements OnChanges {
       borderWidth: 0,
       shadow: false,
       formatter: function (args) {
-        return formatTooltip(args, this.points, this.x, pseudoZones, decimals, freq)
+        return formatTooltip(this.points, this.x, pseudoZones, decimals, freq)
       }
     };
     this.chartOptions.credits = { enabled: false };
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes: function () {
+          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
+          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          this._selectedMin = freq.freq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
+          this._selectedMax = freq.freq === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          const lastDate = seriesDetail.seriesObservations.observationEnd;
+          if (this._extremes) {
+            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+            chartExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
+          }
         }
       },
       minRange: 1000 * 3600 * 24 * 30 * 12,
@@ -347,7 +332,37 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.series = series;
   }
 
-  formatTooltip(args, points, x, pseudoZones, decimals, freq) {
+  getChartExtremes = (chartObject) => {
+    // Gets range of x values to emit
+    // Used to redraw table in the single series view
+    let selectedRange = null;
+    if (!chartObject.series[0].points) {
+      return { min: null, max: null };
+    }
+    if (chartObject.series[0].points) {
+      selectedRange = chartObject.series[0].points;
+    }
+    if (selectedRange.length && chartObject._selectedMin && chartObject._selectedMax) {
+      return this.findVisibleMinMax(selectedRange, chartObject);
+    }
+  };
+
+  findVisibleMinMax = (selectedRange, chartObject) => {
+    let maxCounter = selectedRange.length - 1;
+    let minCounter = 0;
+    let xMin, xMax;
+    while (!xMax || xMax > chartObject._selectedMax) {
+      xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
+      maxCounter--;
+    }
+    while (!xMin || xMin < chartObject._selectedMin) {
+      xMin = new Date(selectedRange[minCounter].x).toISOString().split('T')[0];
+      minCounter++;
+    }
+    return { min: xMin, max: xMax };
+  }
+
+  formatTooltip = (points, x, pseudoZones, decimals, freq) => {
     const getFreqLabel = function (frequency, date) {
       if (frequency === 'A') {
         return '';
@@ -395,33 +410,9 @@ export class HighstockComponent implements OnChanges {
       }
     });
     return s;
-  }
+  };
 
-  updateExtremes(e) {
-    e.context._hasSetExtremes = true;
-    e.context._extremes = this.getChartExtremes(e.context);
-  }
-
-  getChartExtremes(chartObject) {
-    // Gets range of x values to emit
-    // Used to redraw table in the single series view
-    let xMin, xMax;
-    // Selected level data
-    let selectedRange = null;
-    if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
-    }
-    if (!chartObject.series[0].points.length) {
-      return { min: null, max: null };
-    }
-    if (selectedRange.length) {
-      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-      return { min: xMin, max: xMax };
-    }
-  }
-
-  getSelectedChartRange(userStart, userEnd, dates, defaults) {
+  getSelectedChartRange = (userStart, userEnd, dates, defaults) => {
     const defaultEnd = defaults.end ? defaults.end : new Date(dates[dates.length - 1].date).toISOString().substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
     while (new Date(dates[counter].date).toISOString().substr(0, 4) > defaultEnd) {
