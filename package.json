@@ -44,7 +44,7 @@
     "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.5.4",
     "highcharts": "^6.1.1",
-    "highcharts-angular": "^2.0.1",
+    "highcharts-angular": "^2.3.1",
     "highcharts-export-csv": "^1.4.3",
     "ion-rangeslider": "^2.1.7",
     "ng-recaptcha": "4.0.0-beta.1",
