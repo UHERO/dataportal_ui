@@ -5,6 +5,7 @@ import { AnalyzerHighstockComponent } from './analyzer-highstock.component';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
+import { HighstockHelperService } from '../highstock-helper.service';
 
 // Create stub for chart component
 @Component({selector: 'highcharts-chart', template: ''})
@@ -28,6 +29,7 @@ describe('AnalyzerHighstockComponent', () => {
         AnalyzerService,
         UheroApiService,
         HelperService,
+        HighstockHelperService,
         { provide: 'rootCategory', useValue: 59 },
         {
           provide: 'portal',

@@ -21,6 +21,7 @@
     [gridOptions]="statGridOptions" [frameworkComponents]="frameworkComponents">
   </ag-grid-angular>
 </ng-template>
+<p>Scroll to the right for additional statistics</p>
 <p *ngIf="missingSummaryStat" class="stat-warning">
   <i class="material-icons text-danger">&#xE001;</i> The following series contain N/As due to missing values included in the selected range:
   <ng-template ngFor let-serie [ngForOf]="summaryRows">

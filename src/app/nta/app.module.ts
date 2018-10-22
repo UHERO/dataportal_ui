@@ -16,6 +16,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 import { TableHelperService } from '../table-helper.service';
 import { HelpService } from '../help.service';
 import { AnalyzerService } from '../analyzer.service';
+import { HighstockHelperService } from '../highstock-helper.service';
 import { AppComponent } from '../app.component';
 import { NtaHelpComponent } from '../nta-help/nta-help.component';
 import { NtaLayoutComponent } from './nta-layout/nta-layout.component';
@@ -55,6 +56,7 @@ import { ClipboardService } from '../clipboard.service';
     GoogleAnalyticsEventsService,
     HelpService,
     ClipboardService,
+    HighstockHelperService,
     Title,
     {
       provide: 'rootCategory',

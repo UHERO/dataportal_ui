@@ -2,6 +2,7 @@ import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation, C
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
+import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
 declare var require: any;
@@ -38,7 +39,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
-  constructor() { }
+  constructor(private _highstockHelper: HighstockHelperService) { }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
@@ -304,18 +305,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
     const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
+    const getChartExtremes = (chartObject) => this._highstockHelper.getChartExtremes(chartObject);
+    const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
     const tableExtremes = this.tableExtremes;
     this.chartOptions.chart = {
       alignTicks: false,
-      events: {
-        render: function () {
-          const extremes = getChartExtremes(this);
-          if (extremes) {
-            tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-          }
-        }
-      },
       description: undefined,
       zoomType: 'x'
     };
@@ -405,6 +399,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes: function () {
+          const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
+          const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
+          this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
@@ -418,28 +416,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       ordinal: false,
       labels: {
         formatter: function () {
-          const getQLabel = function (month) {
-            if (month === 'Jan') {
-              return 'Q1 ';
-            }
-            if (month === 'Apr') {
-              return 'Q2 ';
-            }
-            if (month === 'Jul') {
-              return 'Q3 ';
-            }
-            if (month === 'Oct') {
-              return 'Q4 ';
-            }
-          };
-          let s = '';
-          const month = Highcharts.dateFormat('%b', this.value);
-          const frequency = navigatorOptions.frequency;
-          const first = Highcharts.dateFormat('%Y', this.axis.userMin);
-          const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-          s = ((last - first) <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
-          s = s + Highcharts.dateFormat('%Y', this.value);
-          return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
+          return xAxisFormatter(this, navigatorOptions.frequency);
         }
       }
     };
@@ -454,28 +431,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
 
   formatTooltip(args, points, x, name: Boolean, units: Boolean, geo: Boolean) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
-    const getFreqLabel = function (frequency, date) {
-      if (frequency === 'A') {
-        return '';
-      }
-      if (frequency === 'Q') {
-        if (Highcharts.dateFormat('%b', date) === 'Jan') {
-          return 'Q1 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Apr') {
-          return 'Q2 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Jul') {
-          return 'Q3 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Oct') {
-          return 'Q4 ';
-        }
-      }
-      if (frequency === 'M' || frequency === 'S') {
-        return Highcharts.dateFormat('%b', date) + ' ';
-      }
-    };
+    const getFreqLabel = (frequency, date) => this._highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = function (chartSeries: Array<any>, freq: string) {
       return chartSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     };
@@ -588,30 +544,5 @@ export class AnalyzerHighstockComponent implements OnChanges {
   geoActive(e) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-  };
-
-  setTableExtremes(e) {
-    // Workaround based on https://github.com/gevgeny/angular2-highcharts/issues/158
-    // Exporting calls load event and creates empty e.context object, emitting wrong values to series table
-    const extremes = this.getChartExtremes(e);
-    if (extremes) {
-      this.tableExtremes.emit({ minDate: extremes.min, maxDate: extremes.max });
-    }
-  };
-
-  getChartExtremes(chartObject) {
-    // Gets range of x values to emit
-    // Used to redraw table in the single series view
-    let xMin = null, xMax = null;
-    // Selected level data
-    let selectedRange = null;
-    if (chartObject && chartObject.navigator) {
-      selectedRange = chartObject.navigator.baseSeries[0] ? chartObject.navigator.baseSeries[0].points : null;
-    }
-    if (selectedRange) {
-      xMin = new Date(selectedRange[0].x).toISOString().split('T')[0];
-      xMax = new Date(selectedRange[selectedRange.length - 1].x).toISOString().split('T')[0];
-      return { min: xMin, max: xMax };
-    }
   };
 }
