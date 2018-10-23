@@ -179,7 +179,7 @@ export class HighstockComponent implements OnChanges {
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
-    const getChartExtremes = (chartObject) => this.getChartExtremes(chartObject);
+    const getChartExtremes = chartObject => this.getChartExtremes(chartObject);
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -199,7 +199,9 @@ export class HighstockComponent implements OnChanges {
       buttons: chartButtons,
       buttonPosition: { x: 0, y: 10 },
       labelStyle: { visibility: 'hidden' },
-      inputEnabled: false,
+      inputEnabled: true,
+      inputDateFormat: freq.freq === 'A' ? '%Y' : '%b %e, %Y',
+      inputEditDateFormat: freq.freq === 'A' ? '%Y' : '%Y-%m-%d'
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.exporting = {
