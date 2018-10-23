@@ -17,6 +17,7 @@
     [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" [suppressDragLeaveHidesColumns]="true"
     (gridReady)="onGridReady($event)">
   </ag-grid-angular>
+  <p class="stat-note">*Scroll to the right for additional statistics</p>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="summaryRows" [columnDefs]="summaryColumns" domLayout="autoHeight"
     [gridOptions]="statGridOptions" [frameworkComponents]="frameworkComponents">
   </ag-grid-angular>

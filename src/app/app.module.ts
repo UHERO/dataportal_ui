@@ -15,6 +15,7 @@ import { GoogleAnalyticsEventsService } from './google-analytics-events.service'
 import { HelpService } from './help.service';
 import { AnalyzerService } from './analyzer.service';
 import { TableHelperService } from './table-helper.service';
+import { HighstockHelperService } from './highstock-helper.service';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
 import { ClipboardService } from './clipboard.service';
 import { RouterModule } from '@angular/router';
@@ -48,6 +49,7 @@ import { RouterModule } from '@angular/router';
     AnalyzerService,
     Title,
     ClipboardService,
+    HighstockHelperService,
     {
       provide: 'rootCategory',
       useValue: 59
