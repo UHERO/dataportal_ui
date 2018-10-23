@@ -1,7 +1,7 @@
 export interface HighstockObject {
   chart: {
     alignTicks: boolean,
-    events: {
+    events?: {
       render: () => void,
     },
     zoomType: string,

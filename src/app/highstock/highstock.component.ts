@@ -6,6 +6,7 @@ import { HighchartChartData } from '../highchart-chart-data';
 import { Series } from '../series';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
+import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
@@ -43,7 +44,10 @@ export class HighstockComponent implements OnChanges {
   chartObject;
   showChart = false;
 
-  constructor(@Inject('defaultRange') private defaultRange) { }
+  constructor(
+    @Inject('defaultRange') private defaultRange,
+    private _HighstockHelper: HighstockHelperService
+  ) {}
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
@@ -179,8 +183,8 @@ export class HighstockComponent implements OnChanges {
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
-    const getChartExtremes = chartObject => this.getChartExtremes(chartObject);
-
+    const getChartExtremes = (chartObject) => this._HighstockHelper.getChartExtremes(chartObject);
+    const xAxisFormatter = (chart, freq) => this._HighstockHelper.xAxisLabelFormatter(chart, freq);
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -273,28 +277,7 @@ export class HighstockComponent implements OnChanges {
       ordinal: false,
       labels: {
         formatter: function () {
-          const getQLabel = function (month) {
-            if (month === 'Jan') {
-              return 'Q1 ';
-            }
-            if (month === 'Apr') {
-              return 'Q2 ';
-            }
-            if (month === 'Jul') {
-              return 'Q3 ';
-            }
-            if (month === 'Oct') {
-              return 'Q4 ';
-            }
-          };
-          let s = '';
-          const month = Highcharts.dateFormat('%b', this.value);
-          const frequency = this.chart.options.chart.description;
-          const first = Highcharts.dateFormat('%Y', this.axis.userMin);
-          const last = Highcharts.dateFormat('%Y', this.axis.userMax);
-          s = ((last - first) <= 5) && frequency === 'Q' ? s + getQLabel(month) : '';
-          s = s + Highcharts.dateFormat('%Y', this.value);
-          return frequency === 'Q' ? s : this.axis.defaultLabelFormatter.call(this);
+          return xAxisFormatter(this, this.chart.options.chart.description);
         }
       }
     };
@@ -334,59 +317,8 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.series = series;
   }
 
-  getChartExtremes = (chartObject) => {
-    // Gets range of x values to emit
-    // Used to redraw table in the single series view
-    let selectedRange = null;
-    if (!chartObject.series[0].points) {
-      return { min: null, max: null };
-    }
-    if (chartObject.series[0].points) {
-      selectedRange = chartObject.series[0].points;
-    }
-    if (selectedRange.length && chartObject._selectedMin && chartObject._selectedMax) {
-      return this.findVisibleMinMax(selectedRange, chartObject);
-    }
-  };
-
-  findVisibleMinMax = (selectedRange, chartObject) => {
-    let maxCounter = selectedRange.length - 1;
-    let minCounter = 0;
-    let xMin, xMax;
-    while (!xMax || xMax > chartObject._selectedMax) {
-      xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
-      maxCounter--;
-    }
-    while (!xMin || xMin < chartObject._selectedMin) {
-      xMin = new Date(selectedRange[minCounter].x).toISOString().split('T')[0];
-      minCounter++;
-    }
-    return { min: xMin, max: xMax };
-  }
-
   formatTooltip = (points, x, pseudoZones, decimals, freq) => {
-    const getFreqLabel = function (frequency, date) {
-      if (frequency === 'A') {
-        return '';
-      }
-      if (frequency === 'Q') {
-        if (Highcharts.dateFormat('%b', date) === 'Jan') {
-          return 'Q1 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Apr') {
-          return 'Q2 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Jul') {
-          return 'Q3 ';
-        }
-        if (Highcharts.dateFormat('%b', date) === 'Oct') {
-          return 'Q4 ';
-        }
-      }
-      if (frequency === 'M' || frequency === 'S') {
-        return Highcharts.dateFormat('%b', date);
-      }
-    };
+    const getFreqLabel = (frequency, date) => this._HighstockHelper.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = '<b>';
     s = s + getFreqLabel(freq.freq, x);

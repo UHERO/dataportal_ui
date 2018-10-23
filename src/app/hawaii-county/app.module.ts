@@ -14,6 +14,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 import { HelpService } from '../help.service';
 import { AnalyzerService } from '../analyzer.service';
 import { TableHelperService } from '../table-helper.service';
+import { HighstockHelperService } from '../highstock-helper.service';
 import { AppComponent } from '../app.component';
 import { CohHelpComponent } from '../coh-help/coh-help.component';
 import { ClipboardService } from '../clipboard.service';
@@ -46,6 +47,7 @@ import { ClipboardService } from '../clipboard.service';
     AnalyzerService,
     Title,
     ClipboardService,
+    HighstockHelperService,
     {
       provide: 'rootCategory',
       useValue: 4429
