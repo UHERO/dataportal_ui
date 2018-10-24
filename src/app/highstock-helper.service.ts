@@ -39,50 +39,83 @@ export class HighstockHelperService {
   };
 
   getTooltipFreqLabel = (frequency, date) => {
+    const year = Highcharts.dateFormat('%Y', date);
+    const month = Highcharts.dateFormat('%b', date);
     if (frequency === 'A') {
-      return '';
+      return year;
     }
     if (frequency === 'Q') {
-      if (Highcharts.dateFormat('%b', date) === 'Jan') {
-        return 'Q1 ';
-      }
-      if (Highcharts.dateFormat('%b', date) === 'Apr') {
-        return 'Q2 ';
-      }
-      if (Highcharts.dateFormat('%b', date) === 'Jul') {
-        return 'Q3 ';
-      }
-      if (Highcharts.dateFormat('%b', date) === 'Oct') {
-        return 'Q4 ';
-      }
+      return year + this.getQuarterLabel(month);
     }
     if (frequency === 'M' || frequency === 'S') {
-      return Highcharts.dateFormat('%b', date) + ' ';
+      return Highcharts.dateFormat('%b', date) + year;
     }
   };
 
   xAxisLabelFormatter = (chart, freq) => {
     let s = '';
     const month = Highcharts.dateFormat('%b', chart.value);
+    const year = Highcharts.dateFormat('%Y', chart.value);
     const first = Highcharts.dateFormat('%Y', chart.axis.userMin);
     const last = Highcharts.dateFormat('%Y', chart.axis.userMax);
-    s = ((last - first) <= 5) && freq === 'Q' ? s + this.getQuarterLabel(month) : '';
-    s = s + Highcharts.dateFormat('%Y', chart.value);
+    //s = ((last - first) <= 5) && freq === 'Q' ? s + this.getQuarterLabel(month) : '';
+    //s = s + Highcharts.dateFormat('%Y', chart.value);
+    s = ((last - first) <= 5) && freq === 'Q' ? year + this.getQuarterLabel(month) : year;
     return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
   };
 
-  getQuarterLabel = (month) => {
+  getQuarterLabel = (month: string) => {
     if (month === 'Jan') {
-      return 'Q1 ';
+      return ' Q1';
     }
     if (month === 'Apr') {
-      return 'Q2 ';
+      return ' Q2';
     }
     if (month === 'Jul') {
-      return 'Q3 ';
+      return ' Q3';
     }
     if (month === 'Oct') {
-      return 'Q4 ';
+      return ' Q4';
     }
+  };
+
+  inputDateFormatter = (freq: string) => {
+    if (freq === 'A') {
+      return '%Y';
+    }
+    if (freq === 'Q') {
+      return '%Y %Q';
+    }
+    return '%b %Y';
+  };
+
+  inputEditDateFormatter = (freq: string) => {
+    if (freq === 'A') {
+      return '%Y';
+    }
+    if (freq === 'Q') {
+      return '%Y %Q';
+    }
+    return '%Y-%m';
+  };
+
+  inputDateParserFormatter = (value: string) => {
+    const year = value.substr(0, 4);
+    if (value.includes('Q1')) {
+      return Date.parse(year + '-01-01');
+    }
+    if (value.includes('Q2')) {
+      return Date.parse(year + '-04-01');
+    }
+    if (value.includes('Q3')) {
+      return Date.parse(year + '-07-01');
+    }
+    if (value.includes('Q4')) {
+      return Date.parse(year + '-10-01');
+    }
+    if (value.length === 4) { // i.e. year only
+      return Date.parse(value + '-01-01');
+    }
+    return Date.parse(value + '-01');
   };
 }

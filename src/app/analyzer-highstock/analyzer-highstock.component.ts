@@ -307,6 +307,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
     const getChartExtremes = (chartObject) => this._highstockHelper.getChartExtremes(chartObject);
     const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
+    const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
+    const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
+    const setInputDateParser = value => this._highstockHelper.inputDateParserFormatter(value);
     const tableExtremes = this.tableExtremes;
     this.chartOptions.chart = {
       alignTicks: false,
@@ -336,13 +339,15 @@ export class AnalyzerHighstockComponent implements OnChanges {
     this.chartOptions.rangeSelector = {
       selected: !startDate && !endDate ? 3 : null,
       buttons: buttons,
-      buttonPosition: { x: 10, y: 10 },
       labelStyle: {
         visibility: 'hidden'
       },
       inputEnabled: true,
-      inputDateFormat: navigatorOptions.frequency === 'A' ? '%Y' : '%b %e, %Y',
-      inputEditDateFormat: navigatorOptions.frequency === 'A' ? '%Y' : '%Y-%m-%d'
+      inputDateFormat: setInputDateFormat(navigatorOptions.frequency),
+      inputEditDateFormat: setInputEditDateFormat(navigatorOptions.frequency),
+      inputDateParser: function (value) {
+        return setInputDateParser(value);
+      }
     };
     this.chartOptions.lang = {
       exportKey: 'Download Chart'
@@ -527,7 +532,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
           tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
         }
       }
-      const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x) + Highcharts.dateFormat('%Y', x);
+      const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x);
       tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
