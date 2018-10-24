@@ -165,7 +165,7 @@ export class HighstockComponent implements OnChanges {
       return end;
     }
     return chartRange ? chartRange.end : null;
-  }
+  };
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) => {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
@@ -179,12 +179,24 @@ export class HighstockComponent implements OnChanges {
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
+    console.log('startDate', startDate);
+    console.log('endDate', endDate)
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
     const getChartExtremes = (chartObject) => this._HighstockHelper.getChartExtremes(chartObject);
     const xAxisFormatter = (chart, freq) => this._HighstockHelper.xAxisLabelFormatter(chart, freq);
+    const setInputDateFormat = (freq, startDate) => {
+      if (freq === 'A') {
+        return '%Y';
+      }
+      if (freq === 'Q') {
+        console.log('date format start date', startDate)
+        return '%Y Q' + $('.highcharts-input-group .highcharts-range-input:eq(0)').text()
+      }
+    };
+    let leftInput;
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -194,6 +206,7 @@ export class HighstockComponent implements OnChanges {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
+          leftInput = $('input.highcharts-range-selector')[0].value;
         }
       }
     };
@@ -201,11 +214,12 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.rangeSelector = {
       selected: null,
       buttons: chartButtons,
-      buttonPosition: { x: 0, y: 10 },
+      //buttonPosition: { x: 0, y: 10 },
       labelStyle: { visibility: 'hidden' },
       inputEnabled: true,
-      inputDateFormat: freq.freq === 'A' ? '%Y' : '%b %e, %Y',
-      inputEditDateFormat: freq.freq === 'A' ? '%Y' : '%Y-%m-%d'
+      // inputDateFormat: freq.freq === 'A' ? '%Y' : freq.freq === 'M' ? '%b %Y' : '%b %e, %Y',
+      inputDateFormat: setInputDateFormat(freq.freq, startDate),
+      inputEditDateFormat: freq.freq === 'A' ? '%Y' : freq.freq === 'M' ? '%Y-%m' : '%Y-%m-%d'
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.exporting = {
@@ -271,7 +285,7 @@ export class HighstockComponent implements OnChanges {
           }
         }
       },
-      minRange: 1000 * 3600 * 24 * 30 * 12,
+      //minRange: 1000 * 3600 * 24 * 30 * 12,
       min: Date.parse(startDate),
       max: Date.parse(endDate),
       ordinal: false,
@@ -347,14 +361,17 @@ export class HighstockComponent implements OnChanges {
   };
 
   getSelectedChartRange = (userStart, userEnd, dates, defaults) => {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dates[dates.length - 1].date).toISOString().substr(0, 4);
+    const defaultEnd = defaults.end ? defaults.end : dates[dates.length - 1].date.substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
-    while (new Date(dates[counter].date).toISOString().substr(0, 4) > defaultEnd) {
+    while (dates[counter].date.substr(0, 4) > defaultEnd) {
       counter--;
     }
-    const end = userEnd ? userEnd : new Date(dates[counter].date).toISOString().substr(0, 10);
-    const defaultStartYear = +new Date(dates[counter].date).toISOString().substr(0, 4) - defaults.range;
-    const start = userStart ? userStart : defaultStartYear + new Date(dates[counter].date).toISOString().substr(4, 6);
+    const end = userEnd ? userEnd : dates[counter].date.substr(0, 10);
+    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaults.range;
+    let start = userStart ? userStart : defaultStartYear + dates[counter].date.substr(4, 6);
+    if (start > end) {
+      start = defaultStartYear + dates[counter].date.substr(4, 6);
+    }
     return { start: start, end: end };
   }
 }

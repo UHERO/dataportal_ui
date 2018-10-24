@@ -23,7 +23,9 @@ export interface HighstockObject {
     labelStyle: {
       visibility: string
     },
-    inputEnabled: boolean
+    inputEnabled: boolean,
+    inputDateFormat: string,
+    inputEditDateFormat: string,
   },
   lang: {
     exportKey: string

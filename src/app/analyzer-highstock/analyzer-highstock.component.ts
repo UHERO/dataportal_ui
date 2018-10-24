@@ -340,7 +340,9 @@ export class AnalyzerHighstockComponent implements OnChanges {
       labelStyle: {
         visibility: 'hidden'
       },
-      inputEnabled: false
+      inputEnabled: true,
+      inputDateFormat: navigatorOptions.frequency === 'A' ? '%Y' : '%b %e, %Y',
+      inputEditDateFormat: navigatorOptions.frequency === 'A' ? '%Y' : '%Y-%m-%d'
     };
     this.chartOptions.lang = {
       exportKey: 'Download Chart'
