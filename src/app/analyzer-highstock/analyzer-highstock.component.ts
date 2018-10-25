@@ -136,7 +136,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   };
 
   checkMaxValues = (unit, baseMin, baseMax) => {
-  const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
+    const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
       const level = serie.chartData ? serie.chartData.level : serie.data;
@@ -305,7 +305,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
     const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    const getChartExtremes = (chartObject) => this._highstockHelper.getChartExtremes(chartObject);
+    const getChartExtremes = (chartObject) => this._highstockHelper.getAnalyzerChartExtremes(chartObject);
     const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
     const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);

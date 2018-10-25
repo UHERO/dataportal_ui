@@ -23,6 +23,16 @@ export class HighstockHelperService {
     }
   };
 
+  getAnalyzerChartExtremes = (chartObject) => {
+    let selectedRange = null;
+    if (chartObject) {
+      selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;
+    }
+    if (selectedRange) {
+      return this.findVisibleMinMax(selectedRange, chartObject);
+    }
+  };
+
   findVisibleMinMax = (selectedRange, chartObject) => {
     let maxCounter = selectedRange.length - 1;
     let minCounter = 0;
@@ -58,8 +68,6 @@ export class HighstockHelperService {
     const year = Highcharts.dateFormat('%Y', chart.value);
     const first = Highcharts.dateFormat('%Y', chart.axis.userMin);
     const last = Highcharts.dateFormat('%Y', chart.axis.userMax);
-    //s = ((last - first) <= 5) && freq === 'Q' ? s + this.getQuarterLabel(month) : '';
-    //s = s + Highcharts.dateFormat('%Y', chart.value);
     s = ((last - first) <= 5) && freq === 'Q' ? year + this.getQuarterLabel(month) : year;
     return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
   };

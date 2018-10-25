@@ -19,17 +19,17 @@ exportCSV(Highcharts);
 
 Highcharts.dateFormats = {
   Q: function (timestamp) {
-    const month = new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
-    if (month === '01') {
+    const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
+    if (1 <= month && month <= 3) {
       return 'Q1';
     }
-    if (month === '04') {
+    if (4 <= month && month <= 6) {
       return 'Q2';
     }
-    if (month === '07') {
+    if (7 <= month && month <= 9) {
       return 'Q3';
     }
-    if (month === '10') {
+    if (10 <= month && month <= 12) {
       return 'Q4';
     }
   }
