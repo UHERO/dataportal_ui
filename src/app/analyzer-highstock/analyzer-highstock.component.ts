@@ -3,6 +3,7 @@ import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
+import { HighchartsObject } from 'app/HighchartsObject';
 declare var $: any;
 declare var require: any;
 declare var require: any;
@@ -42,6 +43,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
   constructor(private _highstockHelper: HighstockHelperService) { }
 
   ngOnChanges() {
+    console.log('test')
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
@@ -49,6 +51,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     if (this.chartObject) {
+      console.log('onChanges', this.chartObject)
       // If the chart has already been drawn, check to see if another y-axis needs to be added
       yAxes.forEach((y) => {
         const axisExists = this.chartObject.yAxis.findIndex(a => a.userOptions.id === y.id)
@@ -314,6 +317,20 @@ export class AnalyzerHighstockComponent implements OnChanges {
     this.chartOptions.chart = {
       alignTicks: false,
       description: undefined,
+      events: {
+        render: function () {
+          console.log('render');
+          const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
+          const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
+          this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
+          this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._hasSetExtremes = true;
+          this._extremes = getChartExtremes(this);
+          if (this._extremes) {
+            tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+          }
+        }
+      },
       zoomType: 'x'
     };
     this.chartOptions.labels = {
