@@ -168,7 +168,7 @@ export class SeriesHelperService {
     const endIndex = dates.indexOf(end);
     const datesInRange = dates.slice(startIndex, endIndex + 1);
     const valuesInRange = level.slice(startIndex, endIndex + 1);
-    if (valuesInRange.includes(null)) {
+    if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
       formattedStats.missing = true;
       return formattedStats;
     }

@@ -15,6 +15,17 @@ exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
 
+Highcharts.setOptions({
+  navigator: {
+    xAxis: {
+        isInternal: true
+      },
+    yAxis: {
+        isInternal: true
+      }
+  }
+});
+
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
@@ -51,12 +62,27 @@ export class AnalyzerHighstockComponent implements OnChanges {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     if (this.chartObject) {
-      console.log('onChanges', this.chartObject)
+      console.log('onChanges', this.chartObject);
+      console.log(selectedAnalyzerSeries)
       // If the chart has already been drawn, check to see if another y-axis needs to be added
       yAxes.forEach((y) => {
         const axisExists = this.chartObject.yAxis.findIndex(a => a.userOptions.id === y.id)
         if (axisExists === -1) {
           this.chartObject.addAxis(y);
+        }
+      });
+      this.chartObject.series.forEach((s) => {
+        console.log('s', s);
+        const displayInChart = selectedAnalyzerSeries.find(serie => serie.name === s.name && s.data.length === serie.data.length);
+        console.log('displayInChart', displayInChart)
+        if (!displayInChart) {
+          s.remove()
+        }
+      });
+      selectedAnalyzerSeries.forEach((s) => {
+        const inChart = this.chartObject.series.find(serie => serie.name === s.name && serie.data.length === s.data.length);
+        if (!inChart) {
+          this.chartObject.addSeries(s);
         }
       });
     }
