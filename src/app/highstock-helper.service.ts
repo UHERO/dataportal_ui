@@ -25,13 +25,11 @@ export class HighstockHelperService {
 
   getAnalyzerChartExtremes = (chartObject) => {
     let selectedRange = null;
-    console.log('getAnalyzerChartExtremes')
     if (chartObject) {
-      console.log('chartObject', chartObject)
-      selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;
+      selectedRange = chartObject.series.find(s => s.name === 'Navigator');
     }
     if (selectedRange) {
-      return this.findVisibleMinMax(selectedRange, chartObject);
+      return this.findVisibleMinMax(selectedRange.points, chartObject);
     }
   };
 
