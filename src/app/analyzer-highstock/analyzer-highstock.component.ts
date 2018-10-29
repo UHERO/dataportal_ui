@@ -15,7 +15,7 @@ exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
 
-Highcharts.setOptions({
+/* Highcharts.setOptions({
   navigator: {
     xAxis: {
         isInternal: true
@@ -24,7 +24,7 @@ Highcharts.setOptions({
         isInternal: true
       }
   }
-});
+}); */
 
 @Component({
   selector: 'app-analyzer-highstock',
