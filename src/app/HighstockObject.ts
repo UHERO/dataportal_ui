@@ -26,7 +26,11 @@ export interface HighstockObject {
     inputEnabled: boolean,
     inputDateFormat: string,
     inputEditDateFormat: string,
-    inputDateParser: (args: any) => any
+    inputDateParser: (args: any) => any,
+    inputPosition?: {
+      x: number,
+      y: number
+    }
   },
   lang: {
     exportKey: string

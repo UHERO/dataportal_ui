@@ -222,12 +222,20 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.rangeSelector = {
       selected: null,
       buttons: chartButtons,
+      buttonPosition: {
+        x: -30,
+        y: 0
+      },
       labelStyle: { visibility: 'hidden' },
       inputEnabled: true,
       inputDateFormat: setInputDateFormat(freq.freq),
       inputEditDateFormat: setInputEditDateFormat(freq.freq),
       inputDateParser: function (value) {
         return setInputDateParser(value);
+      },
+      inputPosition: {
+        x: -30,
+        y: 0
       }
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };

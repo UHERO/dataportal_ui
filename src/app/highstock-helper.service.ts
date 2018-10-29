@@ -85,6 +85,7 @@ export class HighstockHelperService {
     if (month === 'Oct') {
       return ' Q4';
     }
+    return '';
   };
 
   inputDateFormatter = (freq: string) => {

@@ -54,7 +54,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
   constructor(private _highstockHelper: HighstockHelperService) { }
 
   ngOnChanges() {
-    console.log('test')
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries, yAxes;
     if (this.series.length) {
@@ -62,29 +61,12 @@ export class AnalyzerHighstockComponent implements OnChanges {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     if (this.chartObject) {
-      console.log('onChanges', this.chartObject);
-      console.log(selectedAnalyzerSeries)
       // If the chart has already been drawn, check to see if another y-axis needs to be added
-      yAxes.forEach((y) => {
-        const axisExists = this.chartObject.yAxis.findIndex(a => a.userOptions.id === y.id)
-        if (axisExists === -1) {
-          this.chartObject.addAxis(y);
-        }
-      });
-      this.chartObject.series.forEach((s) => {
-        console.log('s', s);
-        const displayInChart = selectedAnalyzerSeries.find(serie => serie.name === s.name && s.data.length === serie.data.length);
-        console.log('displayInChart', displayInChart)
-        if (!displayInChart) {
-          s.remove()
-        }
-      });
-      selectedAnalyzerSeries.forEach((s) => {
-        const inChart = this.chartObject.series.find(serie => serie.name === s.name && serie.data.length === s.data.length);
-        if (!inChart) {
-          this.chartObject.addSeries(s);
-        }
-      });
+      this.addYAxis(this.chartObject, yAxes);
+      // Check for series that need to be added or removed from the chart.
+      // (workaround to make sure x-axis updates when navigator dates change)
+      this.removeSeriesFromChart(this.chartObject.series, selectedAnalyzerSeries);
+      this.addSeriesToChart(this.chartObject, selectedAnalyzerSeries);
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -97,6 +79,33 @@ export class AnalyzerHighstockComponent implements OnChanges {
       setTimeout(() => this.alertMessage = '', 4000);
     }
   }
+
+  addYAxis(chartObject, yAxes: Array<any>) {
+    yAxes.forEach((y) => {
+      const axisExists = chartObject.yAxis.findIndex(a => a.userOptions.id === y.id);
+      if (axisExists === -1) {
+        chartObject.addAxis(y);
+      }
+    });
+  };
+
+  removeSeriesFromChart(chartObjectSeries: Array<any>, analyzerSeries: Array<any>) {
+    chartObjectSeries.forEach((s) => {
+      const keepInChart = analyzerSeries.find(serie => serie.name === s.name && s.data.length === serie.data.length);
+      if (!keepInChart) {
+        s.remove();
+      }
+    });
+  };
+
+  addSeriesToChart(chartObject, analyzerSeries: Array<any>) {
+    analyzerSeries.forEach((s) => {
+      const inChart = chartObject.series.find(serie => serie.name === s.name && serie.data.length === s.data.length);
+      if (!inChart) {
+        chartObject.addSeries(s);
+      }
+    });
+  };
 
   chartCallback = (chart) => {
     this.chartObject = chart;
@@ -345,7 +354,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       description: undefined,
       events: {
         render: function () {
-          console.log('render');
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
@@ -382,6 +390,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
     this.chartOptions.rangeSelector = {
       selected: !startDate && !endDate ? 3 : null,
       buttons: buttons,
+      buttonPosition: {
+        x: -30,
+        y: 0
+      },
       labelStyle: {
         visibility: 'hidden'
       },
@@ -390,6 +402,10 @@ export class AnalyzerHighstockComponent implements OnChanges {
       inputEditDateFormat: setInputEditDateFormat(navigatorOptions.frequency),
       inputDateParser: function (value) {
         return setInputDateParser(value);
+      },
+      inputPosition: {
+        x: -30,
+        y: 0
       }
     };
     this.chartOptions.lang = {
