@@ -15,17 +15,6 @@ exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
 
-/* Highcharts.setOptions({
-  navigator: {
-    xAxis: {
-        isInternal: true
-      },
-    yAxis: {
-        isInternal: true
-      }
-  }
-}); */
-
 @Component({
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
@@ -347,7 +336,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
     const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
-    const setInputDateParser = value => this._highstockHelper.inputDateParserFormatter(value);
+    const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
     const tableExtremes = this.tableExtremes;
     this.chartOptions.chart = {
       alignTicks: false,
@@ -401,7 +390,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       inputDateFormat: setInputDateFormat(navigatorOptions.frequency),
       inputEditDateFormat: setInputEditDateFormat(navigatorOptions.frequency),
       inputDateParser: function (value) {
-        return setInputDateParser(value);
+        return setInputDateParser(value, navigatorOptions.frequency);
       },
       inputPosition: {
         x: -30,

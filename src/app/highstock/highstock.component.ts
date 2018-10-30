@@ -17,24 +17,6 @@ exporting(Highcharts);
 offlineExport(Highcharts);
 exportCSV(Highcharts);
 
-Highcharts.dateFormats = {
-  Q: function (timestamp) {
-    const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
-    if (1 <= month && month <= 3) {
-      return 'Q1';
-    }
-    if (4 <= month && month <= 6) {
-      return 'Q2';
-    }
-    if (7 <= month && month <= 9) {
-      return 'Q3';
-    }
-    if (10 <= month && month <= 12) {
-      return 'Q4';
-    }
-  }
-}
-
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
@@ -205,7 +187,7 @@ export class HighstockComponent implements OnChanges {
     const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
     const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
-    const setInputDateParser = value => this._highstockHelper.inputDateParserFormatter(value);
+    const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -231,7 +213,7 @@ export class HighstockComponent implements OnChanges {
       inputDateFormat: setInputDateFormat(freq.freq),
       inputEditDateFormat: setInputEditDateFormat(freq.freq),
       inputDateParser: function (value) {
-        return setInputDateParser(value);
+        return setInputDateParser(value, freq.freq);
       },
       inputPosition: {
         x: -30,

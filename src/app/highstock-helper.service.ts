@@ -3,6 +3,24 @@ import { Injectable } from '@angular/core';
 declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 
+Highcharts.dateFormats = {
+  Q: function (timestamp) {
+    const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
+    if (1 <= month && month <= 3) {
+      return 'Q1';
+    }
+    if (4 <= month && month <= 6) {
+      return 'Q2';
+    }
+    if (7 <= month && month <= 9) {
+      return 'Q3';
+    }
+    if (10 <= month && month <= 12) {
+      return 'Q4';
+    }
+  }
+};
+
 @Injectable()
 export class HighstockHelperService {
 
@@ -58,7 +76,7 @@ export class HighstockHelperService {
       return year + this.getQuarterLabel(month);
     }
     if (frequency === 'M' || frequency === 'S') {
-      return Highcharts.dateFormat('%b', date) + year;
+      return `${Highcharts.dateFormat('%b', date)} ${year}`;
     }
   };
 
@@ -108,23 +126,31 @@ export class HighstockHelperService {
     return '%Y-%m';
   };
 
-  inputDateParserFormatter = (value: string) => {
+  inputDateParserFormatter = (value: string, freq: string) => {
     const year = value.substr(0, 4);
-    if (value.includes('Q1')) {
-      return Date.parse(year + '-01-01');
+    if (freq === 'Q') {
+      if (value.toUpperCase().includes('Q1')) {
+        return Date.parse(`${year}-01-01`);
+      }
+      if (value.toUpperCase().includes('Q2')) {
+        return Date.parse(`${year}-04-01`);
+      }
+      if (value.toUpperCase().includes('Q3')) {
+        return Date.parse(`${year}-07-01`);
+      }
+      if (value.toUpperCase().includes('Q4')) {
+        return Date.parse(`${year}-10-01`);
+      }
     }
-    if (value.includes('Q2')) {
-      return Date.parse(year + '-04-01');
+    if (freq === 'A') {
+      return Date.parse(`${year}-01-01`);
     }
-    if (value.includes('Q3')) {
-      return Date.parse(year + '-07-01');
+    if (freq === 'M' || freq === 'S') {
+      if (!value.includes('-')) { // i.e. monthly frequency where user removes '-'
+        const month = value.substr(4, 2);
+        return Date.parse(`${year}-${month}-01`)
+      }
+      return Date.parse(`${value}-01`);
     }
-    if (value.includes('Q4')) {
-      return Date.parse(year + '-10-01');
-    }
-    if (value.length === 4) { // i.e. year only
-      return Date.parse(value + '-01-01');
-    }
-    return Date.parse(value + '-01');
   };
 }
