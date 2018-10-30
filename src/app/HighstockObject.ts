@@ -16,14 +16,21 @@ export interface HighstockObject {
   rangeSelector: {
     selected: number,
     buttons: Array<any>,
-    buttonPosition: {
+    buttonPosition?: {
       x: number,
       y: number
     },
     labelStyle: {
       visibility: string
     },
-    inputEnabled: boolean
+    inputEnabled: boolean,
+    inputDateFormat: string,
+    inputEditDateFormat: string,
+    inputDateParser: (args: any) => any,
+    inputPosition?: {
+      x: number,
+      y: number
+    }
   },
   lang: {
     exportKey: string
@@ -94,7 +101,7 @@ export interface HighstockObject {
     events: {
       afterSetExtremes: () => void
     },
-    minRange: number,
+    minRange?: number,
     min: number,
     max: number,
     ordinal: boolean,

@@ -46,8 +46,8 @@ export class HighstockComponent implements OnChanges {
 
   constructor(
     @Inject('defaultRange') private defaultRange,
-    private _HighstockHelper: HighstockHelperService
-  ) {}
+    private _highstockHelper: HighstockHelperService
+  ) { }
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
@@ -165,7 +165,7 @@ export class HighstockComponent implements OnChanges {
       return end;
     }
     return chartRange ? chartRange.end : null;
-  }
+  };
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) => {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
@@ -183,8 +183,11 @@ export class HighstockComponent implements OnChanges {
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
     const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
-    const getChartExtremes = (chartObject) => this._HighstockHelper.getChartExtremes(chartObject);
-    const xAxisFormatter = (chart, freq) => this._HighstockHelper.xAxisLabelFormatter(chart, freq);
+    const getChartExtremes = (chartObject) => this._highstockHelper.getChartExtremes(chartObject);
+    const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
+    const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
+    const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
+    const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -201,9 +204,21 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.rangeSelector = {
       selected: null,
       buttons: chartButtons,
-      buttonPosition: { x: 0, y: 10 },
+      buttonPosition: {
+        x: -30,
+        y: 0
+      },
       labelStyle: { visibility: 'hidden' },
-      inputEnabled: false,
+      inputEnabled: true,
+      inputDateFormat: setInputDateFormat(freq.freq),
+      inputEditDateFormat: setInputEditDateFormat(freq.freq),
+      inputDateParser: function (value) {
+        return setInputDateParser(value, freq.freq);
+      },
+      inputPosition: {
+        x: -30,
+        y: 0
+      }
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.exporting = {
@@ -263,13 +278,13 @@ export class HighstockComponent implements OnChanges {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           const lastDate = seriesDetail.seriesObservations.observationEnd;
+          console.log('this', this)
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             chartExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
           }
         }
       },
-      minRange: 1000 * 3600 * 24 * 30 * 12,
       min: Date.parse(startDate),
       max: Date.parse(endDate),
       ordinal: false,
@@ -316,15 +331,13 @@ export class HighstockComponent implements OnChanges {
   }
 
   formatTooltip = (points, x, pseudoZones, decimals, freq) => {
-    const getFreqLabel = (frequency, date) => this._HighstockHelper.getTooltipFreqLabel(frequency, date);
+    const getFreqLabel = (frequency, date) => this._highstockHelper.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
-    let s = '<b>';
-    s = s + getFreqLabel(freq.freq, x);
-    s = s + ' ' + Highcharts.dateFormat('%Y', x) + '</b>';
+    let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
     points.forEach((point) => {
       const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
       const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-      const seriesColor = '<br><span class="series-' + point.colorIndex + '">\u25CF</span> ';
+      const seriesColor = `<br><span class='series-${point.colorIndex}'>\u25CF</span>`;
       const seriesNameValue = point.series.name + ': ' + formattedValue;
       const label = seriesColor + seriesNameValue;
       if (pseudoZones.length) {
@@ -345,14 +358,17 @@ export class HighstockComponent implements OnChanges {
   };
 
   getSelectedChartRange = (userStart, userEnd, dates, defaults) => {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dates[dates.length - 1].date).toISOString().substr(0, 4);
+    const defaultEnd = defaults.end ? defaults.end : dates[dates.length - 1].date.substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
-    while (new Date(dates[counter].date).toISOString().substr(0, 4) > defaultEnd) {
+    while (dates[counter].date.substr(0, 4) > defaultEnd) {
       counter--;
     }
-    const end = userEnd ? userEnd : new Date(dates[counter].date).toISOString().substr(0, 10);
-    const defaultStartYear = +new Date(dates[counter].date).toISOString().substr(0, 4) - defaults.range;
-    const start = userStart ? userStart : defaultStartYear + new Date(dates[counter].date).toISOString().substr(4, 6);
+    const end = userEnd ? userEnd : dates[counter].date.substr(0, 10);
+    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaults.range;
+    let start = userStart ? userStart : defaultStartYear + dates[counter].date.substr(4, 6);
+    if (start > end) {
+      start = defaultStartYear + dates[counter].date.substr(4, 6);
+    }
     return { start: start, end: end };
   }
 }
