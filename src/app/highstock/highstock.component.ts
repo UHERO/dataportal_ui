@@ -278,6 +278,7 @@ export class HighstockComponent implements OnChanges {
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           const lastDate = seriesDetail.seriesObservations.observationEnd;
+          console.log('this', this)
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             chartExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
