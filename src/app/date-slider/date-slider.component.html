@@ -1,1 +1,5 @@
 <input *ngIf="subCat" class="sliders" type="text" [id]="'slider_' + subCat.id" value="" aria-label="date-range-slider"/>
+<div class="extra-controls">
+    <input type="text" maxlength="4" [value]="sliderDates[start]" class="inp js-from" />
+    <input type="text" maxlength="4" [value]="sliderDates[end]" class="inp js-to" />
+</div>
