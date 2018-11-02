@@ -22,6 +22,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   private start;
   private end;
   private sliderDates;
+  private inputPattern;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -31,24 +32,39 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     if (this.dates && this.dates.length) {
-      const defaultRanges = this.findDefaultRange();
+      const defaultRanges = this.findDefaultRange(this.dates, this.freq, this.defaultRange, this.dateFrom, this.dateTo);
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = defaultRanges.start;
       this.end = defaultRanges.end;
-      this.sliderDates = this.dates.map(date => date.tableDate);
+      this.sliderDates = defaultRanges.sliderDates;
+
+      this.inputPattern = this.setInputPattern(this.freq);
+      console.log(this.inputPattern)
     }
   }
 
   ngAfterViewInit() {
-    //this.sliderDates = this.dates.map(date => date.tableDate)
     const $fromInput = $('.js-from');
     const $toInput = $('.js-to');
     this.initRangeSlider(this.sliderDates, this.start, this.end, this.freq, this.portalSettings);
     const $range = $('#slider_' + this.subCat.id).data('ionRangeSlider');
-    this.setFromInputChangeFunction($fromInput, this.sliderDates, $range, this.portalSettings, this.freq);
-    this.setToInputChangeFunction($toInput, this.sliderDates, $range);
+    // Set change functions for 'from' and 'to' date inputs
+    this.setInputChangeFunction($fromInput, this.sliderDates, $range, 'from', this.portalSettings, this.freq);
+    this.setInputChangeFunction($toInput, this.sliderDates, $range, 'to', this.portalSettings, this.freq);
     this.cd.detectChanges();
+  }
+
+  setInputPattern(freq: string) {
+    if (freq === 'A') {
+      return '/\d{4}/';
+    }
+    if (freq === 'Q') {
+      return '/\d{4}( |)[(Q|q)]\d{1}/';
+    }
+    if (freq === 'M' || freq === 'S') {
+      return '/\d{4}(|-)\d{2}/';
+    }
   }
 
   updateOtherSliders(sublist, subcatId, from, to) {
@@ -65,8 +81,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   initRangeSlider(sliderDates: Array<any>, start: number, end: number, freq: string, portalSettings) {
     const updateOtherSliders = (sublist, subCatId, from, to) => this.updateOtherSliders(sublist, subCatId, from, to);
-    const formatChartDate = (value, freq) => this.formatChartDate(value, freq);
-    const updateRange = this.updateRange;
+    const updateChartsAndTables = (from, to, freq) => this.updateChartsAndTables(from, to, freq);
     const sublist = this.sublist;
     const subCatId = this.subCat.id;
     const $fromInput = $('.js-from');
@@ -82,96 +97,98 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       keyboard_step: 1,
       type: 'double',
       onChange: function (data) {
-        console.log('data', data)
         if (portalSettings.sliderInteraction) {
           updateOtherSliders(sublist, subCatId, data.from, data.to);
         }
         $fromInput.prop('value', data.from_value);
-        console.log('from input', $fromInput)
         $toInput.prop('value', data.to_value);
       },
       onFinish: function (data) {
-        const chartStart = formatChartDate(data.from_value, freq);
-        const chartEnd = formatChartDate(data.to_value, freq);
-        const tableStart = data.from_value.toString();
-        const tableEnd = data.to_value.toString();
-        updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
+        updateChartsAndTables(data.from_value, data.to_value, freq);
       }
     });
   }
 
-  setFromInputChangeFunction(fromInput, sliderDates, rangeSlider, portalSettings, freq) {
-    const updateOtherSliders = (sublist, subCatId, from, to) => this.updateOtherSliders(sublist, subCatId, from, to);
-    const formatChartDate = (value, freq) => this.formatChartDate(value, freq);
-    const updateRange = this.updateRange;
-    const sublist = this.sublist;
-    const subCatId = this.subCat.id;
-    fromInput.on('change', function () {
-      let from = $(this).prop('value');
-      let fromIndex = sliderDates.findIndex(date => date == from);
-      if (fromIndex >= 0) {
-        fromInput.prop('value', from);
-        rangeSlider.update({
-          from: fromIndex
-        });
-        const to = $('.js-to').prop('value');
-        console.log('to', to)
-        const toIndex = sliderDates.findIndex(date => date == to);
-        if (portalSettings.sliderInteraction) {
-          updateOtherSliders(sublist, subCatId, fromIndex, toIndex);
+  updateChartsAndTables(from, to, freq: string) {
+    const chartStart = this.formatChartDate(from, freq);
+    const chartEnd = this.formatChartDate(to, freq);
+    const tableStart = from.toString();
+    const tableEnd = to.toString();
+    this.updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
+  }
+
+  updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
+    if (portalSettings.sliderInteraction) {
+      this.updateOtherSliders(this.sublist, this.subCat.id, fromIndex, toIndex);
+    }
+    this.updateChartsAndTables(from, to, freq);
+  }
+
+  updateRangeSlider(rangeSlider, key, valueIndex) {
+    rangeSlider.update({
+      [key]: valueIndex
+    });
+  }
+
+  checkValidInputs = (value, siblingValue, key: string) => {
+    if (key === 'from') {
+      return value <= siblingValue ? true : false;
+    }
+    if (key === 'to') {
+      return value >= siblingValue ? true : false;
+    }
+  }
+
+  setInputChangeFunction(input, sliderDates: Array<any>, rangeSlider, key: string, portalSettings, freq: string) {
+    const updateRanges = (portalSettings, fromIndex, toIndex, from, to, freq) => this.updateRanges(portalSettings, fromIndex, toIndex, from, to, freq);
+    const updateRangeSlider = (rangeSlider, key, valueIndex) => this.updateRangeSlider(rangeSlider, key, valueIndex);
+    const checkValidInputs = (value, siblingValue, key) => this.checkValidInputs(value, siblingValue, key);
+    input.on('change', function () {
+      let value = $(this).prop('value');
+      console.log('value', value);
+      console.log('typsof Value', typeof value)
+      let valueIndex = sliderDates.findIndex(date => date == value);
+      const siblingValue = $(this).siblings().prop('value');
+      const siblingValueIndex = sliderDates.findIndex(date => date == siblingValue);
+      const validInputs = checkValidInputs(value, siblingValue, key);
+      if (valueIndex >= 0 && validInputs) {
+        input.prop('value', value);
+        updateRangeSlider(rangeSlider, key, valueIndex);
+        if (key === 'from') {
+          updateRanges(portalSettings, valueIndex, siblingValueIndex, value, siblingValue, freq);
         }
-        const chartStart = formatChartDate(from, freq);
-        const chartEnd = formatChartDate(to, freq);
-        const tableStart = from.toString();
-        const tableEnd = to.toString();
-        updateRange.emit({ chartStart: chartStart, chartEnd: chartEnd, tableStart: tableStart, tableEnd: tableEnd });
+        if (key === 'to') {
+          updateRanges(portalSettings, siblingValueIndex, valueIndex, siblingValue, value, freq);
+        }
       }
     });
   }
 
-  setToInputChangeFunction(toInput, sliderDates, rangeSlider) {
-    toInput.on('change', function () {
-      let to = $(this).prop('value');
-      let toIndex = sliderDates.findIndex(date => date == to);
-      if (toIndex >= 0) {
-        toInput.prop('value', to);
-        rangeSlider.update({
-          to: toIndex
-        });
-      }
-    });
-  }
-
-  findDefaultRange() {
-    this.sliderDates = this.dates.map(date => date.tableDate);
-    const defaultRanges = this._helper.setDefaultSliderRange(this.freq, this.sliderDates, this.defaultRange);
+  findDefaultRange = (dates: Array<any>, freq: string, defaultRange, dateFrom, dateTo) => {
+    const sliderDates = dates.map(date => date.tableDate);
+    const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     // Range slider is converting annual year strings to numbers
-    const dateFromExists = this.dates.findIndex(date => date == this.dateFrom);
-    const dateToExists = this.dates.findIndex(date => date == this.dateTo);
+    const dateFromExists = dates.findIndex(date => date == dateFrom);
+    const dateToExists = dates.findIndex(date => date == dateTo);
     if (dateFromExists > -1 && dateToExists > -1) {
       startIndex = dateFromExists;
       endIndex = dateToExists;
     }
-    return { start: startIndex, end: endIndex };
+    return { start: startIndex, end: endIndex, sliderDates: sliderDates };
   }
 
-  formatChartDate(value, freq) {
+  formatChartDate = (value, freq) => {
     const quarters = { Q1: '01', Q2: '04', Q3: '07', Q4: '10' };
-    let date;
     if (freq === 'A') {
-      date = value.toString() + '-01-01';
-      return date;
+      return `${value.toString()}-01-01`;
     }
     if (freq === 'Q') {
-      const year = value.substr(0, 4);
       const q = value.substr(5, 2);
-      date = value.substr(0, 4) + '-' + quarters[q] + '-01';
-      return date;
+      return `${value.substr(0, 4)}-${quarters[q]}-01`;
     }
     if (freq === 'M') {
-      date = value + '-01';
-      return date;
+      return `${value}-01`;
     }
   }
 }
