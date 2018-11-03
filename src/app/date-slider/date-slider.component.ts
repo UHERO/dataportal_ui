@@ -1,6 +1,7 @@
 import { Component, Input, Inject, OnInit, ChangeDetectorRef, AfterViewInit, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import 'jquery';
+import { validateConfig } from '@angular/router/src/config';
 declare var $: any;
 // import 'ion-rangeslider';
 
@@ -22,7 +23,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   private start;
   private end;
   private sliderDates;
-  private inputPattern;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -38,9 +38,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       this.start = defaultRanges.start;
       this.end = defaultRanges.end;
       this.sliderDates = defaultRanges.sliderDates;
-
-      this.inputPattern = this.setInputPattern(this.freq);
-      console.log(this.inputPattern)
     }
   }
 
@@ -53,18 +50,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     this.setInputChangeFunction($fromInput, this.sliderDates, $range, 'from', this.portalSettings, this.freq);
     this.setInputChangeFunction($toInput, this.sliderDates, $range, 'to', this.portalSettings, this.freq);
     this.cd.detectChanges();
-  }
-
-  setInputPattern(freq: string) {
-    if (freq === 'A') {
-      return '/\d{4}/';
-    }
-    if (freq === 'Q') {
-      return '/\d{4}( |)[(Q|q)]\d{1}/';
-    }
-    if (freq === 'M' || freq === 'S') {
-      return '/\d{4}(|-)\d{2}/';
-    }
   }
 
   updateOtherSliders(sublist, subcatId, from, to) {
@@ -130,7 +115,25 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     });
   }
 
-  checkValidInputs = (value, siblingValue, key: string) => {
+  checkValidInputString = (value, freq: string) => {
+    // Accepted input formats:
+    // Annual: YYYY; Quarterly: YYYY Q#, YYYYQ#, YYYY q#, YYYYq#; Monthly/Semiannual: YYYY-MM, YYYYMM
+    if (freq === 'A') {
+      return /^\d{4}$/.test(value);
+    }
+    if (freq === 'Q') {
+      return /^\d{4}( |)[Q]\d{1}$/.test(value); 
+    }
+    if (freq === 'M' || freq === 'S') {
+      return /^\d{4}(|-)\d{2}$/.test(value);
+    }
+  }
+
+  checkValidInputs = (value, siblingValue, key: string, freq: string) => {
+    const validInput = this.checkValidInputString(value.toUpperCase(), freq);
+    if (!validInput) {
+      return false;
+    }
     if (key === 'from') {
       return value <= siblingValue ? true : false;
     }
@@ -139,18 +142,27 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     }
   }
 
+  formatInput = (value: string, freq: string) => {
+    if (freq === 'Q') {
+      return value.includes(' ') ? value : value.slice(0, 4) + ' ' + value.slice(4);
+    }
+    if (freq === 'M' || freq === 'S') {
+      return value.includes('-') ? value : value.slice(0, 4) + '-' + value.slice(4);
+    }
+    return value;
+  }
+
   setInputChangeFunction(input, sliderDates: Array<any>, rangeSlider, key: string, portalSettings, freq: string) {
     const updateRanges = (portalSettings, fromIndex, toIndex, from, to, freq) => this.updateRanges(portalSettings, fromIndex, toIndex, from, to, freq);
     const updateRangeSlider = (rangeSlider, key, valueIndex) => this.updateRangeSlider(rangeSlider, key, valueIndex);
-    const checkValidInputs = (value, siblingValue, key) => this.checkValidInputs(value, siblingValue, key);
+    const checkValidInputs = (value, siblingValue, key, freq) => this.checkValidInputs(value, siblingValue, key, freq);
+    const formatInput = (value, freq) => this.formatInput(value, freq);
     input.on('change', function () {
-      let value = $(this).prop('value');
-      console.log('value', value);
-      console.log('typsof Value', typeof value)
+      let value = formatInput($(this).prop('value').toUpperCase(), freq);
       let valueIndex = sliderDates.findIndex(date => date == value);
-      const siblingValue = $(this).siblings().prop('value');
+      const siblingValue = $(this).siblings('.date-input').prop('value');
       const siblingValueIndex = sliderDates.findIndex(date => date == siblingValue);
-      const validInputs = checkValidInputs(value, siblingValue, key);
+      const validInputs = checkValidInputs(value, siblingValue, key, freq);
       if (valueIndex >= 0 && validInputs) {
         input.prop('value', value);
         updateRangeSlider(rangeSlider, key, valueIndex);
@@ -169,8 +181,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     // Range slider is converting annual year strings to numbers
-    const dateFromExists = dates.findIndex(date => date == dateFrom);
-    const dateToExists = dates.findIndex(date => date == dateTo);
+    const dateFromExists = dates.findIndex(date => date.tableDate == dateFrom);
+    const dateToExists = dates.findIndex(date => date.tableDate == dateTo);
     if (dateFromExists > -1 && dateToExists > -1) {
       startIndex = dateFromExists;
       endIndex = dateToExists;

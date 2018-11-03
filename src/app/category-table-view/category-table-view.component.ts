@@ -51,6 +51,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log('tableStart', this.tableStart)
     this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
@@ -94,14 +95,20 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     dates.forEach((date, index) => {
       // Range slider is converting annual year strings to numbers
       if (date.tableDate == tableStart) {
+        console.log('date.tableDate', date.tableDate);
+        console.log('tableStart', tableStart)
         startIndex = index;
       }
       if (date.tableDate == tableEnd) {
         endIndex = index;
       }
     });
-    const start = startIndex;
-    const end = endIndex;
+    let start = startIndex;
+    let end = endIndex;
+    if (startIndex > endIndex) {
+      start = defaultRanges.startIndex;
+      end = defaultRanges.endIndex;
+    }
     const tableDates = dates.slice(start, end + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {

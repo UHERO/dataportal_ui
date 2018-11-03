@@ -18,10 +18,16 @@
 
     .sliders {
       display: inline-block;
-      width: 200px;
+      width: 400px;
       vertical-align: bottom;
       margin-left: 10px;
       margin-right: 10px;
+
+      @media (max-width: 767px) {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
     }
   }
 
