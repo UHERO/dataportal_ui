@@ -47,6 +47,34 @@ export class HighchartComponent implements OnChanges {
   }
 
   getSeriesStartAndEnd = (dates, start, end) => {
+    /* console.log('dates', dates);
+    console.log('start', start);
+    let startIndex, endIndex;
+    if (start && end) {
+      const startExists = dates.findIndex(date => date.date == start);
+      console.log('startExists', startExists)
+      const endExists = dates.findIndex(date => date.date == end);
+      if (startExists > -1 && endExists > -1) {
+        startIndex = startExists;
+        endIndex = endExists;
+      }
+      if (start < dates[0].date && endExists > -1) {
+        console.log('true')
+        startIndex = 0;
+        endIndex = endExists;
+      }
+      if (startExists > -1 && end > dates[dates.length - 1].date) {
+        startIndex = startExists;
+        endIndex = dates.length - 1;
+      }
+      return { seriesStart: startIndex, seriesEnd: endIndex };
+    }
+    const defaultRanges = this._helper.setDefaultCategoryRange(this.currentFreq, dates, this.defaultRange);
+    startIndex = defaultRanges.startIndex;
+    endIndex = defaultRanges.endIndex;
+    console.log('default')
+    return { seriesStart: startIndex, seriesEnd: endIndex }; */
+
     const defaultRanges = this._helper.setDefaultCategoryRange(this.currentFreq, dates, this.defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     dates.forEach((item, index) => {
@@ -109,6 +137,7 @@ export class HighchartComponent implements OnChanges {
   };
 
   setChartSeries = (portalSettings, series0, currentFreq, startDate, pseudoZones, series1) => {
+    console.log('startDate', new Date(startDate).toISOString())
     const chartSeries = [];
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
@@ -152,6 +181,7 @@ export class HighchartComponent implements OnChanges {
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
     const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd);
+    console.log('seriesStart', seriesStart);
     const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;

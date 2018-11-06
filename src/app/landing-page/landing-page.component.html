@@ -45,7 +45,7 @@
 				 [tableStart]="tableStart" [tableEnd]="tableEnd" [sublist]="sub" [data]="sub.displaySeries" [geo]="data.currentGeo" [tableId]="sub.id"
 				 [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
 				 [noSeries]="sub.noData" [params]="queryParams"></app-category-table-view>
-				<app-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd"
+				<app-category-charts *ngIf="routeView !== 'table' && displayCharts" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd"
 				 [sublist]="sub" [data]="sub.displaySeries" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates" [freq]="data.currentFreq?.freq"
 				 [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 			</ng-template>

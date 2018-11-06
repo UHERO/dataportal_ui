@@ -49,6 +49,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     // Set change functions for 'from' and 'to' date inputs
     this.setInputChangeFunction($fromInput, this.sliderDates, $range, 'from', this.portalSettings, this.freq);
     this.setInputChangeFunction($toInput, this.sliderDates, $range, 'to', this.portalSettings, this.freq);
+    console.log('fromInput', $fromInput.prop('value'));
+    this.updateChartsAndTables($fromInput.prop('value'), $toInput.prop('value'), this.freq)
     this.cd.detectChanges();
   }
 
@@ -178,6 +180,23 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   findDefaultRange = (dates: Array<any>, freq: string, defaultRange, dateFrom, dateTo) => {
     const sliderDates = dates.map(date => date.tableDate);
+    if (dateFrom && dateTo) {
+      const dateFromExists = dates.findIndex(date => date.tableDate == dateFrom);
+      const dateToExists = dates.findIndex(date => date.tableDate == dateTo);
+      if (dateFromExists > -1 && dateToExists > -1) {
+        return { start: dateFromExists, end: dateToExists, sliderDates: sliderDates };
+      }
+      if (dateFrom < dates[0].tableDate && dateToExists > -1) {
+        return { start: 0, end: dateToExists, sliderDates: sliderDates };
+      }
+      if (dateFromExists > -1 && dateTo > dates[dates.length - 1].tableDate) {
+        return { start: dateFromExists, end: dates.length - 1, sliderDates: sliderDates };
+      }
+    }
+    const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
+    let { startIndex, endIndex } = defaultRanges;
+    return { start: startIndex, end: endIndex, sliderDates: sliderDates };
+    /* const sliderDates = dates.map(date => date.tableDate);
     const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     // Range slider is converting annual year strings to numbers
@@ -187,7 +206,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       startIndex = dateFromExists;
       endIndex = dateToExists;
     }
-    return { start: startIndex, end: endIndex, sliderDates: sliderDates };
+    return { start: startIndex, end: endIndex, sliderDates: sliderDates }; */
   }
 
   formatChartDate = (value, freq) => {
