@@ -40,10 +40,10 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const $fromInput = $('.js-from');
-    const $toInput = $('.js-to');
+    const $fromInput = $(`#dateFrom_${this.subCat.id}`);
+    const $toInput = $(`#dateTo_${this.subCat.id}`);
     this.initRangeSlider(this.sliderDates, this.start, this.end, this.freq, this.portalSettings);
-    const $range = $('#slider_' + this.subCat.id).data('ionRangeSlider');
+    const $range = $(`#slider_${this.subCat.id}`).data('ionRangeSlider');
     // Set change functions for 'from' and 'to' date inputs
     this.setInputChangeFunction($fromInput, this.sliderDates, $range, 'from', this.portalSettings, this.freq);
     this.setInputChangeFunction($toInput, this.sliderDates, $range, 'to', this.portalSettings, this.freq);
@@ -51,26 +51,34 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     this.cd.detectChanges();
   }
 
-  updateOtherSliders(sublist, subcatId, from, to) {
+  updateOtherSliders(sublist, subcatId, from, to, fromValue, toValue) {
     sublist.forEach((sub) => {
-      const slider = sub.id !== subcatId ? $('#slider_' + sub.id).data('ionRangeSlider') : null;
+      const slider = sub.id !== subcatId ? $(`#slider_${sub.id}`).data('ionRangeSlider') : null;
+      const $fromInput = sub.id !== subcatId ? $(`#dateFrom_${sub.id}`) : null;
+      const $toInput = sub.id !== subcatId ? $(`#dateTo_${sub.id}`) : null
       if (slider) {
         slider.update({
           from: from,
           to: to
         });
       }
+      if ($fromInput) {
+        $fromInput.prop('value', fromValue);
+      }
+      if ($toInput) {
+        $toInput.prop('value', toValue);
+      }
     });
   }
 
   initRangeSlider(sliderDates: Array<any>, start: number, end: number, freq: string, portalSettings) {
-    const updateOtherSliders = (sublist, subCatId, from, to) => this.updateOtherSliders(sublist, subCatId, from, to);
+    const updateOtherSliders = (sublist, subCatId, from, to, fromValue, toValue) => this.updateOtherSliders(sublist, subCatId, from, to, fromValue, toValue);
     const updateChartsAndTables = (from, to, freq) => this.updateChartsAndTables(from, to, freq);
     const sublist = this.sublist;
     const subCatId = this.subCat.id;
-    const $fromInput = $('.js-from');
-    const $toInput = $('.js-to');
-    $('#slider_' + this.subCat.id).ionRangeSlider({
+    const $fromInput = $(`#dateFrom_${subCatId}`);
+    const $toInput = $(`#dateTo_${subCatId}`);
+    $(`#slider_${subCatId}`).ionRangeSlider({
       min: 0,
       from: start,
       to: end,
@@ -82,7 +90,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       type: 'double',
       onChange: function (data) {
         if (portalSettings.sliderInteraction) {
-          updateOtherSliders(sublist, subCatId, data.from, data.to);
+          updateOtherSliders(sublist, subCatId, data.from, data.to, data.from_value, data.to_value);
         }
         $fromInput.prop('value', data.from_value);
         $toInput.prop('value', data.to_value);
@@ -101,7 +109,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
     if (portalSettings.sliderInteraction) {
-      this.updateOtherSliders(this.sublist, this.subCat.id, fromIndex, toIndex);
+      console.log('sliderInteraction')
+      this.updateOtherSliders(this.sublist, this.subCat.id, fromIndex, toIndex, from, to);
     }
     this.updateChartsAndTables(from, to, freq);
   }

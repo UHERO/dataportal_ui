@@ -31,16 +31,16 @@
 					<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event, sub.id)">Annual Change
 				</label>
 				<app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-				 [sublist]="data.sublist" [subCat]="sub" [dateFrom]="sub.tableStart ? sub.tableStart : null" [dateTo]="sub.tableEnd ? sub.tableEnd: null"
+				 [sublist]="data.sublist" [subCat]="sub" [dateFrom]="sub.seriesStart ? sub.seriesStart : null" [dateTo]="sub.seriesEnd ? sub.seriesEnd: null"
 				 [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, sub)"></app-date-slider>
-				<i *ngIf="!sub.requestComplete || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
+				<i *ngIf="!displaySeries || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table-view *ngIf="routeView === 'table' && sub.requestComplete" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-			 [tableStart]="sub.tableStart" [tableEnd]="sub.tableEnd" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]" [geo]="data.currentGeo" [tableId]="sub.id"
+			<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings" [dates]="sub.dateArray"
+			 [tableStart]="sub.seriesStart" [tableEnd]="sub.seriesEnd" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]" [geo]="data.currentGeo" [tableId]="sub.id"
 			 [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [c5maActive]="queryParams.c5ma === 'true'"
 			 [noSeries]="sub.noData" [params]="queryParams"></app-category-table-view>
-			<app-category-charts *ngIf="routeView !== 'table' && sub.requestComplete" [search]="search" [portalSettings]="portalSettings"
-			 [chartStart]="sub.chartStart" [chartEnd]="sub.chartEnd" [dates]="sub.dateArray" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]"
+			<app-category-charts *ngIf="routeView !== 'table' && displaySeries" [search]="search" [portalSettings]="portalSettings"
+			 [chartStart]="sub.seriesStart" [chartEnd]="sub.seriesEnd" [dates]="sub.dateArray" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]"
 			 [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 			<app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries" (seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging>
 		</ng-template>

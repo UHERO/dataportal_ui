@@ -22,11 +22,10 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   private routeC5ma;
   private search = false;
   private queryParams: any = {};
-  private tableStart;
-  private tableEnd;
-  private chartStart;
-  private chartEnd;
   private chartRange;
+  private seriesStart;
+  private seriesEnd;
+  private displaySeries;
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -103,6 +102,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
 
   // Redraw series when a new measurement is selected
   redrawSeries(event, subId) {
+    this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.m = event.name;
@@ -134,14 +134,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   }
 
   changeRange(e, measurement) {
-    measurement.tableStart = e.tableStart;
-    measurement.tableEnd = e.tableEnd;
-    measurement.chartStart = e.chartStart;
-    measurement.chartEnd = e.chartEnd;
-    this.tableStart = e.tableStart;
-    this.tableEnd = e.tableEnd;
-    this.chartStart = e.chartStart;
-    this.chartEnd = e.chartEnd;
+    measurement.seriesStart = e.seriesStart;
+    measurement.seriesEnd = e.seriesEnd;
+    this.seriesStart = e.seriesStart;
+    this.seriesEnd = e.seriesEnd;
+    this.displaySeries = true;
   }
 
   // Work around for srolling to page anchor

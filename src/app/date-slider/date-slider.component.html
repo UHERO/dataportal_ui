@@ -1,5 +1,5 @@
-<input type="text" [value]="sliderDates[start]" class="date-input js-from" />
+<input type="text" [id]="'dateFrom_' + subCat.id" [value]="sliderDates[start]" class="date-input js-from" />
 <div class="slider-container">
     <input *ngIf="subCat" class="sliders" type="text" [id]="'slider_' + subCat.id" value="" aria-label="date-range-slider" />
 </div>
-<input type="text" [value]="sliderDates[end]" class="date-input js-to" />
+<input type="text" [id]="'dateTo_' + subCat.id" [value]="sliderDates[end]" class="date-input js-to" />

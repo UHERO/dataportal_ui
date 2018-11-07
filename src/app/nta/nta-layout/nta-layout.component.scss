@@ -10,7 +10,7 @@
     color: $primary;
   }
 
-  .filters {
+  /* .filters {
     display: inline-block;
     color: $primary;
     margin-bottom: 5px;
@@ -35,6 +35,27 @@
       vertical-align: bottom;
       margin-left: 10px;
       margin-right: 10px;
+    }
+  } */
+
+  .filters {
+    display: inline-block;
+    color: $primary;
+    margin-bottom: 5px;
+    margin-right: 10px;
+
+    .sliders {
+      display: inline-block;
+      width: 360px;
+      vertical-align: bottom;
+      margin-left: 10px;
+      margin-right: 10px;
+
+      @media (max-width: 767px) {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
     }
   }
 

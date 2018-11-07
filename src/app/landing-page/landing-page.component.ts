@@ -157,6 +157,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   switchView(subId) {
     this.loading = true;
+    this.displaySeries = false;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
       this.updateRoute(subId);
@@ -201,6 +202,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
+    this.displaySeries = true;
   }
 
   scrollTo(): void {
