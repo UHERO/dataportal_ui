@@ -31,10 +31,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private queryParams: any = {};
   private tableStart;
   private tableEnd;
-  private chartStart = null;
-  private chartEnd = null;
+  private seriesStart = null;
+  private seriesEnd = null;
   private portalSettings;
-  private displayCharts;
+  private displaySeries;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -57,14 +57,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   ) {}
 
   ngOnInit() {
-    this.chartStart = null
     this.currentGeo = { fips: null, name: null, shortName: null, handle: null };
     this.currentFreq = { freq: null, label: null };
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
   ngAfterViewInit() {
-    this.chartStart = null
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
       this.search = typeof this.id === 'string' ? true : false;
@@ -136,7 +134,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq, subId) {
-    this.displayCharts = false;
+    this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = event.handle;
@@ -147,6 +145,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   redrawSeriesFreq(event, currentGeo, subId) {
+    this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
@@ -184,12 +183,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   changeRange(e) {
-    console.log('changeRange', e)
-    this.tableStart = e.tableStart;
-    this.tableEnd = e.tableEnd;
-    this.chartStart = e.chartStart;
-    this.chartEnd = e.chartEnd;
-    this.displayCharts = true;
+    this.seriesStart = e.seriesStart;
+    this.seriesEnd = e.seriesEnd;
+    this.displaySeries = true;
   }
 
   // Work around for srolling to page anchor
