@@ -18,9 +18,9 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   @Input() dateTo;
   @Input() sublist;
   @Output() updateRange = new EventEmitter(true);
-  private start;
-  private end;
-  private sliderDates;
+  start;
+  end;
+  sliderDates;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
