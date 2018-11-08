@@ -37,15 +37,15 @@
 						<input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event, sub.id)">Year-to-Date
 					</label>
 					<app-date-slider *ngIf="!sub.noData" class="sliders" [portalSettings]="portalSettings" [dates]="data.categoryDates" [sublist]="data.subcategories"
-					 [subCat]="sub" [dateFrom]="tableStart ? tableStart : null" [dateTo]="tableEnd ? tableEnd: null" [freq]="data.currentFreq?.freq"
+					 [subCat]="sub" [dateFrom]="seriesStart ? seriesStart : null" [dateTo]="seriesEnd ? seriesEnd: null" [freq]="data.currentFreq?.freq"
 					 (updateRange)="changeRange($event)"></app-date-slider>
 				</div>
-				<i *ngIf="!sub.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
+				<i *ngIf="!sub.requestComplete || !displaySeries" class="fas fa-spinner fa-pulse fa-fw"></i>
 				<app-category-table-view *ngIf="routeView === 'table' && sub.requestComplete" [portalSettings]="portalSettings" [dates]="data.categoryDates"
-				 [tableStart]="tableStart" [tableEnd]="tableEnd" [sublist]="sub" [data]="sub.displaySeries" [geo]="data.currentGeo" [tableId]="sub.id"
+				 [tableStart]="seriesStart" [tableEnd]="seriesEnd" [sublist]="sub" [data]="sub.displaySeries" [geo]="data.currentGeo" [tableId]="sub.id"
 				 [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
 				 [noSeries]="sub.noData" [params]="queryParams"></app-category-table-view>
-				<app-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd"
+				<app-category-charts *ngIf="routeView !== 'table' && displaySeries" [portalSettings]="portalSettings" [chartStart]="seriesStart" [chartEnd]="seriesEnd"
 				 [sublist]="sub" [data]="sub.displaySeries" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates" [freq]="data.currentFreq?.freq"
 				 [noSeries]="sub.noData" [params]="queryParams"></app-category-charts>
 			</ng-template>

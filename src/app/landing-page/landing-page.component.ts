@@ -31,9 +31,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private queryParams: any = {};
   private tableStart;
   private tableEnd;
-  private chartStart;
-  private chartEnd;
+  private seriesStart = null;
+  private seriesEnd = null;
   private portalSettings;
+  private displaySeries;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -133,16 +134,18 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq, subId) {
+    this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
       this.updateRoute(subId);
-    }, 10);
+    }, 20);
     this.scrollToFragment();
   }
 
   redrawSeriesFreq(event, currentGeo, subId) {
+    this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
@@ -154,6 +157,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   switchView(subId) {
     this.loading = true;
+    this.displaySeries = false;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
       this.updateRoute(subId);
@@ -180,10 +184,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   changeRange(e) {
-    this.tableStart = e.tableStart;
-    this.tableEnd = e.tableEnd;
-    this.chartStart = e.chartStart;
-    this.chartEnd = e.chartEnd;
+    this.seriesStart = e.seriesStart;
+    this.seriesEnd = e.seriesEnd;
+    this.displaySeries = true;
   }
 
   // Work around for srolling to page anchor
@@ -199,6 +202,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
     this.loading = false;
+    this.displaySeries = true;
   }
 
   scrollTo(): void {

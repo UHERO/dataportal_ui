@@ -1,5 +1,36 @@
 @import 'app_colors';
 
+.js-to, .js-from {
+    display: inline-block;
+    width: 85px;
+    vertical-align: bottom;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.slider-container {
+    display: inline-block;
+    width: 150px;
+    margin: 0 20px;
+    vertical-align: bottom;
+
+    @media (max-width: 767px) {
+        width: 150px;
+        margin: 0 5px;
+    }
+}
+
 .irs-line-mid, .irs-line-left, .irs-line-right,
 .irs-bar, .irs-bar-edge, .irs-slider {
     background: url(../../sprite-skin-nice2.png) repeat-x;

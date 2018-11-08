@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '
 import { HelperService } from '../helper.service';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerService } from '../analyzer.service';
+import { disableDebugTools } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-category-table-view',
@@ -61,15 +62,15 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
           const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.sublist.parentId);
           this.rows.push(seriesData);
           if (this.yoyActive) {
-            const yoyData = this.formatTransformationData(series, yoy);
+            const yoyData = this.formatTransformationData(series, yoy, 'pc1');
             this.rows.push(yoyData)
           }
           if (this.ytdActive && this.freq !== 'A') {
-            const ytdData = this.formatTransformationData(series, ytd);
+            const ytdData = this.formatTransformationData(series, ytd, 'ytd');
             this.rows.push(ytdData)
           }
           if (this.c5maActive) {
-            const c5maData = this.formatTransformationData(series, c5ma);
+            const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
             this.rows.push(c5maData)
           }
         }
@@ -93,15 +94,19 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     let { startIndex, endIndex } = defaultRanges;
     dates.forEach((date, index) => {
       // Range slider is converting annual year strings to numbers
-      if (date.tableDate == tableStart) {
+      if (date.date == tableStart) {
         startIndex = index;
       }
-      if (date.tableDate == tableEnd) {
+      if (date.date == tableEnd) {
         endIndex = index;
       }
     });
-    const start = startIndex;
-    const end = endIndex;
+    let start = startIndex;
+    let end = endIndex;
+    if (startIndex > endIndex) {
+      start = defaultRanges.startIndex;
+      end = defaultRanges.endIndex;
+    }
     const tableDates = dates.slice(start, end + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
@@ -126,17 +131,23 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     return seriesData;
   }
 
-  formatTransformationData = (series, transformation) => {
-    const { dates, values } = transformation;
-    const displayName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
+  formatTransformationData = (series, transformation, transformationName) => {
     const data = {
-      series: displayName,
+      series: '',
       seriesInfo: series.seriesInfo,
       lvlData: false
+    };
+    if (transformation) {
+      const { dates, values } = transformation;
+      const displayName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
+      data.series = displayName;
+      dates.forEach((d, index) => {
+        data[d] = values[index];
+      });
+      return data;
     }
-    dates.forEach((d, index) => {
-      data[d] = values[index];
-    });
+    const displayName = this.formatTransformationName(transformationName, series.seriesInfo.percent);
+    data.series = displayName;
     return data;
   }
 
@@ -170,7 +181,6 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
         parentName + sublistName + ' (' + geoName + this.freq + ')' +
       ': ' + this.portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
       '\n\n'
-
     }
     this.gridApi.exportDataAsCsv(params);
   }
