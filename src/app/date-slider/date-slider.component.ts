@@ -109,7 +109,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
     if (portalSettings.sliderInteraction) {
-      console.log('sliderInteraction')
       this.updateOtherSliders(this.sublist, this.subCat.id, fromIndex, toIndex, from, to);
     }
     this.updateChartsAndTables(from, to, freq);
@@ -136,8 +135,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   }
 
   checkValidInputs = (value, siblingValue, key: string, freq: string) => {
-    const validInput = this.checkValidInputString(value.toUpperCase(), freq);
-    if (!validInput) {
+    const validString = this.checkValidInputString(value.toUpperCase(), freq);
+    if (!validString) {
       return false;
     }
     if (key === 'from') {
