@@ -177,7 +177,7 @@ export class HighstockComponent implements OnChanges {
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
-    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
+    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;    
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
@@ -188,6 +188,7 @@ export class HighstockComponent implements OnChanges {
     const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
+    const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -273,14 +274,16 @@ export class HighstockComponent implements OnChanges {
         afterSetExtremes: function () {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = freq.freq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = freq.freq === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
+          this._selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           const lastDate = seriesDetail.seriesObservations.observationEnd;
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
-            chartExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
+            chartExtremes.emit({ minDate: this._extremes.min, maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
+            // use setExtremes to snap dates to first of the month
+            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
           }
         }
       },

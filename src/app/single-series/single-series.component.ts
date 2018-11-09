@@ -130,7 +130,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
-    this.chartEnd = e.endOfSample ? null : e.maxDate.substr(0, 4);
+    this.chartEnd = e.endOfSample ? null : e.maxDate;
   }
 
   // Update table when selecting new ranges in the chart
