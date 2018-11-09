@@ -75,7 +75,7 @@ export class HighstockHelperService {
     if (freq === 'Q') {
       return `${year}-${this.getQuarterMonths(month)}-01`;
     }
-    if (freq === 'M') {
+    if (freq === 'M' || freq === 'S') {
       return `${date.substr(0, 7)}-01`;
     }
   }
