@@ -337,6 +337,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
+    const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     this.chartOptions.chart = {
       alignTicks: false,
@@ -456,12 +457,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
         afterSetExtremes: function () {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = setDateToFirstOfMonth(navigatorOptions.frequency, userMin);
+          this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
+            // use setExtremes to snap dates to first of the month
+            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
           }
         }
       },

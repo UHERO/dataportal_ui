@@ -66,6 +66,35 @@ export class HighstockHelperService {
     return { min: xMin, max: xMax };
   };
 
+  setDateToFirstOfMonth = (freq, date) => {
+    const month = +date.substr(5, 2);
+    const year = +date.substr(0, 4);
+    if (freq === 'A') {
+      return `${year}-01-01`;
+    }
+    if (freq === 'Q') {
+      return `${year}-${this.getQuarterMonths(month)}-01`;
+    }
+    if (freq === 'M' || freq === 'S') {
+      return `${date.substr(0, 7)}-01`;
+    }
+  }
+
+  getQuarterMonths = (month) => {
+    if (month >= 1 && month <= 3) {
+      return '01';
+    }
+    if (month >= 4 && month <= 6) {
+      return '04';
+    }
+    if (month >= 7 && month <= 9) {
+      return '07';
+    }
+    if (month >= 10 && month <= 12) {
+      return '10';
+    }
+  }
+
   getTooltipFreqLabel = (frequency, date) => {
     const year = Highcharts.dateFormat('%Y', date);
     const month = Highcharts.dateFormat('%b', date);
