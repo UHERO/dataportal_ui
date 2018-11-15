@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
+//import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
 import { AgGridModule } from 'ag-grid-angular';
@@ -65,7 +66,7 @@ import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analy
     HighchartsChartModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule,
+    HttpClientModule,
     RouterModule,
     DataTableModule, SharedModule,
     TableModule,

@@ -17,7 +17,7 @@ import {
   RouterLinkStubDirective
 } from '../../testing/router-stubs';
 import { newEvent } from '../../testing/helpers';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 
 @Component({selector: 'app-search-bar', template: ''})
 class SearchStubComponent {}

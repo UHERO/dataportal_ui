@@ -1,6 +1,6 @@
+import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
@@ -31,15 +31,15 @@ export class NtaHelperService {
   initContent(catId: any, selectedMeasure?: string): Observable<any> {
     const cacheId = NtaHelperService.setCacheId(catId, selectedMeasure);
     if (this.categoryData[cacheId]) {
-      return Observable.of([this.categoryData[cacheId]]);
+      return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
       this.getCategory(cacheId, catId, selectedMeasure);
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
       this.getSearch(cacheId, catId);
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 

@@ -1,5 +1,5 @@
 export { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 import { Component, Directive, Injectable, Input, Type } from '@angular/core';
 import { ActivatedRoute, Route, Params, ActivatedRouteSnapshot, UrlSegment, Data, NavigationExtras } from '@angular/router';
 

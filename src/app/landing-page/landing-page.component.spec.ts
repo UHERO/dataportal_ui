@@ -4,7 +4,7 @@ import { TestBed, async, fakeAsync, inject, tick, ComponentFixture } from '@angu
 import { Component } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+//import { Observable } from 'rxjs/Rx';
 
 import { UheroApiService } from '../uhero-api.service';
 import { LandingPageComponent } from './landing-page.component';

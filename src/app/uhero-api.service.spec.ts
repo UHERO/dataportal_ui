@@ -1,11 +1,12 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { MockBackend, MockConnection } from '@angular/http/testing';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
+//import { Observable } from 'rxjs/Observable';
+//import 'rxjs/add/operator/do';
 import { UheroApiService } from './uhero-api.service';
 
 let backend: MockBackend;
@@ -53,7 +54,7 @@ const mockObservationData = () => [{
 describe('Service: UheroApi', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpModule],
+      imports: [HttpClientModule],
       providers: [
         UheroApiService,
         { provide: XHRBackend, useClass: MockBackend },
@@ -72,7 +73,7 @@ describe('Service: UheroApi', () => {
   }));
 
   describe('fetchCategories', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal) => {
+    beforeEach(inject([HttpClient, XHRBackend], (http: HttpClient, be: MockBackend, root: number, portal) => {
       backend = be;
       portal = portalObj;
       service = new UheroApiService(root, portal, http);
@@ -100,7 +101,7 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchSeries', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal) => {
+    beforeEach(inject([HttpClient, XHRBackend], (http: HttpClient, be: MockBackend, root: number, portal) => {
       backend = be;
       service = new UheroApiService(root, portal, http);
       const mockSeries = mockSeriesData();
@@ -119,7 +120,7 @@ describe('Service: UheroApi', () => {
   });
 
   describe('fetchObservations', () => {
-    beforeEach(inject([Http, XHRBackend], (http: Http, be: MockBackend, root: number, portal) => {
+    beforeEach(inject([HttpClient, XHRBackend], (http: HttpClient, be: MockBackend, root: number, portal) => {
       backend = be;
       service = new UheroApiService(root, portal, http);
       const mockObservations = mockObservationData();

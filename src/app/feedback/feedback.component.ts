@@ -1,3 +1,4 @@
+import {map} from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -43,8 +44,8 @@ export class FeedbackComponent implements OnInit {
     feedback.data.email = this.feedbackForm.value.email;
     feedback.data.feedback = this.feedbackForm.value.feedback;
     feedback['g-recaptcha-response'] = this.feedbackForm.value.captcha;
-    return this.http.post('https://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs)
-      .map((res: Response) => res.json())
+    return this.http.post('https://api.uhero.hawaii.edu/v1/feedback', JSON.stringify(feedback), requestOptionsArgs).pipe(
+      map((res: Response) => res.json()))
       .subscribe(
       data => this.successMsg = 'Submission successful.',
       error => this.errorMsg = 'Something went wrong. Try again.',

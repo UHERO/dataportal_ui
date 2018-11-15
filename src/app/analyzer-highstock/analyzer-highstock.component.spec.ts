@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input } from '@angular/core';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { AnalyzerHighstockComponent } from './analyzer-highstock.component';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
@@ -42,7 +43,7 @@ describe('AnalyzerHighstockComponent', () => {
           }
         }
       ],
-      imports: [ HttpModule ]
+      imports: [ HttpClientModule ]
     })
     .compileComponents();
   }));

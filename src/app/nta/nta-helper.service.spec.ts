@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
-
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { NtaHelperService } from './nta-helper.service';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
@@ -8,7 +8,7 @@ import { HelperService } from '../helper.service';
 describe('NtaHelperService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpModule],
+      imports: [HttpClientModule],
       providers: [
         NtaHelperService,
         UheroApiService,

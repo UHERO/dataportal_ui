@@ -1,6 +1,6 @@
 export { UheroApiService } from '../app/uhero-api.service';
 
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 
 export class MockApiService {
     fetchCategories() {

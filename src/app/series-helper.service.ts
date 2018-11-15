@@ -1,5 +1,6 @@
+
+import {of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
@@ -77,7 +78,7 @@ export class SeriesHelperService {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
       });
-    return Observable.forkJoin(Observable.of(this.seriesData));
+    return observableForkJoin(observableOf(this.seriesData));
   }
 
   dataTransform(seriesObs, dates, decimals) {

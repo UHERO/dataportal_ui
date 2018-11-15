@@ -1,5 +1,5 @@
+import {of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
@@ -43,7 +43,7 @@ export class AnalyzerService {
       this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
       this.checkAnalyzerChartSeries();
     });
-    return Observable.forkJoin(Observable.of(this.analyzerData));
+    return observableForkJoin(observableOf(this.analyzerData));
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {

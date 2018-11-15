@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterLinkStubDirective, ActivatedRouteStub, ActivatedRoute } from '../../testing/router-stubs';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CategoryTableRendererComponent } from './category-table-renderer.component';
 import { TableHelperService } from '../table-helper.service';
@@ -34,7 +35,7 @@ describe('CategoryTableRendererComponent', () => {
         UheroApiService,
         HelperService
       ],
-      imports: [ HttpModule, RouterTestingModule ]
+      imports: [ HttpClientModule, RouterTestingModule ]
     })
     .compileComponents();
   }));

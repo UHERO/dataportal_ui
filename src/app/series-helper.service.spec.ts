@@ -1,7 +1,8 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';
 import { AnalyzerService } from './analyzer.service';
@@ -11,7 +12,7 @@ import { UheroApiService } from './uhero-api.service';
 describe('Service: SeriesHelper', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpModule],
+      imports: [HttpClientModule],
       providers: [
         SeriesHelperService,
         HelperService,

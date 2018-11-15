@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input } from '@angular/core';
-import { HttpModule } from '@angular/http';
+//import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CategoryTableViewComponent } from './category-table-view.component';
 import { AnalyzerService } from '../analyzer.service'
 import { UheroApiService } from '../uhero-api.service';
@@ -42,7 +43,7 @@ describe('CategoryTableViewComponent', () => {
         HelperService,
         UheroApiService
       ],
-      imports: [ HttpModule ]
+      imports: [ HttpClientModule ]
     })
     .compileComponents();
   }));
