@@ -157,6 +157,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         return params.value;
       }
     });
+    columns.push({
+      field: 'actions',
+      headerName: 'Actions',
+      pinned: 'left',
+      width: 25,
+    });
     const tableDates = dates.slice(tableStart, tableEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
