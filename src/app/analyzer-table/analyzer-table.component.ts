@@ -5,7 +5,9 @@ import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
-import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component'
+import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
+import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
+import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { GridOptions } from 'ag-grid-community';
 
 @Component({
@@ -47,7 +49,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   ) {
     this.frameworkComponents = {
       analyzerTableRenderer: AnalyzerTableRendererComponent,
-      analyzerStatsRenderer: AnalyzerStatsRendererComponent
+      analyzerStatsRenderer: AnalyzerStatsRendererComponent,
+      analyzerInteractionsEditor: AnalyzerInteractionsEditorComponent,
+      analyzerInteractionsRenderer: AnalyzerInteractionsRendererComponent
     };
     this.gridOptions = <GridOptions>{
       context: {
@@ -106,6 +110,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(c5maData)
       }
     });
+    console.log('rows', this.rows)
   }
 
   setSummaryStatColumns = () => {
@@ -158,10 +163,13 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       }
     });
     columns.push({
-      field: 'actions',
+      field: 'interactionSettings',
       headerName: 'Actions',
       pinned: 'left',
       width: 25,
+      editable: true,
+      cellRenderer: 'analyzerInteractionsRenderer',
+      cellEditor: 'analyzerInteractionsEditor'
     });
     const tableDates = dates.slice(tableStart, tableEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
@@ -180,9 +188,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series.seriesDetail,
-      showInChart: series.showInChart,
+      interactionSettings: {
+        showInChart: series.showInChart,
+        color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000',
+        seriesInfo: series.seriesDetail
+      },
       lvlData: true,
-      color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000'
     }
     formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);

@@ -1,7 +1,7 @@
 <ng-template ngIf [ngIf]="params && params.data.lvlData">
   <span>
-    <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="invokeParentUpdateAnalyzer()">&#xE872;</i>
-    <i class="material-icons analyze-chart color{{params.data.seriesInfo.id}}" [style.color]="params.data.color" (click)="invokeParentUpdateChart()">{{ params.data.showInChart ? '&#xE834;' : '&#xE835;'}}</i>
+    <!-- <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="invokeParentUpdateAnalyzer()">&#xE872;</i>
+    <i class="material-icons analyze-chart color{{params.data.seriesInfo.id}}" [style.color]="params.data.color" (click)="invokeParentUpdateChart()">{{ params.data.showInChart ? '&#xE834;' : '&#xE835;'}}</i> -->
     <a [routerLink]="['/series']" [queryParams]="{ id: params.data.seriesInfo.id, sa: params.data.seriesInfo.saParam }" queryParamsHandling='merge'>{{params.value}}</a>
   </span>
   <a tabindex="0" id="{{params.data.seriesInfo.id}}" class="info" (click)="showPopover(params.data.seriesInfo)" role="button"
