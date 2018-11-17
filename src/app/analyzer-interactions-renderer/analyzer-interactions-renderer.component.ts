@@ -11,6 +11,7 @@ export class AnalyzerInteractionsRendererComponent implements ICellRendererAngul
 
   agInit(params: any): void {
     this.params = params;
+    console.log(params)
   }
 
   refresh(params: any): boolean {

@@ -1,9 +1,9 @@
 <div class="dropdown">
   <button class="btn analyzer-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
     aria-expanded="false">
-    <i class="analyzer-more material-icons">
-      more_vert
-    </i>
+    <!-- <i class="analyzer-more material-icons" [style.color]="params.value.color">
+      settings
+    </i> -->&nbsp;
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <p>
@@ -11,12 +11,17 @@
       Remove From Analyzer
     </p>
     <p *ngIf="params.value.showInChart">
-      <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}"
-        [style.color]="params.value.color" (click)="invokeParentUpdateChart()">&#xE834;</i> Remove From Chart
+      <i class="material-icons" [style.color]="params.value.color">
+        compare_arrows
+      </i> Switch Y-Axis
+    </p>
+    <p *ngIf="params.value.showInChart">
+      <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
+        (click)="invokeParentUpdateChart()">&#xE834;</i> Remove From Chart
     </p>
     <p *ngIf="!params.value.showInChart">
-      <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}"
-        [style.color]="params.value.color" (click)="invokeParentUpdateChart()">&#xE835;</i> Add To Chart
+      <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
+        (click)="invokeParentUpdateChart()">&#xE835;</i> Add To Chart
     </p>
   </div>
 </div>

@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ICellEditorAngularComp } from 'ag-grid-angular';
+declare var $: any;
 
 @Component({
   selector: 'app-analyzer-interactions-editor',
@@ -14,7 +15,8 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.interactionSelect.element.nativeElement.focus();
+      //this.interactionSelect.element.nativeElement.focus();
+      $('.dropdown').dropdown('toggle')
     })
   }
 
@@ -24,7 +26,7 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
   }
 
   getValue(): any {
-    return true;
+    return this.params.value;
   }
 
   isPopup(): boolean {

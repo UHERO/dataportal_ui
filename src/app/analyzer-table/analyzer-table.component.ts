@@ -156,7 +156,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
-      width: 275,
+      width: 250,
       cellRenderer: 'analyzerTableRenderer',
       tooltip: function (params) {
         return params.value;
@@ -169,7 +169,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       width: 25,
       editable: true,
       cellRenderer: 'analyzerInteractionsRenderer',
-      cellEditor: 'analyzerInteractionsEditor'
+      cellEditor: 'analyzerInteractionsEditor',
+      cellClass: 'action-column',
     });
     const tableDates = dates.slice(tableStart, tableEnd + 1);
     // Reverse dates for right-to-left scrolling on tables

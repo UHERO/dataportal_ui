@@ -2,20 +2,32 @@
 
 .analyze-button {
   color: #B5B5B5;
+}
+
+.material-icons {
   cursor: pointer;
-  vertical-align: middle;
+  vertical-align: bottom;
   font-size: 1.2em;
-  //visibility: hidden;
 }
 
 .analyzer-more {
   font-size: 1.2em;
 }
 
-.analyze-chart {
-  cursor: pointer;
-  vertical-align: middle;
-  font-size: 1.2em;
+.ag-cell.action-column {
+  padding: 0;
+  text-align: center;
+
+  i.material-icons {
+    vertical-align: middle;
+  }
+}
+
+.ag-theme-balham {
+  .ag-popup-editor {
+    background-color: transparent;
+    border: 0;  
+  }
 }
 
 .stat-note {
