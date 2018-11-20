@@ -22,7 +22,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() minDate;
   @Input() maxDate;
   @Input() allTableDates;
-  @Input() chartSeries;
   @Output() updateChartSeries = new EventEmitter();
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
@@ -181,6 +180,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   formatLvlData = (series, level) => {
+    console.log('series', series)
     const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));

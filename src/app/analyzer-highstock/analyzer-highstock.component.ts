@@ -149,11 +149,13 @@ export class AnalyzerHighstockComponent implements OnChanges {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
       // use series with the maximum level value as the base to compare with other series
-      const maxValueSeries = this.findMaxLevelSeries(unit);
-      const level = maxValueSeries.chartData.level;
-      const maxValue = Math.max(...level);
-      const minValue = Math.min(...level);
-      return this.checkMaxValues(unit, minValue, maxValue);
+      //const maxValueSeries = this.findMaxLevelSeries(unit);
+      //const level = maxValueSeries.chartData.level;
+      //const maxValue = Math.max(...level);
+      //const minValue = Math.min(...level);
+      //return this.checkMaxValues(unit, minValue, maxValue);
+      console.log('unit series', unit.series);
+      return [{ axisId: 'yAxis0', units: unit.units, series: unit.series }];
     }
     if (unitGroups.length > 1) {
       return unitGroups.map((unit, index) => {
@@ -162,7 +164,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     }
   };
 
-  checkMaxValues = (unit, baseMin, baseMax) => {
+  /* checkMaxValues = (unit, baseMin, baseMax) => {
     const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
     unit.series.forEach((serie) => {
       // Check if series need to be drawn on separate axes
@@ -238,7 +240,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       }
     });
     return highestOverlapAxis;
-  };
+  }; */
 
   groupByUnits = (series) => {
     const units = series.reduce((obj, serie) => {

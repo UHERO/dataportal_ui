@@ -22,7 +22,14 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   agInit(params: any): void {
     this.params = params;
-    console.log('this.params', this.params)
+  }
+
+  invokeParentUpdateAnalyzer() {
+    this.params.context.componentParent.updateAnalyzer(this.params.value);
+  }
+
+  invokeParentUpdateChart() {
+    this.params.context.componentParent.updateChart(this.params.value);
   }
 
   getValue(): any {
