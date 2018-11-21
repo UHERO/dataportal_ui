@@ -11,7 +11,7 @@
       Remove From Analyzer
     </p>
     <p *ngIf="params.value.showInChart">
-      <i class="material-icons" [style.color]="params.value.color">
+      <i class="material-icons" [style.color]="params.value.color" (click)="invokeParentSwitchChartYAxes()">
         compare_arrows
       </i> Switch Y-Axis
     </p>

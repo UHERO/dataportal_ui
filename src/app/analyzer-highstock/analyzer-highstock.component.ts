@@ -40,7 +40,50 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
-  constructor(private _highstockHelper: HighstockHelperService) { }
+  constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService) {
+    this._analyzer.switchYAxes.subscribe((data: any) => {
+      console.log('test', data);
+      console.log('chartObject', this.chartObject)
+      const yAxes = this.chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== "navigator-y-axis");
+      console.log('yAxes', yAxes);
+      if (yAxes.length === 1) {
+        const axisSeries = yAxes[0].series.slice().filter(s => s.userOptions.className !== "navigator");
+        console.log('axisSeries', axisSeries);
+        this.chartObject.addAxis({
+          labels: {
+            formatter: function () {
+              return Highcharts.numberFormat(this.value, 2, '.', ',');
+            }
+          },
+          //id: axis.axisId,
+          /* title: {
+            text: axis.units
+          }, */
+          id: 'yAxis1',
+          title: {
+            text: 'Test'
+          },
+          //opposite: index === 0 ? false : true,
+          opposite: true,
+          minPadding: 0,
+          maxPadding: 0,
+          minTickInterval: 0.01,
+          //series: axis.series,
+          showEmpty: false
+        });
+        const series = this.chartObject.series.find(s => s.userOptions.className === data.id);
+        console.log('series', series)
+        this.updateChart = true;
+      }
+      // Check how many y-axes are being used
+      // If 1, redraw series on an opposite facing y-axis & remove other axis if there is no series drawn on it any longer
+      // If 2, check if both units are the same
+        // If yes, do same check as if 1 axis was drawn
+        // If no, swap axes & series together
+      // Find series by matching data id with chartObject.userOptions.className
+
+    })
+  }
 
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart

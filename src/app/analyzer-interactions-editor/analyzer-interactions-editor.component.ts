@@ -32,6 +32,10 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
     this.params.context.componentParent.updateChart(this.params.value);
   }
 
+  invokeParentSwitchChartYAxes() {
+    this.params.context.componentParent.switchChartYAxes(this.params.value);
+  }
+
   getValue(): any {
     return this.params.value;
   }

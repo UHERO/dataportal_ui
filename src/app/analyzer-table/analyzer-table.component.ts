@@ -277,4 +277,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   updateChart = (series) => {
     this.updateChartSeries.emit(series);
   }
+
+  switchChartYAxes(series) {
+    this._analyzer.switchYAxes.emit(series);
+  }
 }

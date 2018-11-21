@@ -1,5 +1,5 @@
 import {of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter, Output } from '@angular/core';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
@@ -18,6 +18,8 @@ export class AnalyzerService {
     analyzerFrequency: '',
     chartNavigator: { frequency: '', dateStart: '', numberOfObservations: null }
   };
+
+  @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
