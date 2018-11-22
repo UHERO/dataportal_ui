@@ -42,47 +42,8 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartObject;
   constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService) {
     this._analyzer.switchYAxes.subscribe((data: any) => {
-      console.log('test', data);
-      console.log('chartObject', this.chartObject)
-      const yAxes = this.chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== "navigator-y-axis");
-      console.log('yAxes', yAxes);
-      if (yAxes.length === 1) {
-        const axisSeries = yAxes[0].series.slice().filter(s => s.userOptions.className !== "navigator");
-        console.log('axisSeries', axisSeries);
-        this.chartObject.addAxis({
-          labels: {
-            formatter: function () {
-              return Highcharts.numberFormat(this.value, 2, '.', ',');
-            }
-          },
-          //id: axis.axisId,
-          /* title: {
-            text: axis.units
-          }, */
-          id: 'yAxis1',
-          title: {
-            text: 'Test'
-          },
-          //opposite: index === 0 ? false : true,
-          opposite: true,
-          minPadding: 0,
-          maxPadding: 0,
-          minTickInterval: 0.01,
-          //series: axis.series,
-          showEmpty: false
-        });
-        const series = this.chartObject.series.find(s => s.userOptions.className === data.id);
-        console.log('series', series)
-        this.updateChart = true;
-      }
-      // Check how many y-axes are being used
-      // If 1, redraw series on an opposite facing y-axis & remove other axis if there is no series drawn on it any longer
-      // If 2, check if both units are the same
-        // If yes, do same check as if 1 axis was drawn
-        // If no, swap axes & series together
-      // Find series by matching data id with chartObject.userOptions.className
-
-    })
+      this.switchYAxes(data, this.chartObject);
+    });
   }
 
   ngOnChanges() {
@@ -102,7 +63,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    if (selectedAnalyzerSeries) {
+    if (selectedAnalyzerSeries && this.chartObject === undefined) {
       this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons, this.navigator);
       this.updateChart = true;
     }
@@ -110,6 +71,54 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
     }
+  }
+
+  switchYAxes(data: any, chartObject) {
+    const yAxes = chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
+    const series = chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
+    if (yAxes.length === 1) {
+      chartObject.addAxis({
+        labels: {
+          formatter: function () {
+            return Highcharts.numberFormat(this.value, 2, '.', ',');
+          }
+        },
+        id: yAxes[0].userOptions.id === 'yAxis0' ? 'yAxis1' : 'yAxis0',
+        title: {
+          text: data.seriesInfo.unitsLabelShort
+        },
+        opposite: yAxes[0].userOptions.index === 0 ? true : false,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01,
+        showEmpty: false
+      });
+      series.update({
+        yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+      });
+    }
+    if (yAxes.length === 2) {
+      const axis = this.chartObject.get(series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0');
+      axis.update({
+        title: {
+          text: data.seriesInfo.unitsLabelShort
+        }
+      })
+      series.update({
+        yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+      });
+    }
+    chartObject.yAxis.forEach((a) => {
+      const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator');
+      if (!axisSeries.length) {
+        a.update({
+          visibile: false,
+          title: {
+            text: null
+          }
+        });
+      }
+    });
   }
 
   addYAxis(chartObject, yAxes: Array<any>) {
@@ -192,12 +201,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       // Compare series to check if values differ by order of magnitude
       const unit = unitGroups[0];
       // use series with the maximum level value as the base to compare with other series
-      //const maxValueSeries = this.findMaxLevelSeries(unit);
-      //const level = maxValueSeries.chartData.level;
-      //const maxValue = Math.max(...level);
-      //const minValue = Math.min(...level);
-      //return this.checkMaxValues(unit, minValue, maxValue);
-      console.log('unit series', unit.series);
       return [{ axisId: 'yAxis0', units: unit.units, series: unit.series }];
     }
     if (unitGroups.length > 1) {
@@ -206,84 +209,6 @@ export class AnalyzerHighstockComponent implements OnChanges {
       });
     }
   };
-
-  /* checkMaxValues = (unit, baseMin, baseMax) => {
-    const yAxesGroups = [{ axisId: 'yAxis0', units: unit.units, series: [] }];
-    unit.series.forEach((serie) => {
-      // Check if series need to be drawn on separate axes
-      const level = serie.chartData ? serie.chartData.level : serie.data;
-      const sufficientOverlap = this.isOverlapSufficient(level, baseMin, baseMax);
-      const yAxis1 = yAxesGroups.find(y => y.axisId === 'yAxis1');
-      if (sufficientOverlap) {
-        yAxesGroups[0].series.push(serie);
-        return;
-      }
-      if (!sufficientOverlap) {
-        if (yAxis1) {
-          const highestOverlapAxis = this.findHighestOverlap(yAxesGroups, baseMin, baseMax);
-          highestOverlapAxis.push(serie);
-          return;
-        }
-        if (!yAxis1) {
-          yAxesGroups.push({ axisId: 'yAxis1', units: unit.units, series: [serie] });
-          return;
-        }
-      }
-    });
-    return yAxesGroups;
-  };
-
-  findMaxLevelSeries = (unit) => {
-    let maxLevelValue, maxValueSeries;
-    unit.series.forEach((s) => {
-      const max = Math.max(...s.chartData.level);
-      if (!maxLevelValue || max > maxLevelValue) {
-        maxLevelValue = max;
-        maxValueSeries = s;
-      }
-    });
-    return maxValueSeries;
-  };
-
-  // If the difference between level values of series (with common units) is sufficiently large enough, draw series on separate axes
-  isOverlapSufficient = (level, baseMin, baseMax) => {
-    const sufficientOverlap = 0.5;
-    const overlap = this.calculateOverlap(level, baseMin, baseMax);
-    return overlap >= sufficientOverlap;
-  };
-
-  calculateOverlap = (level, baseMin, baseMax) => {
-    const newMin = Math.min(...level);
-    const newMax = Math.max(...level);
-    const baseRange = baseMax - baseMin;
-    const newRange = newMax - newMin;
-    const baseMaxNewMin = baseMax - newMin;
-    const newMaxBaseMin = newMax - baseMin;
-    return Math.min(baseRange, newRange, baseMaxNewMin, newMaxBaseMin) / Math.max(baseRange, newRange);
-  };
-
-  findHighestOverlap = (yAxesGroups, baseMin, baseMax) => {
-    const y0Series = yAxesGroups[0].series;
-    const y1Series = yAxesGroups[1].series;
-    let highestOverlap, highestOverlapAxis;
-    y0Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y0Series;
-      }
-    });
-    y1Series.forEach((s) => {
-      const level = s.chartData.level;
-      const overlap = this.calculateOverlap(level, baseMin, baseMax);
-      if (!highestOverlap || overlap >= highestOverlap) {
-        highestOverlap = overlap;
-        highestOverlapAxis = y1Series;
-      }
-    });
-    return highestOverlapAxis;
-  }; */
 
   groupByUnits = (series) => {
     const units = series.reduce((obj, serie) => {
@@ -426,7 +351,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       selected: !startDate && !endDate ? 3 : null,
       buttons: buttons,
       buttonPosition: {
-        x: -30,
+        x: 0,
         y: 0
       },
       labelStyle: {
