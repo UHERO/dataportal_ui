@@ -22,7 +22,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() minDate;
   @Input() maxDate;
   @Input() allTableDates;
-  @Output() updateChartSeries = new EventEmitter();
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
   @Input() ytdChecked;
@@ -85,7 +84,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
-        statRow.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
+        statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
       });
       // Check if the summary statistics for a series has NA values
       this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
@@ -109,15 +108,23 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(c5maData)
       }
     });
-    console.log('rows', this.rows)
   }
 
   setSummaryStatColumns = () => {
     return [{
+      field: 'interactionSettings',
+      headerName: 'Actions',
+      pinned: 'left',
+      width: 25,
+      editable: true,
+      cellRenderer: 'analyzerInteractionsRenderer',
+      cellEditor: 'analyzerInteractionsEditor',
+      cellClass: 'action-column',
+    }, {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
-      width: 275,
+      width: 250,
       cellRenderer: 'analyzerStatsRenderer',
       tooltip: function (params) {
         return params.value;
@@ -180,7 +187,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   formatLvlData = (series, level) => {
-    console.log('series', series)
     const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
@@ -268,17 +274,16 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
   }
 
-
-  updateAnalyzer = (series) =>{
-    this._analyzer.updateAnalyzer(series.seriesInfo.id);
-    this.updateChartSeries.emit(series);
-  }
-
-  updateChart = (series) => {
-    this.updateChartSeries.emit(series);
-  }
-
   switchChartYAxes(series) {
     this._analyzer.switchYAxes.emit(series);
+  }
+
+  toggleSeriesInChart(series) {
+    this._analyzer.toggleSeriesInChart.emit(series)
+  }
+
+  removeFromAnalyzer(series) {
+    this._analyzer.updateAnalyzer(series.seriesInfo.id);
+    this.toggleSeriesInChart(series);
   }
 }

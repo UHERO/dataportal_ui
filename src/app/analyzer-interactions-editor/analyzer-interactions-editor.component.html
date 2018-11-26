@@ -7,7 +7,7 @@
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <p>
-      <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="invokeParentUpdateAnalyzer()">&#xE872;</i>
+      <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="invokeParentRemoveFromAnalyzer()">&#xE872;</i>
       Remove From Analyzer
     </p>
     <p *ngIf="params.value.showInChart">
@@ -17,11 +17,11 @@
     </p>
     <p *ngIf="params.value.showInChart">
       <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
-        (click)="invokeParentUpdateChart()">&#xE834;</i> Remove From Chart
+        (click)="invokeParentToggleSeriesInChart()">&#xE834;</i> Remove From Chart
     </p>
     <p *ngIf="!params.value.showInChart">
       <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
-        (click)="invokeParentUpdateChart()">&#xE835;</i> Add To Chart
+        (click)="invokeParentToggleSeriesInChart()">&#xE835;</i> Add To Chart
     </p>
   </div>
 </div>

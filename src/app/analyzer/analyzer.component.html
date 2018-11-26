@@ -7,6 +7,6 @@
     <app-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [alertMessage]="alertMessage" [allDates]="data.analyzerTableDates"
       [series]="data.analyzerChartSeries" [navigator]="data.chartNavigator" [start]="startDate" [end]="endDate" [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)"></app-analyzer-highstock>
     <app-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="minDate" [maxDate]="maxDate" [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma"
-      [series]="data.analyzerSeries" [allTableDates]="data.analyzerTableDates" (tableTransform)="checkTransforms($event)" (updateChartSeries)="updateAnalyzerChart($event, data.analyzerChartSeries)"></app-analyzer-table>
+      [series]="data.analyzerSeries" [allTableDates]="data.analyzerTableDates" (tableTransform)="checkTransforms($event)"></app-analyzer-table>
   </ng-template>
 </div>

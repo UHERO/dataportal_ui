@@ -15,7 +15,6 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   ngAfterViewInit() {
     setTimeout(() => {
-      //this.interactionSelect.element.nativeElement.focus();
       $('.dropdown').dropdown('toggle')
     })
   }
@@ -24,16 +23,16 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
     this.params = params;
   }
 
-  invokeParentUpdateAnalyzer() {
-    this.params.context.componentParent.updateAnalyzer(this.params.value);
-  }
-
-  invokeParentUpdateChart() {
-    this.params.context.componentParent.updateChart(this.params.value);
-  }
-
   invokeParentSwitchChartYAxes() {
     this.params.context.componentParent.switchChartYAxes(this.params.value);
+  }
+
+  invokeParentToggleSeriesInChart() {
+    this.params.context.componentParent.toggleSeriesInChart(this.params.value);
+  }
+
+  invokeParentRemoveFromAnalyzer() {
+    this.params.context.componentParent.removeFromAnalyzer(this.params.value);
   }
 
   getValue(): any {

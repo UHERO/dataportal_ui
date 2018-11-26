@@ -1,4 +1,4 @@
-import {of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
+import { of as observableOf, forkJoin as observableForkJoin, Observable } from 'rxjs';
 import { Injectable, EventEmitter, Output } from '@angular/core';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
@@ -21,7 +21,62 @@ export class AnalyzerService {
 
   @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
 
+  @Output() public toggleSeriesInChart: EventEmitter<any> = new EventEmitter();
+
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
+
+  toggleChartSeries(seriesId: any, units: string) {
+    const seriesDrawn = this.analyzerData.analyzerChartSeries.find(cSeries => cSeries.seriesDetail.id === seriesId);
+    const seriesInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart === true);
+    // If remaining series drawn in chart is removed from analyzer, draw next series in table
+    if (this.analyzerData.analyzerSeries.length && !seriesInChart) {
+      this.analyzerData.analyzerSeries[0].showInChart = true;
+      this.updateChartSeries(this.analyzerData.analyzerSeries);
+      return;
+    }
+    // At least one series must be selected
+    if (this.analyzerData.analyzerChartSeries.length === 1 && seriesDrawn) {
+      //this.alertUser = true;
+      //this.alertMessage = 'At least one series must be selected.';
+      return;
+    }
+    // Allow up to 2 different units to be displayed in chart
+    const toggleChartDisplay = this.checkSeriesUnits(this.analyzerData.analyzerChartSeries, units);
+    if (toggleChartDisplay) {
+      //this.alertUser = false;
+      //this.alertMessage = '';
+      const aSeries = this.analyzerSeries.find(series => series.id === seriesId);
+      const aData = this.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === seriesId);
+      if (aSeries && aData) {
+        aSeries.showInChart = !aSeries.showInChart;
+        aData.showInChart = !aData.showInChart;
+      }  
+    }
+    this.updateChartSeries(this.analyzerData.analyzerSeries);
+  }
+
+  updateChartSeries(analyzerSeries: Array<any>) {
+    // Update series drawn in chart and dates in analyzer table
+    this.analyzerData.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
+    this.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
+    this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
+    this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
+  }
+
+  checkSeriesUnits(chartSeries, units) {
+    // List of units for series in analyzer chart
+    const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
+    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+    if (uniqueUnits.length === 2) {
+      // If two different units are already in use, check if the current series unit is in the list
+      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === units);
+      //this.alertUser = unitsExist ? false : true;
+      //this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
+      return unitsExist ? true : false;
+    }
+    return uniqueUnits.length < 2 ? true : false;
+  }
 
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);

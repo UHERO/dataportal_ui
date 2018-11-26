@@ -14,16 +14,7 @@ export class AnalyzerStatsRendererComponent implements ICellRendererAngularComp 
   agInit(params: any): void {
     this.params = params;
   }
-
-  invokeParentUpdateAnalyzer() {
-    this.params.context.componentParent.updateAnalyzer(this.params.data);
-  }
-
-  invokeParentUpdateChart() {
-    this.params.context.componentParent.updateChart(this.params.data);
-  }
-
-
+  
   refresh(): boolean {
     return false;
   }

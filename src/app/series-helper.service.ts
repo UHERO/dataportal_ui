@@ -137,7 +137,7 @@ export class SeriesHelperService {
     series.forEach((s) => {
       const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, seriesStartDate, seriesEndDate);
       stats.series = s.displayName;
-      stats.showInChart = s.showInChart;
+      stats.interactionSettings.showInChart = s.showInChart
       tableRows.push(stats);
     });
     return tableRows;
@@ -158,6 +158,11 @@ export class SeriesHelperService {
       missing: null,
       range: null,
       showInChart: null,
+      interactionSettings: {
+        showInChart: null,
+        color: null,
+        seriesInfo: seriesDetail
+      }
     };
     formattedStats.range = this._helper.formatDate(startDate, freq) + ' - ' + this._helper.formatDate(endDate, freq);
     const decimals = seriesDetail.decimals;

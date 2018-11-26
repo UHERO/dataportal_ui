@@ -98,63 +98,6 @@ export class AnalyzerComponent implements OnInit {
     });
   }
 
-  updateAnalyzerChart = (event, chartSeries) => {
-    const seriesDrawn = chartSeries.find(cSeries => cSeries.seriesDetail.id === event.seriesInfo.id);
-    const seriesInChart = this._analyzer.analyzerData.analyzerSeries.find(series => series.showInChart === true);
-    // If remaining series drawn in chart is removed from analyzer, draw next series in table
-    if (this._analyzer.analyzerData.analyzerSeries.length && !seriesInChart) {
-      this._analyzer.analyzerData.analyzerSeries[0].showInChart = true;
-      this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
-      return;
-    }
-    // At least one series must be selected
-    if (chartSeries.length === 1 && seriesDrawn) {
-      this.alertUser = true;
-      this.alertMessage = 'At least one series must be selected.';
-      return;
-    }
-    // Allow up to 2 different units to be displayed in chart
-    const toggleChartDisplay = this.checkSeriesUnits(chartSeries, event);
-    if (toggleChartDisplay) {
-      this.alertUser = false;
-      this.alertMessage = '';
-      event.showInChart = !event.showInChart;
-      // toggle showInChart in list of analyzer series
-      const seriesInAnalyzerList = this._analyzer.analyzerSeries.find(series => series.id === event.seriesInfo.id);
-      const seriesInAnalyzerData = this._analyzer.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === event.seriesInfo.id);
-      if (seriesInAnalyzerList && seriesInAnalyzerData) {
-        seriesInAnalyzerList.showInChart = !seriesInAnalyzerList.showInChart;
-        seriesInAnalyzerData.showInChart = !seriesInAnalyzerData.showInChart;
-
-      }
-    }
-    this.updateChartSeries(this._analyzer.analyzerData.analyzerSeries);
-
-  }
-
-  updateChartSeries(analyzerSeries: Array<any>) {
-    // Update series drawn in chart and dates in analyzer table
-    this._analyzer.analyzerData.analyzerTableDates = this._analyzer.setAnalyzerDates(analyzerSeries);
-    this._analyzer.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
-    this._analyzer.analyzerData.chartNavigator.frequency = this._analyzer.checkFrequencies(this._analyzer.analyzerData.analyzerSeries);
-    this._analyzer.analyzerData.chartNavigator.dateStart = this._analyzer.analyzerData.analyzerTableDates[0].date;
-    this._analyzer.analyzerData.chartNavigator.numberOfObservations = this._analyzer.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
-  }
-
-  checkSeriesUnits(chartSeries, currentSeries) {
-    // List of units for series in analyzer chart
-    const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
-    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
-    if (uniqueUnits.length === 2) {
-      // If two different units are already in use, check if the current series unit is in the list
-      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === currentSeries.seriesInfo.unitsLabelShort);
-      this.alertUser = unitsExist ? false : true;
-      this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
-      return unitsExist ? true : false;
-    }
-    return uniqueUnits.length < 2 ? true : false;
-  }
-
   // Update table when selecting new ranges in the chart
   setTableDates(e) {
     this.minDate = e.minDate;

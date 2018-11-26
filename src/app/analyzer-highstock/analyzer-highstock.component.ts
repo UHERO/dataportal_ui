@@ -40,9 +40,13 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
+  
   constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService) {
     this._analyzer.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
+    });
+    this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
+      this._analyzer.toggleChartSeries(data.seriesInfo.id, data.seriesInfo.unitsLabelShort);
     });
   }
 
@@ -98,7 +102,31 @@ export class AnalyzerHighstockComponent implements OnChanges {
       });
     }
     if (yAxes.length === 2) {
-      const axis = this.chartObject.get(series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0');
+      console.log('2 yAxes', yAxes)
+      const uniqueUnits = yAxes.map(y => y.userOptions.title.text).filter((unit, i, self) => self.indexOf(unit) === i);
+      console.log(uniqueUnits);
+      if (uniqueUnits.length === 2) {
+        yAxes.forEach((axis) => {
+          axis.update({
+            title: {
+              text: uniqueUnits.find(unit => unit !== axis.userOptions.title.text)
+            }
+          });
+        });
+        const chartSeries = chartObject.series.filter(s => s.userOptions.yAxis === 'yAxis0' || s.userOptions.yAxis === 'yAxis1');
+        console.log('chart series', chartSeries);
+        chartSeries.forEach((s) => {
+          console.log('s', s.userOptions.yAxis === 'yAxis0')
+          s.update({
+            yAxis: s.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+          });
+          console.log('s', s.userOptions.yAxis)
+        })
+      }
+      // Check if each axis uses a unique unit
+      // If yes, swap all series/axes
+      // If no, swap single series
+      /* const axis = this.chartObject.get(series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0');
       axis.update({
         title: {
           text: data.seriesInfo.unitsLabelShort
@@ -106,7 +134,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       })
       series.update({
         yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-      });
+      }); */
     }
     chartObject.yAxis.forEach((a) => {
       const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator');
