@@ -1,4 +1,4 @@
-import { Component, OnChanges, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -22,7 +22,7 @@ exportCSV(Highcharts);
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyzerHighstockComponent implements OnChanges {
+export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() series;
   @Input() allDates;
   @Input() portalSettings;
@@ -40,12 +40,14 @@ export class AnalyzerHighstockComponent implements OnChanges {
   chartOptions = <HighstockObject>{};
   updateChart = false;
   chartObject;
+  toggleSeries;
+  switchAxes;
   
   constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService) {
-    this._analyzer.switchYAxes.subscribe((data: any) => {
+    this.switchAxes = this._analyzer.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
     });
-    this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
+    this.toggleSeries = this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
       this._analyzer.toggleChartSeries(data.seriesInfo.id, data.seriesInfo.unitsLabelShort);
     });
   }
@@ -64,6 +66,7 @@ export class AnalyzerHighstockComponent implements OnChanges {
       // (workaround to make sure x-axis updates when navigator dates change)
       this.removeSeriesFromChart(this.chartObject.series, selectedAnalyzerSeries);
       this.addSeriesToChart(this.chartObject, selectedAnalyzerSeries);
+      this.updateChart = true;
     }
     // Get buttons for chart
     const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -75,6 +78,11 @@ export class AnalyzerHighstockComponent implements OnChanges {
     if (this.alertMessage) {
       setTimeout(() => this.alertMessage = '', 4000);
     }
+  }
+
+  ngOnDestroy() {
+    this.toggleSeries.unsubscribe();
+    this.switchAxes.unsubscribe();
   }
 
   switchYAxes(data: any, chartObject) {
@@ -122,6 +130,12 @@ export class AnalyzerHighstockComponent implements OnChanges {
           });
           console.log('s', s.userOptions.yAxis)
         })
+      }
+      if (uniqueUnits.length === 1) {
+        console.log('one unit on two axes');
+        series.update({
+          yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+        });
       }
       // Check if each axis uses a unique unit
       // If yes, swap all series/axes

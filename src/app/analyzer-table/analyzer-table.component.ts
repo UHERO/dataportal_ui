@@ -279,10 +279,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   toggleSeriesInChart(series) {
+    console.log('toggleSeriesInChart', series);
     this._analyzer.toggleSeriesInChart.emit(series)
   }
 
   removeFromAnalyzer(series) {
+    console.log('series', series)
     this._analyzer.updateAnalyzer(series.seriesInfo.id);
     this.toggleSeriesInChart(series);
   }

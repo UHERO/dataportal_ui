@@ -42,13 +42,17 @@ export class AnalyzerService {
     }
     // Allow up to 2 different units to be displayed in chart
     const toggleChartDisplay = this.checkSeriesUnits(this.analyzerData.analyzerChartSeries, units);
+    console.log(this.analyzerSeries.indexOf(series => series.id === seriesId))
     if (toggleChartDisplay) {
+      console.log('toggleChartDisplay')
       //this.alertUser = false;
       //this.alertMessage = '';
       const aSeries = this.analyzerSeries.find(series => series.id === seriesId);
       const aData = this.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === seriesId);
       if (aSeries && aData) {
+        console.log('aSeries', aSeries)
         aSeries.showInChart = !aSeries.showInChart;
+        console.log('aData', aData)
         aData.showInChart = !aData.showInChart;
       }  
     }
@@ -59,6 +63,7 @@ export class AnalyzerService {
     // Update series drawn in chart and dates in analyzer table
     this.analyzerData.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
     this.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
+    console.log('analyzerChartSeries', this.analyzerData.analyzerChartSeries)
     this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
     this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
     this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
@@ -270,6 +275,7 @@ export class AnalyzerService {
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
+      console.log('analyzerDataSeries', this.analyzerData.analyzerSeries)
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });

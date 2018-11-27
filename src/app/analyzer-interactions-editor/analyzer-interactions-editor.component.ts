@@ -28,6 +28,7 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
   }
 
   invokeParentToggleSeriesInChart() {
+    console.log('invoke parent toggle', this.params.value);
     this.params.context.componentParent.toggleSeriesInChart(this.params.value);
   }
 
