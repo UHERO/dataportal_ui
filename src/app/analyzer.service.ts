@@ -44,15 +44,12 @@ export class AnalyzerService {
     const toggleChartDisplay = this.checkSeriesUnits(this.analyzerData.analyzerChartSeries, units);
     console.log(this.analyzerSeries.indexOf(series => series.id === seriesId))
     if (toggleChartDisplay) {
-      console.log('toggleChartDisplay')
       //this.alertUser = false;
       //this.alertMessage = '';
       const aSeries = this.analyzerSeries.find(series => series.id === seriesId);
       const aData = this.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === seriesId);
       if (aSeries && aData) {
-        console.log('aSeries', aSeries)
         aSeries.showInChart = !aSeries.showInChart;
-        console.log('aData', aData)
         aData.showInChart = !aData.showInChart;
       }  
     }

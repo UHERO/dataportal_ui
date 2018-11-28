@@ -60,6 +60,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
     }
     if (this.chartObject) {
+      console.log('yAxes groups', yAxes)
       // If the chart has already been drawn, check to see if another y-axis needs to be added
       this.addYAxis(this.chartObject, yAxes);
       // Check for series that need to be added or removed from the chart.
@@ -105,13 +106,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         minTickInterval: 0.01,
         showEmpty: false
       });
-      series.update({
+      /* series.update({
         yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-      });
+      }); */
+      this.chartOptions.series.find(s => s.className === data.seriesInfo.id).yAxis = series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0';
+      this.updateChart = true;
     }
     if (yAxes.length === 2) {
       console.log('2 yAxes', yAxes)
-      const uniqueUnits = yAxes.map(y => y.userOptions.title.text).filter((unit, i, self) => self.indexOf(unit) === i);
+      const uniqueUnits = yAxes.map(y => y.userOptions.title.text).filter((unit, i, self) => self.indexOf(unit) === i && unit !== null);
       console.log(uniqueUnits);
       if (uniqueUnits.length === 2) {
         yAxes.forEach((axis) => {
@@ -124,31 +127,24 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         const chartSeries = chartObject.series.filter(s => s.userOptions.yAxis === 'yAxis0' || s.userOptions.yAxis === 'yAxis1');
         console.log('chart series', chartSeries);
         chartSeries.forEach((s) => {
-          console.log('s', s.userOptions.yAxis === 'yAxis0')
           s.update({
             yAxis: s.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
           });
-          console.log('s', s.userOptions.yAxis)
-        })
+        });
       }
       if (uniqueUnits.length === 1) {
-        console.log('one unit on two axes');
+        yAxes.forEach((axis) => {
+          axis.update({
+            title: {
+              text: uniqueUnits[0]
+            }
+          });
+        });
         series.update({
           yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
         });
+        this.updateChart = true;
       }
-      // Check if each axis uses a unique unit
-      // If yes, swap all series/axes
-      // If no, swap single series
-      /* const axis = this.chartObject.get(series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0');
-      axis.update({
-        title: {
-          text: data.seriesInfo.unitsLabelShort
-        }
-      })
-      series.update({
-        yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-      }); */
     }
     chartObject.yAxis.forEach((a) => {
       const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator');
@@ -168,7 +164,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const axisExists = chartObject.yAxis.findIndex(a => a.userOptions.id === y.id);
       if (axisExists === -1) {
         chartObject.addAxis(y);
-      }
+      } /* else {
+        chartObject.yAxis.find(a => a.userOptions.id === y.id).update({
+          title: {
+            text: y.title.text
+          }
+        })
+      } */
     });
   };
 
@@ -317,7 +319,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       decimals: null,
       frequency: null,
       geography: null,
-      yAxis: 0,
+      yAxis: 'yAxis0',
       dataGrouping: {
         enabled: false
       },
