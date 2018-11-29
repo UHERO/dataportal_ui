@@ -272,10 +272,12 @@ export class AnalyzerService {
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
+      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
       console.log('analyzerDataSeries', this.analyzerData.analyzerSeries)
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });
+      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
     }
   }
 
