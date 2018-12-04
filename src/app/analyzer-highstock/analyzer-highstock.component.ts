@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -26,13 +26,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() series;
   @Input() allDates;
   @Input() portalSettings;
-  @Input() alertMessage;
   @Input() start;
   @Input() end;
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
-  @Input() navigator;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
@@ -42,26 +40,33 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartObject;
   toggleSeries;
   switchAxes;
+  alertMessage;
 
-  constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService) {
+  constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService, private cdr: ChangeDetectorRef) {
     this.switchAxes = this._analyzer.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
     });
     this.toggleSeries = this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
-      // this._analyzer.toggleChartSeries(data.seriesInfo.id, data.seriesInfo.unitsLabelShort);
-      const seriesToUpdate = this._analyzer.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
-      seriesToUpdate.showInChart = !seriesToUpdate.showInChart
-      const seriesInChart = this.chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
-      seriesInChart.update({
-        visible: !seriesInChart.userOptions.visible,
-        showInLegend: !seriesInChart.userOptions.showInLegend,
-        includeInCSVExport: !seriesInChart.userOptions.includeInCSVExport
-      });
-      const seriesAxis = this.chartObject.get(seriesInChart.userOptions.yAxis);
-      console.log('seriesAxis', seriesAxis)
-      seriesAxis.update({
-        visible: seriesAxis.series.find(s => s.userOptions.visible) ? true : false
-      });
+      const chartSeries = this.series.filter(s => s.showInChart);
+      const toggleDisplay = this._analyzer.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
+      if (toggleDisplay) {
+        this.toggleSeriesDisplay(data);
+        const seriesToUpdate = this._analyzer.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
+        if (seriesToUpdate) {
+          seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
+        }
+      }
+      if (!toggleDisplay) {
+        this.alertMessage = 'Chart may only display up to two different units.';
+        if (this.alertMessage) {
+          // Timeout warning message alerting user if too many units are being added to the chart
+          setTimeout(() => {
+            this.alertMessage = '';
+            this.cdr.detectChanges();
+          }, 4000);
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -69,53 +74,35 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries, yAxes, navigatorOptions;
     if (this.series.length) {
-      console.log('highstock series', this.series);
-      const chartSeries = this.series.filter(s => s.showInChart);
-      console.log('chartSeries', chartSeries);
       yAxes = this.setYAxes(this.series);
-      console.log('setYAxes', yAxes);
       navigatorOptions = {
         frequency: this._analyzer.checkFrequencies(this.series),
         dateStart: this.allDates[0].date,
         numberOfObservations: this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length
       }
-      console.log('nav options', navigatorOptions);
+      console.log('chart dates', this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i));
+      console.log('nav length', this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length)
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
-      console.log('selectedAnalyzerSeries', selectedAnalyzerSeries)
     }
-    if (selectedAnalyzerSeries && this.chartObject === undefined) {
+    if (this.chartObject) {
+      // Check for series that need to be added or removed from the chart.
+      // (workaround to make sure x-axis updates when navigator dates change)
+      // this.removeSeriesFromChart(this.chartObject.series, selectedAnalyzerSeries);
+      const nav = this.chartObject.series.find(s => s.userOptions.className === 'navigator');
+      if (nav) {
+        nav.update({
+          data: new Array(navigatorOptions.numberOfObservations).fill(null),
+          pointStart: Date.parse(navigatorOptions.dateStart),
+          pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
+          pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',  
+        });  
+      }
+    }
+    if (selectedAnalyzerSeries) {
       const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons, navigatorOptions);
       this.updateChart = true;
     }
-    // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
-    if (this.alertMessage) {
-      setTimeout(() => this.alertMessage = '', 4000);
-    }
-    /* if (this.series.length) {
-      yAxes = this.setYAxes(this.series);
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, this.navigator);
-    }
-    if (this.chartObject) {
-      console.log('yAxes groups', yAxes)
-      // If the chart has already been drawn, check to see if another y-axis needs to be added
-      this.addYAxis(this.chartObject, yAxes);
-      // Check for series that need to be added or removed from the chart.
-      // (workaround to make sure x-axis updates when navigator dates change)
-      this.removeSeriesFromChart(this.chartObject.series, selectedAnalyzerSeries);
-      this.addSeriesToChart(this.chartObject, selectedAnalyzerSeries);
-      //this.updateChart = true;
-    }
-    // Get buttons for chart
-    const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-    if (selectedAnalyzerSeries && this.chartObject === undefined) {
-      this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons, this.navigator);
-      this.updateChart = true;
-    }
-    // Timeout warning message alerting user if too many units are being added or attempting to remove all series from the chart
-    if (this.alertMessage) {
-      setTimeout(() => this.alertMessage = '', 4000);
-    } */
   }
 
   ngOnDestroy() {
@@ -123,10 +110,51 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.switchAxes.unsubscribe();
   }
 
+  toggleSeriesDisplay(data) {
+    const yAxes = this.chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
+    const seriesInChart = this.chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
+    seriesInChart.update({
+      visible: !seriesInChart.userOptions.visible,
+      showInLegend: !seriesInChart.userOptions.showInLegend,
+      includeInCSVExport: !seriesInChart.userOptions.includeInCSVExport
+    }, false);
+    const seriesAxis = this.chartObject.get(seriesInChart.userOptions.yAxis);
+    const visibleSeriesDifferentUnits = seriesAxis.series.filter(s => s.userOptions.unitsLabelShort !== seriesInChart.userOptions.unitsLabelShort && s.userOptions.className !== 'navigator' && s.userOptions.visible);
+    if (visibleSeriesDifferentUnits.length) {
+      // If the series being made visible is associated with an axis that is currently being used with different units,
+      // (i.e., 2 axes are being used with series that have 'Thous' as their units) move the currently drawn series to the opposite axis first
+      const oppositeAxis = seriesInChart.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+      visibleSeriesDifferentUnits.forEach((s) => {
+        s.update({
+          yAxis: seriesInChart.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+        });
+      });
+      this.chartObject.get(oppositeAxis).update({
+        title: {
+          text: visibleSeriesDifferentUnits[0].userOptions.unitsLabelShort
+        },
+        visible: true
+      });
+    }
+    seriesAxis.update({
+      title: {
+        text: seriesInChart.userOptions.unitsLabelShort
+      },
+      visible: seriesAxis.series.find(s => s.userOptions.visible) ? true : false
+    });
+    yAxes.forEach((a) => {
+      const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator' && s.userOptions.visible);
+      if (!axisSeries.length) {
+        a.update({
+          visible: false,
+        }, false);
+      }
+    });
+  }
+
   switchYAxes(data: any, chartObject) {
     const yAxes = chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
     const series = chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
-    console.log('yAxes', yAxes);
     if (yAxes.length === 1) {
       chartObject.addAxis({
         labels: {
@@ -149,66 +177,54 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       });
     }
     if (yAxes.length === 2) {
-      const uniqueUnits = yAxes.map(y => y.userOptions.title.text).filter((unit, i, self) => self.indexOf(unit) === i && unit !== null);
-      if (uniqueUnits.length === 2) {
-        const chartSeries = chartObject.series.filter(s => s.userOptions.yAxis === 'yAxis0' || s.userOptions.yAxis === 'yAxis1');
-        chartSeries.forEach((s) => {
-          s.update({
-            yAxis: s.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-          });
-        });
-        yAxes.forEach((axis) => {
-          console.log(axis.series.find(s => s.userOptions.visible))
-          axis.update({
-            title: {
-              text: uniqueUnits.find(unit => unit !== axis.userOptions.title.text)
-            },
-            visible: axis.series.find(s => s.userOptions.visible) ? true : false
-          });
-        });
+      const visibleSeries = chartObject.series.filter(s => s.userOptions.visible && s.userOptions.showInLegend);
+      const visibleUnits = visibleSeries.map(s => s.userOptions.unitsLabelShort).filter((unit, i, self) => self.indexOf(unit) === i);
+      if (visibleUnits.length === 2) {
+        this.swapAllSeriesAndAxes(visibleUnits, chartObject, yAxes);
       }
-      if (uniqueUnits.length === 1) {
-        yAxes.forEach((axis) => {
-          axis.update({
-            title: {
-              text: uniqueUnits[0]
-            }
-          });
-        });
-        series.update({
-          yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-        });
+      if (visibleUnits.length === 1) {
+        this.swapSingleSeriesAndAxis(series, chartObject);
       }
     }
-    chartObject.yAxis.forEach((a) => {
-      console.log('a', a)
-      const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator');
+    yAxes.forEach((a) => {
+      const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator' && s.userOptions.visible);
       if (!axisSeries.length) {
         a.update({
           visible: false,
-          title: {
-            text: null
-          }
-        });
+        }, false);
       }
     });
   }
 
-  addYAxis(chartObject, yAxes: Array<any>) {
-    yAxes.forEach((y) => {
-      const axisExists = chartObject.yAxis.findIndex(a => a.userOptions.id === y.id);
-      if (axisExists === -1) {
-        console.log('test')
-        chartObject.addAxis(y);
-      } /* else {
-        chartObject.yAxis.find(a => a.userOptions.id === y.id).update({
-          title: {
-            text: y.title.text
-          }
-        })
-      } */
+  swapAllSeriesAndAxes(visibleUnits: Array<any>, chartObject, yAxes: Array<any>) {
+    const chartSeries = chartObject.series.filter(s => s.userOptions.yAxis === 'yAxis0' || s.userOptions.yAxis === 'yAxis1');
+    chartSeries.forEach((s) => {
+      s.update({
+        yAxis: s.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+      });
     });
-  };
+    yAxes.forEach((axis) => {
+      axis.update({
+        title: {
+          text: visibleUnits.find(unit => unit !== axis.userOptions.title.text)
+        },
+        visible: axis.series.find(s => s.userOptions.visible) ? true : false
+      });
+    });
+  }
+
+  swapSingleSeriesAndAxis(series, chartObject) {
+    const axisToUpdate = series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0';
+    chartObject.get(axisToUpdate).update({
+      title: {
+        text: series.userOptions.unitsLabelShort
+      },
+      visible: true
+    });
+    series.update({
+      yAxis: series.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
+    });
+  }
 
   removeSeriesFromChart(chartObjectSeries: Array<any>, analyzerSeries: Array<any>) {
     chartObjectSeries.forEach((s) => {
@@ -219,45 +235,49 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
   };
 
-  addSeriesToChart(chartObject, analyzerSeries: Array<any>) {
-    analyzerSeries.forEach((s) => {
-      const inChart = chartObject.series.find(serie => serie.name === s.name && serie.data.length === s.data.length);
-      if (!inChart) {
-        chartObject.addSeries(s);
-      }
-    });
-  };
-
   chartCallback = (chart) => {
     this.chartObject = chart;
   }
 
   setYAxes = (series) => {
     // Group series by their units
-    const unitGroups = this.groupByUnits(series);
-    // Create y-axis groups based on units available
     // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    // If only 1 unit is selected, check that the max value of each series does not differ by an order of magnitude
-    // If yes, draw series on separate y axes
-    const yAxesGroups = this.setYAxesGroups(unitGroups);
-    const yAxes = yAxesGroups.map((axis, index) => {
-      const atLeastOneSeriesVisible = axis.series.find(s => s.showInChart);
+    const axisIds = {
+      yAxis0: [],
+      yAxis1: []
+    };
+    series.reduce((obj, serie) => {
+      if (!obj.yAxis0.length) {
+        obj.yAxis0.push(serie);
+        return obj;
+      }
+      const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
+      if (serie.seriesDetail.unitsLabelShort === y0Units) {
+        obj.yAxis0.push(serie);
+      }
+      if (serie.seriesDetail.unitsLabelShort !== y0Units) {
+        obj.yAxis1.push(serie);
+      }
+      return obj;
+    }, axisIds);
+    const yAxes = Object.keys(axisIds).map((axis, index) => {
+      const atLeastOneSeriesVisible = axisIds[axis].find(s => s.showInChart);
       return {
         labels: {
           formatter: function () {
             return Highcharts.numberFormat(this.value, 2, '.', ',');
           }
         },
-        id: axis.axisId,
+        id: axis,
         title: {
-          text: axis.units
+          text: atLeastOneSeriesVisible ? atLeastOneSeriesVisible.seriesDetail.unitsLabelShort : null
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
         maxPadding: 0,
         minTickInterval: 0.01,
-        series: axis.series,
         showEmpty: false,
+        series: axisIds[axis],
         visible: atLeastOneSeriesVisible ? true : false
       }
     });
@@ -275,33 +295,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return allButtons;
     }, []);
     return chartButtons;
-  };
-
-  setYAxesGroups = (unitGroups) => {
-    // Create groups for up to 2 axes, assign axis id's as 'yAxis0' and 'yAxis1'
-    if (unitGroups.length === 1) {
-      // Compare series to check if values differ by order of magnitude
-      const unit = unitGroups[0];
-      // use series with the maximum level value as the base to compare with other series
-      return [{ axisId: 'yAxis0', units: unit.units, series: unit.series }];
-    }
-    if (unitGroups.length > 1) {
-      return unitGroups.map((unit, index) => {
-        return { axisId: 'yAxis' + index, units: unit.units, series: unit.series };
-      });
-    }
-  };
-
-  groupByUnits = (series) => {
-    const units = series.reduce((obj, serie) => {
-      obj[serie.seriesDetail.unitsLabelShort] = obj[serie.seriesDetail.unitsLabelShort] || [];
-      obj[serie.seriesDetail.unitsLabelShort].push(serie);
-      return obj;
-    }, {});
-    const groups = Object.keys(units).map((key) => {
-      return { units: key, series: units[key] };
-    });
-    return groups;
   };
 
   formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, navigatorOptions) => {
@@ -384,6 +377,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render: function () {
+          console.log('this', this)
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
@@ -422,7 +416,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       buttons: buttons,
       buttonPosition: {
         x: 0,
-        y: 0
+        y: 5
       },
       labelStyle: {
         visibility: 'hidden'
@@ -435,7 +429,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       },
       inputPosition: {
         x: -30,
-        y: 0
+        y: 5
       }
     };
     this.chartOptions.lang = {
@@ -497,11 +491,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         afterSetExtremes: function () {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          console.log('userMax', userMax)
           this._selectedMin = setDateToFirstOfMonth(navigatorOptions.frequency, userMin);
           this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
+            console.log('extremes', this._extremes)
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to first of the month
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));

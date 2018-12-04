@@ -128,8 +128,8 @@ export class CategoryChartsComponent implements OnChanges {
     this.googleAES.emitEvent('series', 'click', id);
   }
 
-  updateAnalyze(seriesInfo, tableData, chartData) {
-    this._analyzer.updateAnalyzer(seriesInfo.id, tableData, chartData);
+  updateAnalyze(seriesInfo) {
+    this._analyzer.updateAnalyzer(seriesInfo.id);
     // Update analyze button on chart
     seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
   }

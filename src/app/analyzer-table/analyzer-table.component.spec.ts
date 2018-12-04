@@ -23,6 +23,7 @@ class agGridStubComponent {
   @Input() gridReady;
   @Input() gridOptions;
   @Input() suppressDragLeaveHidesColumns;
+  @Input() singleClickEdit;
 }
 
 describe('AnalyzerTableComponent', () => {

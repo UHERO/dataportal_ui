@@ -17,7 +17,7 @@ import {
   RouterLinkStubDirective
 } from '../../testing/router-stubs';
 import { newEvent } from '../../testing/helpers';
-//import { Observable } from 'rxjs/Observable';
+import { of as observableOf, Observable } from 'rxjs';
 
 @Component({selector: 'app-search-bar', template: ''})
 class SearchStubComponent {}
@@ -33,7 +33,7 @@ describe('SidebarNavComponent', () => {
       providers: [
         { provide: UheroApiService, useClass: MockApiService },
         { provide: Router, useClass: RouterStub },
-        { provide: ActivatedRoute, useValue: { queryParams: Observable.of({id: 1}) }}
+        { provide: ActivatedRoute, useValue: { queryParams: observableOf({id: 1}) }}
       ]
     })
     .compileComponents()

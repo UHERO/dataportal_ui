@@ -1,6 +1,7 @@
 import {map} from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 
@@ -14,7 +15,7 @@ export class FeedbackComponent implements OnInit {
   public successMsg: string;
   public errorMsg: string;
   private hideAlert: Boolean = true;
-  constructor(private fb: FormBuilder, private http: Http) { }
+  constructor(private fb: FormBuilder, private http: HttpClient) { }
 
   ngOnInit() {
     this.buildForm();
@@ -36,9 +37,7 @@ export class FeedbackComponent implements OnInit {
 
   onSubmit() {
     this.hideAlert = false;
-    const headers = new Headers();
-    headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
-    const requestOptionsArgs = { headers: headers };
+    const requestOptionsArgs = { headers: new HttpHeaders({ 'Authorization': 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=' })};
     const feedback = { data: { name: '', email: '', feedback: '' }, 'g-recaptcha-response': '' };
     feedback.data.name = this.feedbackForm.value.name;
     feedback.data.email = this.feedbackForm.value.email;

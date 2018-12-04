@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
@@ -17,7 +17,7 @@ import { GridOptions } from 'ag-grid-community';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerTableComponent implements OnInit, OnChanges {
+export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
@@ -29,6 +29,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   portalSettings;
   missingSummaryStat = false;
   tableDates;
+  toggleSeries;
   private gridApi;
   private columnDefs;
   private rows;
@@ -61,6 +62,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         componentParent: this
       }
     }
+    this.toggleSeries = this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
+      const chartSeries = this.series.filter(s => s.showInChart);
+      const toggleDisplay = this._analyzer.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
+      if (toggleDisplay) {
+        const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === data.seriesInfo.id);
+        const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === data.seriesInfo.id);
+        matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
+        const seriesInChart = $('.highcharts-series.' + data.seriesInfo.id);
+        matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
+        matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
+        matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
+      }
+    });
   }
 
   ngOnInit() {
@@ -68,6 +82,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log('tabledates', this.allTableDates)
     // Update table as minDate & maxDate change
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
@@ -108,6 +123,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         this.rows.push(c5maData)
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.toggleSeries.unsubscribe();
   }
 
   setSummaryStatColumns = () => {
@@ -242,14 +261,13 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    for (let i = allColumns.length - 1; i >= 0; i--) {
+    for (let i = allColumns.length - 2; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
     const params = {
       columnKeys: exportColumns,
       fileName: 'analyzer',
       customHeader: this.portalSettings.catTable.portalSource + '\n\n'
-
     }
     this.gridApi.exportDataAsCsv(params);
   }
@@ -285,6 +303,5 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
 
   removeFromAnalyzer(series) {
     this._analyzer.updateAnalyzer(series.seriesInfo.id);
-    this.toggleSeriesInChart(series);
   }
 }

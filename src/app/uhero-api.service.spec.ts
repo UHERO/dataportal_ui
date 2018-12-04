@@ -5,7 +5,7 @@ import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOp
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { MockBackend, MockConnection } from '@angular/http/testing';
 
-//import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 //import 'rxjs/add/operator/do';
 import { UheroApiService } from './uhero-api.service';
 
@@ -84,19 +84,21 @@ describe('Service: UheroApi', () => {
 
     it('should have expected fake categories', async(inject([], () => {
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(response));
-      service.fetchCategories()
+      /* service.fetchCategories()
         .do(categories => {
           expect(categories.length).toBeGreaterThan(0);
-        });
+        }); */
+        service.fetchCategories().subscribe(data => expect(data.length).toBeGreaterThan(0))
     })));
 
     it('should be OK returning no categories', async(inject([], () => {
       const resp = new Response(new ResponseOptions({ status: 200, body: { data: [] } }));
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(resp));
-      service.fetchCategories()
+      service.fetchCategories().subscribe(categories => expect(categories.length).toBe(0, 'show have no categories'));
+      /* service.fetchCategories()
         .do(categories => {
           expect(categories.length).toBe(0, 'should have no categories');
-        });
+        }); */
     })));
   });
 
@@ -112,10 +114,11 @@ describe('Service: UheroApi', () => {
     it('should have expected fake series data', async(inject([], () => {
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(response));
 
-      service.fetchSeries(1, 'HI', 'A')
+      /* service.fetchSeries(1, 'HI', 'A')
         .do(series => {
           expect(series.length).toBeGreaterThan(0);
-        });
+        }); */
+      service.fetchSeries(1, 'HI', 'A').subscribe(data => expect(data.length).toBeGreaterThan(0))
     })));
   });
 
@@ -131,10 +134,11 @@ describe('Service: UheroApi', () => {
     it('should have expected fake observation data', async(inject([], () => {
       backend.connections.subscribe((c: MockConnection) => c.mockRespond(response));
 
-      service.fetchObservations(1)
+      /* service.fetchObservations(1)
         .do(observations => {
           expect(observations).toBe(true);
-        });
+        }); */
+      service.fetchObservations(1).subscribe(data => expect(data).toBe(true))
     })));
   });
 });

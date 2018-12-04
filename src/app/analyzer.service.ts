@@ -14,9 +14,6 @@ export class AnalyzerService {
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
-    analyzerChartSeries: [],
-    analyzerFrequency: '',
-    chartNavigator: { frequency: '', dateStart: '', numberOfObservations: null }
   };
 
   @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
@@ -25,47 +22,6 @@ export class AnalyzerService {
 
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
-  toggleChartSeries(seriesId: any, units: string) {
-    const seriesDrawn = this.analyzerData.analyzerChartSeries.find(cSeries => cSeries.seriesDetail.id === seriesId);
-    const seriesInChart = this.analyzerData.analyzerSeries.find(series => series.showInChart === true);
-    // If remaining series drawn in chart is removed from analyzer, draw next series in table
-    if (this.analyzerData.analyzerSeries.length && !seriesInChart) {
-      this.analyzerData.analyzerSeries[0].showInChart = true;
-      this.updateChartSeries(this.analyzerData.analyzerSeries);
-      return;
-    }
-    // At least one series must be selected
-    if (this.analyzerData.analyzerChartSeries.length === 1 && seriesDrawn) {
-      //this.alertUser = true;
-      //this.alertMessage = 'At least one series must be selected.';
-      return;
-    }
-    // Allow up to 2 different units to be displayed in chart
-    const toggleChartDisplay = this.checkSeriesUnits(this.analyzerData.analyzerChartSeries, units);
-    console.log(this.analyzerSeries.indexOf(series => series.id === seriesId))
-    if (toggleChartDisplay) {
-      //this.alertUser = false;
-      //this.alertMessage = '';
-      const aSeries = this.analyzerSeries.find(series => series.id === seriesId);
-      const aData = this.analyzerData.analyzerSeries.find(series => series.seriesDetail.id === seriesId);
-      if (aSeries && aData) {
-        aSeries.showInChart = !aSeries.showInChart;
-        aData.showInChart = !aData.showInChart;
-      }  
-    }
-    this.updateChartSeries(this.analyzerData.analyzerSeries);
-  }
-
-  updateChartSeries(analyzerSeries: Array<any>) {
-    // Update series drawn in chart and dates in analyzer table
-    this.analyzerData.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
-    this.analyzerData.analyzerChartSeries = analyzerSeries.filter(series => series.showInChart === true);
-    console.log('analyzerChartSeries', this.analyzerData.analyzerChartSeries)
-    this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
-    this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
-    this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
-  }
-
   checkSeriesUnits(chartSeries, units) {
     // List of units for series in analyzer chart
     const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
@@ -73,8 +29,6 @@ export class AnalyzerService {
     if (uniqueUnits.length === 2) {
       // If two different units are already in use, check if the current series unit is in the list
       const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === units);
-      //this.alertUser = unitsExist ? false : true;
-      //this.alertMessage = unitsExist ? '' : 'Chart may only display up to two different units.';
       return unitsExist ? true : false;
     }
     return uniqueUnits.length < 2 ? true : false;
@@ -95,11 +49,6 @@ export class AnalyzerService {
         this.analyzerData.analyzerSeries.push(seriesData);
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries)
-      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
-      // Get highest frequency of all series in analyzer
-      this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
-      this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
-      this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
       this.checkAnalyzerChartSeries();
     });
     return observableForkJoin(observableOf(this.analyzerData));
@@ -224,11 +173,12 @@ export class AnalyzerService {
 
   checkAnalyzerChartSeries() {
     // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
-    while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+    let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
+    while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
       this.analyzerSeries.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
       notInChart.showInChart = true;
-      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+      chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }
   }
 
@@ -267,13 +217,12 @@ export class AnalyzerService {
     }
   }
 
-  updateAnalyzer(seriesId, tableData?, chartData?) {
+  updateAnalyzer(seriesId) {
     const seriesExist = this.analyzerSeries.findIndex(series => series.id === seriesId);
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
       this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
-      console.log('analyzerDataSeries', this.analyzerData.analyzerSeries)
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });

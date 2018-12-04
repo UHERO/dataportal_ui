@@ -1,9 +1,7 @@
 import { of as observableOf, Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
-//import { Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-//import 'rxjs/Rx';
 import { environment } from '../environments/environment';
 import { Category } from './category';
 import { Series } from './series';
@@ -40,7 +38,6 @@ export class UheroApiService {
     this.baseUrl = environment['apiUrl'];
     this.headers = new HttpHeaders({});
     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
-    //this.requestOptionsArgs = { headers: this.headers };
     this.httpOptions = {
       headers: new HttpHeaders({
         'Authorization': 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M='

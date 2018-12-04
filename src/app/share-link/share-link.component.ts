@@ -17,7 +17,6 @@ export class ShareLinkComponent implements OnInit, OnChanges {
 
   // Series in the analyzer and series drawn in the analyzer chart
   @Input() analyzerSeries;
-  @Input() chartSeries;
 
   // Tooltip options in the analyzer view
   @Input() name;
@@ -84,10 +83,11 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
     if (this.analyzerSeries.length) {
+      const chartSeries = this.analyzerSeries.filter(s => s.showInChart);
       this.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
-      this.chartSeries.forEach((series, index) => {
+      chartSeries.forEach((series, index) => {
         cSeries += index === 0 ? series.seriesDetail.id : '-' + series.seriesDetail.id;
       });
     }
