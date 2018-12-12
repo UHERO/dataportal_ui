@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
-import { Frequency } from '../frequency';
 import { DateWrapper } from '../date-wrapper';
 
 @Injectable()
@@ -61,14 +60,14 @@ export class NtaHelperService {
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        this.getSubcategoryData(cacheId, this.categoryData[cacheId], selectedMeasure);
+        this.getSubcategoryData(this.categoryData[cacheId], selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
     });
   }
 
-  getSubcategoryData(cacheId: string, category, selectedMeasure?: string) {
+  getSubcategoryData(category, selectedMeasure?: string) {
     let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
       this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {

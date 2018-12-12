@@ -349,5 +349,5 @@ function mapCategories(response): Array<Category> {
 }
 
 function mapData(response): any {
-  return {...response.data};
+  return response.data;
 }

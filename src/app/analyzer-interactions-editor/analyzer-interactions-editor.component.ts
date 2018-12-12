@@ -8,7 +8,7 @@ declare var $: any;
   styleUrls: ['./analyzer-interactions-editor.component.scss']
 })
 export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularComp, AfterViewInit {
-  private params: any;
+  params: any;
   @ViewChild('interaction-select', { read: ViewContainerRef }) public interactionSelect;
 
   constructor() { }

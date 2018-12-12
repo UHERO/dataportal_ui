@@ -7,7 +7,7 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
   styleUrls: ['./analyzer-interactions-renderer.component.scss']
 })
 export class AnalyzerInteractionsRendererComponent implements ICellRendererAngularComp {
-  private params: any;
+  params: any;
 
   agInit(params: any): void {
     this.params = params;
