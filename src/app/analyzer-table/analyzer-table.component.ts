@@ -82,7 +82,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    console.log('tabledates', this.allTableDates)
     // Update table as minDate & maxDate change
     let tableEnd;
     for (let i = this.allTableDates.length - 1; i > 0; i--) {
@@ -91,6 +90,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
         break;
       }
     }
+    tableEnd = tableEnd ? tableEnd : this.allTableDates.length - 1;
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];

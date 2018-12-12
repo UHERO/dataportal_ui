@@ -80,8 +80,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         dateStart: this.allDates[0].date,
         numberOfObservations: this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length
       }
-      console.log('chart dates', this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i));
-      console.log('nav length', this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length)
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
     }
     if (this.chartObject) {
@@ -377,7 +375,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render: function () {
-          console.log('this', this)
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
@@ -491,13 +488,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         afterSetExtremes: function () {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-          console.log('userMax', userMax)
           this._selectedMin = setDateToFirstOfMonth(navigatorOptions.frequency, userMin);
           this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
-            console.log('extremes', this._extremes)
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to first of the month
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));

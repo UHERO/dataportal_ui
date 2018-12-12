@@ -20,7 +20,7 @@ export class HelperService {
 
   createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'))
+    const end = new Date(dateEnd.replace(/-/g, '\/'));
     if (currentFreq === 'A') {
       return this.addToDateArray(start, end, dateArray, currentFreq);
     }
