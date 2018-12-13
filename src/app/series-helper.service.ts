@@ -1,5 +1,6 @@
+
+import {of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
@@ -77,7 +78,7 @@ export class SeriesHelperService {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
       });
-    return Observable.forkJoin(Observable.of(this.seriesData));
+    return observableForkJoin(observableOf(this.seriesData));
   }
 
   dataTransform(seriesObs, dates, decimals) {
@@ -136,7 +137,7 @@ export class SeriesHelperService {
     series.forEach((s) => {
       const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, seriesStartDate, seriesEndDate);
       stats.series = s.displayName;
-      stats.showInChart = s.showInChart;
+      stats.interactionSettings.showInChart = s.showInChart
       tableRows.push(stats);
     });
     return tableRows;
@@ -157,6 +158,11 @@ export class SeriesHelperService {
       missing: null,
       range: null,
       showInChart: null,
+      interactionSettings: {
+        showInChart: null,
+        color: null,
+        seriesInfo: seriesDetail
+      }
     };
     formattedStats.range = this._helper.formatDate(startDate, freq) + ' - ' + this._helper.formatDate(endDate, freq);
     const decimals = seriesDetail.decimals;

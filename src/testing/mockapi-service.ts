@@ -1,10 +1,11 @@
 export { UheroApiService } from '../app/uhero-api.service';
+import { of as observableOf, Observable } from 'rxjs';
 
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 
 export class MockApiService {
     fetchCategories() {
-        return Observable.of(
+        return observableOf(
             [{
                 'children': {
                     'id': 8,
@@ -18,7 +19,7 @@ export class MockApiService {
     }
 
     fetchSeries(id: number) {
-        return Observable.of(
+        return observableOf(
             [{
                 'id': 140000,
                 'name': 'T@ES.T',
@@ -31,7 +32,7 @@ export class MockApiService {
     }
 
     fetchSeriesDetail(id: number) {
-        return Observable.of(
+        return observableOf(
             [{
                 'id': 146634,
                 'name': 'T_EST@HAW.Q',
@@ -45,7 +46,7 @@ export class MockApiService {
     }
 
     fetchObservations(id: number) {
-        return Observable.of(
+        return observableOf(
             [{
                 'chart data': {
                     'level': [283996800000, 1160.325],

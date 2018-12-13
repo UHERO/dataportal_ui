@@ -26,7 +26,6 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
     this.params.context.componentParent.updateChart(this.params.data);
   }
 
-
   refresh(): boolean {
     return false;
   }

@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
-
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { AnalyzerService } from './analyzer.service';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
@@ -25,7 +25,7 @@ describe('AnalyzerService', () => {
         }
       ],
       imports: [
-        HttpModule
+        HttpClientModule
       ]
     });
   });

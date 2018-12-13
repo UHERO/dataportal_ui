@@ -2,7 +2,8 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+//import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
@@ -37,7 +38,7 @@ import { ClipboardService } from '../clipboard.service';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule,
+    HttpClientModule,
     HighchartsChartModule,
     DataTableModule,
     SharedModule,

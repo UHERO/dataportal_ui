@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input } from '@angular/core';
-import { HttpModule, Http, XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { RouterLinkStubDirective, ActivatedRouteStub, ActivatedRoute } from '../../testing/router-stubs';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -81,7 +82,7 @@ describe('AnalyzerComponent', () => {
         { provide: 'rootCategory', useValue: 59 },
         { provide: ActivatedRoute, useValue: activatedRoute }
       ],
-      imports: [HttpModule, RouterTestingModule]
+      imports: [HttpClientModule, RouterTestingModule]
     })
     .compileComponents();
   }));

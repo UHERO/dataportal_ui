@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
+//import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
 import { AgGridModule } from 'ag-grid-angular';
@@ -32,6 +33,8 @@ import { CategoryTableViewComponent } from '../category-table-view/category-tabl
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
+import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
+import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +60,9 @@ import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analy
     CategoryTableViewComponent,
     CategoryTableRendererComponent,
     AnalyzerTableRendererComponent,
-    AnalyzerStatsRendererComponent
+    AnalyzerStatsRendererComponent,
+    AnalyzerInteractionsEditorComponent,
+    AnalyzerInteractionsRendererComponent
   ],
   imports: [
     CommonModule,
@@ -65,7 +70,7 @@ import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analy
     HighchartsChartModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpModule,
+    HttpClientModule,
     RouterModule,
     DataTableModule, SharedModule,
     TableModule,
@@ -73,7 +78,9 @@ import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analy
     AgGridModule.withComponents([
       CategoryTableRendererComponent,
       AnalyzerTableRendererComponent,
-      AnalyzerStatsRendererComponent
+      AnalyzerStatsRendererComponent,
+      AnalyzerInteractionsEditorComponent,
+      AnalyzerInteractionsRendererComponent
     ])
   ],
   exports: [

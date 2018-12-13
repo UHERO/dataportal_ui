@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { of as observableOf, forkJoin as observableForkJoin, Observable } from 'rxjs';
+import { Injectable, EventEmitter, Output } from '@angular/core';
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './frequency';
@@ -14,12 +14,25 @@ export class AnalyzerService {
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
-    analyzerChartSeries: [],
-    analyzerFrequency: '',
-    chartNavigator: { frequency: '', dateStart: '', numberOfObservations: null }
   };
 
+  @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
+
+  @Output() public toggleSeriesInChart: EventEmitter<any> = new EventEmitter();
+
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
+
+  checkSeriesUnits(chartSeries, units) {
+    // List of units for series in analyzer chart
+    const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
+    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+    if (uniqueUnits.length === 2) {
+      // If two different units are already in use, check if the current series unit is in the list
+      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === units);
+      return unitsExist ? true : false;
+    }
+    return uniqueUnits.length < 2 ? true : false;
+  }
 
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
@@ -36,14 +49,9 @@ export class AnalyzerService {
         this.analyzerData.analyzerSeries.push(seriesData);
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries)
-      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
-      // Get highest frequency of all series in analyzer
-      this.analyzerData.chartNavigator.frequency = this.checkFrequencies(this.analyzerData.analyzerSeries);
-      this.analyzerData.chartNavigator.dateStart = this.analyzerData.analyzerTableDates[0].date;
-      this.analyzerData.chartNavigator.numberOfObservations = this.analyzerData.analyzerTableDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length;
       this.checkAnalyzerChartSeries();
     });
-    return Observable.forkJoin(Observable.of(this.analyzerData));
+    return observableForkJoin(observableOf(this.analyzerData));
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
@@ -165,11 +173,12 @@ export class AnalyzerService {
 
   checkAnalyzerChartSeries() {
     // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
-    while (this.analyzerData.analyzerChartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !this.analyzerData.analyzerChartSeries.length) {
+    let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
+    while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
       this.analyzerSeries.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
       notInChart.showInChart = true;
-      this.analyzerData.analyzerChartSeries = this.analyzerData.analyzerSeries.filter(serie => serie.showInChart === true);
+      chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }
   }
 
@@ -208,14 +217,16 @@ export class AnalyzerService {
     }
   }
 
-  updateAnalyzer(seriesId, tableData?, chartData?) {
+  updateAnalyzer(seriesId) {
     const seriesExist = this.analyzerSeries.findIndex(series => series.id === seriesId);
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
+      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });
+      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
     }
   }
 

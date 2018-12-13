@@ -1,10 +1,9 @@
+import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
 import { CategoryData } from '../category-data';
-import { Frequency } from '../frequency';
 import { DateWrapper } from '../date-wrapper';
 
 @Injectable()
@@ -31,15 +30,15 @@ export class NtaHelperService {
   initContent(catId: any, selectedMeasure?: string): Observable<any> {
     const cacheId = NtaHelperService.setCacheId(catId, selectedMeasure);
     if (this.categoryData[cacheId]) {
-      return Observable.of([this.categoryData[cacheId]]);
+      return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
       this.getCategory(cacheId, catId, selectedMeasure);
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
       this.getSearch(cacheId, catId);
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
@@ -61,14 +60,14 @@ export class NtaHelperService {
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        this.getSubcategoryData(cacheId, this.categoryData[cacheId], selectedMeasure);
+        this.getSubcategoryData(this.categoryData[cacheId], selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
     });
   }
 
-  getSubcategoryData(cacheId: string, category, selectedMeasure?: string) {
+  getSubcategoryData(category, selectedMeasure?: string) {
     let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
       this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {

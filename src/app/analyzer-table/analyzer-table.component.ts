@@ -1,11 +1,13 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analyzer-table-renderer.component';
-import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component'
+import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
+import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
+import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { GridOptions } from 'ag-grid-community';
 
 @Component({
@@ -15,13 +17,11 @@ import { GridOptions } from 'ag-grid-community';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class AnalyzerTableComponent implements OnInit, OnChanges {
+export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
   @Input() allTableDates;
-  @Input() chartSeries;
-  @Output() updateChartSeries = new EventEmitter();
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
   @Input() ytdChecked;
@@ -29,6 +29,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   portalSettings;
   missingSummaryStat = false;
   tableDates;
+  toggleSeries;
   private gridApi;
   private columnDefs;
   private rows;
@@ -47,7 +48,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   ) {
     this.frameworkComponents = {
       analyzerTableRenderer: AnalyzerTableRendererComponent,
-      analyzerStatsRenderer: AnalyzerStatsRendererComponent
+      analyzerStatsRenderer: AnalyzerStatsRendererComponent,
+      analyzerInteractionsEditor: AnalyzerInteractionsEditorComponent,
+      analyzerInteractionsRenderer: AnalyzerInteractionsRendererComponent
     };
     this.gridOptions = <GridOptions>{
       context: {
@@ -59,6 +62,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         componentParent: this
       }
     }
+    this.toggleSeries = this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
+      const chartSeries = this.series.filter(s => s.showInChart);
+      const toggleDisplay = this._analyzer.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
+      if (toggleDisplay) {
+        const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === data.seriesInfo.id);
+        const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === data.seriesInfo.id);
+        matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
+        const seriesInChart = $('.highcharts-series.' + data.seriesInfo.id);
+        matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
+        matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
+        matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
+      }
+    });
   }
 
   ngOnInit() {
@@ -74,6 +90,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
         break;
       }
     }
+    tableEnd = tableEnd ? tableEnd : this.allTableDates.length - 1;
     const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
     this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];
@@ -82,7 +99,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
-        statRow.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
+        statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
       });
       // Check if the summary statistics for a series has NA values
       this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
@@ -108,12 +125,25 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     });
   }
 
+  ngOnDestroy() {
+    this.toggleSeries.unsubscribe();
+  }
+
   setSummaryStatColumns = () => {
     return [{
+      field: 'interactionSettings',
+      headerName: 'Actions',
+      pinned: 'left',
+      width: 25,
+      editable: true,
+      cellRenderer: 'analyzerInteractionsRenderer',
+      cellEditor: 'analyzerInteractionsEditor',
+      cellClass: 'action-column',
+    }, {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
-      width: 275,
+      width: 250,
       cellRenderer: 'analyzerStatsRenderer',
       tooltip: function (params) {
         return params.value;
@@ -151,11 +181,21 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       field: 'series',
       headerName: 'Series',
       pinned: 'left',
-      width: 275,
+      width: 250,
       cellRenderer: 'analyzerTableRenderer',
       tooltip: function (params) {
         return params.value;
       }
+    });
+    columns.push({
+      field: 'interactionSettings',
+      headerName: 'Actions',
+      pinned: 'left',
+      width: 25,
+      editable: true,
+      cellRenderer: 'analyzerInteractionsRenderer',
+      cellEditor: 'analyzerInteractionsEditor',
+      cellClass: 'action-column',
     });
     const tableDates = dates.slice(tableStart, tableEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
@@ -174,9 +214,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series.seriesDetail,
-      showInChart: series.showInChart,
+      interactionSettings: {
+        showInChart: series.showInChart,
+        color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000',
+        seriesInfo: series.seriesDetail
+      },
       lvlData: true,
-      color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000'
     }
     formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
@@ -218,14 +261,13 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    for (let i = allColumns.length - 1; i >= 0; i--) {
+    for (let i = allColumns.length - 2; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
     const params = {
       columnKeys: exportColumns,
       fileName: 'analyzer',
       customHeader: this.portalSettings.catTable.portalSource + '\n\n'
-
     }
     this.gridApi.exportDataAsCsv(params);
   }
@@ -250,13 +292,16 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.tableTransform.emit({ value: e.target.checked, label: 'c5ma' });
   }
 
-
-  updateAnalyzer = (series) =>{
-    this._analyzer.updateAnalyzer(series.seriesInfo.id);
-    this.updateChartSeries.emit(series);
+  switchChartYAxes(series) {
+    this._analyzer.switchYAxes.emit(series);
   }
 
-  updateChart = (series) => {
-    this.updateChartSeries.emit(series);
+  toggleSeriesInChart(series) {
+    this._analyzer.toggleSeriesInChart.emit(series);
+    this._analyzer.setAnalyzerDates(this._analyzer.analyzerData.analyzerSeries)
+  }
+
+  removeFromAnalyzer(series) {
+    this._analyzer.updateAnalyzer(series.seriesInfo.id);
   }
 }

@@ -1,6 +1,6 @@
+import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 
 import { UheroApiService } from './uhero-api.service';
 import { HelperService } from './helper.service';
@@ -39,7 +39,7 @@ export class CategoryHelperService {
   initContent(catId: any, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
-      return Observable.of([this.categoryData[cacheId]]);
+      return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = <CategoryData>{};
       this._uheroAPIService.fetchCategories().subscribe((categories) => {
@@ -68,7 +68,7 @@ export class CategoryHelperService {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
         }
       });
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
@@ -222,7 +222,7 @@ export class CategoryHelperService {
   initSearch(search: string, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(search, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
-      return Observable.of([this.categoryData[cacheId]]);
+      return observableOf([this.categoryData[cacheId]]);
     } else {
       let obsEnd, obsStart;
       this.categoryData[cacheId] = <CategoryData>{};
@@ -245,7 +245,7 @@ export class CategoryHelperService {
       if (!routeGeo || !routeFreq) {
         this.getSearchWithDefaults(search, cacheId);
       }
-      return Observable.forkJoin(Observable.of(this.categoryData[cacheId]));
+      return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
