@@ -6,9 +6,9 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 //import { Observable } from 'rxjs/Rx';
 
-import { UheroApiService } from '../uhero-api.service';
+//import { UheroApiService } from '../uhero-api.service';
 import { LandingPageComponent } from './landing-page.component';
-import { MockApiService } from '../../testing/mockapi-service';
+//import { MockApiService } from '../../testing/mockapi-service';
 import { RouterLinkStubDirective, ActivatedRouteStub, ActivatedRoute } from '../../testing/router-stubs';
 
 let comp: LandingPageComponent;
@@ -25,7 +25,7 @@ describe('LandingPageComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ HighchartComponent ],
       providers: [
-        { provide: UheroApiService, useClass: MockApiService },
+        //{ provide: UheroApiService, useClass: MockApiService },
         { provide: ActivatedRoute, useValue: activatedRoute}
       ]
     })

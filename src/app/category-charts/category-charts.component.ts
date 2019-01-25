@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnChanges, Inject, ChangeDetectionStrategy, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
@@ -24,13 +24,15 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() search;
   @Input() dates;
   @Input() dateWrapper;
+  @Input() seriesInAnalyzer;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private _helper: HelperService,
     private googleAES: GoogleAnalyticsEventsService,
-    private _analyzer: AnalyzerService
-  ) { }
+    private _analyzer: AnalyzerService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnChanges() {
     if (this.data) {
@@ -88,7 +90,7 @@ export class CategoryChartsComponent implements OnChanges {
           dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
         });
         return transformationValues;
-      }  
+      }
     }
   }
 
@@ -129,9 +131,7 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   updateAnalyze(seriesInfo) {
-    this._analyzer.updateAnalyzer(seriesInfo.id);
-    // Update analyze button on chart
-    seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
+    this._analyzer.updateAnalyzerSeriesCount(seriesInfo);
   }
 
   trackBySeries(index, item) {

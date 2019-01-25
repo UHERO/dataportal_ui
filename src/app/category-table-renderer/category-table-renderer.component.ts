@@ -31,7 +31,6 @@ export class CategoryTableRendererComponent implements ICellRendererAngularComp 
   }
 
   updateAnalyze = (seriesInfo) => {
-    this._analyzer.updateAnalyzer(seriesInfo.id);
-    seriesInfo.analyze = this._analyzer.checkAnalyzer(seriesInfo);
+    this._analyzer.updateAnalyzerSeriesCount(seriesInfo);
   }
 }

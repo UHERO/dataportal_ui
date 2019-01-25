@@ -20,6 +20,8 @@ export class AnalyzerService {
 
   @Output() public toggleSeriesInChart: EventEmitter<any> = new EventEmitter();
 
+  @Output() public updateAnalyzerCount: EventEmitter<any> = new EventEmitter();
+
   constructor(private _uheroAPIService: UheroApiService, private _helper: HelperService) { }
 
   checkSeriesUnits(chartSeries, units) {
@@ -37,6 +39,13 @@ export class AnalyzerService {
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
+  }
+
+  updateAnalyzerSeriesCount(seriesInfo) {
+    this.updateAnalyzer(seriesInfo.id);
+    // Update analyze button on category charts/tables
+    // Emits click event to parent (landing-page.component) to trigger change detection in for a series that may show up in multiple places on a page
+    this.updateAnalyzerCount.emit(seriesInfo);
   }
 
   getAnalyzerData(aSeries) {
