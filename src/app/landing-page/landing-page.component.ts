@@ -59,7 +59,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     private cdRef: ChangeDetectorRef
   ) {
     this.toggleSeriesInAnalyzer = this._analyzer.updateAnalyzerCount.subscribe((data: any) => {
-      this.seriesInAnalyzer = data.analyze;
+      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
     });
   }
 

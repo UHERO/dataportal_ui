@@ -36,7 +36,8 @@
   }
     
   .analyzer-toggle {
-    color: rgba(240, 240, 240, 0.65);
+    // color: rgba(240, 240, 240, 0.65);
+    color: $primary-text;
     cursor: pointer;
     position: relative;
     top: -25px;
@@ -60,7 +61,8 @@
   }
 
   .remove-analyze-button {
-    color: $secondary;
+    // color: $secondary;
+    color: $primary-text;
 
     &:hover::after {
       color: $series-gray;

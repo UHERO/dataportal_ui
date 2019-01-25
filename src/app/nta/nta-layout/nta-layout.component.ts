@@ -50,7 +50,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     private cdRef: ChangeDetectorRef
   ) {
     this.toggleSeriesInAnalyzer = this._analyzer.updateAnalyzerCount.subscribe((data: any) => {
-      this.seriesInAnalyzer = data.analyze;
+      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
     });
   }
 

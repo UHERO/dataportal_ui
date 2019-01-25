@@ -20,8 +20,10 @@
 				<app-highchart [minValue]="sublist.minValue" [maxValue]="sublist.maxValue" [portalSettings]="portalSettings" [chartStart]="chartStart"
 				 [chartEnd]="chartEnd" [seriesData]="serie" [categoryDates]="dates" [currentFreq]="freq"></app-highchart>
 			</a>
-			<i [class.add-analyze-button]="!serie.seriesInfo.analyze" [class.remove-analyze-button]="serie.seriesInfo.analyze" class="material-icons analyzer-toggle remove-button"
-			 (click)="updateAnalyze(serie.seriesInfo, serie.tableData, serie.chartData)">&#xE838;</i>
+			<!-- <i [class.add-analyze-button]="!serie.seriesInfo.analyze" [class.remove-analyze-button]="serie.seriesInfo.analyze" class="material-icons analyzer-toggle remove-button"
+			 (click)="updateAnalyze(serie.seriesInfo)">star</i> -->
+			 <i *ngIf="!serie.seriesInfo.analyze" title="Add to Analyzer" [class.add-analyze-button]="!serie.seriesInfo.analyze" class="material-icons analyzer-toggle" (click)="updateAnalyze(serie.seriesInfo)">star_border</i>
+			 <i *ngIf="serie.seriesInfo.analyze" title="Remove from Analyzer" [class.remove-analyze-button]="serie.seriesInfo.analyze" class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(serie.seriesInfo)">star</i>		 
 		</div>
 	</ng-template>
 </div>
