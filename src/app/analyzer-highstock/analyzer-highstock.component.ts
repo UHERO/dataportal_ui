@@ -6,7 +6,6 @@ import { HighstockHelperService } from '../highstock-helper.service';
 import { HighchartsObject } from 'app/HighchartsObject';
 declare var $: any;
 declare var require: any;
-declare var require: any;
 const Highcharts = require('highcharts/js/highstock');
 const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
 const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
@@ -93,7 +92,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           pointStart: Date.parse(navigatorOptions.dateStart),
           pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
           pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',  
-        });  
+        });
       }
     }
     if (selectedAnalyzerSeries) {

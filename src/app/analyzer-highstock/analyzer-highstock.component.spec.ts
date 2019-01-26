@@ -18,7 +18,7 @@ class ChartStubComponent {
   @Input() navigator;
   @Input() callbackFunction;
 }
- 
+
 describe('AnalyzerHighstockComponent', () => {
   let component: AnalyzerHighstockComponent;
   let fixture: ComponentFixture<AnalyzerHighstockComponent>;

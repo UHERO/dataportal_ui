@@ -35,21 +35,17 @@
   }
 
   .analyzer-toggle {
-    color: rgba(240, 240, 240, 0.65);
+    color: $primary-text;
     cursor: pointer;
     vertical-align: middle;
     left: 10px;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-right: 10px;
     font-size: 1em;
-  }
-
-  .add-button {
-    text-shadow: 1px 2px 6px $white, 0 0 0 $black, 1px 2px 6px $white;
+    font-weight: bold;
   }
 
   .remove-button {
-    color: $secondary;
+    color: $primary-text;
   }
 
   .source {

@@ -2,11 +2,13 @@
   <p *ngIf="data.error">Series does not exist.</p>
   <div *ngIf="!data.error">
     <h3 class="series-title">{{data.seriesDetail.title}}</h3>
+    <i *ngIf="data.seriesDetail && !data.seriesDetail.analyze" title="Add to Analyzer" [class.add-button]="!data.seriesDetail.analyze" class="material-icons analyzer-toggle" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData, data.chartData)">star_border</i>
+    <i *ngIf="data.seriesDetail && data.seriesDetail.analyze" title="Remove from Analyzer" [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData, data.chartData)">star</i>		 
     <app-geo-selector *ngIf="data.regions" [regions]="data.regions" [(selectedGeo)]="data.currentGeo" (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></app-geo-selector>
     <app-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies" [(selectedFreq)]="data.currentFreq"
       (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)" class="freq-selector"></app-freq-selector>
-    <i *ngIf="data.seriesDetail" [title]="data.seriesDetail.analyze ? 'Remove from Analyzer' : 'Add to Analyzer'" [class.add-button]="!data.seriesDetail.analyze" [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData, data.chartData)">&#xE838;</i>
+    <!-- <i *ngIf="data.seriesDetail" [title]="data.seriesDetail.analyze ? 'Remove from Analyzer' : 'Add to Analyzer'" [class.add-button]="!data.seriesDetail.analyze" [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(data.seriesDetail, data.seriesTableData, data.chartData)">&#xE838;</i> -->
     <app-share-link [view]="'series'" [startDate]="chartStart" [endDate]="chartEnd"></app-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">

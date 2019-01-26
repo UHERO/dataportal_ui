@@ -165,7 +165,6 @@ export class CategoryHelperService {
         if (displaySeries) {
           sub.displaySeries = displaySeries;
           sub.noData = false;
-          //this.formatCategoryData(displaySeries, this.categoryData[cacheId].categoryDates, this.categoryData[cacheId].categoryDateWrapper);
           sub.requestComplete = true;
         }
         if (!displaySeries) {
@@ -280,7 +279,6 @@ export class CategoryHelperService {
       this.categoryData[cacheId].subcategories = [sublist];
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
-      //this.categoryData[cacheId].sliderDates = this._helper.getTableDates(categoryDateArray);
       this.categoryData[cacheId].requestComplete = true;
       sublist.requestComplete = true;
     }
