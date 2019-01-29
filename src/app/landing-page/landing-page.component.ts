@@ -3,6 +3,7 @@ import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, 
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
+import { AnalyzerService } from '../analyzer.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency } from '../frequency';
@@ -35,6 +36,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private seriesEnd = null;
   private portalSettings;
   private displaySeries;
+  private seriesInAnalyzer;
+  private toggleSeriesInAnalyzer;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -47,14 +50,18 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
 
   constructor(
     @Inject('portal') private portal,
-    private _uheroAPIService: UheroApiService,
+    private _analyzer: AnalyzerService,
     private _dataPortalSettings: DataPortalSettingsService,
     private _catHelper: CategoryHelperService,
     private _helperService: HelperService,
     private route: ActivatedRoute,
     private _router: Router,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this.toggleSeriesInAnalyzer = this._analyzer.updateAnalyzerCount.subscribe((data: any) => {
+      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
+    });
+  }
 
   ngOnInit() {
     this.currentGeo = { fips: null, name: null, shortName: null, handle: null };

@@ -1,8 +1,7 @@
-import { Component, Inject, OnInit, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerService } from '../analyzer.service';
-import { disableDebugTools } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-category-table-view',
@@ -10,7 +9,7 @@ import { disableDebugTools } from '@angular/platform-browser';
   styleUrls: ['./category-table-view.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CategoryTableViewComponent implements OnInit, OnChanges {
+export class CategoryTableViewComponent implements OnChanges {
   @Input() data;
   @Input() sublist;
   @Input() freq;
@@ -26,6 +25,7 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
+  @Input() seriesInAnalyzer;
   private gridApi;
   private columnDefs;
   private rows;
@@ -41,22 +41,13 @@ export class CategoryTableViewComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit() {
-    if (this.data) {
-      this.data.forEach((chartSeries) => {
-        if (chartSeries.seriesInfo !== 'No data available') {
-          chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
-        }
-      });  
-    }
-  }
-
   ngOnChanges() {
     this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
+          series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.sublist.parentId);

@@ -38,7 +38,7 @@ div.th-buttons {
   }
 
   .analyzer-toggle {
-    color: rgba(240, 240, 240, 0.65);
+    color: $primary-text;
     cursor: pointer;
     vertical-align: middle;
     font-size: inherit;
@@ -52,7 +52,7 @@ div.th-buttons {
   }
 
   .remove-button {
-    color: $secondary;
+    color: $primary-text;
   }               
 }
 

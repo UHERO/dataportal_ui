@@ -12,7 +12,6 @@ import { ObservationResults } from './observation-results';
 @Injectable()
 export class UheroApiService {
   private baseUrl: string;
-  //private requestOptionsArgs: RequestOptionsArgs;
   private headers: HttpHeaders;
   private cachedCategories;
   private cachedGeos;
@@ -56,7 +55,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedCategories = val;
           categories$ = null;
-        }),);
+        }), );
       return categories$;
     }
   }
@@ -70,7 +69,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedGeos = val;
           geos$ = null;
-        }),);
+        }), );
       return geos$;
     }
   }
@@ -86,7 +85,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedExpanded[id + geo + freq] = val;
           expanded$ = null;
-        }),);
+        }), );
       return expanded$;
     }
   }
@@ -101,7 +100,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSelectedCategory[id] = val;
           selectedCat$ = null;
-        }),);
+        }), );
       return selectedCat$;
     }
   }
@@ -117,7 +116,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
           selectedCat$ = null;
-        }),);
+        }), );
       return selectedCat$;
     }
   }
@@ -130,7 +129,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedPackageSeries[id] = val;
           series$ = null;
-        }),);
+        }), );
       return series$;
     }
   }
@@ -145,7 +144,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedPackageCategory[id + geo + freq] = val;
           selectedCat$ = null;
-        }),);
+        }), );
       return selectedCat$;
     }
   }
@@ -159,7 +158,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSeries[id + geo + freq] = val;
           series$ = null;
-        }),);
+        }), );
       return series$;
     }
   }
@@ -174,7 +173,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSeriesDetail[id] = val;
           seriesDetail$ = null;
-        }),);
+        }), );
       return seriesDetail$;
     }
   }
@@ -189,7 +188,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSiblings[seriesId] = val;
           seriesSiblings$ = null;
-        }),);
+        }), );
       return seriesSiblings$;
     }
   }
@@ -203,7 +202,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedGeoSeries[id + handle] = val;
           geoSeries$ = null;
-        }),);
+        }), );
       return geoSeries$;
     }
   }
@@ -217,7 +216,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedCatMeasures[id] = val;
           catMeasures$ = null;
-        }),);
+        }), );
       return catMeasures$;
     }
   }
@@ -231,7 +230,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedMeasureSeries[id] = val;
           measureSeries$ = null;
-        }),);
+        }), );
       return measureSeries$;
     }
   }
@@ -245,7 +244,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSearch[search] = val;
           filters$ = null;
-        }),);
+        }), );
       return filters$;
     }
   }
@@ -259,7 +258,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSearchExpand[search] = val;
           search$ = null;
-        }),);
+        }), );
       return search$;
     }
   }
@@ -274,7 +273,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
           search$ = null;
-        }),);
+        }), );
       return search$;
     }
   }
@@ -289,7 +288,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
           search$ = null;
-        }),);
+        }), );
       return search$;
     }
   }
@@ -303,7 +302,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedPackageAnalyzer[ids] = val;
           analyzer$ = null;
-        }),);
+        }), );
       return analyzer$;
     }
   }
@@ -318,7 +317,7 @@ export class UheroApiService {
         tap(val => {
           this.cachedObservations[id] = val;
           observations$ = null;
-        }),);
+        }), );
       return observations$;
     }
   }

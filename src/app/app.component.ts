@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
       this.titleService.setTitle(this.portal.title);
       // Set favicon
       $('#favicon').attr('href', this.portal.favicon);
-  
+
       this._router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
           gtag('config', this.gaId, { 'page_path': event.urlAfterRedirects });
