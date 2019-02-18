@@ -41,7 +41,7 @@
     "@angular/router": "^7.2.1",
     "ag-grid-angular": "^20.0.0",
     "ag-grid-community": "^20.0.0",
-    "bootstrap": "^4.0.0-beta.2",
+    "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
     "highcharts": "^6.2.0",
     "highcharts-angular": "^2.3.1",
