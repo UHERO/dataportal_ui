@@ -30,7 +30,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],
@@ -125,7 +124,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],
@@ -210,7 +208,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],
@@ -305,7 +302,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],
@@ -390,7 +386,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],
@@ -485,7 +480,6 @@
               "node_modules/primeng/resources/themes/omega/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
             ],

@@ -1,6 +1,6 @@
 import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
-import * as Highcharts from 'highcharts/js/highcharts';
+import * as Highcharts from 'highcharts/highcharts';
 import { HighchartsObject } from '../HighchartsObject';
 
 @Component({

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 declare var require: any;
-const Highcharts = require('highcharts/js/highstock');
+const Highcharts = require('highcharts/highstock');
 
 Highcharts.dateFormats = {
   Q: function (timestamp) {

@@ -85,8 +85,10 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       values: sliderDates,
       prettify_enabled: false,
       hide_min_max: true,
+      hide_from_to: true,
       keyboard: true,
       keyboard_step: 1,
+      skin: 'round',
       type: 'double',
       onChange: function (data) {
         if (portalSettings.sliderInteraction) {
