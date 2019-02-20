@@ -37,6 +37,12 @@
     position: absolute;
 }
 
+.irs--round .irs-handle {
+    width: 18px;
+    height: 18px;
+    border: 2px solid $primary;
+}
+
 .irs-slider.from, .irs-slider.to {
     background-position: 0 -120px;
 }
