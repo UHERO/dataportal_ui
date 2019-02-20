@@ -199,7 +199,8 @@ export class HighstockComponent implements OnChanges {
             this.chartObject = Object.assign({}, this);
           }
         }
-      }
+      },
+      styledMode: true,
     };
     this.chartOptions.labels = labelItems;
     this.chartOptions.rangeSelector = {

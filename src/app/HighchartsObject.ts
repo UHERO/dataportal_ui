@@ -4,7 +4,8 @@ export interface HighchartsObject {
     className: string,
     events: {
       render: () => void,
-    }
+    },
+    styledMode: true,
   },
   exporting: {
     enabled: boolean,

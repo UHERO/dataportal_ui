@@ -385,6 +385,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         }
       },
+      styledMode: true,
       zoomType: 'x'
     };
     this.chartOptions.labels = {

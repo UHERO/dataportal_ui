@@ -238,7 +238,8 @@ export class HighchartComponent implements OnChanges {
             this.setSubtitle({ text: 'Data Available From: ' + categoryDisplayStart + ' - ' + categoryDisplayEnd, verticalAlign: 'middle', y: -20 });
           }
         }
-      }
+      },
+      styledMode: true,
     };
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.title = this.setChartTitle('<br>');
