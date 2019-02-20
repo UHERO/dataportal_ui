@@ -6,9 +6,9 @@ import { HighstockHelperService } from '../highstock-helper.service';
 import { HighchartsObject } from 'app/HighchartsObject';
 declare var $: any;
 declare var require: any;
-const Highcharts = require('highcharts/js/highstock');
-const exporting = require('../../../node_modules/highcharts/js/modules/exporting');
-const offlineExport = require('../../../node_modules/highcharts/js/modules/offline-exporting');
+const Highcharts = require('highcharts/highstock');
+const exporting = require('../../../node_modules/highcharts/modules/exporting');
+const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
 const exportCSV = require('../csv-export');
 exporting(Highcharts);
 offlineExport(Highcharts);
@@ -385,6 +385,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         }
       },
+      styledMode: true,
       zoomType: 'x'
     };
     this.chartOptions.labels = {

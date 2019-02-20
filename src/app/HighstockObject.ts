@@ -5,6 +5,7 @@ export interface HighstockObject {
       render: () => void,
     },
     zoomType: string,
+    styledMode: boolean,
     description: string, // used in xAxis label formatter
   },
   labels: {

@@ -1,6 +1,6 @@
 import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
 import { HelperService } from '../helper.service';
-import * as Highcharts from 'highcharts/js/highcharts';
+import * as Highcharts from 'highcharts/highcharts';
 import { HighchartsObject } from '../HighchartsObject';
 
 @Component({
@@ -238,7 +238,8 @@ export class HighchartComponent implements OnChanges {
             this.setSubtitle({ text: 'Data Available From: ' + categoryDisplayStart + ' - ' + categoryDisplayEnd, verticalAlign: 'middle', y: -20 });
           }
         }
-      }
+      },
+      styledMode: true,
     };
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.title = this.setChartTitle('<br>');
