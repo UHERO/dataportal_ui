@@ -35,6 +35,7 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
 import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
+import { SeriesPagingComponent } from '../series-paging/series-paging.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     AnalyzerTableRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent
+    AnalyzerInteractionsRendererComponent,
+    SeriesPagingComponent
   ],
   imports: [
     CommonModule,

@@ -1,4 +1,4 @@
-import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
+import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 
@@ -160,12 +160,29 @@ export class CategoryHelperService {
       sub.requestComplete = false;
       // sublist id used as anchor fragments in landing-page component, fragment expects a string
       sub.id = sub.id.toString();
+      // At most, display 12 series at a time in the multiple chart view
+      sub.scrollSeries = [];
+      // Default to the first set of (12) series to display
+      sub.scrollIndex = 0;
       if (sub.series) {
         const displaySeries = this.getDisplaySeries(sub.series, this.categoryData[cacheId].currentFreq.freq);
         if (displaySeries) {
           sub.displaySeries = displaySeries;
           sub.noData = false;
-          sub.requestComplete = true;
+          let seriesGroup = [];
+          sub.displaySeries.forEach((series, s) => {
+            seriesGroup.push(series);
+            if (seriesGroup.length === 8 || s === sub.displaySeries.length - 1) {
+              sub.scrollSeries.push(seriesGroup);
+              seriesGroup = [];
+            }
+            const decimals = series.decimals ? series.decimals : 1;
+            series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, sub.dateArray, decimals);
+            if (s === sub.displaySeries.length - 1) {
+              sub.requestComplete = true;
+            }
+          });
+          //sub.requestComplete = true;
         }
         if (!displaySeries) {
           this.setNoData(sub);
@@ -177,6 +194,7 @@ export class CategoryHelperService {
       if (sub.isHeader) {
         sub.requestComplete = true;
       }
+      console.log('sub', sub)
     });
   }
 
@@ -214,6 +232,7 @@ export class CategoryHelperService {
     subcategory.datatables = {};
     subcategory.displaySeries = series;
     subcategory.noData = true;
+    console.log('no data', subcategory)
     subcategory.requestComplete = true;
   }
 

@@ -25,6 +25,8 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() dates;
   @Input() dateWrapper;
   @Input() seriesInAnalyzer;
+  @Input() scrollSeriesTest;
+  @Input() scrollSeriesIndex;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -36,6 +38,8 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
+      console.log('scrollSeries', this.scrollSeriesTest);
+      console.log('scroll index', this.scrollSeriesIndex)
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);

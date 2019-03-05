@@ -139,6 +139,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     return heightDiff;
   }
 
+  updatePageCounter(event, subcategory) {
+    console.log('update test')
+    subcategory.scrollIndex = event;
+  }
+
   // Redraw series when a new region is selected
   redrawSeriesGeo(event, currentFreq, subId) {
     this.displaySeries = false;
