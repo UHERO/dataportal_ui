@@ -102,7 +102,8 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     CategoryTableViewComponent,
     CategoryTableRendererComponent,
     AnalyzerTableRendererComponent,
-    AnalyzerStatsRendererComponent
+    AnalyzerStatsRendererComponent,
+    SeriesPagingComponent
   ]
 })
 export class Shared { }

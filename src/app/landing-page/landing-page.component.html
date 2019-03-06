@@ -56,7 +56,7 @@
 					[noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
 				</app-category-table-view>
 				<app-category-charts *ngIf="routeView !== 'table' && displaySeries" [portalSettings]="portalSettings"
-					[chartStart]="seriesStart" [chartEnd]="seriesEnd" [sublist]="sub" [data]="sub.scrollSeries ? sub.scrollSeries[sub.scrollIndex] : sub.displaySeries" [scrollSeriesTest]="sub.scrollSeries" [scrollSeriesIndex]="sub.scrollIndex"
+					[chartStart]="seriesStart" [chartEnd]="seriesEnd" [sublist]="sub" [data]="sub.scrollSeries ? sub.scrollSeries[sub.scrollIndex] : sub.displaySeries"
 					[dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
 					[freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"
 					[seriesInAnalyzer]="seriesInAnalyzer"></app-category-charts>
