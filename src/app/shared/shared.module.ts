@@ -36,6 +36,9 @@ import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analy
 import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
 import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
 import { SeriesPagingComponent } from '../series-paging/series-paging.component';
+import { PrimengMenuNavComponent } from '../primeng-menu-nav/primeng-menu-nav.component';
+import { PanelMenuModule } from 'primeng/panelmenu';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -64,7 +67,8 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     AnalyzerStatsRendererComponent,
     AnalyzerInteractionsEditorComponent,
     AnalyzerInteractionsRendererComponent,
-    SeriesPagingComponent
+    SeriesPagingComponent,
+    PrimengMenuNavComponent
   ],
   imports: [
     CommonModule,
@@ -76,6 +80,8 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     RouterModule,
     DataTableModule, SharedModule,
     TableModule,
+    PanelMenuModule,
+    BrowserAnimationsModule,
     RecaptchaModule.forRoot(),
     AgGridModule.withComponents([
       CategoryTableRendererComponent,
@@ -103,7 +109,8 @@ import { SeriesPagingComponent } from '../series-paging/series-paging.component'
     CategoryTableRendererComponent,
     AnalyzerTableRendererComponent,
     AnalyzerStatsRendererComponent,
-    SeriesPagingComponent
+    SeriesPagingComponent,
+    PrimengMenuNavComponent
   ]
 })
 export class Shared { }

@@ -103,15 +103,29 @@ export class CategoryHelperService {
       // Merge subcats with original list of categories from /category response
       const sublistCopy = [];
       let navIndent = false;
-      subcats.forEach((sub) => {
+      subcats.forEach((sub, index) => {
+        let subItems = [];
         // Indent subcategory in sidebar navigation if category follows a header
         navIndent = !navIndent ? sub.isHeader : navIndent;
+        if (sub.isHeader) {
+          let subIndex = index + 1;
+          sub.items = [];
+          while (subIndex <= subcats.length - 1) {
+            if (subcats[subIndex].isHeader) {
+              break;
+            }
+            subcats[subIndex].label = subcats[subIndex].name
+            sub.items.push(subcats[subIndex]);
+            subIndex++;
+          }
+        }
         if (navIndent) {
           sub.navIndent = !sub.isHeader ? true : false;
         }
         const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
         sublistCopy.push(Object.assign({}, sub, subMatch));
       });
+      console.log(sublistCopy)
       this.categoryData[cacheId].subcategories = sublistCopy;
       this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
@@ -194,7 +208,6 @@ export class CategoryHelperService {
       if (sub.isHeader) {
         sub.requestComplete = true;
       }
-      console.log('sub', sub)
     });
   }
 
@@ -232,7 +245,6 @@ export class CategoryHelperService {
     subcategory.datatables = {};
     subcategory.displaySeries = series;
     subcategory.noData = true;
-    console.log('no data', subcategory)
     subcategory.requestComplete = true;
   }
 

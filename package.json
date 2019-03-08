@@ -50,6 +50,7 @@
     "ion-rangeslider": "^2.3.0",
     "ng-recaptcha": "^4.2.1",
     "popper.js": "^1.14.7",
+    "primeicons": "^1.0.0",
     "primeng": "^7.0.5",
     "rxjs": "^6.4.0",
     "tether": "^1.4.5",

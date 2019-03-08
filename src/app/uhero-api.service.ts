@@ -331,14 +331,18 @@ function mapCategories(response): Array<Category> {
   const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
   const categoryTree = [];
   categories.forEach((value) => {
+    value.label = value.name;
     const parent = dataMap[value.parentId];
     if (parent) {
       (parent.children || (parent.children = [])).push(value);
+      parent.icon = 'pi pi-pw';
+      parent.items = parent.children;
     } else {
       categoryTree.push(value);
     }
   });
   let result = categoryTree;
+  console.log(categoryTree)
   categoryTree.forEach((category) => {
     if (category.id === this.rootCategory) {
       result = category.children;
