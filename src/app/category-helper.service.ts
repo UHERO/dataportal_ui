@@ -99,34 +99,7 @@ export class CategoryHelperService {
   getData(catId: any, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
       this.categoryData[cacheId].results = categoryData;
-      const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
-      // Merge subcats with original list of categories from /category response
-      const sublistCopy = [];
-      let navIndent = false;
-      subcats.forEach((sub, index) => {
-        let subItems = [];
-        // Indent subcategory in sidebar navigation if category follows a header
-        navIndent = !navIndent ? sub.isHeader : navIndent;
-        if (sub.isHeader) {
-          let subIndex = index + 1;
-          sub.items = [];
-          while (subIndex <= subcats.length - 1) {
-            if (subcats[subIndex].isHeader) {
-              break;
-            }
-            subcats[subIndex].label = subcats[subIndex].name
-            sub.items.push(subcats[subIndex]);
-            subIndex++;
-          }
-        }
-        if (navIndent) {
-          sub.navIndent = !sub.isHeader ? true : false;
-        }
-        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
-        sublistCopy.push(Object.assign({}, sub, subMatch));
-      });
-      console.log(sublistCopy)
-      this.categoryData[cacheId].subcategories = sublistCopy;
+      this.categoryData[cacheId].subcategories = categoryData.categories;
       this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);

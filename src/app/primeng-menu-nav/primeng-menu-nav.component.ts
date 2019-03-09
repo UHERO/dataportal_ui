@@ -28,7 +28,6 @@ export class PrimengMenuNavComponent implements OnInit {
   private packageCatData;
   private expand = true;
 
-  items: MenuItem[];
   navMenuItems: MenuItem[];
 
   constructor(
@@ -44,7 +43,17 @@ export class PrimengMenuNavComponent implements OnInit {
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       this.categories = categories;
-      console.log(categories)
+      console.log(categories);
+      this.navMenuItems = [];
+      categories.forEach((category) => {
+        let subMenu = this.createSubmenuItems(category.children, category.id);
+        this.navMenuItems.push({
+          label: category.name,
+          icon: 'pi pi-pw',
+          items: subMenu,
+        })
+      })
+      console.log(this.navMenuItems)
       /* console.log('category', categories);
 
       this.navMenuItems = categories.map((category) => {
@@ -88,90 +97,65 @@ export class PrimengMenuNavComponent implements OnInit {
         //this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
       }
     });
-    this._helperService.getCatData().subscribe((data) => {
+    /* this._helperService.getCatData().subscribe((data) => {
       this.packageCatData = data;
       console.log('packageCatData', data)
-    });
+    }); */
     this.route.fragment.subscribe((frag) => {
       this.fragment = frag;
     })
     this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
-    this.items = [
-      {
-        label: 'File',
-        icon: 'pi pi-pw',
-        items: [{
-          label: 'New',
-          icon: 'pi pi-fw pi-plus',
-          items: [
-            { label: 'User', icon: 'pi pi-fw pi-user-plus' },
-            { label: 'Filter', icon: 'pi pi-fw pi-filter' }
-          ]
-        },
-        { label: 'Open', icon: 'pi pi-fw pi-external-link' },
-        { separator: true },
-        { label: 'Quit', icon: 'pi pi-fw pi-times' }
-        ]
-      },
-      {
-        label: 'Edit',
-        icon: 'pi pi-fw',
-        items: [
-          { label: 'Delete', icon: 'pi pi-fw pi-trash' },
-          { label: 'Refresh', icon: 'pi pi-fw pi-refresh' }
-        ]
-      },
-      {
-        label: 'Help',
-        icon: 'pi pi-fw',
-        items: [
-          {
-            label: 'Contents',
-            icon: 'pi pi-pi pi-bars'
-          },
-          {
-            label: 'Search',
-            icon: 'pi pi-pi pi-search',
-            items: [
-              {
-                label: 'Text',
-                items: [
-                  {
-                    label: 'Workspace'
-                  }
-                ]
-              },
-              {
-                label: 'User',
-                icon: 'pi pi-fw pi-file',
-              }
-            ]
-          }
-        ]
-      },
-      {
-        label: 'Actions',
-        icon: 'pi pi-fw',
-        items: [
-          {
-            label: 'Edit',
-            icon: 'pi pi-fw pi-pencil',
-            items: [
-              { label: 'Save', icon: 'pi pi-fw pi-save' },
-              { label: 'Update', icon: 'pi pi-fw pi-save' },
-            ]
-          },
-          {
-            label: 'Other',
-            icon: 'pi pi-fw pi-tags',
-            items: [
-              { label: 'Delete', icon: 'pi pi-fw pi-minus' }
-            ]
-          }
-        ]
+  }
+
+  createSubmenuItems(subcategories, categoryId) {
+    let subMenu = [];
+    subcategories.forEach((sub) => {
+      let subMenuItem: MenuItem = {};
+      subMenuItem.label = sub.name;
+      subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
+      if (sub.children) {
+        subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
-    ];
+      if (!sub.children) {
+        subMenuItem.command = (event) => {
+          console.log('event', event);
+          this.navigate(categoryId, sub.id)
+        }
+      }
+      subMenu.push(subMenuItem)
+    });
+    return subMenu;
+  }
+
+
+  navigate(catId, subId?) {
+    // If a popover from the category tables is open, remove when navigating to another category
+    const popover = $('.popover');
+    if (popover) {
+      popover.remove();
+    }
+    this.loading = true;
+    this.selectedCategory = catId;
+    setTimeout(() => {
+      const catQParams = {
+        id: catId,
+        start: null,
+        end: null,
+        analyzerSeries: null,
+        chartSeries: null,
+        name: null,
+        units: null,
+        geography: null
+      };
+      if (subId) {
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + subId });
+      }
+      if (!subId) {
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + catId });
+      }
+      this.loading = false;
+    }, 15);
   }
 
 }
