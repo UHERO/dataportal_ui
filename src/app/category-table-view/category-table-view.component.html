@@ -27,6 +27,7 @@
     <span>{{currentPage}} of {{totalPages}}</span>
     <button (click)="onBtNext()" class="pi pi-caret-right"></button>
     <button (click)="onBtLast()" class="pi pi-step-forward"></button>
+    <span>Results per page:</span>
     <select [(ngModel)]="selectedPaginationSize" (ngModelChange)="onPaginationSizeChange($event)" id="pagination-size"
       aria-label="pagination-size-selector">
       <option [ngValue]="paginationSize" *ngFor="let paginationSize of paginationSizeOptions">
