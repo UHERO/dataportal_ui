@@ -55,13 +55,22 @@
 					[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
 					[noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
 				</app-category-table-view>
-				<app-category-charts *ngIf="routeView !== 'table' && displaySeries" [portalSettings]="portalSettings"
-					[chartStart]="seriesStart" [chartEnd]="seriesEnd" [sublist]="sub" [data]="sub.scrollSeries ? sub.scrollSeries[sub.scrollIndex] : sub.displaySeries"
+				<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete"
+					[portalSettings]="portalSettings" [chartStart]="seriesStart" [chartEnd]="seriesEnd" [sublist]="sub"
+					[data]="sub.displaySeries.slice(sub.paginatedSeriesStartIndex, sub.paginatedSeriesEndIndex)"
 					[dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
 					[freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"
 					[seriesInAnalyzer]="seriesInAnalyzer"></app-category-charts>
-				<app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries"
-					(seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging>
+				<p-paginator *ngIf="sub.requestComplete && routeView !== 'table'" [rows]="8"
+					[totalRecords]="sub.displaySeries.length" [alwaysShow]="false" [rowsPerPageOptions]="[8,16,32]"
+					(onPageChange)="paginate($event, sub)" [templateLeft]="templateLeft">
+				</p-paginator>
+				<ng-template pTemplate="templateLeft">
+					Showing {{totalRecords < 1 ? 0 : first + 1}} to
+					{{totalRecords > 0 ? ((rows+ first) <= totalRecords ? (rows + first) : 
+					totalRecords) : 0}} of {{totalRecords ? totalRecords : 0}} entries
+				</ng-template>
+				<!-- <app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries" (seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging> -->
 			</ng-template>
 		</ng-template>
 	</ng-template>

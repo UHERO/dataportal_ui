@@ -38,6 +38,7 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
 import { SeriesPagingComponent } from '../series-paging/series-paging.component';
 import { PrimengMenuNavComponent } from '../primeng-menu-nav/primeng-menu-nav.component';
 import { PanelMenuModule } from 'primeng/panelmenu';
+import { PaginatorModule } from 'primeng/paginator';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
@@ -81,6 +82,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DataTableModule, SharedModule,
     TableModule,
     PanelMenuModule,
+    PaginatorModule,
     BrowserAnimationsModule,
     RecaptchaModule.forRoot(),
     AgGridModule.withComponents([

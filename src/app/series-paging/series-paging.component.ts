@@ -31,6 +31,4 @@ export class SeriesPagingComponent implements OnInit {
     this.counter++;
     this.seriesPageChange.emit(this.counter);
   }
-
-
 }

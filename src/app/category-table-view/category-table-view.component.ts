@@ -30,6 +30,10 @@ export class CategoryTableViewComponent implements OnChanges {
   private columnDefs;
   private rows;
   private frameworkComponents;
+  paginationSizeOptions = [8, 16, 32];
+  selectedPaginationSize = 8;
+  currentPage;
+  totalPages;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -77,7 +81,7 @@ export class CategoryTableViewComponent implements OnChanges {
       pinned: 'left',
       width: 275,
       cellRenderer: "categoryTableRenderer",
-      tooltip: function (params) {
+      tooltipValueGetter: function (params) {
         return params.value;
       }
     });
@@ -152,6 +156,33 @@ export class CategoryTableViewComponent implements OnChanges {
     if (transformation === 'c5ma') {
       return percent ? 'Annual (ch.)' : 'Annual (%)';
     }
+  }
+
+  onPaginationChanged() {
+    if (this.gridApi) {
+      this.currentPage = this.gridApi.paginationGetCurrentPage() + 1;
+      this.totalPages = this.gridApi.paginationGetTotalPages();
+    }
+  }
+
+  onPaginationSizeChange(newPageSize) {
+    this.gridApi.paginationSetPageSize(Number(newPageSize));
+  }
+
+  onBtFirst() {
+    this.gridApi.paginationGoToFirstPage();
+  }
+
+  onBtLast() {
+    this.gridApi.paginationGoToLastPage();
+  }
+
+  onBtNext() {
+    this.gridApi.paginationGoToNextPage();
+  }
+
+  onBtPrevious() {
+    this.gridApi.paginationGoToPreviousPage();
   }
 
   onExport = () => {

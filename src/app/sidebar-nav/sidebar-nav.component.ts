@@ -39,7 +39,6 @@ export class SidebarNavComponent implements OnInit {
 
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
-      console.log('categories', categories)
       this.categories = categories;
     },
       (error) => {

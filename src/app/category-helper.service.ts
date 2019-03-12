@@ -99,7 +99,14 @@ export class CategoryHelperService {
   getData(catId: any, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
       this.categoryData[cacheId].results = categoryData;
-      this.categoryData[cacheId].subcategories = categoryData.categories;
+      const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
+      // Merge subcats with original list of categories from /category response
+      const sublistCopy = [];
+      subcats.forEach((sub) => {
+        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
+        sublistCopy.push(Object.assign({}, sub, subMatch));
+      });
+      this.categoryData[cacheId].subcategories = sublistCopy;
       this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
       this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
@@ -157,6 +164,8 @@ export class CategoryHelperService {
           sub.displaySeries = displaySeries;
           sub.noData = false;
           let seriesGroup = [];
+          sub.paginatedSeriesStartIndex = 0;
+          sub.paginatedSeriesEndIndex = 8;
           sub.displaySeries.forEach((series, s) => {
             seriesGroup.push(series);
             if (seriesGroup.length === 8 || s === sub.displaySeries.length - 1) {

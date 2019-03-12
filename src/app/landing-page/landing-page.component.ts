@@ -17,7 +17,7 @@ declare var $: any;
   templateUrl: 'landing-page.component.html',
   styleUrls: ['landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterViewChecked , */ OnDestroy {
   private sub;
   private defaultCategory;
   private id: number;
@@ -38,6 +38,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   private displaySeries;
   private seriesInAnalyzer;
   private toggleSeriesInAnalyzer;
+  private paginatedSeriesStartIndex = 0;
+  private paginatedSeriesEndIndex = 8;
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
@@ -93,13 +95,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     });
   }
 
-  ngAfterViewChecked() {
+  /* ngAfterViewChecked() {
     // Check height of content and scroll to anchor if fragment is in URL
     // If true, height is changing, i.e. content still loading
     if (this.checkContainerHeight()) {
       this.scrollTo();
     }
-  }
+  } */
 
   ngOnDestroy() {
     this.sub.unsubscribe();
@@ -140,8 +142,17 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   }
 
   updatePageCounter(event, subcategory) {
-    console.log('update test')
-    subcategory.scrollIndex = event;
+    console.log('event', event)
+    subcategory.paginatedSeriesStartIndex = event * 8
+    subcategory.paginatedSeriesEndIndex = (event * 8) + 8;
+  }
+
+  paginate(event, sub) {
+    console.log('event', event);
+    // this.paginatedSeriesToDisplay = displaySeries.slice(event.first, event.rows + event.first);
+    // console.log(this.paginatedSeriesToDisplay)
+    sub.paginatedSeriesStartIndex = event.first;
+    sub.paginatedSeriesEndIndex = event.first + event.rows;
   }
 
   // Redraw series when a new region is selected

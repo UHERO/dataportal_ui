@@ -43,7 +43,6 @@ export class PrimengMenuNavComponent implements OnInit {
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       this.categories = categories;
-      console.log(categories);
       this.navMenuItems = [];
       categories.forEach((category) => {
         let subMenu = this.createSubmenuItems(category.children, category.id);
@@ -53,29 +52,6 @@ export class PrimengMenuNavComponent implements OnInit {
           items: subMenu,
         })
       })
-      console.log(this.navMenuItems)
-      /* console.log('category', categories);
-
-      this.navMenuItems = categories.map((category) => {
-        let subMenuChildren = [];
-        category.children.forEach((subcat) => {
-          if (!subcat.isHeader) {
-
-          }
-        })
-        let subMenuItems = category.children.map((subcat) => {
-          const subItem = {
-            label: subcat.name
-          }
-          return subItem;
-        });
-        const menuItem = {
-          label: category.name,
-          icon: 'pi pi-pw',
-          items: subMenuItems
-        }
-        return menuItem;
-      }); */
     },
       (error) => {
         console.log('error', error);
@@ -87,20 +63,14 @@ export class PrimengMenuNavComponent implements OnInit {
           this.view = params['view'] ? params['view'] : 'chart';
           this.yoy = params['yoy'] ? params['yoy'] : 'false';
           this.ytd = params['ytd'] ? params['ytd'] : 'false';
-          //this.selectedCategory = this.findSelectedCategory(this.id);
+          this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this._router.url);
         });
       });
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        const helpUrl = event.url === '/help';
-        const analyzerUrl = event.url.substr(0, 9) === '/analyzer';
-        //this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
+        this.selectedCategory = this.checkRoute(this.id, event.url);
       }
     });
-    /* this._helperService.getCatData().subscribe((data) => {
-      this.packageCatData = data;
-      console.log('packageCatData', data)
-    }); */
     this.route.fragment.subscribe((frag) => {
       this.fragment = frag;
     })
@@ -119,7 +89,6 @@ export class PrimengMenuNavComponent implements OnInit {
       }
       if (!sub.children) {
         subMenuItem.command = (event) => {
-          console.log('event', event);
           this.navigate(categoryId, sub.id)
         }
       }
@@ -128,6 +97,28 @@ export class PrimengMenuNavComponent implements OnInit {
     return subMenu;
   }
 
+
+  findSelectedCategory(id) {
+    if (id === undefined) {
+      return this.defaultCategory;
+    }
+    if (id && isNaN(id)) {
+      return null;
+    }
+    if (id && +id) {
+      return +id;
+    }
+  }
+
+  checkRoute(id, url) {
+    if (url.includes('/help')) {
+      return 'help';
+    }
+    if (url.includes('/analyzer')) {
+      return 'analyzer';
+    }
+    return this.findSelectedCategory(id);
+  }
 
   navigate(catId, subId?) {
     // If a popover from the category tables is open, remove when navigating to another category
@@ -156,6 +147,11 @@ export class PrimengMenuNavComponent implements OnInit {
       }
       this.loading = false;
     }, 15);
+  }
+
+  mobileMenuToggle(): void {
+    this.reveal = this.reveal === false ? true : false;
+    this.overlay = this.overlay === false ? true : false;
   }
 
 }

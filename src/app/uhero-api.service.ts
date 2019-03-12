@@ -335,14 +335,11 @@ function mapCategories(response): Array<Category> {
     const parent = dataMap[value.parentId];
     if (parent) {
       (parent.children || (parent.children = [])).push(value);
-      parent.icon = 'pi pi-pw';
-      parent.items = parent.children;
     } else {
       categoryTree.push(value);
     }
   });
   let result = categoryTree;
-  console.log(categoryTree)
   categoryTree.forEach((category) => {
     if (category.id === this.rootCategory) {
       result = category.children;
