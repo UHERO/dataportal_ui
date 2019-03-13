@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -18,7 +18,6 @@ exportCSV(Highcharts);
   selector: 'app-analyzer-highstock',
   templateUrl: './analyzer-highstock.component.html',
   styleUrls: ['./analyzer-highstock.component.scss'],
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {

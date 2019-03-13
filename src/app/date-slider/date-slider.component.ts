@@ -1,4 +1,4 @@
-import { Component, Input, Inject, OnInit, ChangeDetectorRef, AfterViewInit, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Inject, OnInit, ChangeDetectorRef, AfterViewInit, EventEmitter, Output } from '@angular/core';
 import { HelperService } from '../helper.service';
 import 'jquery';
 declare var $: any;
@@ -6,8 +6,7 @@ declare var $: any;
 @Component({
   selector: 'app-date-slider',
   templateUrl: './date-slider.component.html',
-  styleUrls: ['./date-slider.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./date-slider.component.scss']
 })
 export class DateSliderComponent implements OnInit, AfterViewInit {
   @Input() portalSettings;

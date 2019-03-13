@@ -96,38 +96,42 @@
   .single-chart-container {
     margin: 2% 3%;
   }
+}
 
-  .series-table {
-      
-    th, td {
-      text-align: right;
-      font-family: 'Lucida Sans', sans-serif;
-      font-size: 0.9em;
-      border: 0;
-      border-right: 1px solid #E5E5E5;
-    }
-
-    .ui-datatable th.ui-state-default {
-      background: #F5F5F5;
-      border: 1px solid #E5E5E5;
-      border-bottom: 0;
-    }
-
-    th.ui-state-active {
-      background: #ebedf0;
-      color: $primary-text;
-      outline: 0;
-    }
-
-    tr.ui-widget-content {
-      border-top-color: transparent;
-      border-bottom-color: transparent;
-      border-left: 1px solid #E5E5E5;
-      border-right: 1px solid #E5E5E5;
-    }
-
-    tr:last-child {
-      border-bottom: 1px solid #E5E5E5;
+:host {
+  ::ng-deep {
+    .ui-datatable {
+      background-color: #000;
+      th, td {
+        text-align: right;
+        font-family: 'Lucida Sans', sans-serif;
+        font-size: 0.9em;
+        border: 0;
+        border-right: 1px solid #E5E5E5;
+      }
+  
+      .ui-datatable th.ui-state-default {
+        background: #F5F5F5;
+        border: 1px solid #E5E5E5;
+        border-bottom: 0;
+      }
+  
+      th.ui-state-active {
+        background: #ebedf0;
+        color: $primary-text;
+        outline: 0;
+      }
+  
+      tr.ui-widget-content {
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+        border-left: 1px solid #E5E5E5;
+        border-right: 1px solid #E5E5E5;
+      }
+  
+      tr:last-child {
+        border-bottom: 1px solid #E5E5E5;
+      }
     }
   }
 }

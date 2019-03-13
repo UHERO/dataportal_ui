@@ -76,6 +76,10 @@
 
 :host {
   ::ng-deep {
+    .ui-widget {
+      font-size: 0.9em;
+    }
+
     .ui-paginator {
       background: none;
       border: 0;
@@ -85,7 +89,7 @@
     .ui-paginator-left-content {
       display: inline-block;
       float: none;
-      font-size: 0.9em;
+      // font-size: 0.9em;
       color: $primary-text;
       vertical-align: middle;
     }
@@ -106,7 +110,7 @@
       border: none;
       color: $primary;
       font-family: 'primeicons';
-      font-size: 0.9em;
+      // font-size: 0.9em;
       padding: 0.5em;
     }
 
@@ -131,7 +135,7 @@
 
     .ui-dropdown-label {
       color: $primary-text;
-      font-size: 0.9em;
+      // font-size: 0.9em;
       padding-bottom: 0;
       padding-top: 0;
     }
@@ -147,7 +151,7 @@
     }
 
     .ui-dropdown-panel {
-      font-size: 0.9em;
+      // font-size: 0.9em;
     }
 
     .ui-dropdown-items {

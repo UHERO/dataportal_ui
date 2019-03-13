@@ -1,4 +1,4 @@
-import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerService } from '../analyzer.service';
@@ -6,8 +6,7 @@ import { AnalyzerService } from '../analyzer.service';
 @Component({
   selector: 'app-category-table-view',
   templateUrl: './category-table-view.component.html',
-  styleUrls: ['./category-table-view.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./category-table-view.component.scss']
 })
 export class CategoryTableViewComponent implements OnChanges {
   @Input() data;

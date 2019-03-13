@@ -1,4 +1,4 @@
-import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts/highcharts';
 import { HighchartsObject } from '../HighchartsObject';
@@ -6,8 +6,7 @@ import { HighchartsObject } from '../HighchartsObject';
 @Component({
   selector: 'app-highchart',
   templateUrl: './highchart.component.html',
-  styleUrls: ['./highchart.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./highchart.component.scss']
 })
 export class HighchartComponent implements OnChanges {
   @Input() portalSettings;

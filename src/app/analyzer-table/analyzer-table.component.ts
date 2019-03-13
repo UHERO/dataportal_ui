@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { TableHelperService } from '../table-helper.service';
@@ -14,8 +14,7 @@ import { GridOptions } from 'ag-grid-community';
   selector: 'app-analyzer-table',
   templateUrl: './analyzer-table.component.html',
   styleUrls: ['./analyzer-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() series;
