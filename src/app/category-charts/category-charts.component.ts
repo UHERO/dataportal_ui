@@ -143,6 +143,7 @@ export class CategoryChartsComponent implements OnChanges {
     // If the URL contains an anchor/fragment, update the fragment to the sublist id currently viewed when using pagination to prevent the page from jumping around
     this.updateURLFragment.emit(sub.id);
     sub.numberOfSeriesToDisplay = event.rows;
+    sub.paginatorFirst = event.first;
     sub.paginatedSeriesStartIndex = event.first;
     sub.paginatedSeriesEndIndex = event.first + event.rows;
   }

@@ -32,7 +32,7 @@
 				class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(serie.seriesInfo)">star</i>
 		</div>
 	</ng-template>
-	<p-paginator *ngIf="!noSeries" #paginatorRef [rows]="sublist.numberOfSeriesToDisplay ? sublist.numberOfSeriesToDisplay : paginatorRowsPerPageOptions[0]" [totalRecords]="sublist.displaySeries.length"
+	<p-paginator *ngIf="!noSeries" #paginatorRef [first]="sublist.paginatorFirst ? sublist.paginatorFirst : 0" [rows]="sublist.numberOfSeriesToDisplay ? sublist.numberOfSeriesToDisplay : paginatorRowsPerPageOptions[0]" [totalRecords]="sublist.displaySeries.length"
 		[rowsPerPageOptions]="paginatorRowsPerPageOptions" (onPageChange)="paginate($event, sublist)" [templateLeft]="templateLeft">
 		<ng-template pTemplate="templateLeft" #templateLeft>
 			Displaying {{paginatorRef.first + 1}} -

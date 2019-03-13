@@ -3,6 +3,7 @@
 .multi-series-container {
   vertical-align: top;
   min-height: 100%;
+  margin-top: 60px;
   
   .fa-spinner {
     color: $primary;
@@ -154,11 +155,11 @@
     margin-top: 10px;
   }
 
-  @media (min-width: 768px) {
-    margin-top: 70px;
+  /* @media (min-width: 768px) {
+    margin-top: 55px;
   }
 
   @media (max-width: 767px) {
     margin-top: 50px;
-  }
+  } */
 }

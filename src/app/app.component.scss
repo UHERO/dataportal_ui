@@ -29,9 +29,9 @@
 
      @media (min-width: 768px) {
        position: fixed;
-       top: 0;
+       top: 55px;
        left: 0;
-       height: 100vh;
+       height: calc(100% - 55px);
        overflow-y: auto;     
      }
    }

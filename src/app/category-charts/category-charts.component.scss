@@ -76,13 +76,10 @@
 
 :host {
   ::ng-deep {
-    .ui-widget {
-      font-size: 0.9em;
-    }
-
     .ui-paginator {
       background: none;
       border: 0;
+      font-size: 0.9em;
       text-align: left;
     }
 

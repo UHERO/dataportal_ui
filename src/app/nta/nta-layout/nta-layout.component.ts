@@ -171,7 +171,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
         el.scrollIntoView();
         const scrolledY = window.scrollY;
         if (scrolledY) {
-          window.scroll(0, scrolledY - 75);
+          window.scroll(0, scrolledY - 55);
         }
       }
       if (frag === 'top') { el.scrollTop; };

@@ -37,7 +37,7 @@
   }
   
   @media (min-width: 768px) {
-    margin-top: 65px;
+    // margin-top: 65px;
     position: relative;
     padding: 0;
   }
@@ -178,6 +178,7 @@
     &:hover {
       background-color: $hover-gray;
       color: $white;
+      text-decoration: none;
     }
   }
 
@@ -189,6 +190,42 @@
   .selectedCategory {
     a, a:hover, a:active {
       color: $white;
+    }
+  }
+}
+
+:host {
+  ::ng-deep {
+    .ui-panelmenu {
+      font-size: 0.9em;
+    }
+
+    .ui-panelmenu-header {
+      border: 0;
+      border-top: 1px solid $gray;
+      background: transparent;
+    }
+
+    .ui-panelmenu .ui-panelmenu-header.ui-state-active, .ui-panelmenu .ui-panelmenu-header.ui-state-active a {
+      background: transparent;
+      border-color: $gray;
+      color: $primary;
+    }
+
+    .ui-panelmenu .ui-panelmenu-content {
+      border: 0;
+    }
+
+    .ui-submenu-list {
+      padding-left: 10px;
+    }
+
+    .ui-panelmenu .ui-panelmenu-content {
+      background: transparent;
+    }
+
+    .ui-panelmenu .ui-panelmenu-content .ui-menuitem-link {
+      color: $primary-text;
     }
   }
 }
