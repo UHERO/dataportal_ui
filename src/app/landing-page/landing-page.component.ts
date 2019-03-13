@@ -95,13 +95,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
     });
   }
 
-  /* ngAfterViewChecked() {
+  ngAfterViewChecked() {
     // Check height of content and scroll to anchor if fragment is in URL
     // If true, height is changing, i.e. content still loading
     if (this.checkContainerHeight()) {
       this.scrollTo();
     }
-  } */
+  }
 
   ngOnDestroy() {
     this.sub.unsubscribe();

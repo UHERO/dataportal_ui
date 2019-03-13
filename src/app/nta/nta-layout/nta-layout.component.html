@@ -10,40 +10,48 @@
 					<a class="current-sub">{{sub.name}}</a>
 				</li>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+						aria-expanded="false"></a>
 					<div class="dropdown-menu">
-						<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item" [routerLink]="['/category']" [fragment]="'id_' + sub.id"
-						 [queryParams]="queryParams" [class.current-sub]="subInd === i">{{sub.name}}</a>
+						<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item"
+							[routerLink]="['/category']" [fragment]="'id_' + sub.id" [queryParams]="queryParams"
+							[class.current-sub]="subInd === i">{{sub.name}}</a>
 					</div>
 				</li>
 			</ul>
 			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
 			<div class="filters">
-				<app-measurement-selector *ngIf="sub.measurements" [measurements]="sub.measurements" [selectedMeasurement]="sub.currentMeasurement"
-				 (selectedMeasurementChange)="redrawSeries($event, sub.id)" class="selector"></app-measurement-selector>
+				<app-measurement-selector *ngIf="sub.measurements" [measurements]="sub.measurements"
+					[selectedMeasurement]="sub.currentMeasurement"
+					(selectedMeasurementChange)="redrawSeries($event, sub.id)" class="selector">
+				</app-measurement-selector>
 				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View
 					<i class="material-icons md-18">show_chart</i>
 				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table View
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table
+					View
 					<i class="material-icons md-18">view_list</i>
 				</a>
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-					<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event, sub.id)">Annual Change
+					<input type="checkbox" [checked]="queryParams.c5ma === 'true'"
+						(change)="c5maActive($event, sub.id)">Annual Change
 				</label>
-				<app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-				 [sublist]="data.sublist" [subCat]="sub" [dateFrom]="sub.seriesStart ? sub.seriesStart : null" [dateTo]="sub.seriesEnd ? sub.seriesEnd: null"
-				 [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, sub)"></app-date-slider>
+				<app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings"
+					[dates]="sub.dateArray" [sublist]="data.sublist" [subCat]="sub"
+					[dateFrom]="sub.seriesStart ? sub.seriesStart : null" [dateTo]="sub.seriesEnd ? sub.seriesEnd: null"
+					[freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, sub)"></app-date-slider>
 				<i *ngIf="!displaySeries || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
 			</div>
-			<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-			 [tableStart]="sub.seriesStart" [tableEnd]="sub.seriesEnd" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]" [geo]="data.currentGeo" [tableId]="sub.id"
-			 [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [c5maActive]="queryParams.c5ma === 'true'"
-			 [noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"></app-category-table-view>
-			<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete" [search]="search" [portalSettings]="portalSettings"
-			 [chartStart]="sub.seriesStart" [chartEnd]="sub.seriesEnd" [dates]="sub.dateArray" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]"
-			 [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"></app-category-charts>
-			 <app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries"
-			 (seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging>
+			<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings"
+				[dates]="sub.dateArray" [tableStart]="sub.seriesStart" [tableEnd]="sub.seriesEnd" [sublist]="sub"
+				[data]="sub.displaySeries" [geo]="data.currentGeo" [tableId]="sub.id" [freq]="data.currentFreq?.freq"
+				[subcatIndex]="sub.id" [c5maActive]="queryParams.c5ma === 'true'" [noSeries]="sub.noData"
+				[params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"></app-category-table-view>
+			<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete" [search]="search"
+				[portalSettings]="portalSettings" [chartStart]="sub.seriesStart" [chartEnd]="sub.seriesEnd"
+				[dates]="sub.dateArray" [sublist]="sub" [data]="sub.displaySeries" [freq]="data.currentFreq?.freq"
+				[noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer" (updateURLFragment)="updateRoute($event)">
+			</app-category-charts>
 		</ng-template>
 	</ng-template>
 </div>

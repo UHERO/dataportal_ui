@@ -16,7 +16,7 @@ declare var $: any;
   templateUrl: './nta-layout.component.html',
   styleUrls: ['./nta-layout.component.scss']
 })
-export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewChecked, */ OnDestroy {
   private sub;
   private id: number;
   private routeView: string;

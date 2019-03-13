@@ -73,3 +73,90 @@
     }
   }
 }
+
+:host {
+  ::ng-deep {
+    .ui-paginator {
+      background: none;
+      border: 0;
+      text-align: left;
+    }
+
+    .ui-paginator-left-content {
+      display: inline-block;
+      float: none;
+      font-size: 0.9em;
+      color: $primary-text;
+      vertical-align: middle;
+    }
+
+    .ui-dropdown {
+      display: inline-block;
+    }
+
+    .ui-paginator-pages {
+      min-width: unset;
+    }
+
+    .ui-paginator .ui-paginator-element {
+      display: none;
+    }
+
+    .ui-widget button {
+      border: none;
+      color: $primary;
+      font-family: 'primeicons';
+      font-size: 0.9em;
+      padding: 0.5em;
+    }
+
+    .ui-widget button:hover {
+      background-color: rgba(90, 90, 90, 0.1);
+      border-radius: 100%;
+    }
+
+    .ui-state-disabled:hover {
+      background: none !important;
+    }
+
+    .ui-widget button:focus {
+      outline: none;
+    }
+
+    .ui-dropdown {
+      border: 0;
+      border-bottom: 1px solid rgba(90, 90, 90, 0.2);
+      border-radius: 0;
+    }
+
+    .ui-dropdown-label {
+      color: $primary-text;
+      font-size: 0.9em;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+
+    .ui-dropdown-label:focus {
+      box-shadow: none;
+      outline: none;
+    }
+
+    .ui-dropdown-trigger {
+      border-left: 0;
+      color: $primary;
+    }
+
+    .ui-dropdown-panel {
+      font-size: 0.9em;
+    }
+
+    .ui-dropdown-items {
+      color: $primary-text;
+      padding: 0;
+    }
+
+    .ui-dropdown-item {
+      border-radius: 0;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
+import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { UheroApiService } from '../uhero-api.service';
@@ -213,6 +213,8 @@ export class NtaHelperService {
     subcategory.scrollSeries = [];
     // Default to the first set of (12) series to display
     subcategory.scrollIndex = 0;
+    subcategory.paginatedSeriesStartIndex = 0;
+    subcategory.paginatedSeriesEndIndex = 8;
     let seriesGroup = [];
     subcategory.displaySeries.forEach((series, s) => {
       seriesGroup.push(series);
@@ -221,7 +223,7 @@ export class NtaHelperService {
         seriesGroup = [];
       }
       const decimals = series.decimals ? series.decimals : 1;
-      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, subcategory.dateArray, decimals);  
+      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, subcategory.dateArray, decimals);
       if (s === subcategory.displaySeries.length - 1) {
         subcategory.requestComplete = true;
         category.requestComplete = true;

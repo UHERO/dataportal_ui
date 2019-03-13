@@ -209,6 +209,9 @@ export class CategoryTableViewComponent implements OnChanges {
 
   onGridReady = (params) => {
     this.gridApi = params.api;
+    if (!this.currentPage || !this.totalPages) {
+      this.currentPage = this.gridApi.paginationGetCurrentPage() + 1;
+      this.totalPages = this.gridApi.paginationGetTotalPages();  
+    }
   }
-
 }

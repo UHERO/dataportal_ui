@@ -57,20 +57,10 @@
 				</app-category-table-view>
 				<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete"
 					[portalSettings]="portalSettings" [chartStart]="seriesStart" [chartEnd]="seriesEnd" [sublist]="sub"
-					[data]="sub.displaySeries.slice(sub.paginatedSeriesStartIndex, sub.paginatedSeriesEndIndex)"
-					[dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
+					[data]="sub.displaySeries" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
 					[freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"
-					[seriesInAnalyzer]="seriesInAnalyzer"></app-category-charts>
-				<p-paginator *ngIf="sub.requestComplete && routeView !== 'table'" [rows]="8"
-					[totalRecords]="sub.displaySeries.length" [alwaysShow]="false" [rowsPerPageOptions]="[8,16,32]"
-					(onPageChange)="paginate($event, sub)" [templateLeft]="templateLeft">
-				</p-paginator>
-				<ng-template pTemplate="templateLeft">
-					Showing {{totalRecords < 1 ? 0 : first + 1}} to
-					{{totalRecords > 0 ? ((rows+ first) <= totalRecords ? (rows + first) : 
-					totalRecords) : 0}} of {{totalRecords ? totalRecords : 0}} entries
-				</ng-template>
-				<!-- <app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries" (seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging> -->
+					[seriesInAnalyzer]="seriesInAnalyzer" (updateURLFragment)="updateRoute($event)">
+				</app-category-charts>
 			</ng-template>
 		</ng-template>
 	</ng-template>
