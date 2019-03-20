@@ -104,6 +104,7 @@ export class SidebarNavComponent implements OnInit {
     setTimeout(() => {
       const catQParams = {
         id: catId,
+        subId: subId,
         start: null,
         end: null,
         analyzerSeries: null,

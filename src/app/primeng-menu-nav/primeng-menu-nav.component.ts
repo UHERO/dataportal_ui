@@ -20,7 +20,6 @@ export class PrimengMenuNavComponent implements OnInit {
   private view: string;
   private yoy: string;
   private ytd: string;
-  private fragment;
   private loading;
   public headerLogo;
   analyzerSeries;
@@ -50,8 +49,8 @@ export class PrimengMenuNavComponent implements OnInit {
           label: category.name,
           icon: 'pi pi-pw',
           items: subMenu,
-        })
-      })
+        });
+      });
     },
       (error) => {
         console.log('error', error);
@@ -71,9 +70,6 @@ export class PrimengMenuNavComponent implements OnInit {
         this.selectedCategory = this.checkRoute(this.id, event.url);
       }
     });
-    this.route.fragment.subscribe((frag) => {
-      this.fragment = frag;
-    })
     this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
   }
@@ -131,6 +127,7 @@ export class PrimengMenuNavComponent implements OnInit {
     setTimeout(() => {
       const catQParams = {
         id: catId,
+        data_list_id: subId,
         start: null,
         end: null,
         analyzerSeries: null,
@@ -140,10 +137,10 @@ export class PrimengMenuNavComponent implements OnInit {
         geography: null
       };
       if (subId) {
-        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + subId });
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       if (!subId) {
-        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + catId });
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       this.loading = false;
     }, 15);
@@ -153,5 +150,4 @@ export class PrimengMenuNavComponent implements OnInit {
     this.reveal = this.reveal === false ? true : false;
     this.overlay = this.overlay === false ? true : false;
   }
-
 }

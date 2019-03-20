@@ -15,8 +15,8 @@ export class NtaHelperService {
   private defaultFreq: string;
   private categoryData = {};
 
-  static setCacheId(category, selectedMeasure?) {
-    let id = '' + category;
+  static setCacheId(category, subcategory, selectedMeasure?) {
+    let id = '' + category + subcategory;
     if (selectedMeasure) {
       id = id + selectedMeasure;
     }
@@ -27,8 +27,8 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, selectedMeasure?: string): Observable<any> {
-    const cacheId = NtaHelperService.setCacheId(catId, selectedMeasure);
+  initContent(catId: any, subId: number, selectedMeasure?: string): Observable<any> {
+    const cacheId = NtaHelperService.setCacheId(catId, subId, selectedMeasure);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     }

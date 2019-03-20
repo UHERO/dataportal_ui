@@ -29,10 +29,13 @@ export class CategoryTableViewComponent implements OnChanges {
   private columnDefs;
   private rows;
   private frameworkComponents;
-  paginationSizeOptions = [8, 16, 32];
-  selectedPaginationSize = 8;
-  currentPage;
-  totalPages;
+  paginationSizeOptions: number[] = [];
+  selectedPaginationSize;
+  totalPages: number;
+  totalRows: number;
+  paginationSize: number;
+  disablePrevious: boolean;
+  disableNext: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -48,6 +51,9 @@ export class CategoryTableViewComponent implements OnChanges {
     this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
+      this.paginationSizeOptions = this.createPaginatorRowOptions(this.data.length);
+      this.selectedPaginationSize = this.sublist.numberOfSeriesToDisplay ? this.paginationSizeOptions[this.paginationSizeOptions.indexOf(this.sublist.numberOfSeriesToDisplay)] : this.paginationSizeOptions[this.paginationSizeOptions.indexOf(this.sublist.paginatedSeriesEndIndex - this.sublist.paginatedSeriesStartIndex)];
+
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
@@ -157,23 +163,33 @@ export class CategoryTableViewComponent implements OnChanges {
     }
   }
 
-  onPaginationChanged() {
+  createPaginatorRowOptions = (displaySeriesLength: number) => {
+    let count = 8;
+    const pageCountOptions = [];
+    while (count < displaySeriesLength) {
+      pageCountOptions.push(count);
+      count += 8;
+    }
+    pageCountOptions.push(displaySeriesLength);
+    return pageCountOptions;
+  }
+
+  onPaginationChanged(sublist) {
+
     if (this.gridApi) {
-      this.currentPage = this.gridApi.paginationGetCurrentPage() + 1;
-      this.totalPages = this.gridApi.paginationGetTotalPages();
+      sublist.paginatedSeriesStartIndex = this.gridApi.getFirstDisplayedRow();
+      this.totalPages = this.gridApi.getLastDisplayedRow() + 1;//this.gridApi.paginationGetTotalPages();
+      sublist.paginatedSeriesEndIndex = this.gridApi.getLastDisplayedRow() + 1;
+      this.paginationSize = this.gridApi.paginationGetPageSize();
+      this.disablePrevious = this.gridApi.paginationGetCurrentPage() === 0;
+      this.disableNext = this.gridApi.paginationGetCurrentPage() === this.gridApi.paginationGetTotalPages() - 1;
+      sublist.paginatedSeriesStartIndex ? this.gridApi.ensureIndexVisible(sublist.paginatedSeriesStartIndex) : this.gridApi.ensureIndexVisible(0);
     }
   }
 
-  onPaginationSizeChange(newPageSize) {
+  onPaginationSizeChange(newPageSize, sublist) {
     this.gridApi.paginationSetPageSize(Number(newPageSize));
-  }
-
-  onBtFirst() {
-    this.gridApi.paginationGoToFirstPage();
-  }
-
-  onBtLast() {
-    this.gridApi.paginationGoToLastPage();
+    sublist.numberOfSeriesToDisplay = newPageSize;
   }
 
   onBtNext() {
@@ -206,11 +222,16 @@ export class CategoryTableViewComponent implements OnChanges {
     this.gridApi.exportDataAsCsv(params);
   }
 
-  onGridReady = (params) => {
+  onGridReady = (params, sublist) => {
     this.gridApi = params.api;
-    if (!this.currentPage || !this.totalPages) {
-      this.currentPage = this.gridApi.paginationGetCurrentPage() + 1;
-      this.totalPages = this.gridApi.paginationGetTotalPages();  
+    if (!this.totalPages) {
+      this.selectedPaginationSize = sublist.numberOfSeriesToDisplay ? this.paginationSizeOptions[this.paginationSizeOptions.indexOf(sublist.numberOfSeriesToDisplay)] : this.paginationSizeOptions[this.paginationSizeOptions.indexOf(sublist.paginatedSeriesEndIndex - sublist.paginatedSeriesStartIndex)];
+      this.totalPages = sublist.paginatedSeriesEndIndex ? sublist.paginatedSeriesEndIndex : this.gridApi.getLastDisplayedRow() + 1;
+      this.totalRows = this.gridApi.paginationGetRowCount();
+      this.paginationSize = this.gridApi.paginationGetPageSize();
+      this.disablePrevious = this.gridApi.paginationGetCurrentPage() === 0;
+      this.disableNext = this.gridApi.paginationGetCurrentPage() === this.gridApi.paginationGetTotalPages() - 1;
+      sublist.paginatedSeriesStartIndex ? this.gridApi.ensureIndexVisible(sublist.paginatedSeriesStartIndex) : this.gridApi.ensureIndexVisible(0);
     }
   }
 }

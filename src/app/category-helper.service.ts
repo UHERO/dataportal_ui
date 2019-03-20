@@ -21,8 +21,8 @@ export class CategoryHelperService {
   private seriesDates = [];
   private series = [];
 
-  static setCacheId(category, routeGeo, routeFreq) {
-    let id = '' + category;
+  static setCacheId(category, routeGeo, routeFreq, dataList?) {
+    let id = '' + category + dataList;
     if (routeGeo) {
       id = id + routeGeo;
     }
@@ -36,8 +36,9 @@ export class CategoryHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, routeGeo?: string, routeFreq?: string): Observable<any> {
-    const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq);
+  initContent(catId: any, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+    const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
+    console.log('cacheId', cacheId)
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     } else {
@@ -48,6 +49,11 @@ export class CategoryHelperService {
         }
         const cat = categories.find(category => category.id === catId);
         if (cat) {
+          if (dataListId == null) {
+            dataListId = cat.children[0].id;
+            this.categoryData[cacheId].defaultDataList = dataListId;
+          }
+          const selectedSubcategory = cat.children.find(sub => sub.id === dataListId);
           const selectedCategory = cat.name;
           const sublist = cat.children;
           this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
@@ -59,10 +65,10 @@ export class CategoryHelperService {
           });
           this.categoryData[cacheId].subcategories = sublistCopy;
           if (routeGeo && routeFreq) {
-            this.checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId);
+            this.checkRouteGeoAndFreq(catId, dataListId, routeGeo, routeFreq, cacheId);
           }
           if (!routeGeo || !routeFreq) {
-            this.getData(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
+            this.getData(catId, dataListId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
           }
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
@@ -72,7 +78,7 @@ export class CategoryHelperService {
     }
   }
 
-  checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId) {
+  checkRouteGeoAndFreq(catId, subId, routeGeo, routeFreq, cacheId) {
     let routeGeoExists, routeFreqExists, categoryData;
     this._uheroAPIService.fetchPackageCategory(catId, routeGeo, routeFreq).subscribe((data) => {
       categoryData = data;
@@ -87,17 +93,21 @@ export class CategoryHelperService {
       },
       () => {
         if (routeGeoExists && routeFreqExists) {
-          this.getData(catId, routeGeo, routeFreq, cacheId);
+          this.getData(catId, subId, routeGeo, routeFreq, cacheId);
         }
         if (!routeGeoExists || !routeFreqExists) {
           // If geo/freq specified in route does not exist in a category, get category data using its default geo/freq
-          this.getData(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
+          this.getData(catId, subId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
         }
       });
   }
 
-  getData(catId: any, geo: string, freq: string, cacheId: string) {
+  getData(catId: any, subId: number, geo: string, freq: string, cacheId: string) {
+    /* this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
+      console.log('expanded category', expandedCategory)
+    }); */
     this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
+      console.log(categoryData)
       this.categoryData[cacheId].results = categoryData;
       const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
       // Merge subcats with original list of categories from /category response
@@ -166,6 +176,7 @@ export class CategoryHelperService {
           let seriesGroup = [];
           sub.paginatedSeriesStartIndex = 0;
           sub.paginatedSeriesEndIndex = 8;
+          sub.totalSeries = sub.displaySeries.length;
           sub.displaySeries.forEach((series, s) => {
             seriesGroup.push(series);
             if (seriesGroup.length === 8 || s === sub.displaySeries.length - 1) {
@@ -177,6 +188,7 @@ export class CategoryHelperService {
             if (s === sub.displaySeries.length - 1) {
               sub.requestComplete = true;
             }
+            console.log(this.categoryData[cacheId])
           });
           //sub.requestComplete = true;
         }

@@ -14,7 +14,7 @@
 		<p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
 	</ng-template>
 	<ng-template ngFor let-serie
-		[ngForOf]="data.slice(sublist.paginatedSeriesStartIndex, sublist.paginatedSeriesEndIndex)"
+		[ngForOf]="data"
 		[ngForTrackBy]="trackBySeries">
 		<div *ngIf="!noSeries" class="multi-charts">
 			<a href="#" [routerLink]="['/series']"
@@ -32,17 +32,4 @@
 				class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(serie.seriesInfo)">star</i>
 		</div>
 	</ng-template>
-	<p-paginator *ngIf="!noSeries" #paginatorRef [first]="sublist.paginatorFirst ? sublist.paginatorFirst : 0" [rows]="sublist.numberOfSeriesToDisplay ? sublist.numberOfSeriesToDisplay : paginatorRowsPerPageOptions[0]" [totalRecords]="sublist.displaySeries.length"
-		[rowsPerPageOptions]="paginatorRowsPerPageOptions" (onPageChange)="paginate($event, sublist)" [templateLeft]="templateLeft">
-		<ng-template pTemplate="templateLeft" #templateLeft>
-			Displaying {{paginatorRef.first + 1}} -
-			{{paginatorRef.first + sublist.displaySeries.slice(sublist.paginatedSeriesStartIndex, sublist.paginatedSeriesEndIndex).length}}
-			of {{paginatorRef.totalRecords}}
-			<button (click)="paginatorRef.changePageToPrev($event)" [disabled]="paginatorRef.isFirstPage()"
-				[class.ui-state-disabled]="paginatorRef.isFirstPage()" class="pi pi-chevron-left"></button>
-			<button (click)="paginatorRef.changePageToNext($event)" [disabled]="paginatorRef.isLastPage()"
-				[class.ui-state-disabled]="paginatorRef.isLastPage()" class="pi pi-chevron-right"></button>
-			Show:
-		</ng-template>
-	</p-paginator>
 </div>

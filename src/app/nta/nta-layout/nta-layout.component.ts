@@ -19,6 +19,7 @@ declare var $: any;
 export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewChecked, */ OnDestroy {
   private sub;
   private id: number;
+  private dataListId: number;
   private routeView: string;
   private routeC5ma;
   private search = false;
@@ -61,6 +62,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
+      this.dataListId = this.getIdParam(params['dataListId']);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
@@ -69,7 +71,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
       if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this._ntaHelper.initContent(this.id, this.selectedMeasure);
+      this.categoryData = this._ntaHelper.initContent(this.id, this.dataListId, this.selectedMeasure);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
@@ -158,6 +160,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
 
   updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
+    this.queryParams.dataListId = this.queryParams.dataListId ? this.queryParams.dataListId : this.dataListId;
     this.fragment = subId === 'search' ? null : 'id_' + subId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
@@ -171,7 +174,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
         el.scrollIntoView();
         const scrolledY = window.scrollY;
         if (scrolledY) {
-          window.scroll(0, scrolledY - 55);
+          window.scroll(0, scrolledY - 75);
         }
       }
       if (frag === 'top') { el.scrollTop; };

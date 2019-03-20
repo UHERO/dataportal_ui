@@ -35,7 +35,6 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
 import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
-import { SeriesPagingComponent } from '../series-paging/series-paging.component';
 import { PrimengMenuNavComponent } from '../primeng-menu-nav/primeng-menu-nav.component';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { PaginatorModule } from 'primeng/paginator';
@@ -68,7 +67,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AnalyzerStatsRendererComponent,
     AnalyzerInteractionsEditorComponent,
     AnalyzerInteractionsRendererComponent,
-    SeriesPagingComponent,
     PrimengMenuNavComponent
   ],
   imports: [
@@ -111,7 +109,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CategoryTableRendererComponent,
     AnalyzerTableRendererComponent,
     AnalyzerStatsRendererComponent,
-    SeriesPagingComponent,
     PrimengMenuNavComponent
   ]
 })

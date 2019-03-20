@@ -18,21 +18,6 @@
   </button>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs"
     domLayout="autoHeight" [frameworkComponents]="frameworkComponents" [enableRtl]="true"
-    [suppressPaginationPanel]="true" [paginationPageSize]="selectedPaginationSize" [pagination]="true"
-    (paginationChanged)="onPaginationChanged($event)" (gridReady)="onGridReady($event)">
+    (gridReady)="onGridReady($event, sublist)">
   </ag-grid-angular>
-  <div>
-    <button (click)="onBtFirst()" class="pi pi-step-backward"></button>
-    <button (click)="onBtPrevious()" class="pi pi-caret-left"></button>
-    <span>{{currentPage}} of {{totalPages}}</span>
-    <button (click)="onBtNext()" class="pi pi-caret-right"></button>
-    <button (click)="onBtLast()" class="pi pi-step-forward"></button>
-    <span>Results per page:</span>
-    <select [(ngModel)]="selectedPaginationSize" (ngModelChange)="onPaginationSizeChange($event)" id="pagination-size"
-      aria-label="pagination-size-selector">
-      <option [ngValue]="paginationSize" *ngFor="let paginationSize of paginationSizeOptions">
-        {{paginationSize}}
-      </option>
-    </select>
-  </div>
 </ng-template>

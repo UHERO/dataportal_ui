@@ -144,7 +144,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       pinned: 'left',
       width: 250,
       cellRenderer: 'analyzerStatsRenderer',
-      tooltip: function (params) {
+      tooltipValueGetter: function (params) {
         return params.value;
       }
     }, {
@@ -182,7 +182,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       pinned: 'left',
       width: 250,
       cellRenderer: 'analyzerTableRenderer',
-      tooltip: function (params) {
+      tooltipValueGetter: function (params) {
         return params.value;
       }
     });

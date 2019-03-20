@@ -21,6 +21,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
   private sub;
   private defaultCategory;
   private id: number;
+  private dataListId: number;
   private routeGeo: string;
   private routeFreq: string;
   private routeView: string;
@@ -74,6 +75,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
+      this.dataListId = this.getIdParam(params['data_list_id']);
+      console.log('id', this.id);
+      console.log('dataListId', this.dataListId);
+      console.log('params', params)
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
@@ -83,25 +88,26 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
       this.routeStart = params['start'];
       this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-      this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
+      this.categoryData = this.getData(this.id, this.dataListId, this.routeGeo, this.routeFreq);
       this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
   }
 
-  ngAfterViewChecked() {
+  /* ngAfterViewChecked() {
     // Check height of content and scroll to anchor if fragment is in URL
     // If true, height is changing, i.e. content still loading
     if (this.checkContainerHeight()) {
       this.scrollTo();
     }
-  }
+  } */
 
   ngOnDestroy() {
     this.sub.unsubscribe();
@@ -121,15 +127,16 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
     }
   }
 
-  getData(id, geo, freq) {
+  getData(id, dataListId, geo, freq) {
     if (geo && freq) {
+      console.log('geo and freq', true)
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, geo, freq) :
+        this._catHelper.initContent(id, dataListId, geo, freq) :
         this._catHelper.initSearch(id, geo, freq);
     }
     if (!geo && !freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id) :
+        this._catHelper.initContent(id, dataListId) :
         this._catHelper.initSearch(id);
     }
   }
@@ -142,15 +149,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
   }
 
   updatePageCounter(event, subcategory) {
-    console.log('event', event)
     subcategory.paginatedSeriesStartIndex = event * 8
     subcategory.paginatedSeriesEndIndex = (event * 8) + 8;
   }
 
   paginate(event, sub) {
-    console.log('event', event);
-    // this.paginatedSeriesToDisplay = displaySeries.slice(event.first, event.rows + event.first);
-    // console.log(this.paginatedSeriesToDisplay)
     sub.paginatedSeriesStartIndex = event.first;
     sub.paginatedSeriesEndIndex = event.first + event.rows;
   }
@@ -164,7 +167,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
       this.queryParams.freq = currentFreq.freq;
       this.updateRoute(subId);
     }, 20);
-    this.scrollToFragment();
+    // this.scrollToFragment();
   }
 
   redrawSeriesFreq(event, currentGeo, subId) {
@@ -175,7 +178,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
       this.queryParams.freq = event.freq;
       this.updateRoute(subId);
     }, 10);
-    this.scrollToFragment();
+    // this.scrollToFragment();
   }
 
   switchView(subId) {
@@ -185,7 +188,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
       this.updateRoute(subId);
     });
-    this.scrollToFragment();
+    // this.scrollToFragment();
   }
 
   yoyActive(e, subId) {
@@ -203,7 +206,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
       this.queryParams.ytd = e.target.checked;
       this.updateRoute(subId);
     }, 10);
-    this.scrollToFragment();
+    // this.scrollToFragment();
   }
 
   changeRange(e) {
@@ -221,9 +224,10 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
 
   updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.fragment = subId === 'search' ? null : 'id_' + subId;
+    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
+    // this.fragment = subId === 'search' ? null : 'id_' + subId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
-    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;
   }
@@ -235,7 +239,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, /* AfterView
         el.scrollIntoView();
         const scrolledY = window.scrollY;
         if (scrolledY) {
-          window.scroll(0, scrolledY - 55);
+          window.scroll(0, scrolledY - 75);
         }
       }
       if (frag === 'top') { el.scrollTop; };
