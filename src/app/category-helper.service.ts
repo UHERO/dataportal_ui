@@ -188,7 +188,6 @@ export class CategoryHelperService {
             if (s === sub.displaySeries.length - 1) {
               sub.requestComplete = true;
             }
-            console.log(this.categoryData[cacheId])
           });
           //sub.requestComplete = true;
         }

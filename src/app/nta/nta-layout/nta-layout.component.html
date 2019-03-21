@@ -5,7 +5,7 @@
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
-			<ng-template ngIf [ngIf]="sub.id == dataListId">
+			<ng-template ngIf [ngIf]="search || (dataListId ? sub.id == dataListId : sub.id == data.defaultDataList)">
 				<ul class="nav content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
 					<li class="">
 						<a class="current-sub">{{sub.name}}</a>
@@ -15,7 +15,7 @@
 							aria-expanded="false"></a>
 						<div class="dropdown-menu">
 							<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item"
-								[routerLink]="['/category']" [fragment]="'id_' + sub.id" [queryParams]="queryParams"
+								[routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}" queryParamsHandling="merge"
 								[class.current-sub]="subInd === i">{{sub.name}}</a>
 						</div>
 					</li>

@@ -16,7 +16,7 @@ export class PrimengMenuNavComponent implements OnInit {
   public reveal = false;
   public overlay = false;
   public selectedCategory: any;
-  private id: number;
+  private id: string;
   private view: string;
   private yoy: string;
   private ytd: string;
@@ -46,6 +46,7 @@ export class PrimengMenuNavComponent implements OnInit {
       categories.forEach((category) => {
         let subMenu = this.createSubmenuItems(category.children, category.id);
         this.navMenuItems.push({
+          id: '' + category.id,
           label: category.name,
           icon: 'pi pi-pw',
           items: subMenu,
@@ -63,6 +64,14 @@ export class PrimengMenuNavComponent implements OnInit {
           this.yoy = params['yoy'] ? params['yoy'] : 'false';
           this.ytd = params['ytd'] ? params['ytd'] : 'false';
           this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this._router.url);
+          this.navMenuItems.forEach((item) => {
+            if (this.id) {
+              item.expanded = item.id === this.id ? true : false;
+            }
+            if (!this.id && this.selectedCategory !== 'analyzer' && this.selectedCategory !== 'help') {
+              item.expanded = +item.id === this.defaultCategory ? true : false; 
+            }
+          });
         });
       });
     this._router.events.subscribe((event) => {
@@ -144,6 +153,20 @@ export class PrimengMenuNavComponent implements OnInit {
       }
       this.loading = false;
     }, 15);
+  }
+
+  onSearch(event) {
+    const searchQParams = {
+      id: event,
+      start: null,
+      end: null,
+      analyzerSeries: null,
+      chartSeries: null,
+      name: null,
+      units: null,
+      geography: null
+    };
+    this._router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
   mobileMenuToggle(): void {

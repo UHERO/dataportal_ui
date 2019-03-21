@@ -89,7 +89,7 @@
   }
 
   .selected-category {
-    display: inline-block;
+    display: block;
     color: $primary;
     font-size: 1.4em;
     margin: 0px;
@@ -97,7 +97,7 @@
     text-transform: capitalize;
 
     @media (min-width: 768px) {
-      display: none;
+      //display: none;
     }
   }
 

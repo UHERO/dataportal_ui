@@ -62,7 +62,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
-      this.dataListId = this.getIdParam(params['dataListId']);
+      this.dataListId = this.getIdParam(params['data_list_id']);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
@@ -160,7 +160,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, /* AfterViewCh
 
   updateRoute(subId) {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.queryParams.dataListId = this.queryParams.dataListId ? this.queryParams.dataListId : this.dataListId;
+    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
     this.fragment = subId === 'search' ? null : 'id_' + subId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });

@@ -15,8 +15,8 @@ export class NtaHelperService {
   private defaultFreq: string;
   private categoryData = {};
 
-  static setCacheId(category, subcategory, selectedMeasure?) {
-    let id = '' + category + subcategory;
+  static setCacheId(category, dataListId, selectedMeasure?) {
+    let id = '' + category + dataListId;
     if (selectedMeasure) {
       id = id + selectedMeasure;
     }
@@ -27,13 +27,13 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, subId: number, selectedMeasure?: string): Observable<any> {
-    const cacheId = NtaHelperService.setCacheId(catId, subId, selectedMeasure);
+  initContent(catId: any, dataListId: number, selectedMeasure?: string): Observable<any> {
+    const cacheId = NtaHelperService.setCacheId(catId, dataListId, selectedMeasure);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
-      this.getCategory(cacheId, catId, selectedMeasure);
+      this.getCategory(cacheId, catId, dataListId, selectedMeasure);
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
@@ -42,7 +42,7 @@ export class NtaHelperService {
     }
   }
 
-  getCategory(cacheId: string, catId: any, selectedMeasure?: string) {
+  getCategory(cacheId: string, catId: any, dataListId, selectedMeasure?: string) {
     this.categoryData[cacheId] = <CategoryData>{};
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       if (catId === null) {
@@ -50,6 +50,10 @@ export class NtaHelperService {
       }
       const cat = categories.find(category => category.id === catId);
       if (cat) {
+        if (dataListId == null) {
+          dataListId = cat.children[0].id;
+          this.categoryData[cacheId].defaultDataList = dataListId;
+        }
         const sublist = cat.children;
         this.categoryData[cacheId].selectedCategory = cat.name;
         this.categoryData[cacheId].categoryId = cat.id;
