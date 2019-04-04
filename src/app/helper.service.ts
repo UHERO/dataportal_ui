@@ -81,7 +81,7 @@ export class HelperService {
     return { level: level, yoy: yoy, ytd: ytd, c5ma: c5ma };
   }
 
-  dataTransform(seriesObs, dates, decimals) {
+  dataTransform(seriesObs) {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;

@@ -475,6 +475,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       borderWidth: 0,
       shadow: false,
       shared: true,
+      followPointer: true,
       formatter: function (args) {
         return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
       }

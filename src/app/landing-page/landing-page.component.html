@@ -21,7 +21,7 @@
 					<p class="subcategory-header" *ngIf="!sub.isHeader" [attr.id]="'id_' + sub.id">{{sub.name}}</p>
 				</ng-template>
 				<ng-template ngIf [ngIf]="!sub.isHeader">
-					<div class="filters" *ngIf="sub.requestComplete">
+					<div class="filters" *ngIf="data.requestComplete">
 						<app-geo-selector [regions]="data.regions" [selectedGeo]="data.currentGeo"
 							(selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq, sub.id)" class="selector">
 						</app-geo-selector>
@@ -49,17 +49,17 @@
 							[dateFrom]="seriesStart ? seriesStart : null" [dateTo]="seriesEnd ? seriesEnd: null"
 							[freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
 					</div>
-					<i *ngIf="!sub.requestComplete || !displaySeries" class="fas fa-spinner fa-pulse fa-fw"></i>
-					<app-category-table-view *ngIf="routeView === 'table' && sub.requestComplete"
+					<i *ngIf="!data.requestComplete || !displaySeries" class="fas fa-spinner fa-pulse fa-fw"></i>
+					<app-category-table-view *ngIf="routeView === 'table'"
 						[portalSettings]="portalSettings" [dates]="data.categoryDates" [tableStart]="seriesStart"
-						[tableEnd]="seriesEnd" [sublist]="sub" [data]="sub.displaySeries" [geo]="data.currentGeo"
+						[tableEnd]="seriesEnd" [sublist]="sub" [data]="data.displaySeries" [geo]="data.currentGeo"
 						[tableId]="sub.id" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
 						[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'"
 						[noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
 					</app-category-table-view>
-					<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete"
+					<app-category-charts *ngIf="routeView !== 'table' && displaySeries"
 						[portalSettings]="portalSettings" [chartStart]="seriesStart" [chartEnd]="seriesEnd"
-						[sublist]="sub" [data]="sub.displaySeries" [dateWrapper]="data.categoryDateWrapper"
+						[sublist]="sub" [data]="data.displaySeries" [dateWrapper]="data.categoryDateWrapper"
 						[dates]="data.categoryDates" [freq]="data.currentFreq?.freq" [noSeries]="sub.noData"
 						[params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"
 						(updateURLFragment)="updateRoute($event)">

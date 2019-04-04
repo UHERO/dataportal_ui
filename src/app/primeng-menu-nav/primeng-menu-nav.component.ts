@@ -50,6 +50,9 @@ export class PrimengMenuNavComponent implements OnInit {
           label: category.name,
           icon: 'pi pi-pw',
           items: subMenu,
+          command: (event) => {
+            console.log('top level cat event', event)
+          }
         });
       });
     },

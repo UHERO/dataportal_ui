@@ -340,11 +340,13 @@ function mapCategories(response): Array<Category> {
     }
   });
   let result = categoryTree;
+  console.log('categoryTree', categoryTree)
   categoryTree.forEach((category) => {
     if (category.id === this.rootCategory) {
       result = category.children;
     }
   });
+  console.log('result', result)
   return result;
 }
 

@@ -227,7 +227,7 @@ export class NtaHelperService {
         seriesGroup = [];
       }
       const decimals = series.decimals ? series.decimals : 1;
-      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, subcategory.dateArray, decimals);
+      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations);
       if (s === subcategory.displaySeries.length - 1) {
         subcategory.requestComplete = true;
         category.requestComplete = true;
@@ -263,7 +263,7 @@ export class NtaHelperService {
         sublist.dateWrapper.firstDate = this.setStartDate(sublist.dateWrapper, seriesObsStart);
         sublist.dateWrapper.endDate = this.setEndDate(sublist.dateWrapper, seriesObsEnd);
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
+        series = this._helper.dataTransform(res.seriesObservations);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.title;

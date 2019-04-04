@@ -264,6 +264,7 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.tooltip = {
       borderWidth: 0,
       shadow: false,
+      followPointer: true,
       formatter: function (args) {
         return formatTooltip(this.points, this.x, pseudoZones, decimals, freq)
       }
