@@ -39,7 +39,7 @@
 							(change)="c5maActive($event, sub.id)">Annual Change
 					</label>
 					<app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings"
-						[dates]="sub.dateArray" [sublist]="data.sublist" [subCat]="sub"
+						[dates]="sub.dateArray" [sublist]="data.sublist"
 						[dateFrom]="sub.seriesStart ? sub.seriesStart : null"
 						[dateTo]="sub.seriesEnd ? sub.seriesEnd: null" [freq]="data.currentFreq?.freq"
 						(updateRange)="changeRange($event, sub)"></app-date-slider>

@@ -92,13 +92,22 @@
     display: block;
     color: $primary;
     font-size: 1.4em;
-    margin: 0px;
+    //margin: 0px;
     vertical-align: middle;
     text-transform: capitalize;
 
     @media (min-width: 768px) {
       //display: none;
     }
+  }
+
+  .selected-data-list {
+    display: block;
+    color: $primary;
+    font-size: 0.9em;
+    font-weight: 100;
+    margin: 0px;
+    text-transform: capitalize;
   }
 
   .search-term {
