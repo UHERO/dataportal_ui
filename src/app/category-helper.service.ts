@@ -92,7 +92,7 @@ export class CategoryHelperService {
         if (!routeGeoExists || !routeFreqExists) {
           const defaultFreq = dataList.defaults ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
           const defaultGeo = dataList.defaults ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
-          this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, routeGeo, routeFreq);
+          this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
         }
       });
   }
@@ -143,6 +143,10 @@ export class CategoryHelperService {
       }
       if (!expandedCategory) {
         this.categoryData[cacheId].requestComplete = true;
+        this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+        this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
+        this.categoryData[cacheId].noData = true;
+        console.log(this.categoryData[cacheId])
       }
       this.categoryData[cacheId].subcategories.forEach((sub) => {
         this.initContent(catId, sub.id, routeGeo, routeFreq);

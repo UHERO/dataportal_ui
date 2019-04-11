@@ -13,7 +13,6 @@ import { AppComponent } from '../app.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
 import { HeaderComponent } from '../header/header.component';
 import { SingleSeriesComponent } from '../single-series/single-series.component';
-import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
 import { HighchartComponent } from '../highchart/highchart.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
@@ -46,7 +45,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     LandingPageComponent,
     HeaderComponent,
     SingleSeriesComponent,
-    SidebarNavComponent,
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
@@ -96,7 +94,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CommonModule,
     HeaderComponent,
     SingleSeriesComponent,
-    SidebarNavComponent,
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,

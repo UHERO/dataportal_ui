@@ -11,6 +11,7 @@ import { AnalyzerService } from '../analyzer.service';
 export class CategoryTableViewComponent implements OnChanges {
   @Input() data;
   @Input() sublist;
+  @Input() selectedDataList;
   @Input() freq;
   @Input() geo;
   @Input() tableId;
@@ -51,15 +52,12 @@ export class CategoryTableViewComponent implements OnChanges {
     this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
-      this.paginationSizeOptions = this.createPaginatorRowOptions(this.data.length);
-      this.selectedPaginationSize = this.sublist.numberOfSeriesToDisplay ? this.paginationSizeOptions[this.paginationSizeOptions.indexOf(this.sublist.numberOfSeriesToDisplay)] : this.paginationSizeOptions[this.paginationSizeOptions.indexOf(this.sublist.paginatedSeriesEndIndex - this.sublist.paginatedSeriesStartIndex)];
-
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.sublist.parentId);
+          const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList);
           this.rows.push(seriesData);
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
@@ -122,7 +120,7 @@ export class CategoryTableViewComponent implements OnChanges {
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
-      subcatIndex: subcatIndex,
+      //subcatIndex: subcatIndex,
       categoryId: parentId
     }
     dates.forEach((d, index) => {
@@ -163,43 +161,6 @@ export class CategoryTableViewComponent implements OnChanges {
     }
   }
 
-  createPaginatorRowOptions = (displaySeriesLength: number) => {
-    let count = 8;
-    const pageCountOptions = [];
-    while (count < displaySeriesLength) {
-      pageCountOptions.push(count);
-      count += 8;
-    }
-    pageCountOptions.push(displaySeriesLength);
-    return pageCountOptions;
-  }
-
-  onPaginationChanged(sublist) {
-
-    if (this.gridApi) {
-      sublist.paginatedSeriesStartIndex = this.gridApi.getFirstDisplayedRow();
-      this.totalPages = this.gridApi.getLastDisplayedRow() + 1;//this.gridApi.paginationGetTotalPages();
-      sublist.paginatedSeriesEndIndex = this.gridApi.getLastDisplayedRow() + 1;
-      this.paginationSize = this.gridApi.paginationGetPageSize();
-      this.disablePrevious = this.gridApi.paginationGetCurrentPage() === 0;
-      this.disableNext = this.gridApi.paginationGetCurrentPage() === this.gridApi.paginationGetTotalPages() - 1;
-      sublist.paginatedSeriesStartIndex ? this.gridApi.ensureIndexVisible(sublist.paginatedSeriesStartIndex) : this.gridApi.ensureIndexVisible(0);
-    }
-  }
-
-  onPaginationSizeChange(newPageSize, sublist) {
-    this.gridApi.paginationSetPageSize(Number(newPageSize));
-    sublist.numberOfSeriesToDisplay = newPageSize;
-  }
-
-  onBtNext() {
-    this.gridApi.paginationGoToNextPage();
-  }
-
-  onBtPrevious() {
-    this.gridApi.paginationGoToPreviousPage();
-  }
-
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
@@ -222,16 +183,7 @@ export class CategoryTableViewComponent implements OnChanges {
     this.gridApi.exportDataAsCsv(params);
   }
 
-  onGridReady = (params, sublist) => {
+  onGridReady = (params) => {
     this.gridApi = params.api;
-    if (!this.totalPages) {
-      this.selectedPaginationSize = sublist.numberOfSeriesToDisplay ? this.paginationSizeOptions[this.paginationSizeOptions.indexOf(sublist.numberOfSeriesToDisplay)] : this.paginationSizeOptions[this.paginationSizeOptions.indexOf(sublist.paginatedSeriesEndIndex - sublist.paginatedSeriesStartIndex)];
-      this.totalPages = sublist.paginatedSeriesEndIndex ? sublist.paginatedSeriesEndIndex : this.gridApi.getLastDisplayedRow() + 1;
-      this.totalRows = this.gridApi.paginationGetRowCount();
-      this.paginationSize = this.gridApi.paginationGetPageSize();
-      this.disablePrevious = this.gridApi.paginationGetCurrentPage() === 0;
-      this.disableNext = this.gridApi.paginationGetCurrentPage() === this.gridApi.paginationGetTotalPages() - 1;
-      sublist.paginatedSeriesStartIndex ? this.gridApi.ensureIndexVisible(sublist.paginatedSeriesStartIndex) : this.gridApi.ensureIndexVisible(0);
-    }
   }
 }

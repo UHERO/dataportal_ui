@@ -48,11 +48,11 @@
 				<app-category-table-view *ngIf="routeView === 'table' && displaySeries"
 					[portalSettings]="portalSettings" [dates]="sub.dateArray" [tableStart]="sub.seriesStart"
 					[tableEnd]="sub.seriesEnd" [sublist]="sub" [data]="sub.displaySeries" [geo]="data.currentGeo"
-					[tableId]="sub.id" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id"
+					[tableId]="sub.id" [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [selectedDataList]="sub.id"
 					[c5maActive]="queryParams.c5ma === 'true'" [noSeries]="sub.noData" [params]="queryParams"
 					[seriesInAnalyzer]="seriesInAnalyzer"></app-category-table-view>
 				<app-category-charts *ngIf="routeView !== 'table' && displaySeries && sub.requestComplete"
-					[search]="search" [portalSettings]="portalSettings" [chartStart]="sub.seriesStart"
+					[search]="search" [portalSettings]="portalSettings" [chartStart]="sub.seriesStart" [selectedDataList]="sub.id"
 					[chartEnd]="sub.seriesEnd" [dates]="sub.dateArray" [sublist]="sub" [data]="sub.displaySeries"
 					[freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams"
 					[seriesInAnalyzer]="seriesInAnalyzer" (updateURLFragment)="updateRoute($event)">

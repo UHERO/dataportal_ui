@@ -13,6 +13,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
   @Input() sublist;
   @Input() data;
+  @Input() selectedDataList;
   @Input() freq;
   @Input() noSeries;
   @Input() nsaActive;
@@ -26,8 +27,6 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() dateWrapper;
   @Input() seriesInAnalyzer;
   @Output() updateURLFragment = new EventEmitter();
-  paginatorRowsPerPageOptions: number[] = [];
-  numberOfSeriesToDisplay: number;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -39,7 +38,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
-      this.paginatorRowsPerPageOptions = this.createPaginatorRowOptions(this.data.length);
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
@@ -126,26 +124,6 @@ export class CategoryChartsComponent implements OnChanges {
     const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
     const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
     return series.seriesInfo.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
-  }
-
-  createPaginatorRowOptions = (displaySeriesLength: number) => {
-    let count = 8;
-    const pageCountOptions = [];
-    while (count < displaySeriesLength) {
-      pageCountOptions.push(count);
-      count += 8;
-    }
-    pageCountOptions.push(displaySeriesLength);
-    return pageCountOptions;
-  }
-
-  paginate(event, sub) {
-    // If the URL contains an anchor/fragment, update the fragment to the sublist id currently viewed when using pagination to prevent the page from jumping around
-    this.updateURLFragment.emit(sub.id);
-    sub.numberOfSeriesToDisplay = event.rows;
-    sub.paginatorFirst = event.first;
-    sub.paginatedSeriesStartIndex = event.first;
-    sub.paginatedSeriesEndIndex = event.first + event.rows;
   }
 
   // Google Analytics: Track clicking on series
