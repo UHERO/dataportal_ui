@@ -90,8 +90,8 @@ export class CategoryHelperService {
           this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
         }
         if (!routeGeoExists || !routeFreqExists) {
-          const defaultFreq = dataList.defaults ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
-          const defaultGeo = dataList.defaults ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
+          const defaultFreq = dataList.defaults && dataList.defaults.freq ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
+          const defaultGeo = dataList.defaults && dataList.defaults.geo ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
           this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
         }
       });
