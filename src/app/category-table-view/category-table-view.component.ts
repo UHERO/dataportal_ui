@@ -11,6 +11,7 @@ import { AnalyzerService } from '../analyzer.service';
 export class CategoryTableViewComponent implements OnChanges {
   @Input() data;
   @Input() sublist;
+  @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() freq;
   @Input() geo;
@@ -57,7 +58,7 @@ export class CategoryTableViewComponent implements OnChanges {
           series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList);
+          const seriesData = this.selectedDataList ? this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) : this.formatLvlData(series, level, this.subcatIndex, null);
           this.rows.push(seriesData);
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
@@ -164,11 +165,11 @@ export class CategoryTableViewComponent implements OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    const parentName = this.sublist && this.sublist.parentName ? this.sublist.parentName + ' - ' : '';
-    const sublistName = this.sublist ? this.sublist.name : '';
+    const parentName = this.selectedCategory ? this.selectedCategory.name + ' - ' : '';
+    const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
     const geoName = this.geo ? this.geo.name + ' - ' : '';
-    const catId = this.sublist ? this.sublist.parentId : '';
-    const tableId = this.tableId;
+    const catId = this.selectedCategory ? this.selectedCategory.id : '';
+    const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
@@ -177,8 +178,8 @@ export class CategoryTableViewComponent implements OnChanges {
       fileName: sublistName,
       customHeader: this.portalSettings.catTable.portalSource +
         parentName + sublistName + ' (' + geoName + this.freq + ')' +
-      ': ' + this.portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
-      '\n\n'
+        ': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table' +
+        '\n\n'
     }
     this.gridApi.exportDataAsCsv(params);
   }

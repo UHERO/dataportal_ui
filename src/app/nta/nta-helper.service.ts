@@ -49,18 +49,16 @@ export class NtaHelperService {
         catId = categories[0].id;
       }
       const cat = categories.find(category => category.id === catId);
-      console.log('categories', categories)
       if (cat) {
         if (dataListId == null) {
           dataListId = cat.children[0].id;
           this.categoryData[cacheId].defaultDataList = dataListId;
         }
         const categoryDataLists = cat.children;
-        console.log('categoryDataLists', categoryDataLists);
         const selectedDataList = dataListId ? this.findSelectedDataList(categoryDataLists, dataListId, '') : this.getCategoryDataLists(categoryDataLists[0], '');
-        this.categoryData[cacheId].selectedDataList = selectedDataList.id;
+        this.categoryData[cacheId].selectedDataList = selectedDataList;
         this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
-        this.categoryData[cacheId].selectedCategory = cat.name;
+        this.categoryData[cacheId].selectedCategory = cat;
         this.categoryData[cacheId].categoryId = cat.id;
         this.categoryData[cacheId].currentFreq = { freq: 'A', label: 'Annual' };
         const sublistCopy = [];
@@ -69,7 +67,6 @@ export class NtaHelperService {
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        console.log('categoryData[cacheId]', this.categoryData[cacheId])
         this.getSubcategoryData(this.categoryData[cacheId], selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
@@ -108,7 +105,7 @@ export class NtaHelperService {
   }
 
   getSubcategoryData(category, selectedMeasure?: string) {
-    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList).subscribe((measures) => {
+    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList.id).subscribe((measures) => {
       category.measurements = measures;
     },
       (error) => {
@@ -118,24 +115,6 @@ export class NtaHelperService {
         this.findSelectedMeasurement(category, selectedMeasure);
         this.getSeriesData(category);
       });
-    /* let subcategoryCount = category.sublist.length;
-    category.sublist.forEach((sub, index) => {
-      this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {
-        sub.measurements = measures;
-      },
-        (error) => {
-          this.errorMessage = error;
-        },
-        () => {
-          subcategoryCount--;
-          if (subcategoryCount === 0) {
-            category.sublist.forEach((subcategory) => {
-              this.findSelectedMeasurement(subcategory, selectedMeasure);
-            });
-            this.getSeriesData(category);
-          }
-        });
-    }); */
   }
 
   findSelectedMeasurement(sublist, selectedMeasure) {
@@ -162,30 +141,12 @@ export class NtaHelperService {
       (error) => {
         console.log('error fetching measurement series', error);
       });
-    /* category.sublist.forEach((sub, index) => {
-      const sublistDateArray = [];
-      sub.dateWrapper = { firstDate: '', endDate: '' };
-      this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
-        if (series) {
-          sub.series = series;
-          this.formatCategoryData(category, sub, sublistDateArray, false);
-        }
-        sub.id = sub.id.toString();
-        if (!series) {
-          sub.noData = true;
-        }
-      },
-        (error) => {
-          this.errorMessage = error;
-        });
-    }); */
   }
 
   getSearch(cacheId, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, freqs, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
-      console.log('results', results)
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       freqs = results.freqs;
@@ -200,7 +161,7 @@ export class NtaHelperService {
           const dateWrapper = <DateWrapper>{};
           this.getSearchData(catId, cacheId, dateWrapper);
           this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
-          this.categoryData[cacheId].selectedCategory = 'Search: ' + catId;
+          this.categoryData[cacheId].selectedCategory = { name: 'Search: ' + catId };
         } else {
           this.categoryData[cacheId].invalid = catId;
         }
@@ -278,7 +239,6 @@ export class NtaHelperService {
     category.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
     category.sliderDates = this._helper.getTableDates(category.dateArray);
     category.findMinMax = true;
-    console.log(category)
     category.requestComplete = true;
     /* subcategory.displaySeries.forEach((series, s) => {
       //series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations);
@@ -293,7 +253,6 @@ export class NtaHelperService {
         this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
       });  
     }
-    console.log('categoryData', this.categoryData)
   }
 
   getGeoName(series, geoHandle: string) {

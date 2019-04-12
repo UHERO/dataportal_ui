@@ -44,12 +44,13 @@ export class CategoryHelperService {
         if (cat) {
           const categoryDataLists = cat.children;
           const selectedDataList = dataListId ? this.findSelectedDataList(categoryDataLists, dataListId, '') : this.getCategoryDataLists(categoryDataLists[0], '');
-          this.categoryData[cacheId].selectedDataList = selectedDataList.id;
+          this.categoryData[cacheId].selectedDataList = selectedDataList;
           this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
           if (dataListId === null) {
             this.categoryData[cacheId].defaultDataList = selectedDataList.id;
           }
-          this.categoryData[cacheId].selectedCategory = cat.name;
+          this.categoryData[cacheId].selectedCategoryId = cat.id;
+          this.categoryData[cacheId].selectedCategory = cat;
           this.categoryData[cacheId].subcategories = categoryDataLists;
           this.getDataListGeos(catId, selectedDataList, cacheId, routeGeo, routeFreq);
         } else {
@@ -279,7 +280,7 @@ export class CategoryHelperService {
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-      this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
+      // this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;

@@ -1,6 +1,6 @@
 <div class="multi-series-container">
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
-		<h2 class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory}}</h2>
+		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
@@ -10,13 +10,13 @@
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
 						<a [routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}"
 							queryParamsHandling="merge"
-							[class.current-sub]="sub.id === data.selectedDataList">{{sub.name}}</a>
+							[class.current-sub]="sub.id === data.selectedDataList.id">{{sub.name}}</a>
 					</li>
 				</ul>
 				<hr class="sublist-separator" *ngIf="data.subcategories && data.subcategories.length > 1">
 			</ng-template>
 			<ng-template ngIf [ngIf]="!portal.categoryTabs">
-				<h3 class="selected-data-list" [class.search-term]="search">{{data.selectedDataListName}}</h3>
+				<h3 *ngIf="data.requestComplete" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
 			</ng-template>
 			<div class="filters" *ngIf="data.requestComplete">
 				<app-geo-selector [regions]="data.regions" [selectedGeo]="data.currentGeo"
@@ -47,7 +47,7 @@
 		</ng-template>
 		<i *ngIf="!search && !data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<app-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
-			[dates]="data.categoryDates" [tableStart]="seriesStart" [tableEnd]="seriesEnd"
+			[dates]="data.categoryDates" [tableStart]="seriesStart" [tableEnd]="seriesEnd" [selectedCategory]="data.selectedCategory"
 			[selectedDataList]="data.selectedDataList" [data]="data.displaySeries" [geo]="data.currentGeo"
 			[freq]="data.currentFreq?.freq" [yoyActive]="queryParams.yoy === 'true'"
 			[ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData" [params]="queryParams"
