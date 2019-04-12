@@ -3,7 +3,8 @@
 .multi-series-container {
   vertical-align: top;
   min-height: 100%;
-  
+  margin-top: 65px;
+
   .fa-spinner {
     display: block;
     margin: 20px;
@@ -117,13 +118,21 @@
     display: block;
     color: $primary;
     font-size: 1.4em;
-    margin: 0px;
-    vertical-align: middle;
     text-transform: capitalize;
+    margin: 0px;
 
     @media (min-width: 768px) {
       //display: none;
     }
+  }
+
+  .selected-data-list {
+    display: block;
+    color: $primary;
+    font-size: 0.9em;
+    font-weight: 100;
+    margin: 10px 0 0 0;
+    text-transform: capitalize;
   }
 
   .search-term {

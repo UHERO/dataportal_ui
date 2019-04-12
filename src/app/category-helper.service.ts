@@ -146,12 +146,22 @@ export class CategoryHelperService {
         this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
         this.categoryData[cacheId].noData = true;
-        console.log(this.categoryData[cacheId])
       }
       this.categoryData[cacheId].subcategories.forEach((sub) => {
-        this.initContent(catId, sub.id, routeGeo, routeFreq);
+        this.getSiblingData(sub, catId, routeGeo, routeFreq);
       });
     });
+  }
+
+  getSiblingData(sub, catId, routeGeo, routeFreq) {
+    if (!sub.children) {
+      this.initContent(catId, sub.id, routeGeo, routeFreq);  
+    }
+    if (sub.children) {
+      sub.children.forEach((s) => {
+        this.getSiblingData(s, catId, routeGeo, routeFreq);
+      });
+    }
   }
 
   setCategoryDates = (series: Array<any>, currentFreq: string) => {
@@ -266,22 +276,13 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
       const displaySeries = this.getDisplaySeries(results.series, freq);
       this.categoryData[cacheId].displaySeries = displaySeries;
-      const sublist = {
-        id: 'search',
-        parentName: 'Search',
-        name: search,
-        displaySeries: displaySeries,
-        requestComplete: false
-      };
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
       this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
-      this.categoryData[cacheId].subcategories = [sublist];
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
-      sublist.requestComplete = true;
     }
     if (!results.observationStart || !results.observationEnd) {
       this.categoryData[cacheId].invalid = search;

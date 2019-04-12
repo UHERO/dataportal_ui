@@ -10,12 +10,10 @@ declare var $: any;
 })
 export class DateSliderComponent implements OnInit, AfterViewInit {
   @Input() portalSettings;
-  //@Input() subCat;
   @Input() dates;
   @Input() freq;
   @Input() dateFrom;
   @Input() dateTo;
-  @Input() sublist;
   @Output() updateRange = new EventEmitter(true);
   start;
   end;
@@ -50,31 +48,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     this.cd.detectChanges();
   }
 
-  updateOtherSliders(sublist, from, to, fromValue, toValue) {
-    sublist.forEach((sub) => {
-      const slider = $(`#slider`).data('ionRangeSlider');
-      const $fromInput = $(`#dateFrom`);
-      const $toInput = $(`#dateTo`);
-      if (slider) {
-        slider.update({
-          from: from,
-          to: to
-        });
-      }
-      if ($fromInput) {
-        $fromInput.prop('value', fromValue);
-      }
-      if ($toInput) {
-        $toInput.prop('value', toValue);
-      }
-    });
-  }
-
   initRangeSlider(sliderDates: Array<any>, start: number, end: number, freq: string, portalSettings) {
-    const updateOtherSliders = (sublist, from, to, fromValue, toValue) => this.updateOtherSliders(sublist, from, to, fromValue, toValue);
     const updateChartsAndTables = (from, to, freq) => this.updateChartsAndTables(from, to, freq);
-    const sublist = this.sublist;
-    // const subCatId = this.subCat.id;
     const $fromInput = $(`#dateFrom`);
     const $toInput = $(`#dateTo`);
     $(`#slider`).ionRangeSlider({
@@ -90,9 +65,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       skin: 'round',
       type: 'double',
       onChange: function (data) {
-        if (portalSettings.sliderInteraction) {
-          updateOtherSliders(sublist, data.from, data.to, data.from_value, data.to_value);
-        }
         $fromInput.prop('value', data.from_value);
         $toInput.prop('value', data.to_value);
       },
@@ -109,9 +81,6 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   }
 
   updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
-    if (portalSettings.sliderInteraction) {
-      this.updateOtherSliders(this.sublist, fromIndex, toIndex, from, to);
-    }
     this.updateChartsAndTables(from, to, freq);
   }
 

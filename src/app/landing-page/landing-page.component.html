@@ -4,52 +4,47 @@
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<!-- <ng-template ngFor let-sub [ngForOf]="data.subcategories" let-i="index"> -->
 		<ng-template ngIf [ngIf]="search || data.requestComplete">
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
-				<ul class="content-links" *ngIf="data.subcategories.length > 1" [attr.id]="'id_' + sub.id">
+				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1" [attr.id]="'id_' + sub.id">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
 						<a [routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}"
 							queryParamsHandling="merge"
 							[class.current-sub]="sub.id === data.selectedDataList">{{sub.name}}</a>
 					</li>
 				</ul>
-				<hr class="sublist-separator" *ngIf="data.subcategories.length > 1">
+				<hr class="sublist-separator" *ngIf="data.subcategories && data.subcategories.length > 1">
 			</ng-template>
 			<ng-template ngIf [ngIf]="!portal.categoryTabs">
 				<h3 class="selected-data-list" [class.search-term]="search">{{data.selectedDataListName}}</h3>
 			</ng-template>
-			<!-- <ng-template ngIf [ngIf]="!sub.isHeader"> -->
 			<div class="filters" *ngIf="data.requestComplete">
 				<app-geo-selector [regions]="data.regions" [selectedGeo]="data.currentGeo"
-					(selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq, sub.id)" class="selector">
+					(selectedGeoChange)="redrawSeriesGeo($event, data.currentFreq)" class="selector">
 				</app-geo-selector>
 				<app-freq-selector [freqs]="data.frequencies" [selectedFreq]="data.currentFreq"
-					(selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo, sub.id)" class="selector">
+					(selectedFreqChange)="redrawSeriesFreq($event, data.currentGeo)" class="selector">
 				</app-freq-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View
+				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
 					<i class="material-icons md-18">show_chart</i>
 				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(s)" class="switch-view">Table
 					View
 					<i class="material-icons md-18">view_list</i>
 				</a>
 				<label *ngIf="routeView === 'table'" class="form-check-inline">
-					<input type="checkbox" [checked]="queryParams.yoy === 'true'"
-						(change)="yoyActive($event, sub.id)">Year/Year
+					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
 				</label>
 				<label *ngIf="routeView === 'table' && data.currentFreq?.freq !== 'A'" class="form-check-inline">
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'"
-						(change)="ytdActive($event, sub.id)">Year-to-Date
+						(change)="ytdActive($event)">Year-to-Date
 				</label>
 				<app-date-slider *ngIf="data.displaySeries" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [sublist]="data.subcategories"
-					[dateFrom]="seriesStart ? seriesStart : null" [dateTo]="seriesEnd ? seriesEnd: null"
-					[freq]="data.currentFreq?.freq" (updateRange)="changeRange($event)"></app-date-slider>
+					[dates]="data.categoryDates" [dateFrom]="seriesStart ? seriesStart : null"
+					[dateTo]="seriesEnd ? seriesEnd: null" [freq]="data.currentFreq?.freq"
+					(updateRange)="changeRange($event)"></app-date-slider>
 			</div>
-			<!-- </ng-template> -->
 		</ng-template>
-		<!-- </ng-template> -->
 		<i *ngIf="!search && !data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<app-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
 			[dates]="data.categoryDates" [tableStart]="seriesStart" [tableEnd]="seriesEnd"
@@ -60,8 +55,8 @@
 		</app-category-table-view>
 		<app-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings"
 			[chartStart]="seriesStart" [chartEnd]="seriesEnd" [data]="data.displaySeries"
-			[selectedDataList]="data.selectedDataList" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
-			[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [params]="queryParams"
+			[selectedDataList]="data.selectedDataList" [dateWrapper]="data.categoryDateWrapper"
+			[dates]="data.categoryDates" [freq]="data.currentFreq?.freq" [noSeries]="data.noData" [params]="queryParams"
 			[seriesInAnalyzer]="seriesInAnalyzer" (updateURLFragment)="updateRoute($event)">
 		</app-category-charts>
 	</ng-template>

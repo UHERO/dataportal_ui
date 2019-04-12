@@ -49,21 +49,27 @@ export class NtaHelperService {
         catId = categories[0].id;
       }
       const cat = categories.find(category => category.id === catId);
+      console.log('categories', categories)
       if (cat) {
         if (dataListId == null) {
           dataListId = cat.children[0].id;
           this.categoryData[cacheId].defaultDataList = dataListId;
         }
-        const sublist = cat.children;
+        const categoryDataLists = cat.children;
+        console.log('categoryDataLists', categoryDataLists);
+        const selectedDataList = dataListId ? this.findSelectedDataList(categoryDataLists, dataListId, '') : this.getCategoryDataLists(categoryDataLists[0], '');
+        this.categoryData[cacheId].selectedDataList = selectedDataList.id;
+        this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
         this.categoryData[cacheId].selectedCategory = cat.name;
         this.categoryData[cacheId].categoryId = cat.id;
         this.categoryData[cacheId].currentFreq = { freq: 'A', label: 'Annual' };
         const sublistCopy = [];
-        sublist.forEach((sub) => {
+        categoryDataLists.forEach((sub) => {
           sub.parentName = cat.name;
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
+        console.log('categoryData[cacheId]', this.categoryData[cacheId])
         this.getSubcategoryData(this.categoryData[cacheId], selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
@@ -71,8 +77,48 @@ export class NtaHelperService {
     });
   }
 
+  findSelectedDataList = (dataList, dataListId, dataListName) => {
+    for (let i = 0; i < dataList.length; i++) {
+      let name = dataListName || '';
+      if (dataList[i].id === dataListId) {
+        dataList[i].dataListName = `${name} ${dataList[i].name}`;
+        return dataList[i];
+      } else {
+        if (dataList[i].children && Array.isArray(dataList[i].children)) {
+          name += `${dataList[i].name} > `;
+          const selected = this.findSelectedDataList(dataList[i].children, dataListId, name);
+          if (selected) {
+            return selected;
+          }
+        }
+      }
+    }
+  }
+
+  getCategoryDataLists = (category, dataListName) => {
+    let name = dataListName || '';
+    if (!category.children) {
+      category.dataListName = `${name} ${category.name}`;
+      return category;
+    }
+    if (category.children && Array.isArray(category.children)) {
+      name += `${category.name} > `;
+      return this.getCategoryDataLists(category.children[0], name);
+    }
+  }
+
   getSubcategoryData(category, selectedMeasure?: string) {
-    let subcategoryCount = category.sublist.length;
+    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList).subscribe((measures) => {
+      category.measurements = measures;
+    },
+      (error) => {
+        console.log('error fetching category measurements', error);
+      },
+      () => {
+        this.findSelectedMeasurement(category, selectedMeasure);
+        this.getSeriesData(category);
+      });
+    /* let subcategoryCount = category.sublist.length;
     category.sublist.forEach((sub, index) => {
       this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {
         sub.measurements = measures;
@@ -89,7 +135,7 @@ export class NtaHelperService {
             this.getSeriesData(category);
           }
         });
-    });
+    }); */
   }
 
   findSelectedMeasurement(sublist, selectedMeasure) {
@@ -102,7 +148,21 @@ export class NtaHelperService {
 
   // Get list of series belonging to each measurement
   getSeriesData(category) {
-    category.sublist.forEach((sub, index) => {
+    const categoryDataArray = [];
+    category.dateWrapper = { firstDate: '', endDate: '' };
+    this._uheroAPIService.fetchMeasurementSeries(category.currentMeasurement.id).subscribe((series) => {
+      if (series) {
+        category.series = series;
+        this.formatCategoryData(category, categoryDataArray, false);
+      }
+      if (!series) {
+        category.noData = true;
+      }
+    },
+      (error) => {
+        console.log('error fetching measurement series', error);
+      });
+    /* category.sublist.forEach((sub, index) => {
       const sublistDateArray = [];
       sub.dateWrapper = { firstDate: '', endDate: '' };
       this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
@@ -118,13 +178,14 @@ export class NtaHelperService {
         (error) => {
           this.errorMessage = error;
         });
-    });
+    }); */
   }
 
   getSearch(cacheId, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, freqs, obsEnd, obsStart;
     this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
+      console.log('results', results)
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       freqs = results.freqs;
@@ -181,7 +242,10 @@ export class NtaHelperService {
               id: 'search',
               series: searchSeries
             };
-            this.formatCategoryData(category, sublist, [], true);
+            category.dateWrapper = { firstDate: '', endDate: '' };
+            category.id = 'search';
+            category.series = searchSeries
+            this.formatCategoryData(category, [], true);
             category.sublist = [sublist];
           }
         });
@@ -208,31 +272,28 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category, subcategory, subcategoryDateArray: Array<any>, search: Boolean) {
-    const dateWrapper = subcategory.dateWrapper;
-    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory, search);
-    subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
-    subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
-    // At most, display 12 series at a time in the multiple chart view
-    subcategory.scrollSeries = [];
-    // Default to the first set of (12) series to display
-    subcategory.scrollIndex = 0;
-    subcategory.paginatedSeriesStartIndex = 0;
-    subcategory.paginatedSeriesEndIndex = 8;
-    let seriesGroup = [];
-    subcategory.displaySeries.forEach((series, s) => {
-      seriesGroup.push(series);
-      if (seriesGroup.length === 12 || s === subcategory.displaySeries.length - 1) {
-        subcategory.scrollSeries.push(seriesGroup);
-        seriesGroup = [];
-      }
-      const decimals = series.decimals ? series.decimals : 1;
-      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations);
+  formatCategoryData(category, subcategoryDateArray: Array<any>, search: Boolean) {
+    const dateWrapper = category.dateWrapper;
+    category.displaySeries = this.filterSeries(category.series, category, search);
+    category.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
+    category.sliderDates = this._helper.getTableDates(category.dateArray);
+    category.findMinMax = true;
+    console.log(category)
+    category.requestComplete = true;
+    /* subcategory.displaySeries.forEach((series, s) => {
+      //series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations);
       if (s === subcategory.displaySeries.length - 1) {
         subcategory.requestComplete = true;
+        console.log(category)
         category.requestComplete = true;
       }
-    });
+    }); */
+    if (category.sublist) {
+      category.sublist.forEach((sub) => {
+        this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
+      });  
+    }
+    console.log('categoryData', this.categoryData)
   }
 
   getGeoName(series, geoHandle: string) {
@@ -249,7 +310,7 @@ export class NtaHelperService {
       });
   }
 
-  filterSeries(seriesArray: Array<any>, sublist, search: Boolean) {
+  filterSeries(seriesArray: Array<any>, category, search: Boolean) {
     const filtered = [];
     seriesArray.forEach((res) => {
       let seriesDates = [], series;
@@ -260,8 +321,8 @@ export class NtaHelperService {
       if (levelData || newLevelData) {
         const seriesObsStart = res.seriesObservations.observationStart;
         const seriesObsEnd = res.seriesObservations.observationEnd;
-        sublist.dateWrapper.firstDate = this.setStartDate(sublist.dateWrapper, seriesObsStart);
-        sublist.dateWrapper.endDate = this.setEndDate(sublist.dateWrapper, seriesObsEnd);
+        category.dateWrapper.firstDate = this.setStartDate(category.dateWrapper, seriesObsStart);
+        category.dateWrapper.endDate = this.setEndDate(category.dateWrapper, seriesObsEnd);
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
         series = this._helper.dataTransform(res.seriesObservations);
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';

@@ -13,6 +13,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
   @Input() sublist;
   @Input() data;
+  @Input() findMinMax;
   @Input() selectedDataList;
   @Input() freq;
   @Input() noSeries;
@@ -27,6 +28,8 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() dateWrapper;
   @Input() seriesInAnalyzer;
   @Output() updateURLFragment = new EventEmitter();
+  minValue;
+  maxValue;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -50,10 +53,10 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.portalSettings.highcharts.setYAxes && !this.search) {
       const start = this.chartStart ? this.chartStart : Date.parse(this.defaultRange.start);
       const end = this.chartEnd ? this.chartEnd : Date.parse(this.defaultRange.end);
-      if (this.sublist) {
+      if (this.findMinMax) {
         // Find minimum and maximum values out of all series within a sublist; Use values to set min/max of yAxis
-        this.sublist.minValue = this.findMin(this.sublist, start, end);
-        this.sublist.maxValue = this.findMax(this.sublist, start, end);
+        this.minValue = this.findMin(this.data, start, end);
+        this.maxValue = this.findMax(this.data, start, end);
       }
     }
   }
@@ -96,9 +99,9 @@ export class CategoryChartsComponent implements OnChanges {
     }
   }
 
-  findMin(sublist, start, end) {
+  findMin(displaySeries, start, end) {
     let minValue = null;
-    sublist.displaySeries.forEach((serie) => {
+    displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
       const min = Math.min(...values);
       if (minValue === null || min < minValue) {
@@ -108,9 +111,9 @@ export class CategoryChartsComponent implements OnChanges {
     return minValue;
   }
 
-  findMax(sublist, start, end) {
+  findMax(displaySeries, start, end) {
     let maxValue = null;
-    sublist.displaySeries.forEach((serie) => {
+    displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
       const max = Math.max(...values);
       if (maxValue === null || max > maxValue) {
