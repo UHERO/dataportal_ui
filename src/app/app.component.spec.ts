@@ -12,7 +12,7 @@ import { AppComponent } from './app.component';
 class HeaderStubComponent {}
 
 // Create stub for sidebar-nav component
-@Component({selector: 'app-sidebar-nav', template: ''})
+@Component({selector: 'app-primeng-menu-nav', template: ''})
 class SidebarNavStubComponent {}
 
 @Component({selector: 'app-feedback', template: ''})

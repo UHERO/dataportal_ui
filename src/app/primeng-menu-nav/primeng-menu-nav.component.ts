@@ -31,7 +31,7 @@ export class PrimengMenuNavComponent implements OnInit {
 
   constructor(
     @Inject('logo') private logo,
-    @Inject('navigation') private navSettings,
+    //@Inject('navigation') private navSettings,
     private _uheroAPIService: UheroApiService,
     private _helperService: HelperService,
     private _analyzerService: AnalyzerService,
