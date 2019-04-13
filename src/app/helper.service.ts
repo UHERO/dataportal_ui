@@ -18,6 +18,36 @@ export class HelperService {
     this.categoryData.next(data)
   }
 
+  findSelectedDataList = (dataList, dataListId, dataListName) => {
+    for (let i = 0; i < dataList.length; i++) {
+      let name = dataListName || '';
+      if (dataList[i].id === dataListId) {
+        dataList[i].dataListName = `${name} ${dataList[i].name}`;
+        return dataList[i];
+      } else {
+        if (dataList[i].children && Array.isArray(dataList[i].children)) {
+          name += `${dataList[i].name} > `;
+          const selected = this.findSelectedDataList(dataList[i].children, dataListId, name);
+          if (selected) {
+            return selected;
+          }
+        }
+      }
+    }
+  }
+
+  getCategoryDataLists = (category, dataListName) => {
+    let name = dataListName || '';
+    if (!category.children) {
+      category.dataListName = `${name} ${category.name}`;
+      return category;
+    }
+    if (category.children && Array.isArray(category.children)) {
+      name += `${category.name} > `;
+      return this.getCategoryDataLists(category.children[0], name);
+    }
+  }
+
   createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     const start = new Date(dateStart.replace(/-/g, '\/'));
     const end = new Date(dateEnd.replace(/-/g, '\/'));
@@ -79,27 +109,6 @@ export class HelperService {
       }
     });
     return { level: level, yoy: yoy, ytd: ytd, c5ma: c5ma };
-  }
-
-  dataTransform(seriesObs) {
-    const observations = seriesObs;
-    const start = observations.observationStart;
-    const end = observations.observationEnd;
-    const transformations = this.getTransformations(observations);
-    const level = transformations.level;
-    const pseudoZones = [];
-    if (level.pseudoHistory) {
-      level.pseudoHistory.forEach((obs, index) => {
-        if (obs && !level.pseudoHistory[index + 1]) {
-          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-        }
-      });
-    }
-    // const seriesTable = this.createSeriesTable(dates, transformations, decimals);
-    //const chart = this.createSeriesChart(dates, transformations);
-    // const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
-    const results = { start: start, end: end };
-    return results;
   }
 
   binarySearch = (valueList, date) => {

@@ -51,7 +51,7 @@ export class PrimengMenuNavComponent implements OnInit {
           icon: 'pi pi-pw',
           items: subMenu,
           command: (event) => {
-            console.log('top level cat event', event)
+            this.navToFirstDataList(event.item, category.id)
           }
         });
       });
@@ -86,12 +86,23 @@ export class PrimengMenuNavComponent implements OnInit {
     this.headerLogo = this.logo;
   }
 
+  // navigate to Summary or first data list when clicking on a category
+  navToFirstDataList(menuItem, categoryId) {
+    if (!menuItem.items) {
+      this.navigate(categoryId, menuItem.id);
+    }
+    if (menuItem.items) {
+      return this.navToFirstDataList(menuItem.items[0], categoryId);
+    }
+  }
+
   createSubmenuItems(subcategories, categoryId) {
     let subMenu = [];
     subcategories.forEach((sub) => {
       let subMenuItem: MenuItem = {};
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
+      subMenuItem.id = sub.id;
       if (sub.children) {
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }

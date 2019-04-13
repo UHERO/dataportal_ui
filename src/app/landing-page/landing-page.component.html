@@ -16,7 +16,7 @@
 				<hr class="sublist-separator" *ngIf="data.subcategories && data.subcategories.length > 1">
 			</ng-template>
 			<ng-template ngIf [ngIf]="!portal.categoryTabs">
-				<h3 *ngIf="data.requestComplete" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
+				<h3 *ngIf="data.requestComplete" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters" *ngIf="data.requestComplete">
 				<app-geo-selector [regions]="data.regions" [selectedGeo]="data.currentGeo"

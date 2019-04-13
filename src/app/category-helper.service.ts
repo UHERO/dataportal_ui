@@ -43,7 +43,7 @@ export class CategoryHelperService {
         const cat = categories.find(category => category.id === catId);
         if (cat) {
           const categoryDataLists = cat.children;
-          const selectedDataList = dataListId ? this.findSelectedDataList(categoryDataLists, dataListId, '') : this.getCategoryDataLists(categoryDataLists[0], '');
+          const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
           this.categoryData[cacheId].selectedDataList = selectedDataList;
           this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
           if (dataListId === null) {
@@ -98,36 +98,6 @@ export class CategoryHelperService {
       });
   }
 
-  findSelectedDataList = (dataList, dataListId, dataListName) => {
-    for (let i = 0; i < dataList.length; i++) {
-      let name = dataListName || '';
-      if (dataList[i].id === dataListId) {
-        dataList[i].dataListName = `${name} ${dataList[i].name}`;
-        return dataList[i];
-      } else {
-        if (dataList[i].children && Array.isArray(dataList[i].children)) {
-          name += `${dataList[i].name} > `;
-          const selected = this.findSelectedDataList(dataList[i].children, dataListId, name);
-          if (selected) {
-            return selected;
-          }
-        }
-      }
-    }
-  }
-
-  getCategoryDataLists = (category, dataListName) => {
-    let name = dataListName || '';
-    if (!category.children) {
-      category.dataListName = `${name} ${category.name}`;
-      return category;
-    }
-    if (category.children && Array.isArray(category.children)) {
-      name += `${category.name} > `;
-      return this.getCategoryDataLists(category.children[0], name);
-    }
-  }
-
   getData(catId: any, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
       if (expandedCategory) {
@@ -138,7 +108,8 @@ export class CategoryHelperService {
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-        this.formatSeriesForDisplay(series, cacheId);
+        const displaySeries = this.getDisplaySeries(series, this.categoryData[cacheId].currentFreq.freq);
+        this.categoryData[cacheId].displaySeries = displaySeries;
         this.categoryData[cacheId].series = series;
         this.categoryData[cacheId].requestComplete = true;
       }
@@ -208,16 +179,6 @@ export class CategoryHelperService {
     return freqList;
   }
 
-  formatSeriesForDisplay(series: Array<any>, cacheId) {
-    const displaySeries = this.getDisplaySeries(series, this.categoryData[cacheId].currentFreq.freq);
-    if (displaySeries) {
-      displaySeries.forEach((serie) => {
-        serie['categoryDisplay'] = this._helper.dataTransform(serie.seriesInfo.seriesObservations)
-      });
-      this.categoryData[cacheId].displaySeries = displaySeries;
-    }
-  }
-
   setNoData(subcategory) {
     const series = [{ seriesInfo: 'No data available' }];
     subcategory.dateWrapper = <DateWrapper>{};
@@ -270,7 +231,7 @@ export class CategoryHelperService {
   getSearchData(results, cacheId, search, geo, freq) {
     if (results.observationStart && results.observationEnd) {
       const categoryDateWrapper = { firstDate: '', endDate: '' };
-      this.categoryData[cacheId].selectedCategory = 'Search: ' + search;
+      this.categoryData[cacheId].selectedCategory = { name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
@@ -280,7 +241,6 @@ export class CategoryHelperService {
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-      // this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
@@ -341,13 +301,5 @@ export class CategoryHelperService {
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq);
     return filtered.length ? filtered : null;
-  }
-
-  formatCategoryData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
-    displaySeries.forEach((series) => {
-      if (series.seriesInfo !== 'No data available') {
-        const decimals = series.decimals ? series.decimals : 1;
-      }
-    });
   }
 }

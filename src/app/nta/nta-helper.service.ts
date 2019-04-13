@@ -55,7 +55,7 @@ export class NtaHelperService {
           this.categoryData[cacheId].defaultDataList = dataListId;
         }
         const categoryDataLists = cat.children;
-        const selectedDataList = dataListId ? this.findSelectedDataList(categoryDataLists, dataListId, '') : this.getCategoryDataLists(categoryDataLists[0], '');
+        const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
         this.categoryData[cacheId].selectedDataList = selectedDataList;
         this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
         this.categoryData[cacheId].selectedCategory = cat;
@@ -72,36 +72,6 @@ export class NtaHelperService {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
     });
-  }
-
-  findSelectedDataList = (dataList, dataListId, dataListName) => {
-    for (let i = 0; i < dataList.length; i++) {
-      let name = dataListName || '';
-      if (dataList[i].id === dataListId) {
-        dataList[i].dataListName = `${name} ${dataList[i].name}`;
-        return dataList[i];
-      } else {
-        if (dataList[i].children && Array.isArray(dataList[i].children)) {
-          name += `${dataList[i].name} > `;
-          const selected = this.findSelectedDataList(dataList[i].children, dataListId, name);
-          if (selected) {
-            return selected;
-          }
-        }
-      }
-    }
-  }
-
-  getCategoryDataLists = (category, dataListName) => {
-    let name = dataListName || '';
-    if (!category.children) {
-      category.dataListName = `${name} ${category.name}`;
-      return category;
-    }
-    if (category.children && Array.isArray(category.children)) {
-      name += `${category.name} > `;
-      return this.getCategoryDataLists(category.children[0], name);
-    }
   }
 
   getSubcategoryData(category, selectedMeasure?: string) {
@@ -240,33 +210,11 @@ export class NtaHelperService {
     category.sliderDates = this._helper.getTableDates(category.dateArray);
     category.findMinMax = true;
     category.requestComplete = true;
-    /* subcategory.displaySeries.forEach((series, s) => {
-      //series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations);
-      if (s === subcategory.displaySeries.length - 1) {
-        subcategory.requestComplete = true;
-        console.log(category)
-        category.requestComplete = true;
-      }
-    }); */
     if (category.sublist) {
       category.sublist.forEach((sub) => {
         this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
       });  
     }
-  }
-
-  getGeoName(series, geoHandle: string) {
-    let geographies;
-    this._uheroAPIService.fetchGeographies().subscribe((geos) => {
-      geographies = geos;
-    },
-      (error) => {
-        this.errorMessage = error;
-      },
-      () => {
-        const geo = geographies.find(geos => geos.handle === geoHandle);
-        series.title = geo ? geo.name : geoHandle;
-      });
   }
 
   filterSeries(seriesArray: Array<any>, category, search: Boolean) {
@@ -283,7 +231,7 @@ export class NtaHelperService {
         category.dateWrapper.firstDate = this.setStartDate(category.dateWrapper, seriesObsStart);
         category.dateWrapper.endDate = this.setEndDate(category.dateWrapper, seriesObsEnd);
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations);
+        series = {};
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.title;
