@@ -131,7 +131,7 @@ export class NtaHelperService {
           const dateWrapper = <DateWrapper>{};
           this.getSearchData(catId, cacheId, dateWrapper);
           this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
-          this.categoryData[cacheId].selectedCategory = { name: 'Search: ' + catId };
+          this.categoryData[cacheId].selectedCategory = { id: catId, name: 'Search: ' + catId };
         } else {
           this.categoryData[cacheId].invalid = catId;
         }

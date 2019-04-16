@@ -5,25 +5,6 @@
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
 		<!-- <i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i> -->
 		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
-		<!-- <ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
-			<ng-template ngIf [ngIf]="search || data.requestComplete">
-				<ul class="nav content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
-					<li class="">
-						<a class="current-sub">{{sub.name}}</a>
-					</li>
-					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-							aria-expanded="false"></a>
-						<div class="dropdown-menu">
-							<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item"
-								[routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}"
-								queryParamsHandling="merge" [class.current-sub]="subInd === i">{{sub.name}}</a>
-						</div>
-					</li>
-				</ul>
-			</ng-template>
-		</ng-template>
-		<hr class="sublist-separator" *ngIf="data.sublist.length > 1"> -->
 		<div class="filters">
 			<app-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
 				[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeries($event)"

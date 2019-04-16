@@ -141,11 +141,14 @@
   }
 
   .sidebar-list, .list-item {
+    display: block;
     list-style-type: none;
     -webkit-padding-start: 1em;
     color: $primary-text;
     font-size: 0.9em;
     cursor: pointer;
+    padding: 0.5em;
+    border-top: 1px solid #E5E5E5;
   }
 
   .list-item {
@@ -176,8 +179,8 @@
     }
 
     &:hover {
-      background-color: $hover-gray;
-      color: $white;
+      background-color: #EEEEEE;
+      color: #212121;
       text-decoration: none;
     }
   }

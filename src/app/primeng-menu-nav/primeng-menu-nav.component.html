@@ -12,12 +12,9 @@
   <div id="navbar-side" class="navbar-side" [class.reveal]="reveal">
     <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
-    <hr class="mobile-divider">
     <p-panelMenu [model]="navMenuItems"></p-panelMenu>
-    <hr class="mobile-divider">
     <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
       routerLink="/help">&nbsp; About</a>
-    <hr>
     <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer"
       *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a>
   </div>

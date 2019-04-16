@@ -231,7 +231,7 @@ export class CategoryHelperService {
   getSearchData(results, cacheId, search, geo, freq) {
     if (results.observationStart && results.observationEnd) {
       const categoryDateWrapper = { firstDate: '', endDate: '' };
-      this.categoryData[cacheId].selectedCategory = { name: 'Search: ' + search };
+      this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
