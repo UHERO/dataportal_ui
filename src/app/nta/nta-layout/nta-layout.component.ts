@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../../uhero-api.service';
@@ -16,9 +16,10 @@ declare var $: any;
   templateUrl: './nta-layout.component.html',
   styleUrls: ['./nta-layout.component.scss']
 })
-export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+export class NtaLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   private sub;
   private id: number;
+  private dataListId: number;
   private routeView: string;
   private routeC5ma;
   private search = false;
@@ -34,9 +35,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   public categoryData;
   private selectedMeasure;
   private loading = false;
-  private fragment;
   private userEvent;
-  private previousHeight;
   private portalSettings;
 
   constructor(
@@ -61,6 +60,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
+      this.dataListId = this.getIdParam(params['data_list_id']);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
@@ -69,18 +69,10 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
       if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this._ntaHelper.initContent(this.id, this.selectedMeasure);
+      this.categoryData = this._ntaHelper.initContent(this.id, this.dataListId, this.selectedMeasure);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
-  }
-
-  ngAfterViewChecked() {
-    // Check height of content and scroll to anchor if fragment is in URL
-    // If true, height is changing, i.e. content still loading
-    if (this.checkContainerHeight()) {
-      this.scrollTo();
-    }
   }
 
   ngOnDestroy() {
@@ -101,44 +93,30 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     }
   }
 
-  checkContainerHeight() {
-    const contianer = $('.multi-series-container');
-    const heightDiff = (this.previousHeight !== contianer.height());
-    this.previousHeight = contianer.height();
-    return heightDiff;
-  }
-
   // Redraw series when a new measurement is selected
-  redrawSeries(event, subId) {
+  redrawSeries(event) {
     this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.m = event.name;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 10);
-    this.scrollToFragment();
   }
 
-  updatePageCounter(event, subcategory) {
-    subcategory.scrollIndex = event;
-  }
-
-  switchView(subId) {
+  switchView() {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.updateRoute(subId);
+      this.updateRoute();
     });
-    this.scrollToFragment();
   }
 
-  c5maActive(e, subId) {
+  c5maActive(e) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.c5ma = e.target.checked;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 10);
-    this.scrollToFragment();
   }
 
   changeRange(e, measurement) {
@@ -149,32 +127,11 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, AfterViewCheck
     this.displaySeries = true;
   }
 
-  // Work around for srolling to page anchor
-  scrollToFragment() {
-    setTimeout(() => {
-      this.scrollTo();
-    }, 10);
-  }
-
-  updateRoute(subId) {
+  updateRoute() {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.fragment = subId === 'search' ? null : 'id_' + subId;
+    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
-    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    this._router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
-  }
-
-  scrollTo(): void {
-    this.route.fragment.subscribe((frag) => {
-      const el = document.querySelector('#' + frag);
-      if (el) {
-        el.scrollIntoView();
-        const scrolledY = window.scrollY;
-        if (scrolledY) {
-          window.scroll(0, scrolledY - 75);
-        }
-      }
-      if (frag === 'top') { el.scrollTop; };
-    });
   }
 }

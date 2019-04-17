@@ -18,6 +18,8 @@ export class UheroApiService {
   private cachedExpanded = [];
   private cachedSelectedCategory = [];
   private cachedSelectedCategoryGeoFreq = [];
+  private cachedCategoryGeos = [];
+  private cachedCategoryFreqs = [];
   private cachedGeoSeries = [];
   private cachedObservations = [];
   private cachedSeries = [];
@@ -73,6 +75,35 @@ export class UheroApiService {
       return geos$;
     }
   }
+
+  fetchCategoryGeos(id: number): Observable<any> {
+    if (this.cachedCategoryGeos[id]) {
+      return observableOf(this.cachedCategoryGeos[id]);
+    } else {
+      let categoryGeos$ = this.http.get(`${this.baseUrl}/category/geo?id=` + id, this.httpOptions).pipe(
+        map(mapData),
+        tap(val => {
+          this.cachedCategoryGeos[id] = val;
+          categoryGeos$ = null;
+        }), );
+      return categoryGeos$;
+    }
+  }
+
+  fetchCategoryFreqs(id: number): Observable<any> {
+    if (this.cachedCategoryFreqs[id]) {
+      return observableOf(this.cachedCategoryFreqs[id]);
+    } else {
+      let categoryFreqs$ = this.http.get(`${this.baseUrl}/category/freq?id=` + id, this.httpOptions).pipe(
+        map(mapData),
+        tap(val => {
+          this.cachedCategoryFreqs[id] = val;
+          categoryFreqs$ = null;
+        }), );
+      return categoryFreqs$;
+    }
+  }
+
 
   // Gets observations for series in a (sub) category
   fetchExpanded(id: number, geo: string, freq: string): Observable<any> {

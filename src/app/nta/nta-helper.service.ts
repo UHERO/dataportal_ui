@@ -1,4 +1,4 @@
-import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
+import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { UheroApiService } from '../uhero-api.service';
@@ -15,8 +15,8 @@ export class NtaHelperService {
   private defaultFreq: string;
   private categoryData = {};
 
-  static setCacheId(category, selectedMeasure?) {
-    let id = '' + category;
+  static setCacheId(category, dataListId, selectedMeasure?) {
+    let id = '' + category + dataListId;
     if (selectedMeasure) {
       id = id + selectedMeasure;
     }
@@ -27,13 +27,13 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, selectedMeasure?: string): Observable<any> {
-    const cacheId = NtaHelperService.setCacheId(catId, selectedMeasure);
+  initContent(catId: any, dataListId: number, selectedMeasure?: string): Observable<any> {
+    const cacheId = NtaHelperService.setCacheId(catId, dataListId, selectedMeasure);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
-      this.getCategory(cacheId, catId, selectedMeasure);
+      this.getCategory(cacheId, catId, dataListId, selectedMeasure);
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
@@ -42,7 +42,7 @@ export class NtaHelperService {
     }
   }
 
-  getCategory(cacheId: string, catId: any, selectedMeasure?: string) {
+  getCategory(cacheId: string, catId: any, dataListId, selectedMeasure?: string) {
     this.categoryData[cacheId] = <CategoryData>{};
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       if (catId === null) {
@@ -50,12 +50,19 @@ export class NtaHelperService {
       }
       const cat = categories.find(category => category.id === catId);
       if (cat) {
-        const sublist = cat.children;
-        this.categoryData[cacheId].selectedCategory = cat.name;
+        if (dataListId == null) {
+          dataListId = cat.children[0].id;
+          this.categoryData[cacheId].defaultDataList = dataListId;
+        }
+        const categoryDataLists = cat.children;
+        const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
+        this.categoryData[cacheId].selectedDataList = selectedDataList;
+        this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
+        this.categoryData[cacheId].selectedCategory = cat;
         this.categoryData[cacheId].categoryId = cat.id;
         this.categoryData[cacheId].currentFreq = { freq: 'A', label: 'Annual' };
         const sublistCopy = [];
-        sublist.forEach((sub) => {
+        categoryDataLists.forEach((sub) => {
           sub.parentName = cat.name;
           sublistCopy.push(Object.assign({}, sub));
         });
@@ -68,24 +75,16 @@ export class NtaHelperService {
   }
 
   getSubcategoryData(category, selectedMeasure?: string) {
-    let subcategoryCount = category.sublist.length;
-    category.sublist.forEach((sub, index) => {
-      this._uheroAPIService.fetchCategoryMeasurements(sub.id).subscribe((measures) => {
-        sub.measurements = measures;
+    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList.id).subscribe((measures) => {
+      category.measurements = measures;
+    },
+      (error) => {
+        console.log('error fetching category measurements', error);
       },
-        (error) => {
-          this.errorMessage = error;
-        },
-        () => {
-          subcategoryCount--;
-          if (subcategoryCount === 0) {
-            category.sublist.forEach((subcategory) => {
-              this.findSelectedMeasurement(subcategory, selectedMeasure);
-            });
-            this.getSeriesData(category);
-          }
-        });
-    });
+      () => {
+        this.findSelectedMeasurement(category, selectedMeasure);
+        this.getSeriesData(category);
+      });
   }
 
   findSelectedMeasurement(sublist, selectedMeasure) {
@@ -98,23 +97,20 @@ export class NtaHelperService {
 
   // Get list of series belonging to each measurement
   getSeriesData(category) {
-    category.sublist.forEach((sub, index) => {
-      const sublistDateArray = [];
-      sub.dateWrapper = { firstDate: '', endDate: '' };
-      this._uheroAPIService.fetchMeasurementSeries(sub.currentMeasurement.id).subscribe((series) => {
-        if (series) {
-          sub.series = series;
-          this.formatCategoryData(category, sub, sublistDateArray, false);
-        }
-        sub.id = sub.id.toString();
-        if (!series) {
-          sub.noData = true;
-        }
-      },
-        (error) => {
-          this.errorMessage = error;
-        });
-    });
+    const categoryDataArray = [];
+    category.dateWrapper = { firstDate: '', endDate: '' };
+    this._uheroAPIService.fetchMeasurementSeries(category.currentMeasurement.id).subscribe((series) => {
+      if (series) {
+        category.series = series;
+        this.formatCategoryData(category, categoryDataArray, false);
+      }
+      if (!series) {
+        category.noData = true;
+      }
+    },
+      (error) => {
+        console.log('error fetching measurement series', error);
+      });
   }
 
   getSearch(cacheId, catId) {
@@ -135,7 +131,7 @@ export class NtaHelperService {
           const dateWrapper = <DateWrapper>{};
           this.getSearchData(catId, cacheId, dateWrapper);
           this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
-          this.categoryData[cacheId].selectedCategory = 'Search: ' + catId;
+          this.categoryData[cacheId].selectedCategory = { id: catId, name: 'Search: ' + catId };
         } else {
           this.categoryData[cacheId].invalid = catId;
         }
@@ -177,7 +173,10 @@ export class NtaHelperService {
               id: 'search',
               series: searchSeries
             };
-            this.formatCategoryData(category, sublist, [], true);
+            category.dateWrapper = { firstDate: '', endDate: '' };
+            category.id = 'search';
+            category.series = searchSeries
+            this.formatCategoryData(category, [], true);
             category.sublist = [sublist];
           }
         });
@@ -204,46 +203,21 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category, subcategory, subcategoryDateArray: Array<any>, search: Boolean) {
-    const dateWrapper = subcategory.dateWrapper;
-    subcategory.displaySeries = this.filterSeries(subcategory.series, subcategory, search);
-    subcategory.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
-    subcategory.sliderDates = this._helper.getTableDates(subcategory.dateArray);
-    // At most, display 12 series at a time in the multiple chart view
-    subcategory.scrollSeries = [];
-    // Default to the first set of (12) series to display
-    subcategory.scrollIndex = 0;
-    let seriesGroup = [];
-    subcategory.displaySeries.forEach((series, s) => {
-      seriesGroup.push(series);
-      if (seriesGroup.length === 12 || s === subcategory.displaySeries.length - 1) {
-        subcategory.scrollSeries.push(seriesGroup);
-        seriesGroup = [];
-      }
-      const decimals = series.decimals ? series.decimals : 1;
-      series['categoryDisplay'] = this._helper.dataTransform(series.seriesInfo.seriesObservations, subcategory.dateArray, decimals);  
-      if (s === subcategory.displaySeries.length - 1) {
-        subcategory.requestComplete = true;
-        category.requestComplete = true;
-      }
-    });
+  formatCategoryData(category, subcategoryDateArray: Array<any>, search: Boolean) {
+    const dateWrapper = category.dateWrapper;
+    category.displaySeries = this.filterSeries(category.series, category, search);
+    category.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
+    category.sliderDates = this._helper.getTableDates(category.dateArray);
+    category.findMinMax = true;
+    category.requestComplete = true;
+    if (category.sublist) {
+      category.sublist.forEach((sub) => {
+        this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
+      });  
+    }
   }
 
-  getGeoName(series, geoHandle: string) {
-    let geographies;
-    this._uheroAPIService.fetchGeographies().subscribe((geos) => {
-      geographies = geos;
-    },
-      (error) => {
-        this.errorMessage = error;
-      },
-      () => {
-        const geo = geographies.find(geos => geos.handle === geoHandle);
-        series.title = geo ? geo.name : geoHandle;
-      });
-  }
-
-  filterSeries(seriesArray: Array<any>, sublist, search: Boolean) {
+  filterSeries(seriesArray: Array<any>, category, search: Boolean) {
     const filtered = [];
     seriesArray.forEach((res) => {
       let seriesDates = [], series;
@@ -254,10 +228,10 @@ export class NtaHelperService {
       if (levelData || newLevelData) {
         const seriesObsStart = res.seriesObservations.observationStart;
         const seriesObsEnd = res.seriesObservations.observationEnd;
-        sublist.dateWrapper.firstDate = this.setStartDate(sublist.dateWrapper, seriesObsStart);
-        sublist.dateWrapper.endDate = this.setEndDate(sublist.dateWrapper, seriesObsEnd);
+        category.dateWrapper.firstDate = this.setStartDate(category.dateWrapper, seriesObsStart);
+        category.dateWrapper.endDate = this.setEndDate(category.dateWrapper, seriesObsEnd);
         seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
-        series = this._helper.dataTransform(res.seriesObservations, seriesDates, decimals);
+        series = {};
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.title;

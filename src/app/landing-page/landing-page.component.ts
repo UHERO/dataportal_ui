@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, AfterViewChecked, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { UheroApiService } from '../uhero-api.service';
@@ -17,10 +17,11 @@ declare var $: any;
   templateUrl: 'landing-page.component.html',
   styleUrls: ['landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private sub;
   private defaultCategory;
   private id: number;
+  private dataListId: number;
   private routeGeo: string;
   private routeFreq: string;
   private routeView: string;
@@ -44,9 +45,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   public currentFreq: Frequency;
   public categoryData;
   private loading = false;
-  private fragment;
   private userEvent;
-  private previousHeight;
 
   constructor(
     @Inject('portal') private portal,
@@ -72,6 +71,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
   ngAfterViewInit() {
     this.sub = this.route.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params['id']);
+      this.dataListId = this.getIdParam(params['data_list_id']);
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params['geo'];
       this.routeFreq = params['freq'];
@@ -81,24 +81,17 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
       this.routeStart = params['start'];
       this.routeEnd = params['end'];
       if (this.id) { this.queryParams.id = this.id; };
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-      this.categoryData = this.getData(this.id, this.routeGeo, this.routeFreq);
+      this.categoryData = this.getData(this.id, this.dataListId, this.routeGeo, this.routeFreq);
       this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
-  }
-
-  ngAfterViewChecked() {
-    // Check height of content and scroll to anchor if fragment is in URL
-    // If true, height is changing, i.e. content still loading
-    if (this.checkContainerHeight()) {
-      this.scrollTo();
-    }
   }
 
   ngOnDestroy() {
@@ -119,75 +112,63 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     }
   }
 
-  getData(id, geo, freq) {
+  getData(id, dataListId, geo, freq) {
     if (geo && freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, geo, freq) :
+        this._catHelper.initContent(id, dataListId, geo, freq) :
         this._catHelper.initSearch(id, geo, freq);
     }
     if (!geo && !freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id) :
+        this._catHelper.initContent(id, dataListId) :
         this._catHelper.initSearch(id);
     }
   }
 
-  checkContainerHeight() {
-    const contianer = $('.multi-series-container');
-    const heightDiff = (this.previousHeight !== contianer.height());
-    this.previousHeight = contianer.height();
-    return heightDiff;
-  }
-
   // Redraw series when a new region is selected
-  redrawSeriesGeo(event, currentFreq, subId) {
+  redrawSeriesGeo(event, currentFreq) {
     this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 20);
-    this.scrollToFragment();
   }
 
-  redrawSeriesFreq(event, currentGeo, subId) {
+  redrawSeriesFreq(event, currentGeo) {
     this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 10);
-    this.scrollToFragment();
   }
 
-  switchView(subId) {
+  switchView() {
     this.loading = true;
     this.displaySeries = false;
     setTimeout(() => {
       this.queryParams.view = this.routeView === 'table' ? 'chart' : 'table';
-      this.updateRoute(subId);
+      this.updateRoute();
     });
-    this.scrollToFragment();
   }
 
-  yoyActive(e, subId) {
+  yoyActive(e) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.yoy = e.target.checked;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 10);
-    this.scrollToFragment();
   }
 
-  ytdActive(e, subId) {
+  ytdActive(e) {
     this.loading = true;
     setTimeout(() => {
       this.queryParams.ytd = e.target.checked;
-      this.updateRoute(subId);
+      this.updateRoute();
     }, 10);
-    this.scrollToFragment();
   }
 
   changeRange(e) {
@@ -196,33 +177,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, AfterViewChe
     this.displaySeries = true;
   }
 
-  // Work around for srolling to page anchor
-  scrollToFragment() {
-    setTimeout(() => {
-      this.scrollTo();
-    }, 10);
-  }
-
-  updateRoute(subId) {
+  updateRoute() {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.fragment = subId === 'search' ? null : 'id_' + subId;
+    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
-    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge', fragment: this.fragment });
+    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;
-  }
-
-  scrollTo(): void {
-    this.route.fragment.subscribe((frag) => {
-      const el = document.querySelector('#' + frag);
-      if (el) {
-        el.scrollIntoView();
-        const scrolledY = window.scrollY;
-        if (scrolledY) {
-          window.scroll(0, scrolledY - 75);
-        }
-      }
-      if (frag === 'top') { el.scrollTop; };
-    });
   }
 }

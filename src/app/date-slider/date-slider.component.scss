@@ -1,80 +1,85 @@
 @import 'app_colors';
 
-.js-to, .js-from {
-    display: inline-block;
-    width: 85px;
-    vertical-align: bottom;
-    font-size: 0.85em;
-    text-align: center;
-}
+:host {
+  ::ng-deep {
+    .js-to, .js-from {
+      display: inline-block;
+      width: 85px;
+      vertical-align: bottom;
+      font-size: 0.85em;
+      text-align: center;
+    }
 
-.visuallyhidden {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-}
+    .visuallyhidden {
+      border: 0;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
 
-.slider-container {
-    display: inline-block;
-    width: 150px;
-    margin: 0 20px;
-    vertical-align: bottom;
+    .slider-container {
+      display: inline-block;
+      width: 150px;
+      margin: 0 20px;
+      vertical-align: bottom;
 
-    @media (max-width: 767px) {
+      @media (max-width: 767px) {
         width: 150px;
         margin: 0 5px;
+      }
     }
-}
 
-.irs-line-mid, .irs-line-left, .irs-line-right,
-.irs-bar, .irs-bar-edge, .irs-slider {
-    background: url(../../sprite-skin-nice2.png) repeat-x;
-    position: absolute;
-}
+    .irs-line-mid, .irs-line-left, .irs-line-right,
+    .irs-bar, .irs-bar-edge, .irs-slider {
+      background: url(../../sprite-skin-nice2.png) repeat-x;
+      position: absolute;
+    }
 
-.irs--round .irs-handle {
-    width: 18px;
-    height: 18px;
-    border: 2px solid $primary;
-}
+    .irs--round .irs-handle {
+      width: 18px;
+      height: 18px;
+      border: 2px solid $primary;
+      z-index: 0;
+    }
 
-.irs-slider.from, .irs-slider.to {
-    background-position: 0 -120px;
-}
+    .irs-slider.from, .irs-slider.to {
+      background-position: 0 -120px;
+    }
 
-.irs-slider.state_hover, .irs-slider:hover {
-    background-position: 0 -150px;
-}
+    .irs-slider.state_hover, .irs-slider:hover {
+      background-position: 0 -150px;
+    }
 
-.irs-line-mid {
-    background-position: 0 0;
-}
+    .irs-line-mid {
+      background-position: 0 0;
+    }
 
-.irs-line-left {
-    background-position: 0 -30px;
-}
+    .irs-line-left {
+      background-position: 0 -30px;
+    }
 
-.irs-line-right {
-    background-position: 100% -30px;
-}
+    .irs-line-right {
+      background-position: 100% -30px;
+    }
 
-.irs-bar {
-    background-position: 0 -60px;
-}
+    .irs-bar {
+      background-position: 0 -60px;
+    }
 
-.irs-slider, .irs-slider.type_last {
-    z-index: 0;
-}
+    .irs-slider, .irs-slider.type_last {
+      z-index: 0;
+    }
 
-.irs-from, .irs-to, .irs-single {
-    background: none;
-    border-radius: 0px;
-    font-size: 12px;
-    color: $primary-text;
-    padding: 1px 2px;
+    .irs-from, .irs-to, .irs-single {
+      background: none;
+      border-radius: 0px;
+      font-size: 12px;
+      color: $primary-text;
+      padding: 1px 2px;
+    }
+  }
 }

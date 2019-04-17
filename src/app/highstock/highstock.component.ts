@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -22,7 +22,6 @@ exportCSV(Highcharts);
   templateUrl: './highstock.component.html',
   // Use styles defined in analyzer-highstock component
   styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
-  encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;
@@ -265,6 +264,7 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.tooltip = {
       borderWidth: 0,
       shadow: false,
+      followPointer: true,
       formatter: function (args) {
         return formatTooltip(this.points, this.x, pseudoZones, decimals, freq)
       }

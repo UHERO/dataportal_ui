@@ -7,8 +7,8 @@ export class DataPortalSettingsService {
   public dataPortalSettings = {
     nta: {
       catTable: {
-        portalSource: 'National Transfer Accounts (NTA) Dataportal: http://data.uhero.hawaii.edu/nta \n ',
-        portalLink: 'http://data.uhero.hawaii.edu/nta/#/category?id='
+        portalSource: 'National Transfer Accounts (NTA) Dataportal: https://data.uhero.hawaii.edu/nta \n ',
+        portalLink: 'https://data.uhero.hawaii.edu/nta/#/category?id='
       },
       highcharts: {
         seriesTotal: 1,
@@ -23,9 +23,9 @@ export class DataPortalSettingsService {
       highstock: {
         credits: 'data.uhero.hawaii.edu/nta',
         labels: {
-          seriesLink: 'http://data.uhero.hawaii.edu/nta/#/series?id=',
+          seriesLink: 'https://data.uhero.hawaii.edu/nta/#/series?id=',
           portal: 'National Transfer Accounts (NTA)',
-          portalLink: 'NTA Dataportal: http://data.uhero.hawaii.edu/nta'
+          portalLink: 'NTA Dataportal: https://data.uhero.hawaii.edu/nta'
         },
         series0Name: 'level',
         series0Type: 'line',
@@ -52,8 +52,8 @@ export class DataPortalSettingsService {
     },
     uhero: {
       catTable: {
-        portalSource: 'The University of Hawaii Economic Research Organization (UHERO) Dataportal: http://data.uhero.hawaii.edu/ \n ',
-        portalLink: 'http://data.uhero.hawaii.edu/#/category?id='
+        portalSource: 'The University of Hawaii Economic Research Organization (UHERO) Dataportal: https://data.uhero.hawaii.edu/ \n ',
+        portalLink: 'https://data.uhero.hawaii.edu/#/category?id='
       },
       highcharts: {
         seriesTotal: 2,
@@ -68,9 +68,9 @@ export class DataPortalSettingsService {
       highstock: {
         credits: 'data.uhero.hawaii.edu',
         labels: {
-          seriesLink: 'http://data.uhero.hawaii.edu/#/series?id=',
+          seriesLink: 'https://data.uhero.hawaii.edu/#/series?id=',
           portal: 'The University of Hawaii Economic Research Organization (UHERO)',
-          portalLink: 'Data Portal: http://data.uhero.hawaii.edu/'
+          portalLink: 'Data Portal: https://data.uhero.hawaii.edu/'
         },
         series0Name: 'level',
         series0Type: 'line',
@@ -100,8 +100,8 @@ export class DataPortalSettingsService {
     },
     coh: {
       catTable: {
-        portalSource: 'County of Hawaii: http://data.uhero.hawaii.edu/coh \n ',
-        portalLink: 'http://data.uhero.hawaii.edu/coh/#/category?id='
+        portalSource: 'County of Hawaii: https://data.uhero.hawaii.edu/coh \n ',
+        portalLink: 'https://data.uhero.hawaii.edu/coh/#/category?id='
       },
       highcharts: {
         seriesTotal: 2,
@@ -116,9 +116,9 @@ export class DataPortalSettingsService {
       highstock: {
         credits: 'data.uhero.hawaii.edu',
         labels: {
-          seriesLink: 'http://data.uhero.hawaii.edu/coh/#/series?id=',
+          seriesLink: 'https://data.uhero.hawaii.edu/coh/#/series?id=',
           portal: 'County of Hawaii',
-          portalLink: 'County of Hawaii Data Portal: http://data.uhero.hawaii.edu/coh'
+          portalLink: 'County of Hawaii Data Portal: https://data.uhero.hawaii.edu/coh'
         },
         series0Name: 'level',
         series0Type: 'line',

@@ -13,7 +13,6 @@ import { AppComponent } from '../app.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
 import { HeaderComponent } from '../header/header.component';
 import { SingleSeriesComponent } from '../single-series/single-series.component';
-import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
 import { HighchartComponent } from '../highchart/highchart.component';
 import { FreqSelectorComponent } from '../freq-selector/freq-selector.component';
 import { GeoSelectorComponent } from '../geo-selector/geo-selector.component';
@@ -35,6 +34,10 @@ import { AnalyzerTableRendererComponent } from '../analyzer-table-renderer/analy
 import { AnalyzerStatsRendererComponent } from '../analyzer-stats-renderer/analyzer-stats-renderer.component';
 import { AnalyzerInteractionsEditorComponent } from '../analyzer-interactions-editor/analyzer-interactions-editor.component';
 import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-renderer/analyzer-interactions-renderer.component';
+import { PrimengMenuNavComponent } from '../primeng-menu-nav/primeng-menu-nav.component';
+import { PanelMenuModule } from 'primeng/panelmenu';
+import { PaginatorModule } from 'primeng/paginator';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,6 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     LandingPageComponent,
     HeaderComponent,
     SingleSeriesComponent,
-    SidebarNavComponent,
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
@@ -62,7 +64,8 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     AnalyzerTableRendererComponent,
     AnalyzerStatsRendererComponent,
     AnalyzerInteractionsEditorComponent,
-    AnalyzerInteractionsRendererComponent
+    AnalyzerInteractionsRendererComponent,
+    PrimengMenuNavComponent
   ],
   imports: [
     CommonModule,
@@ -74,6 +77,9 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     RouterModule,
     DataTableModule, SharedModule,
     TableModule,
+    PanelMenuModule,
+    PaginatorModule,
+    BrowserAnimationsModule,
     RecaptchaModule.forRoot(),
     AgGridModule.withComponents([
       CategoryTableRendererComponent,
@@ -88,7 +94,6 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     CommonModule,
     HeaderComponent,
     SingleSeriesComponent,
-    SidebarNavComponent,
     HighchartComponent,
     FreqSelectorComponent,
     HighstockComponent,
@@ -100,7 +105,8 @@ import { AnalyzerInteractionsRendererComponent } from '../analyzer-interactions-
     CategoryTableViewComponent,
     CategoryTableRendererComponent,
     AnalyzerTableRendererComponent,
-    AnalyzerStatsRendererComponent
+    AnalyzerStatsRendererComponent,
+    PrimengMenuNavComponent
   ]
 })
 export class Shared { }

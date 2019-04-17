@@ -1,4 +1,4 @@
-import {forkJoin as observableForkJoin, of as observableOf,  Observable } from 'rxjs';
+import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 
@@ -13,16 +13,10 @@ import { DateWrapper } from './date-wrapper';
 export class CategoryHelperService {
   private errorMessage: string;
   // Variables for geo and freq selectors
-  private defaults;
-  private defaultFreq;
-  private defaultGeo;
   private categoryData = {};
-  private categoryDates = [];
-  private seriesDates = [];
-  private series = [];
 
-  static setCacheId(category, routeGeo, routeFreq) {
-    let id = '' + category;
+  static setCacheId(category, routeGeo, routeFreq, dataList?) {
+    let id = `category${category}list${dataList}`;
     if (routeGeo) {
       id = id + routeGeo;
     }
@@ -36,8 +30,8 @@ export class CategoryHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, routeGeo?: string, routeFreq?: string): Observable<any> {
-    const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq);
+  initContent(catId: any, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+    const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     } else {
@@ -48,163 +42,141 @@ export class CategoryHelperService {
         }
         const cat = categories.find(category => category.id === catId);
         if (cat) {
-          const selectedCategory = cat.name;
-          const sublist = cat.children;
-          this.defaultFreq = cat.defaults ? cat.defaults.freq : '';
-          this.defaultGeo = cat.defaults ? cat.defaults.geo : '';
-          this.categoryData[cacheId].selectedCategory = selectedCategory;
-          const sublistCopy = [];
-          sublist.forEach((sub) => {
-            sublistCopy.push(Object.assign({}, sub));
-          });
-          this.categoryData[cacheId].subcategories = sublistCopy;
-          if (routeGeo && routeFreq) {
-            this.checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId);
+          const categoryDataLists = cat.children;
+          const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
+          this.categoryData[cacheId].selectedDataList = selectedDataList;
+          this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
+          if (dataListId === null) {
+            this.categoryData[cacheId].defaultDataList = selectedDataList.id;
           }
-          if (!routeGeo || !routeFreq) {
-            this.getData(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
-          }
+          this.categoryData[cacheId].selectedCategoryId = cat.id;
+          this.categoryData[cacheId].selectedCategory = cat;
+          this.categoryData[cacheId].subcategories = categoryDataLists;
+          this.getDataListGeos(catId, selectedDataList, cacheId, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
+          this.categoryData[cacheId].requestComplete = true;
         }
       });
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
-  checkRouteGeoAndFreq(catId, routeGeo, routeFreq, cacheId) {
-    let routeGeoExists, routeFreqExists, categoryData;
-    this._uheroAPIService.fetchPackageCategory(catId, routeGeo, routeFreq).subscribe((data) => {
-      categoryData = data;
-      const subcategories = data.categories.slice(0, data.categories.length - 1);
-      const regions = this.getUniqueRegionsList(subcategories);
-      const frequencies = this.getUniqueFreqsList(subcategories);
-      routeGeoExists = regions.find(region => region.handle === routeGeo);
-      routeFreqExists = frequencies.find(frequency => frequency.freq === routeFreq);
+  getDataListGeos(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+    this._uheroAPIService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
+      this.categoryData[cacheId].regions = geos;
     },
       (error) => {
-        console.log('check route error', error);
+        console.log('check category geos error', error);
       },
       () => {
+        this.getDataListFreqs(catId, dataList, cacheId, routeGeo, routeFreq);
+      });
+  }
+
+  getDataListFreqs(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+    this._uheroAPIService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
+      this.categoryData[cacheId].frequencies = freqs;
+    },
+      (error) => {
+        console.log('check category freqs error', error);
+      },
+      () => {
+        let routeGeoExists, routeFreqExists;
+        if (routeGeo && routeFreq) {
+          routeGeoExists = this.categoryData[cacheId].regions.find(region => region.handle === routeGeo);
+          routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
+        }
         if (routeGeoExists && routeFreqExists) {
-          this.getData(catId, routeGeo, routeFreq, cacheId);
+          this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
         }
         if (!routeGeoExists || !routeFreqExists) {
-          // If geo/freq specified in route does not exist in a category, get category data using its default geo/freq
-          this.getData(catId, this.defaultGeo.handle, this.defaultFreq.freq, cacheId);
+          const defaultFreq = dataList.defaults && dataList.defaults.freq ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
+          const defaultGeo = dataList.defaults && dataList.defaults.geo ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
+          this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
         }
       });
   }
 
-  getData(catId: any, geo: string, freq: string, cacheId: string) {
-    this._uheroAPIService.fetchPackageCategory(catId, geo, freq).subscribe((categoryData) => {
-      this.categoryData[cacheId].results = categoryData;
-      const subcats = categoryData.categories.slice(0, categoryData.categories.length - 1);
-      // Merge subcats with original list of categories from /category response
-      const sublistCopy = [];
-      let navIndent = false;
-      subcats.forEach((sub) => {
-        // Indent subcategory in sidebar navigation if category follows a header
-        navIndent = !navIndent ? sub.isHeader : navIndent;
-        if (navIndent) {
-          sub.navIndent = !sub.isHeader ? true : false;
-        }
-        const subMatch = this.categoryData[cacheId].subcategories.find(s => s.id === sub.id);
-        sublistCopy.push(Object.assign({}, sub, subMatch));
+  getData(catId: any, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
+    this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
+      if (expandedCategory) {
+        const series = expandedCategory;
+        const dates = this.setCategoryDates(series, freq);
+        this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
+        this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
+        this.categoryData[cacheId].categoryDates = dates.categoryDates;
+        this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+        this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
+        const displaySeries = this.getDisplaySeries(series, this.categoryData[cacheId].currentFreq.freq);
+        this.categoryData[cacheId].displaySeries = displaySeries;
+        this.categoryData[cacheId].series = series;
+        this.categoryData[cacheId].requestComplete = true;
+      }
+      if (!expandedCategory) {
+        this.categoryData[cacheId].requestComplete = true;
+        this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+        this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
+        this.categoryData[cacheId].noData = true;
+      }
+      this.categoryData[cacheId].subcategories.forEach((sub) => {
+        this.getSiblingData(sub, catId, routeGeo, routeFreq);
       });
-      this.categoryData[cacheId].subcategories = sublistCopy;
-      this.categoryData[cacheId].regions = this.getUniqueRegionsList(this.categoryData[cacheId].subcategories);
-      this.categoryData[cacheId].frequencies = this.getUniqueFreqsList(this.categoryData[cacheId].subcategories);
-      this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
-      this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-      const dates = this.setCategoryDates(this.categoryData[cacheId].subcategories, this.categoryData[cacheId].currentGeo, this.categoryData[cacheId].currentFreq, cacheId);
-      this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
-      this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
-      this.categoryData[cacheId].categoryDates = dates.categoryDates;
-      this.formatSeriesForDisplay(this.categoryData[cacheId].subcategories, cacheId);
     });
   }
 
-  getUniqueRegionsList(subcategories: Array<any>) {
-    const geoArray = [];
-    subcategories.forEach((sub) => {
-      if (sub.geos) {
-        sub.geos.forEach((geo) => {
-          const geoExist = geoArray.find(g => g.handle === geo.handle);
-          if (!geoExist) {
-            geoArray.push(geo);
-          }
-        });
-      }
-    });
-    return geoArray;
+  getSiblingData(sub, catId, routeGeo, routeFreq) {
+    if (!sub.children) {
+      this.initContent(catId, sub.id, routeGeo, routeFreq);  
+    }
+    if (sub.children) {
+      sub.children.forEach((s) => {
+        this.getSiblingData(s, catId, routeGeo, routeFreq);
+      });
+    }
   }
 
-  getUniqueFreqsList(subcategories: Array<any>) {
-    const freqArray = [];
-    subcategories.forEach((sub) => {
-      if (sub.freqs) {
-        sub.freqs.forEach((freq) => {
-          const freqExist = freqArray.find(f => f.freq === freq.freq);
-          if (!freqExist) {
-            freqArray.push(freq);
-          }
-        });
-      }
-    });
-    return freqArray;
-  }
-
-  formatSeriesForDisplay(subcategories: Array<any>, cacheId) {
-    subcategories.forEach((sub) => {
-      sub.requestComplete = false;
-      // sublist id used as anchor fragments in landing-page component, fragment expects a string
-      sub.id = sub.id.toString();
-      if (sub.series) {
-        const displaySeries = this.getDisplaySeries(sub.series, this.categoryData[cacheId].currentFreq.freq);
-        if (displaySeries) {
-          sub.displaySeries = displaySeries;
-          sub.noData = false;
-          sub.requestComplete = true;
-        }
-        if (!displaySeries) {
-          this.setNoData(sub);
-        }
-      }
-      if (!sub.series && !sub.isHeader) {
-        this.setNoData(sub);
-      }
-      if (sub.isHeader) {
-        sub.requestComplete = true;
-      }
-    });
-  }
-
-  setCategoryDates(sublist, currentGeo, currentFreq, cacheId) {
+  setCategoryDates = (series: Array<any>, currentFreq: string) => {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     const categoryDateArray = [];
-    // Check subcategories for the earliest/latest start and end dates
+    // Check series for the earliest/latest start and end dates
     // Used to create array of dates for enitre category
-    sublist.forEach((sub) => {
-      if (!sub.geoFreqs && sub.current) {
-        let start, end;
-        if (sub.current.geo === currentGeo.hanlde && sub.current.freq === currentFreq.freq) {
-          start = sub.current.observationStart.substr(0, 10);
-          end = sub.current.observationEnd.substr(0, 10);
-        }
-        const freq = sub.freqs.find(f => f.freq === currentFreq.freq);
-        start = freq ? freq.observationStart.substr(0, 10) : sub.freqs[0].observationStart.substr(0, 10);
-        end = freq ? freq.observationEnd.substr(0, 10) : sub.freqs[0].observationEnd.substr(0, 10);
-        if (start < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-          categoryDateWrapper.firstDate = start;
-        }
-        if (end > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-          categoryDateWrapper.endDate = end;
-        }
+    series.forEach((s) => {
+      if (categoryDateWrapper.endDate === '' || s.seriesObservations.observationEnd > categoryDateWrapper.endDate) {
+        categoryDateWrapper.endDate = s.seriesObservations.observationEnd;
+      }
+      if (categoryDateWrapper.firstDate === '' || s.seriesObservations.observationStart < categoryDateWrapper.firstDate) {
+        categoryDateWrapper.firstDate = s.seriesObservations.observationStart;
       }
     });
-    this._helper.createDateArray(categoryDateWrapper.firstDate, categoryDateWrapper.endDate, currentFreq.freq, categoryDateArray);
+    this._helper.createDateArray(categoryDateWrapper.firstDate, categoryDateWrapper.endDate, currentFreq, categoryDateArray);
     return { categoryDateWrapper: categoryDateWrapper, categoryDates: categoryDateArray };
+  }
+
+  getUniqueRegionList = (series: Array<any>) => {
+    const regionList = [];
+    series.forEach((s) => {
+      s.geos.forEach((geo) => {
+        const regionExists = regionList.find(region => region.handle === geo.handle);
+        if (!regionExists) {
+          regionList.push(geo);
+        }
+      });
+    });
+    return regionList;
+  }
+
+  getUniqueFrequencyList = (series: Array<any>) => {
+    const freqList = [];
+    series.forEach((s) => {
+      s.freqs.forEach((freq) => {
+        const freqExists = freqList.find(frequency => frequency.freq === freq.freq);
+        if (!freqExists) {
+          freqList.push(freq);
+        }
+      });
+    });
+    return freqList;
   }
 
   setNoData(subcategory) {
@@ -259,28 +231,19 @@ export class CategoryHelperService {
   getSearchData(results, cacheId, search, geo, freq) {
     if (results.observationStart && results.observationEnd) {
       const categoryDateWrapper = { firstDate: '', endDate: '' };
-      this.categoryData[cacheId].selectedCategory = 'Search: ' + search;
+      this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
       const displaySeries = this.getDisplaySeries(results.series, freq);
-      const sublist = {
-        id: 'search',
-        parentName: 'Search',
-        name: search,
-        displaySeries: displaySeries,
-        requestComplete: false
-      };
+      this.categoryData[cacheId].displaySeries = displaySeries;
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
-      this.formatCategoryData(displaySeries, categoryDateArray, catWrapper);
-      this.categoryData[cacheId].subcategories = [sublist];
       this.categoryData[cacheId].categoryDateWrapper = categoryDateWrapper;
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
-      sublist.requestComplete = true;
     }
     if (!results.observationStart || !results.observationEnd) {
       this.categoryData[cacheId].invalid = search;
@@ -338,13 +301,5 @@ export class CategoryHelperService {
     // Filter out series that do not have level data
     const filtered = this.filterSeriesResults(displaySeries, freq);
     return filtered.length ? filtered : null;
-  }
-
-  formatCategoryData(displaySeries: Array<any>, dateArray: Array<any>, dateWrapper: DateWrapper) {
-    displaySeries.forEach((series) => {
-      if (series.seriesInfo !== 'No data available') {
-        const decimals = series.decimals ? series.decimals : 1;
-      }
-    });
   }
 }

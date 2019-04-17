@@ -12,48 +12,52 @@ ul.available-geos, ul.available-freqs {
   }
 }
 
-.ag-pinned-left-header {
-  .ag-header-cell-text {
-    display: none;
-  }
-}
+:host {
+  ::ng-deep {
+    .ag-pinned-left-header {
+      .ag-header-cell-text {
+        display: none;
+      }
+    }
 
-.ag-body-container.ag-layout-auto-height {
-  display: block;
-}
+    .ag-body-container.ag-layout-auto-height {
+      display: block;
+    }
 
-.ag-root-wrapper {
-  margin-bottom: 40px;
+    .ag-root-wrapper {
+      margin-bottom: 20px;
 
-  @media (min-width: 768px) {
-    margin-top: 10px;
-  }
+      @media (min-width: 768px) {
+        margin-top: 10px;
+      }
 
-  @media (max-width: 767px) {
-    margin-top: 50px;
-  }
-}
+      @media (max-width: 767px) {
+        margin-top: 50px;
+      }
+    }
 
-.ag-cell {
-  direction: ltr;
-  text-align: right;
-}
+    .ag-cell {
+      direction: ltr;
+      text-align: right;
+    }
 
-.ag-cell-last-left-pinned {
-  text-align: left;
-}
+    .ag-cell-last-left-pinned {
+      text-align: left;
+    }
 
-.csv-export-button {
-  display: inline-block;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: $primary;
-  text-decoration: none;
-  font-size: 0.85em;
+    .csv-export-button {
+      display: inline-block;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $primary;
+      text-decoration: none;
+      font-size: 0.85em;
   
-  .material-icons {
-      font-size: 18px;
-      vertical-align: middle;
+      .material-icons {
+        font-size: 18px;
+        vertical-align: middle;
+      }
+    }
   }
 }

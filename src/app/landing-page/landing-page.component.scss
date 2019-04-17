@@ -3,6 +3,7 @@
 .multi-series-container {
   vertical-align: top;
   min-height: 100%;
+  margin-top: 65px;
   
   .fa-spinner {
     color: $primary;
@@ -88,16 +89,24 @@
   }
 
   .selected-category {
-    display: inline-block;
+    display: block;
     color: $primary;
     font-size: 1.4em;
-    margin: 0px;
-    vertical-align: middle;
     text-transform: capitalize;
+    margin: 0;
 
     @media (min-width: 768px) {
-      display: none;
+      //display: none;
     }
+  }
+
+  .selected-data-list {
+    display: block;
+    color: $primary;
+    font-size: 0.9em;
+    font-weight: 100;
+    margin: 10px 0 0 0;
+    text-transform: capitalize;
   }
 
   .search-term {
@@ -154,11 +163,11 @@
     margin-top: 10px;
   }
 
-  @media (min-width: 768px) {
-    margin-top: 70px;
+  /* @media (min-width: 768px) {
+    margin-top: 55px;
   }
 
   @media (max-width: 767px) {
     margin-top: 50px;
-  }
+  } */
 }

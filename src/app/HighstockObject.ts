@@ -92,6 +92,7 @@ export interface HighstockObject {
   tooltip: {
     borderWidth: number,
     shadow: false,
+    followPointer: boolean,
     shared?: boolean,
     formatter: (args: any) => any
   },

@@ -1,4 +1,4 @@
-import { Component, Inject, OnChanges, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRendererComponent } from '../category-table-renderer/category-table-renderer.component';
 import { AnalyzerService } from '../analyzer.service';
@@ -6,12 +6,13 @@ import { AnalyzerService } from '../analyzer.service';
 @Component({
   selector: 'app-category-table-view',
   templateUrl: './category-table-view.component.html',
-  styleUrls: ['./category-table-view.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./category-table-view.component.scss']
 })
 export class CategoryTableViewComponent implements OnChanges {
   @Input() data;
   @Input() sublist;
+  @Input() selectedCategory;
+  @Input() selectedDataList;
   @Input() freq;
   @Input() geo;
   @Input() tableId;
@@ -30,6 +31,13 @@ export class CategoryTableViewComponent implements OnChanges {
   private columnDefs;
   private rows;
   private frameworkComponents;
+  paginationSizeOptions: number[] = [];
+  selectedPaginationSize;
+  totalPages: number;
+  totalRows: number;
+  paginationSize: number;
+  disablePrevious: boolean;
+  disableNext: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -50,7 +58,7 @@ export class CategoryTableViewComponent implements OnChanges {
           series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.formatLvlData(series, level, this.subcatIndex, this.sublist.parentId);
+          const seriesData = this.selectedDataList ? this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) : this.formatLvlData(series, level, this.subcatIndex, null);
           this.rows.push(seriesData);
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
@@ -77,7 +85,7 @@ export class CategoryTableViewComponent implements OnChanges {
       pinned: 'left',
       width: 275,
       cellRenderer: "categoryTableRenderer",
-      tooltip: function (params) {
+      tooltipValueGetter: function (params) {
         return params.value;
       }
     });
@@ -113,7 +121,7 @@ export class CategoryTableViewComponent implements OnChanges {
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
-      subcatIndex: subcatIndex,
+      //subcatIndex: subcatIndex,
       categoryId: parentId
     }
     dates.forEach((d, index) => {
@@ -157,11 +165,11 @@ export class CategoryTableViewComponent implements OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    const parentName = this.sublist && this.sublist.parentName ? this.sublist.parentName + ' - ' : '';
-    const sublistName = this.sublist ? this.sublist.name : '';
+    const parentName = this.selectedCategory ? this.selectedCategory.name + ' - ' : '';
+    const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
     const geoName = this.geo ? this.geo.name + ' - ' : '';
-    const catId = this.sublist ? this.sublist.parentId : '';
-    const tableId = this.tableId;
+    const catId = this.selectedCategory ? this.selectedCategory.id : '';
+    const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
@@ -170,8 +178,8 @@ export class CategoryTableViewComponent implements OnChanges {
       fileName: sublistName,
       customHeader: this.portalSettings.catTable.portalSource +
         parentName + sublistName + ' (' + geoName + this.freq + ')' +
-      ': ' + this.portalSettings.catTable.portalLink + catId + '&view=table#' + tableId +
-      '\n\n'
+        ': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table' +
+        '\n\n'
     }
     this.gridApi.exportDataAsCsv(params);
   }
@@ -179,5 +187,4 @@ export class CategoryTableViewComponent implements OnChanges {
   onGridReady = (params) => {
     this.gridApi = params.api;
   }
-
 }

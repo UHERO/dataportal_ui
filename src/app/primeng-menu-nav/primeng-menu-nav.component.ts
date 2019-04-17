@@ -3,23 +3,23 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { UheroApiService } from '../uhero-api.service';
 import { HelperService } from '../helper.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
-  selector: 'app-sidebar-nav',
-  templateUrl: './sidebar-nav.component.html',
-  styleUrls: ['./sidebar-nav.component.scss']
+  selector: 'app-primeng-menu-nav',
+  templateUrl: './primeng-menu-nav.component.html',
+  styleUrls: ['./primeng-menu-nav.component.scss']
 })
-export class SidebarNavComponent implements OnInit {
+export class PrimengMenuNavComponent implements OnInit {
   public categories;
   private errorMessage: string;
   public reveal = false;
   public overlay = false;
   public selectedCategory: any;
-  private id: number;
+  private id: string;
   private view: string;
   private yoy: string;
   private ytd: string;
-  private fragment;
   private loading;
   public headerLogo;
   analyzerSeries;
@@ -27,9 +27,11 @@ export class SidebarNavComponent implements OnInit {
   private packageCatData;
   private expand = true;
 
+  navMenuItems: MenuItem[];
+
   constructor(
     @Inject('logo') private logo,
-    @Inject('navigation') private navSettings,
+    //@Inject('navigation') private navSettings,
     private _uheroAPIService: UheroApiService,
     private _helperService: HelperService,
     private _analyzerService: AnalyzerService,
@@ -40,6 +42,19 @@ export class SidebarNavComponent implements OnInit {
   ngOnInit() {
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       this.categories = categories;
+      this.navMenuItems = [];
+      categories.forEach((category) => {
+        let subMenu = this.createSubmenuItems(category.children, category.id);
+        this.navMenuItems.push({
+          id: '' + category.id,
+          label: category.name,
+          icon: 'pi pi-pw',
+          items: subMenu,
+          command: (event) => {
+            this.navToFirstDataList(event.item, category.id)
+          }
+        });
+      });
     },
       (error) => {
         console.log('error', error);
@@ -51,25 +66,56 @@ export class SidebarNavComponent implements OnInit {
           this.view = params['view'] ? params['view'] : 'chart';
           this.yoy = params['yoy'] ? params['yoy'] : 'false';
           this.ytd = params['ytd'] ? params['ytd'] : 'false';
-          this.selectedCategory = this.findSelectedCategory(this.id);
-        });    
+          this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this._router.url);
+          this.navMenuItems.forEach((item) => {
+            if (this.id) {
+              item.expanded = item.id === this.id ? true : false;
+            }
+            if (!this.id && this.selectedCategory !== 'analyzer' && this.selectedCategory !== 'help') {
+              item.expanded = +item.id === this.defaultCategory ? true : false; 
+            }
+          });
+        });
       });
     this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        const helpUrl = event.url === '/help';
-        const analyzerUrl = event.url.substr(0, 9) === '/analyzer';
-        this.selectedCategory = this.checkRoute(this.id, helpUrl, analyzerUrl);
+        this.selectedCategory = this.checkRoute(this.id, event.url);
       }
     });
-    this._helperService.getCatData().subscribe(data => {
-      this.packageCatData = data;
-    });
-    this.route.fragment.subscribe((frag) => {
-      this.fragment = frag;
-    })
     this.analyzerSeries = this._analyzerService.analyzerSeries;
     this.headerLogo = this.logo;
   }
+
+  // navigate to Summary or first data list when clicking on a category
+  navToFirstDataList(menuItem, categoryId) {
+    if (!menuItem.items) {
+      this.navigate(categoryId, menuItem.id);
+    }
+    if (menuItem.items) {
+      return this.navToFirstDataList(menuItem.items[0], categoryId);
+    }
+  }
+
+  createSubmenuItems(subcategories, categoryId) {
+    let subMenu = [];
+    subcategories.forEach((sub) => {
+      let subMenuItem: MenuItem = {};
+      subMenuItem.label = sub.name;
+      subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
+      subMenuItem.id = sub.id;
+      if (sub.children) {
+        subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
+      }
+      if (!sub.children) {
+        subMenuItem.command = (event) => {
+          this.navigate(categoryId, sub.id)
+        }
+      }
+      subMenu.push(subMenuItem)
+    });
+    return subMenu;
+  }
+
 
   findSelectedCategory(id) {
     if (id === undefined) {
@@ -83,11 +129,11 @@ export class SidebarNavComponent implements OnInit {
     }
   }
 
-  checkRoute(id, help, analyzer) {
-    if (help) {
+  checkRoute(id, url) {
+    if (url.includes('/help')) {
       return 'help';
     }
-    if (analyzer) {
+    if (url.includes('/analyzer')) {
       return 'analyzer';
     }
     return this.findSelectedCategory(id);
@@ -104,6 +150,7 @@ export class SidebarNavComponent implements OnInit {
     setTimeout(() => {
       const catQParams = {
         id: catId,
+        data_list_id: subId,
         start: null,
         end: null,
         analyzerSeries: null,
@@ -113,23 +160,13 @@ export class SidebarNavComponent implements OnInit {
         geography: null
       };
       if (subId) {
-        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge', fragment: 'id_' + subId });
+        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       if (!subId) {
         this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       this.loading = false;
     }, 15);
-  }
-
-  mobileMenuToggle(): void {
-    this.reveal = this.reveal === false ? true : false;
-    this.overlay = this.overlay === false ? true : false;
-  }
-
-  toggleExpand(event) {
-    this.expand = this.expand ? false : true;
-    event.stopImmediatePropagation();
   }
 
   onSearch(event) {
@@ -146,4 +183,8 @@ export class SidebarNavComponent implements OnInit {
     this._router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
+  mobileMenuToggle(): void {
+    this.reveal = this.reveal === false ? true : false;
+    this.overlay = this.overlay === false ? true : false;
+  }
 }

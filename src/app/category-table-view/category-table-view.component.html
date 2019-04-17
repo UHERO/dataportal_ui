@@ -1,22 +1,12 @@
 <ng-template ngIf [ngIf]="noSeries">
-  <p *ngIf="noSeries && (sublist.freqs || sublist.geos)" class="no-data">Data Available for:</p>
-  <ul *ngIf="sublist.geos" class="available-geos">
-    <li *ngFor="let geo of sublist.geos">
-      {{geo.shortName}}
-    </li>
-  </ul>
-  <ul *ngIf="sublist.freqs && !sublist.geos" class="available-freqs">
-    <li *ngFor="let freq of sublist.freqs">
-      {{freq.label}}
-    </li>
-  </ul>
-  <p *ngIf="noSeries && !sublist.freqs && !sublist.geos" class="no-data">No data available</p>
+  <p *ngIf="noSeries" class="no-data">No data available for current selection.</p>
 </ng-template>
 <ng-template ngIf [ngIf]="!noSeries">
   <button class="csv-export-button" (click)="onExport()">Download CSV
     <i class="far fa-file-excel"></i>
   </button>
-  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
-    [frameworkComponents]="frameworkComponents" [enableRtl]="true" (gridReady)="onGridReady($event)">
+  <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs"
+    domLayout="autoHeight" [frameworkComponents]="frameworkComponents" [enableRtl]="true"
+    (gridReady)="onGridReady($event)">
   </ag-grid-angular>
 </ng-template>

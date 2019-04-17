@@ -1,0 +1,22 @@
+<nav id="sidebar-nav" class="navbar navbar-fixed-top navbar-light">
+  <div>
+    <button (click)="mobileMenuToggle()" id="navbarSideButton" class="hidden-md-up" type="button" data-toggle="collapse"
+      aria-controls="navbar-side" aria-expanded="false" aria-label="Toggle Category Menu">
+      &#9776;
+    </button>
+    <a class="navbar-brand" routerLink="/">
+      <img *ngIf="headerLogo.mobileLogo" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
+      <p *ngIf="!headerLogo.mobileLogo">{{headerLogo.headerText}}</p>
+    </a>
+  </div>
+  <div id="navbar-side" class="navbar-side" [class.reveal]="reveal">
+    <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
+    <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
+    <p-panelMenu [model]="navMenuItems"></p-panelMenu>
+    <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
+      routerLink="/help">&nbsp; About</a>
+    <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer"
+      *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a>
+  </div>
+  <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
+</nav>

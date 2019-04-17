@@ -1,48 +1,44 @@
 <div class="multi-series-container">
 	<ng-template ngFor let-data [ngForOf]="categoryData | async">
-		<h2 class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory}}</h2>
+		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
-		<ng-template ngFor let-sub [ngForOf]="data.sublist" let-i="index">
-			<ul class="nav content-links" *ngIf="data.sublist.length > 1" [attr.id]="'id_' + sub.id">
-				<li class="">
-					<a class="current-sub">{{sub.name}}</a>
-				</li>
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
-					<div class="dropdown-menu">
-						<a *ngFor="let sub of data.sublist; let subInd='index'" class="dropdown-item" [routerLink]="['/category']" [fragment]="'id_' + sub.id"
-						 [queryParams]="queryParams" [class.current-sub]="subInd === i">{{sub.name}}</a>
-					</div>
-				</li>
-			</ul>
-			<hr class="sublist-separator" *ngIf="data.sublist.length > 1">
-			<div class="filters">
-				<app-measurement-selector *ngIf="sub.measurements" [measurements]="sub.measurements" [selectedMeasurement]="sub.currentMeasurement"
-				 (selectedMeasurementChange)="redrawSeries($event, sub.id)" class="selector"></app-measurement-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView(sub.id)" class="switch-view">Chart View
-					<i class="material-icons md-18">show_chart</i>
-				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView(sub.id)" class="switch-view">Table View
-					<i class="material-icons md-18">view_list</i>
-				</a>
-				<label *ngIf="routeView === 'table'" class="form-check-inline">
-					<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event, sub.id)">Annual Change
-				</label>
-				<app-date-slider class="sliders" *ngIf="sub.requestComplete" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-				 [sublist]="data.sublist" [subCat]="sub" [dateFrom]="sub.seriesStart ? sub.seriesStart : null" [dateTo]="sub.seriesEnd ? sub.seriesEnd: null"
-				 [freq]="data.currentFreq?.freq" (updateRange)="changeRange($event, sub)"></app-date-slider>
-				<i *ngIf="!displaySeries || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
-			</div>
-			<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings" [dates]="sub.dateArray"
-			 [tableStart]="sub.seriesStart" [tableEnd]="sub.seriesEnd" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]" [geo]="data.currentGeo" [tableId]="sub.id"
-			 [freq]="data.currentFreq?.freq" [subcatIndex]="sub.id" [c5maActive]="queryParams.c5ma === 'true'"
-			 [noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"></app-category-table-view>
-			<app-category-charts *ngIf="routeView !== 'table' && displaySeries" [search]="search" [portalSettings]="portalSettings"
-			 [chartStart]="sub.seriesStart" [chartEnd]="sub.seriesEnd" [dates]="sub.dateArray" [sublist]="sub" [data]="sub.scrollSeries[sub.scrollIndex]"
-			 [freq]="data.currentFreq?.freq" [noSeries]="sub.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer"></app-category-charts>
-			<app-series-paging *ngIf="sub.requestComplete" [data]="sub.scrollSeries" (seriesPageChange)="updatePageCounter($event, sub)"></app-series-paging>
-		</ng-template>
+		<!-- <i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i> -->
+		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
+		<div class="filters">
+			<app-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
+				[selectedMeasurement]="data.currentMeasurement" (selectedMeasurementChange)="redrawSeries($event)"
+				class="selector">
+			</app-measurement-selector>
+			<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
+				<i class="material-icons md-18">show_chart</i>
+			</a>
+			<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table
+				View
+				<i class="material-icons md-18">view_list</i>
+			</a>
+			<label *ngIf="routeView === 'table'" class="form-check-inline">
+				<input type="checkbox" [checked]="queryParams.c5ma === 'true'" (change)="c5maActive($event)">Annual
+				Change
+			</label>
+			<app-date-slider class="sliders" *ngIf="data.requestComplete" [portalSettings]="portalSettings"
+				[dates]="data.dateArray" [dateFrom]="data.seriesStart ? data.seriesStart : null"
+				[dateTo]="data.seriesEnd ? data.seriesEnd: null" [freq]="data.currentFreq?.freq"
+				(updateRange)="changeRange($event, data)"></app-date-slider>
+			<i *ngIf="!displaySeries || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
+		</div>
+		<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings"
+			[dates]="data.dateArray" [tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd"
+			[data]="data.displaySeries" [geo]="data.currentGeo" [tableId]="data.selectedDataList" [freq]="data.currentFreq?.freq"
+			[selectedDataList]="data.selectedDataList" [selectedCategory]="data.selectedCategory" [c5maActive]="queryParams.c5ma === 'true'"
+			[noSeries]="data.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
+		</app-category-table-view>
+		<app-category-charts *ngIf="routeView !== 'table' && displaySeries && data.requestComplete" [search]="search"
+			[portalSettings]="portalSettings" [chartStart]="data.seriesStart" [selectedDataList]="data.selectedDataList"
+			[chartEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
+			[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [params]="queryParams"
+			[findMinMax]="data.findMinMax" [seriesInAnalyzer]="seriesInAnalyzer"
+			(updateURLFragment)="updateRoute($event)">
+		</app-category-charts>
 	</ng-template>
 </div>

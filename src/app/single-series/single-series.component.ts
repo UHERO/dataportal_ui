@@ -1,4 +1,4 @@
-import { Inject, Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -13,7 +13,6 @@ declare var $: any;
   selector: 'app-single-series',
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss'],
-  encapsulation: ViewEncapsulation.None
 })
 export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
