@@ -104,6 +104,9 @@ export class PrimengMenuNavComponent implements OnInit {
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
       if (sub.children) {
+        subMenuItem.command = (event) => {
+          this.navToFirstDataList(event.item, categoryId);
+        }
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
       if (!sub.children) {
