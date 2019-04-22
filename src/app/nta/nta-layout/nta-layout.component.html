@@ -3,7 +3,7 @@
 		<h2 *ngIf="data.requestComplete" class="selected-category" [class.search-term]="search" id="id_top">{{data.selectedCategory.name}}</h2>
 		<p *ngIf="search && data.invalid">No results found for "{{data.invalid}}."</p>
 		<p *ngIf="!search && data.invalid">{{data.invalid}}</p>
-		<!-- <i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i> -->
+		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<h3 *ngIf="data.requestComplete && !search" class="selected-data-list" [class.search-term]="search">{{data.selectedDataList.name}}</h3>
 		<div class="filters">
 			<app-measurement-selector *ngIf="data.measurements" [measurements]="data.measurements"
@@ -25,8 +25,8 @@
 				[dates]="data.dateArray" [dateFrom]="data.seriesStart ? data.seriesStart : null"
 				[dateTo]="data.seriesEnd ? data.seriesEnd: null" [freq]="data.currentFreq?.freq"
 				(updateRange)="changeRange($event, data)"></app-date-slider>
-			<i *ngIf="!displaySeries || loading" class="fas fa-spinner fa-pulse fa-fw"></i>
 		</div>
+		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<app-category-table-view *ngIf="routeView === 'table' && displaySeries" [portalSettings]="portalSettings"
 			[dates]="data.dateArray" [tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd"
 			[data]="data.displaySeries" [geo]="data.currentGeo" [tableId]="data.selectedDataList" [freq]="data.currentFreq?.freq"

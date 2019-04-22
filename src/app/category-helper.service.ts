@@ -64,7 +64,7 @@ export class CategoryHelperService {
 
   getDataListGeos(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
-      this.categoryData[cacheId].regions = geos;
+      this.categoryData[cacheId].regions = geos ? geos : [dataList.defaults.geo];
     },
       (error) => {
         console.log('check category geos error', error);
@@ -76,7 +76,7 @@ export class CategoryHelperService {
 
   getDataListFreqs(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
-      this.categoryData[cacheId].frequencies = freqs;
+      this.categoryData[cacheId].frequencies = freqs ? freqs : [dataList.defaults.freq];
     },
       (error) => {
         console.log('check category freqs error', error);

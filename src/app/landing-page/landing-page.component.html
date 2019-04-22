@@ -6,7 +6,7 @@
 		<i *ngIf="search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<ng-template ngIf [ngIf]="search || data.requestComplete">
 			<ng-template ngIf [ngIf]="portal.categoryTabs">
-				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1" [attr.id]="'id_' + sub.id">
+				<ul class="content-links" *ngIf="data.subcategories && data.subcategories.length > 1">
 					<li *ngFor="let sub of data.subcategories; let subInd='index'">
 						<a [routerLink]="['/category']" [queryParams]="{data_list_id: sub.id}"
 							queryParamsHandling="merge"

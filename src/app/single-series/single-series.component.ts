@@ -86,8 +86,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
       }
-      if (params['seriesCat']) {
-        categoryId = Number.parseInt(params['seriesCat']);
+      if (params['data_list_id']) {
+        categoryId = Number.parseInt(params['data_list_id']);
       }
       if (params['start']) {
         this.startDate = params['start'];
