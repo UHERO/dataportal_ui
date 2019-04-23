@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="series-table">
-      <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData">
+      <p-dataTable *ngIf="!noSelection && !data.noData" [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fa-spinner'">
         <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
         <p-column [field]=portalSettings.seriesTable.series1 header="Level"></p-column>
         <p-column [field]=portalSettings.seriesTable.series2 [header]="data.seriesDetail.percent ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label"></p-column>

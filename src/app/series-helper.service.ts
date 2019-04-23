@@ -34,7 +34,8 @@ export class SeriesHelperService {
       seriesTableData: [],
       siblings: [],
       error: null,
-      noData: ''
+      noData: '',
+      requestComplete: false
     };
     const dateArray = [];
     const analyzerSeries = this._analyzer.analyzerSeries;
@@ -70,13 +71,16 @@ export class SeriesHelperService {
         const formattedData = this.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = formattedData.chartData;
         this.seriesData.seriesTableData = formattedData.tableData;
+        this.seriesData.requestComplete = true;
       } else {
         this.seriesData.noData = 'Data not available';
+        this.seriesData.requestComplete = true;
       }
     },
       (error) => {
         error = this.errorMessage = error;
         this.seriesData.eror = true;
+        this.seriesData.requestComplete = true;
       });
     return observableForkJoin(observableOf(this.seriesData));
   }
