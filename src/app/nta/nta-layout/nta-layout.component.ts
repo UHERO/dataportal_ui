@@ -67,6 +67,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedMeasure = params['m'];
       if (this.id) { this.queryParams.id = this.id; };
       if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; };
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       this.categoryData = this._ntaHelper.initContent(this.id, this.dataListId, this.selectedMeasure);
