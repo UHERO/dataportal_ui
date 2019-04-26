@@ -173,7 +173,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changeRange(e) {
     this.seriesStart = e.seriesStart;
-    this.seriesEnd = e.seriesEnd;
+    this.seriesEnd = e.endOfSample ? null : e.seriesEnd;
     this.displaySeries = true;
   }
 

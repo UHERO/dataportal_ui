@@ -77,7 +77,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   updateChartsAndTables(from, to, freq: string) {
     const seriesStart = this.formatChartDate(from, freq);
     const seriesEnd = this.formatChartDate(to, freq);
-    this.updateRange.emit({ seriesStart: seriesStart, seriesEnd: seriesEnd });
+    const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
+    this.updateRange.emit({ seriesStart: seriesStart, seriesEnd: seriesEnd, endOfSample: endOfSample });
   }
 
   updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
