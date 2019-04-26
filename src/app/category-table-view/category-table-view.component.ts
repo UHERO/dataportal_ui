@@ -164,9 +164,10 @@ export class CategoryTableViewComponent implements OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    const parentName = this.selectedCategory ? this.selectedCategory.name + ' - ' : '';
+    const parentName = this.selectedCategory ? this.selectedCategory.name + ': ' : '';
     const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
-    const geoName = this.geo ? this.geo.name + ' - ' : '';
+    //const geoName = this.geo ? this.geo.name + ' ' : '';
+    const geoAndFreq = this.geo ? "\"" + `${this.geo.name}, ${this.freq}` + "\"" : this.freq;
     const catId = this.selectedCategory ? this.selectedCategory.id : '';
     const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
@@ -175,10 +176,8 @@ export class CategoryTableViewComponent implements OnChanges {
     const params = {
       columnKeys: exportColumns,
       fileName: sublistName,
-      customHeader: this.portalSettings.catTable.portalSource +
-        parentName + sublistName + ' (' + geoName + this.freq + ')' +
-        ': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table' +
-        '\n\n'
+      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`//'\n\n' + parentName + sublistName + ' (' + geoName + this.freq + ')' +
+        //': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table'
     }
     this.gridApi.exportDataAsCsv(params);
   }
