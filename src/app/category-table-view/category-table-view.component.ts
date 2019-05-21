@@ -14,6 +14,7 @@ export class CategoryTableViewComponent implements OnChanges {
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() freq;
+  @Input() freqLabel;
   @Input() geo;
   @Input() tableId;
   @Input() dates;
@@ -166,8 +167,7 @@ export class CategoryTableViewComponent implements OnChanges {
     const exportColumns = [];
     const parentName = this.selectedCategory ? this.selectedCategory.name + ': ' : '';
     const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
-    //const geoName = this.geo ? this.geo.name + ' ' : '';
-    const geoAndFreq = this.geo ? "\"" + `${this.geo.name}, ${this.freq}` + "\"" : this.freq;
+    const geoAndFreq = this.geo ?  `${this.geo.name} - ${this.freqLabel}` : this.freqLabel;
     const catId = this.selectedCategory ? this.selectedCategory.id : '';
     const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
@@ -175,7 +175,8 @@ export class CategoryTableViewComponent implements OnChanges {
     }
     const params = {
       columnKeys: exportColumns,
-      fileName: sublistName,
+      suppressQuotes: false,
+      fileName: `${sublistName}_${this.geo.handle}_${this.freq}`,
       customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`//'\n\n' + parentName + sublistName + ' (' + geoName + this.freq + ')' +
         //': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table'
     }

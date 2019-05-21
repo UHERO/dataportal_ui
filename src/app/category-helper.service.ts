@@ -112,6 +112,7 @@ export class CategoryHelperService {
         this.categoryData[cacheId].displaySeries = displaySeries;
         this.categoryData[cacheId].series = series;
         this.categoryData[cacheId].requestComplete = true;
+        console.log(this.categoryData[cacheId])
       }
       if (!expandedCategory) {
         this.categoryData[cacheId].requestComplete = true;
