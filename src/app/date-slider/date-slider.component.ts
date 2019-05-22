@@ -27,12 +27,15 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     if (this.dates && this.dates.length) {
+      console.log('SERIES START', this.dateFrom)
       const defaultRanges = this.findDefaultRange(this.dates, this.freq, this.defaultRange, this.dateFrom, this.dateTo);
       // Start and end used for 'from' and 'to' inputs in slider
       // If start/end exist in values array, position handles at start/end; otherwise, use default range
       this.start = defaultRanges.start;
       this.end = defaultRanges.end;
+      console.log('this.start', this.start)
       this.sliderDates = defaultRanges.sliderDates;
+      console.log('sliderDate', this.sliderDates[this.start])
     }
   }
 
@@ -78,6 +81,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     const seriesStart = this.formatChartDate(from, freq);
     const seriesEnd = this.formatChartDate(to, freq);
     const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
+    console.log('endOfSample', endOfSample)
     this.updateRange.emit({ seriesStart: seriesStart, seriesEnd: seriesEnd, endOfSample: endOfSample });
   }
 
@@ -154,11 +158,20 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   findDefaultRange = (dates: Array<any>, freq: string, defaultRange, dateFrom, dateTo) => {
     const sliderDates = dates.map(date => date.tableDate);
-    if (dateFrom && dateTo) {
+    console.log('find default rage: dateFrom', dateFrom)
+    console.log('find default rage: dateTo', dateTo)
+    if (dateFrom || dateTo) {
+      console.log('IF DATEFROM', dateFrom)
       const dateFromExists = dates.findIndex(date => date.date == dateFrom);
       const dateToExists = dates.findIndex(date => date.date == dateTo);
       if (dateFromExists > -1 && dateToExists > -1) {
         return { start: dateFromExists, end: dateToExists, sliderDates: sliderDates };
+      }
+      if (dateFromExists > -1 && dateToExists === -1) {
+        return { start: dateFromExists, end: dates.length - 1, sliderDates: sliderDates };
+      }
+      if (dateFromExists === -1 && dateToExists > -1) {
+        return { start: 0, end: dateToExists, sliderDates: sliderDates };
       }
       if (dateFrom < dates[0].tableDate && dateToExists > -1) {
         return { start: 0, end: dateToExists, sliderDates: sliderDates };

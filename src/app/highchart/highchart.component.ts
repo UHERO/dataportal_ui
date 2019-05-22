@@ -269,16 +269,18 @@ export class HighchartComponent implements OnChanges {
             return '';
           }
           if (freq === 'Q') {
-            if (Highcharts.dateFormat('%b', date) === 'Jan') {
+            // console.log('date', date)
+            const month = Highcharts.dateFormat('%b', date);
+            if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
               return 'Q1 ';
             }
-            if (Highcharts.dateFormat('%b', date) === 'Apr') {
+            if (month === 'Apr' || month === 'May' || month === 'Jun') {
               return 'Q2 ';
             }
-            if (Highcharts.dateFormat('%b', date) === 'Jul') {
+            if (month === 'Jul' || month === 'Aug' || month === 'Sep') {
               return 'Q3 ';
             }
-            if (Highcharts.dateFormat('%b', date) === 'Oct') {
+            if (month === 'Oct' || month === 'Nov' || month === 'Dec') {
               return 'Q4 ';
             }
           }
@@ -359,17 +361,19 @@ export class HighchartComponent implements OnChanges {
       return year;
     }
     if (freq === 'Q') {
-      if (Highcharts.dateFormat('%b', date) === 'Jan') {
-        return 'Q1 ' + year;
+      const month = Highcharts.dateFormat('%b', date);
+      // console.log('month', month)
+      if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
+        return 'Q1 ';
       }
-      if (Highcharts.dateFormat('%b', date) === 'Apr') {
-        return 'Q2 ' + year;
+      if (month === 'Apr' || month === 'May' || month === 'Jun') {
+        return 'Q2 ';
       }
-      if (Highcharts.dateFormat('%b', date) === 'Jul') {
-        return 'Q3 ' + year;
+      if (month === 'Jul' || month === 'Aug' || month === 'Sep') {
+        return 'Q3 ';
       }
-      if (Highcharts.dateFormat('%b', date) === 'Oct') {
-        return 'Q4 ' + year;
+      if (month === 'Oct' || month === 'Nov' || month === 'Dec') {
+        return 'Q4 ';
       }
     }
     if (freq === 'M' || freq === 'S') {
