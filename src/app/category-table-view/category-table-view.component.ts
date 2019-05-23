@@ -117,8 +117,9 @@ export class CategoryTableViewComponent implements OnChanges {
 
   formatLvlData = (series, level, subcatIndex, parentId) => {
     const { dates, values } = level;
+    const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
     const seriesData = {
-      series: `${series.seriesInfo.tablePrefix} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix}`,
+      series: `${series.seriesInfo.tablePrefix} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix} (${units})`,
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
