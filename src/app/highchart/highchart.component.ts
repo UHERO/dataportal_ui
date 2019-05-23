@@ -269,7 +269,6 @@ export class HighchartComponent implements OnChanges {
             return '';
           }
           if (freq === 'Q') {
-            // console.log('date', date)
             const month = Highcharts.dateFormat('%b', date);
             if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
               return 'Q1 ';
@@ -362,7 +361,6 @@ export class HighchartComponent implements OnChanges {
     }
     if (freq === 'Q') {
       const month = Highcharts.dateFormat('%b', date);
-      // console.log('month', month)
       if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
         return 'Q1 ';
       }
