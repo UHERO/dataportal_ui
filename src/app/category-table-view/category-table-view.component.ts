@@ -178,8 +178,7 @@ export class CategoryTableViewComponent implements OnChanges {
       columnKeys: exportColumns,
       suppressQuotes: false,
       fileName: `${sublistName}_${this.geo.handle}_${this.freq}`,
-      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`//'\n\n' + parentName + sublistName + ' (' + geoName + this.freq + ')' +
-        //': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table'
+      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
     }
     this.gridApi.exportDataAsCsv(params);
   }

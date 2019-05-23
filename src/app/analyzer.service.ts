@@ -84,13 +84,15 @@ export class AnalyzerService {
       title: series.title,
       geography: series.geography.handle,
       frequency: series.frequencyShort,
-      seasonalAdjustment: series.seasonalAdjustment
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
     };
     const chartNameDetails = {
       title: series.title,
       geography: series.geography.shortName,
       frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
     };
     seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
     seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
@@ -191,7 +193,7 @@ export class AnalyzerService {
     }
   }
 
-  formatDisplayName({ title, geography, frequency, seasonalAdjustment }) {
+  formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
     let ending = '';
     if (seasonalAdjustment === 'seasonally_adjusted') {
       ending = '; Seasonally Adjusted';
@@ -199,7 +201,7 @@ export class AnalyzerService {
     if (seasonalAdjustment === 'not_seasonally_adjusted') {
       ending = '; Not Seasonally Adjusted';
     }
-    return `${title} (${geography}; ${frequency}${ending})`;
+    return `${title} (${units}) (${geography}; ${frequency}${ending})`;
   }
 
   setAnalyzerDates(analyzerSeries) {
