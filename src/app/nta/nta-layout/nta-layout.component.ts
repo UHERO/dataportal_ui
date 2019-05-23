@@ -124,7 +124,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     measurement.seriesStart = e.seriesStart;
     measurement.seriesEnd = e.seriesEnd;
     this.seriesStart = e.seriesStart;
-    this.seriesEnd = e.seriesEnd;
+    this.seriesEnd = e.endOfSample ? null : e.seriesEnd;
     this.displaySeries = true;
   }
 
