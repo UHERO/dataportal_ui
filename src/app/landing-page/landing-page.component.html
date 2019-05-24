@@ -49,7 +49,7 @@
 		<app-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
 			[dates]="data.categoryDates" [tableStart]="seriesStart" [tableEnd]="seriesEnd" [selectedCategory]="data.selectedCategory"
 			[selectedDataList]="data.selectedDataList" [data]="data.displaySeries" [geo]="data.currentGeo"
-			[freq]="data.currentFreq?.freq" [yoyActive]="queryParams.yoy === 'true'"
+			[freq]="data.currentFreq?.freq" [freqLabel]="data.currentFreq?.label" [yoyActive]="queryParams.yoy === 'true'"
 			[ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData" [params]="queryParams"
 			[seriesInAnalyzer]="seriesInAnalyzer">
 		</app-category-table-view>

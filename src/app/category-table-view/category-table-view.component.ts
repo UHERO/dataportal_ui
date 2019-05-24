@@ -14,6 +14,7 @@ export class CategoryTableViewComponent implements OnChanges {
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() freq;
+  @Input() freqLabel;
   @Input() geo;
   @Input() tableId;
   @Input() dates;
@@ -116,8 +117,9 @@ export class CategoryTableViewComponent implements OnChanges {
 
   formatLvlData = (series, level, subcatIndex, parentId) => {
     const { dates, values } = level;
+    const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
     const seriesData = {
-      series: `${series.seriesInfo.tablePrefix} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix}`,
+      series: `${series.seriesInfo.tablePrefix} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix} (${units})`,
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
@@ -164,9 +166,9 @@ export class CategoryTableViewComponent implements OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    const parentName = this.selectedCategory ? this.selectedCategory.name + ' - ' : '';
+    const parentName = this.selectedCategory ? this.selectedCategory.name + ': ' : '';
     const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
-    const geoName = this.geo ? this.geo.name + ' - ' : '';
+    const geoAndFreq = this.geo ?  `${this.geo.name} - ${this.freqLabel}` : this.freqLabel;
     const catId = this.selectedCategory ? this.selectedCategory.id : '';
     const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
@@ -174,11 +176,9 @@ export class CategoryTableViewComponent implements OnChanges {
     }
     const params = {
       columnKeys: exportColumns,
-      fileName: sublistName,
-      customHeader: this.portalSettings.catTable.portalSource +
-        parentName + sublistName + ' (' + geoName + this.freq + ')' +
-        ': ' + this.portalSettings.catTable.portalLink + catId + dataListId + '&view=table' +
-        '\n\n'
+      suppressQuotes: false,
+      fileName: `${sublistName}_${this.geo.handle}_${this.freq}`,
+      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
     }
     this.gridApi.exportDataAsCsv(params);
   }

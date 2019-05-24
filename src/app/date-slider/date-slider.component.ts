@@ -81,7 +81,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
     this.updateRange.emit({ seriesStart: seriesStart, seriesEnd: seriesEnd, endOfSample: endOfSample });
   }
 
-  updateRanges(portalSettings, fromIndex: number, toIndex: number, from, to, freq: string) {
+  updateRanges(from, to, freq: string) {
     this.updateChartsAndTables(from, to, freq);
   }
 
@@ -129,7 +129,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
   }
 
   setInputChangeFunction(input, sliderDates: Array<any>, rangeSlider, key: string, portalSettings, freq: string) {
-    const updateRanges = (portalSettings, fromIndex, toIndex, from, to, freq) => this.updateRanges(portalSettings, fromIndex, toIndex, from, to, freq);
+    const updateRanges = (portalSettings, fromIndex, toIndex, from, to, freq) => this.updateRanges(from, to, freq);
     const updateRangeSlider = (rangeSlider, key, valueIndex) => this.updateRangeSlider(rangeSlider, key, valueIndex);
     const checkValidInputs = (value, siblingValue, key, freq) => this.checkValidInputs(value, siblingValue, key, freq);
     const formatInput = (value, freq) => this.formatInput(value, freq);
@@ -154,22 +154,51 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
 
   findDefaultRange = (dates: Array<any>, freq: string, defaultRange, dateFrom, dateTo) => {
     const sliderDates = dates.map(date => date.tableDate);
-    if (dateFrom && dateTo) {
-      const dateFromExists = dates.findIndex(date => date.date == dateFrom);
-      const dateToExists = dates.findIndex(date => date.date == dateTo);
-      if (dateFromExists > -1 && dateToExists > -1) {
-        return { start: dateFromExists, end: dateToExists, sliderDates: sliderDates };
-      }
-      if (dateFrom < dates[0].tableDate && dateToExists > -1) {
-        return { start: 0, end: dateToExists, sliderDates: sliderDates };
-      }
-      if (dateFromExists > -1 && dateTo > dates[dates.length - 1].tableDate) {
-        return { start: dateFromExists, end: dates.length - 1, sliderDates: sliderDates };
-      }
-    }
     const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
+    if (dateFrom) {
+      const dateFromExists = this.checkDateExists(dateFrom, dates, freq);
+      if (dateFromExists > -1) {
+        startIndex = dateFromExists;
+      }
+      if (dateFrom < dates[0].date) {
+        startIndex = 0;
+      }
+    }
+    if (dateTo) {
+      const dateToExists = this.checkDateExists(dateTo, dates, freq);
+      if (dateToExists > -1) {
+        endIndex = dateToExists;
+      }
+      if (dateTo > dates[dates.length - 1].date) {
+        endIndex = dates.length - 1;
+      }
+    }
     return { start: startIndex, end: endIndex, sliderDates: sliderDates };
+  }
+
+  checkDateExists = (date: string, dates: Array<any>, freq: string) => {
+    let dateToCheck = date;
+    const year = date.substring(0, 4);
+    if (freq === 'A') {
+      dateToCheck = `${year}-01-01`;
+    }
+    if (freq === 'Q') {
+      const month = +date.substring(5, 7);
+      if (month >= 1 && month <= 3) {
+        dateToCheck = `${year}-01-01`;
+      }
+      if (month >= 4 && month <= 6) {
+        dateToCheck = `${year}-04-01`
+      }
+      if (month >= 7 && month <= 9) {
+        dateToCheck = `${year}-07-01`
+      }
+      if (month >= 10 && month <= 12) {
+        dateToCheck = `${year}-10-01`;
+      }
+    }
+    return dates.findIndex(date => date.date == dateToCheck);
   }
 
   formatChartDate = (value, freq) => {
@@ -178,8 +207,8 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       return `${value.toString()}-01-01`;
     }
     if (freq === 'Q') {
-      const q = value.substr(5, 2);
-      return `${value.substr(0, 4)}-${quarters[q]}-01`;
+      const q = value.substring(5, 7);
+      return `${value.substring(0, 4)}-${quarters[q]}-01`;
     }
     if (freq === 'M') {
       return `${value}-01`;
