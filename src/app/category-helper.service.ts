@@ -102,6 +102,7 @@ export class CategoryHelperService {
     this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
       if (expandedCategory) {
         const series = expandedCategory;
+        console.log('series', series)
         const dates = this.setCategoryDates(series, freq);
         this.categoryData[cacheId].sliderDates = this._helper.getTableDates(dates.categoryDates);
         this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
@@ -119,9 +120,13 @@ export class CategoryHelperService {
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
         this.categoryData[cacheId].noData = true;
       }
-      this.categoryData[cacheId].subcategories.forEach((sub) => {
+      console.log('subcategories', this.categoryData[cacheId].subcategories);
+      for (let i = 1; i < this.categoryData[cacheId].subcategories.length - 1; i++) {
+        //this.getSiblingData(this.categoryData[cacheId].subcategories[i], catId, routeGeo, routeFreq);
+      }
+      /*this.categoryData[cacheId].subcategories.forEach((sub) => {
         this.getSiblingData(sub, catId, routeGeo, routeFreq);
-      });
+      }); */
     });
   }
 
