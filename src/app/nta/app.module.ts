@@ -7,7 +7,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
-import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { SharedModule } from 'primeng/primeng';
+import { TableModule } from 'primeng/table';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -38,7 +39,7 @@ import { ClipboardService } from '../clipboard.service';
     ReactiveFormsModule,
     HttpClientModule,
     HighchartsChartModule,
-    DataTableModule,
+    TableModule,
     SharedModule,
   ],
   entryComponents: [

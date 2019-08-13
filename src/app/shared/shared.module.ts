@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 //import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
-import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { SharedModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
 import { AgGridModule } from 'ag-grid-angular';
 import { RecaptchaModule } from 'ng-recaptcha';
@@ -75,7 +75,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule,
-    DataTableModule, SharedModule,
+    TableModule, SharedModule,
     TableModule,
     PanelMenuModule,
     PaginatorModule,
