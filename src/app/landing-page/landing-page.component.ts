@@ -119,9 +119,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this._catHelper.initSearch(id, geo, freq);
     }
     if (!geo && !freq) {
-      return (typeof id === 'number' || id === null) ?
+      if (typeof id === 'number' || id === null) {
+        return this._catHelper.initContent(id, dataListId);
+      }
+      return this._catHelper.initSearch(id);
+      /* return (typeof id === 'number' || id === null) ?
         this._catHelper.initContent(id, dataListId) :
-        this._catHelper.initSearch(id);
+        this._catHelper.initSearch(id); */
     }
   }
 

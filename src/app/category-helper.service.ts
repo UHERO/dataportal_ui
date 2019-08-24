@@ -42,9 +42,11 @@ export class CategoryHelperService {
         }
         const cat = categories.find(category => category.id === catId);
         if (cat) {
+          console.log('cat', cat)
           const categoryDataLists = cat.children;
           const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
           this.categoryData[cacheId].selectedDataList = selectedDataList;
+          console.log('selectedDataList', selectedDataList)
           this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
           if (dataListId === null) {
             this.categoryData[cacheId].defaultDataList = selectedDataList.id;
@@ -88,9 +90,10 @@ export class CategoryHelperService {
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
         }
         if (routeGeoExists && routeFreqExists) {
-          this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
+          //this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
         }
         if (!routeGeoExists || !routeFreqExists) {
+          console.log('!routeGeoExists || !routeFreqExists')
           const defaultFreq = dataList.defaults && dataList.defaults.freq ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
           const defaultGeo = dataList.defaults && dataList.defaults.geo ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
           this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
@@ -100,6 +103,7 @@ export class CategoryHelperService {
 
   getData(catId: any, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
+      console.log('subId', subId)
       if (expandedCategory) {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
@@ -119,14 +123,17 @@ export class CategoryHelperService {
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
         this.categoryData[cacheId].noData = true;
       }
-      this.categoryData[cacheId].subcategories.forEach((sub) => {
+      console.log('categoryData', this.categoryData[cacheId])
+
+      /* this.categoryData[cacheId].subcategories.forEach((sub) => {
         this.getSiblingData(sub, catId, routeGeo, routeFreq);
-      });
+      }); */
     });
   }
 
   getSiblingData(sub, catId, routeGeo, routeFreq) {
     if (!sub.children) {
+      console.log('!sub.children', sub)
       this.initContent(catId, sub.id, routeGeo, routeFreq);  
     }
     if (sub.children) {
