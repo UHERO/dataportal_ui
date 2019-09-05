@@ -112,6 +112,10 @@
         background-color: #F4F4F4;
         color: #333;
 
+        &:focus {
+          outline: none;
+        }
+
         .ui-sortable-column-icon {
           color: #848484;
           vertical-align: middle;
