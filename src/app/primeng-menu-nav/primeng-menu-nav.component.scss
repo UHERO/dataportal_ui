@@ -149,6 +149,11 @@
     cursor: pointer;
     padding: 0.5em;
     border-top: 1px solid #E5E5E5;
+
+    &:hover {
+      background-color: #DBDBDB;
+      text-decoration: none;
+    }
   }
 
   /* .list-item {
@@ -201,81 +206,72 @@
   ::ng-deep {
     .ui-panelmenu {
       font-size: 0.9em;
-    }
 
-    .pi {
-      font-size: 1em;
-    }
-
-    .ui-panelmenu-header {
-      border: 0;
-      border-top: 1px solid $gray;
-      background: transparent;
-    }
-
-    .ui-panelmenu .ui-panelmenu-header {
-      a {
+      .ui-panelmenu-header {
         border: 0;
-        background-color: transparent;
-        padding: .5em;
-        font-size: 1em;
-        font-weight: normal;
-      }
-    }
-
-    .ui-panelmenu .ui-panelmenu-header.ui-state-active {
-      a {
-        border: 0;
-
-        &:hover {
+        border-top: 1px solid $gray;
+        background: transparent;
+  
+        a {
           border: 0;
           background-color: transparent;
+          padding: .5em;
+          font-size: 1em;
+          font-weight: normal;
+
+          .ui-panelmenu-icon {
+            color: $primary-text;
+            font-size: 1em;
+          }
+        }
+      }
+
+      .ui-panelmenu-header.ui-state-active {
+        a {
+          border: 0;
+          background: transparent;
+          border-color: $gray;
           color: $primary;
 
+          &:hover {
+            border: 0;
+            background-color: transparent;
+            color: $primary;
+  
+            .ui-panelmenu-icon {
+              color: $primary;
+            }
+          }
+  
           .ui-panelmenu-icon {
             color: $primary;
           }
         }
+      }
 
-        .ui-panelmenu-icon {
-          color: $primary;
+      .ui-panelmenu-header:not(.ui-state-active) {
+        a {
+          &:hover {
+            border: 0;
+          }
         }
       }
-    }
 
-    .ui-panelmenu .ui-panelmenu-header:not(.ui-state-active) {
-      a {
-        &:hover {
-          border: 0;
+      .ui-panelmenu-content {
+        border: 0;
+        background: transparent;
+
+        .ui-menuitem {
+          .ui-menuitem-link {
+            color: $primary-text;
+            padding: .25em;
+          }  
         }
       }
-    }
-
-    .ui-panelmenu .ui-panelmenu-header.ui-state-active, .ui-panelmenu .ui-panelmenu-header.ui-state-active a {
-      background: transparent;
-      border-color: $gray;
-      color: $primary;
-    }
-
-    .ui-panelmenu .ui-panelmenu-content {
-      border: 0;
     }
 
     .ui-submenu-list {
       padding-left: 10px;
     }
-
-    .ui-panelmenu .ui-panelmenu-content {
-      background: transparent;
-    }
-
-    .ui-panelmenu .ui-panelmenu-content .ui-menuitem-link {
-      color: $primary-text;
-    }
-
-    .ui-panelmenu .ui-panelmenu-content .ui-menuitem .ui-menuitem-link {
-      padding: .25em;
-    }
-
   }
 }

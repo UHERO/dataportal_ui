@@ -39,28 +39,20 @@
       </div>
     </div>
     <div class="series-table">
-      <!-- <p-table *ngIf="!noSelection && !data.noData" [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fa-spinner'">
-        <p-column field="tableDate" header="Date" [sortable]="true"></p-column>
-        <p-column [field]=portalSettings.seriesTable.series1 header="Level"></p-column>
-        <p-column [field]=portalSettings.seriesTable.series2 [header]="data.seriesDetail.percent ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label"></p-column>
-        <p-column *ngIf="data.currentFreq.freq !== 'A' && portalSettings.seriesTable.columns === 4" [field]="portalSettings.seriesTable.series3"
-          [header]="data.seriesDetail.percent ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label"></p-column>
-      </p-table> -->
-      <p-table *ngIf="!noSelection && !data.noData" [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fa-spinner'">
-        <ng-template pTemplate="header" let-rowData>
+      <p-table *ngIf="!noSelection && !data.noData" [columns]="tableHeaders" [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fa-spinner'">
+        <ng-template pTemplate="header" let-columns>
           <tr>
-            <th [pSortableColumn]="true">Date <p-sortIcon [field]="tableDate"></p-sortIcon></th>
-            <th>Level</th>
-            <th>{{data.seriesDetail.percent ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label}}</th>
-            <th *ngIf="data.currentFreq.freq !== 'A' && portalSettings.seriesTable.columns === 4">{{data.seriesDetail.percent ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label}}</th>
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field" [pSortableColumnDisabled]="col.field !== 'tableDate'">
+              {{col.header}}
+              <p-sortIcon *ngIf="col.field === 'tableDate'" [field]="col.field" ariaLabel="Activate to sort" ariaLabelDesc="Activate to sort in descending order" ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+            </th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-rowData>
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
           <tr>
-            <td>{{rowData.tableDate}}</td>
-            <td>{{rowData.formattedValue}}</td>
-            <td>{{rowData.formattedYoy}}</td>
-            <td *ngIf="data.currentFreq.freq !== 'A' && portalSettings.seriesTable.columns === 4">{{rowData.formattedYtd}}</td>
+            <td *ngFor="let col of columns">
+              {{rowData[col.field]}}
+            </td>
           </tr>
         </ng-template>
       </p-table>
