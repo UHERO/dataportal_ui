@@ -1,6 +1,6 @@
 // This file includes polyfills needed by Angular and is loaded before the app.
 // You can add your own extra polyfills to this file.
-/* import 'core-js/es/symbol';
+import 'core-js/es/symbol';
 import 'core-js/es/object';
 import 'core-js/es/function';
 import 'core-js/es/parse-int';
@@ -16,7 +16,7 @@ import 'core-js/es/set';
 import 'core-js/es/reflect';
 
 
-import 'zone.js/dist/zone'; */
+import 'zone.js/dist/zone';
 
 // If you need to support the browsers/features below, uncomment the import
 // and run `npm install import-name-here';
