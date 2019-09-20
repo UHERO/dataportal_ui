@@ -31,6 +31,7 @@ export class CategoryHelperService {
   // Called on page load
   // Gets data sublists available for a selected category
   initContent(catId: any, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+    console.log('ROUTE GEO', routeGeo)
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
@@ -90,7 +91,7 @@ export class CategoryHelperService {
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
         }
         if (routeGeoExists && routeFreqExists) {
-          //this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
+          this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
         }
         if (!routeGeoExists || !routeFreqExists) {
           console.log('!routeGeoExists || !routeFreqExists')
