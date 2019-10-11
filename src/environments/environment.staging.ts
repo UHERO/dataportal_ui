@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  caching: true,
   apiUrl: 'https://stage-api.uhero.hawaii.edu/v1',
   portalUrl: {
     uhero: 'https://stage-data.uhero.hawaii.edu/#',
