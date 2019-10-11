@@ -48,10 +48,10 @@ export class AnalyzerService {
     this.updateAnalyzerCount.emit(seriesInfo);
   }
 
-  getAnalyzerData(aSeries) {
+  getAnalyzerData(aSeries, noCache: boolean) {
     this.analyzerData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
-    this._uheroAPIService.fetchPackageAnalyzer(ids).subscribe((results) => {
+    this._uheroAPIService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
         const seriesData = this.formatSeriesForAnalyzer(s, aSeries);

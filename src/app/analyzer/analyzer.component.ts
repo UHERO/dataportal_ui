@@ -24,6 +24,7 @@ export class AnalyzerComponent implements OnInit {
   private tableC5ma;
   private startDate;
   private endDate;
+  private noCache: boolean;
   private tooltipName;
   private tooltipUnits;
   private tooltipGeo;
@@ -72,11 +73,14 @@ export class AnalyzerComponent implements OnInit {
         if (params['c5ma']) {
           this.tableC5ma = (params['c5ma'] === 'true');
         }
+        if(params['nocache']) {
+          this.noCache = params['nocache'] === 'true';
+        }
       });
     }
     this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
     if (this._analyzer.analyzerSeries.length) {
-      this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries);
+      this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries, this.noCache);
     }
   }
 

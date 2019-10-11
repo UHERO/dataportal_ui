@@ -83,6 +83,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.route.queryParams.subscribe(params => {
       const seriesId = Number.parseInt(params['id']);
       let categoryId;
+      let noCache: boolean;
       if (params['sa'] !== undefined) {
         this.seasonallyAdjusted = (params['sa'] === 'true');
       }
@@ -95,7 +96,10 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       if (params['end']) {
         this.endDate = params['end'];
       }
-      this.seriesData = this._series.getSeriesData(seriesId, categoryId);
+      if (params['nocache']) {
+        noCache = params['nocache'] === 'true';
+      }
+      this.seriesData = this._series.getSeriesData(seriesId, noCache, categoryId);
     });
     this.cdRef.detectChanges();
   }

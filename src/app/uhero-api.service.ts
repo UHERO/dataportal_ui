@@ -12,7 +12,6 @@ import { ObservationResults } from './observation-results';
 @Injectable()
 export class UheroApiService {
   private baseUrl: string;
-  private caching: string;
   private headers: HttpHeaders;
   private cachedCategories;
   private cachedGeos;
@@ -38,7 +37,6 @@ export class UheroApiService {
 
   constructor(@Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: HttpClient) {
     this.baseUrl = environment['apiUrl'];
-    this.caching = environment['caching'] ? '' : '&noCache';
     this.headers = new HttpHeaders({});
     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
     this.httpOptions = {
@@ -54,7 +52,7 @@ export class UheroApiService {
     if (this.cachedCategories) {
       return observableOf(this.cachedCategories);
     } else {
-      let categories$ = this.http.get(`${this.baseUrl}/category?u=${this.portal.universe}${this.caching}`, this.httpOptions).pipe(
+      let categories$ = this.http.get(`${this.baseUrl}/category?u=${this.portal.universe}`, this.httpOptions).pipe(
         map(mapCategories, this),
         tap(val => {
           this.cachedCategories = val;
@@ -68,7 +66,7 @@ export class UheroApiService {
     if (this.cachedGeos) {
       return observableOf(this.cachedGeos);
     } else {
-      let geos$ = this.http.get(`${this.baseUrl}/geo${this.caching}`, this.httpOptions).pipe(
+      let geos$ = this.http.get(`${this.baseUrl}/geo`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedGeos = val;
@@ -82,7 +80,7 @@ export class UheroApiService {
     if (this.cachedCategoryGeos[id]) {
       return observableOf(this.cachedCategoryGeos[id]);
     } else {
-      let categoryGeos$ = this.http.get(`${this.baseUrl}/category/geo?id=${id}${this.caching}`, this.httpOptions).pipe(
+      let categoryGeos$ = this.http.get(`${this.baseUrl}/category/geo?id=${id}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedCategoryGeos[id] = val;
@@ -96,7 +94,7 @@ export class UheroApiService {
     if (this.cachedCategoryFreqs[id]) {
       return observableOf(this.cachedCategoryFreqs[id]);
     } else {
-      let categoryFreqs$ = this.http.get(`${this.baseUrl}/category/freq?id=${id}${this.caching}`, this.httpOptions).pipe(
+      let categoryFreqs$ = this.http.get(`${this.baseUrl}/category/freq?id=${id}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedCategoryFreqs[id] = val;
@@ -108,11 +106,12 @@ export class UheroApiService {
 
 
   // Gets observations for series in a (sub) category
-  fetchExpanded(id: number, geo: string, freq: string): Observable<any> {
+  fetchExpanded(id: number, geo: string, freq: string, noCache: boolean): Observable<any> {
     if (this.cachedExpanded[id + geo + freq]) {
       return observableOf(this.cachedExpanded[id + geo + freq]);
     } else {
-      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}&expand=true${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : ''
+      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}&expand=true${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedExpanded[id + geo + freq] = val;
@@ -127,7 +126,7 @@ export class UheroApiService {
     if (this.cachedSelectedCategory[id]) {
       return observableOf(this.cachedSelectedCategory[id]);
     } else {
-      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=${id}${this.caching}`, this.httpOptions).pipe(
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=${id}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSelectedCategory[id] = val;
@@ -142,7 +141,7 @@ export class UheroApiService {
     if (this.cachedSelectedCategoryGeoFreq[id + geo + freq]) {
       return observableOf(this.cachedSelectedCategoryGeoFreq[id + geo + freq]);
     } else {
-      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=${id}&geo=${geo}&freq${freq}${this.caching}`, this.httpOptions).pipe(
+      let selectedCat$ = this.http.get(`${this.baseUrl}/category?id=${id}&geo=${geo}&freq${freq}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSelectedCategoryGeoFreq[id + geo + freq] = val;
@@ -152,11 +151,12 @@ export class UheroApiService {
     }
   }
 
-  fetchPackageSeries(id: number, catId?: number) {
+  fetchPackageSeries(id: number, noCache: boolean, catId?: number) {
     if (this.cachedPackageSeries[id]) {
       return observableOf(this.cachedPackageSeries[id]);
     } else {
-      let series$ = this.http.get(`${this.baseUrl}/package/series?id=${id}&u=${this.portal.universe}&cat=${catId}${this.caching}`, this.httpOptions).pipe(map(mapData),
+      const caching = noCache ? '&nocache' : '';
+      let series$ = this.http.get(`${this.baseUrl}/package/series?id=${id}&u=${this.portal.universe}&cat=${catId}${caching}`, this.httpOptions).pipe(map(mapData),
         tap(val => {
           this.cachedPackageSeries[id] = val;
           series$ = null;
@@ -169,7 +169,7 @@ export class UheroApiService {
     if (this.cachedPackageCategory[id + geo + freq]) {
       return observableOf(this.cachedPackageCategory[id + geo + freq]);
     } else {
-      let selectedCat$ = this.http.get(`${this.baseUrl}/package/category?id=${id}&geo=${geo}&freq=${freq}${this.caching}`, this.httpOptions).pipe(
+      let selectedCat$ = this.http.get(`${this.baseUrl}/package/category?id=${id}&geo=${geo}&freq=${freq}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedPackageCategory[id + geo + freq] = val;
@@ -183,7 +183,7 @@ export class UheroApiService {
     if (this.cachedSeries[id + geo + freq]) {
       return observableOf(this.cachedSeries[id + geo + freq]);
     } else {
-      let series$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}${this.caching}`, this.httpOptions).pipe(
+      let series$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSeries[id + geo + freq] = val;
@@ -198,7 +198,7 @@ export class UheroApiService {
     if (this.cachedSeriesDetail[id]) {
       return observableOf(this.cachedSeriesDetail[id]);
     } else {
-      let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=${id}${this.caching}`, this.httpOptions).pipe(
+      let seriesDetail$ = this.http.get(`${this.baseUrl}/series?id=${id}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSeriesDetail[id] = val;
@@ -213,7 +213,7 @@ export class UheroApiService {
     if (this.cachedSiblings[seriesId]) {
       return observableOf(this.cachedSiblings[seriesId]);
     } else {
-      let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=${seriesId}${this.caching}`, this.httpOptions).pipe(
+      let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=${seriesId}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSiblings[seriesId] = val;
@@ -227,7 +227,7 @@ export class UheroApiService {
     if (this.cachedGeoSeries[id + handle]) {
       return observableOf(this.cachedGeoSeries[id + handle]);
     } else {
-      let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${handle}${this.caching}`, this.httpOptions).pipe(
+      let geoSeries$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${handle}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedGeoSeries[id + handle] = val;
@@ -237,11 +237,12 @@ export class UheroApiService {
     }
   }
 
-  fetchCategoryMeasurements(id: number) {
+  fetchCategoryMeasurements(id: number, noCache: boolean) {
     if (this.cachedCatMeasures[id]) {
       return observableOf(this.cachedCatMeasures[id]);
     } else {
-      let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=${id}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let catMeasures$ = this.http.get(`${this.baseUrl}/category/measurements?id=${id}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedCatMeasures[id] = val;
@@ -251,11 +252,12 @@ export class UheroApiService {
     }
   }
 
-  fetchMeasurementSeries(id: number) {
+  fetchMeasurementSeries(id: number, noCache: boolean) {
     if (this.cachedMeasureSeries[id]) {
       return observableOf(this.cachedMeasureSeries[id]);
     } else {
-      let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=${id}&expand=true${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let measureSeries$ = this.http.get(`${this.baseUrl}/measurement/series?id=${id}&expand=true${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedMeasureSeries[id] = val;
@@ -265,11 +267,12 @@ export class UheroApiService {
     }
   }
 
-  fetchSearch(search: string) {
+  fetchSearch(search: string, noCache: boolean) {
     if (this.cachedSearch[search]) {
       return observableOf(this.cachedSearch[search]);
     } else {
-      let filters$ = this.http.get(`${this.baseUrl}/search?q=${search}&u=${this.portal.universe}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=${search}&u=${this.portal.universe}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearch[search] = val;
@@ -279,11 +282,12 @@ export class UheroApiService {
     }
   }
 
-  fetchSearchSeries(search: string): Observable<any> {
+  fetchSearchSeries(search: string, noCache: boolean): Observable<any> {
     if (this.cachedSearchExpand[search]) {
       return observableOf(this.cachedSearchExpand[search]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/search/series?q=${search}&u=${this.portal.universe}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=${search}&u=${this.portal.universe}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearchExpand[search] = val;
@@ -297,7 +301,7 @@ export class UheroApiService {
     if (this.cachedSearchExpand[search + geo + freq]) {
       return observableOf(this.cachedSearchExpand[search + geo + freq]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/search/series?q=${search}&geo=${geo}&freq=${freq}&u=${this.portal.universe}&expand=true${this.caching}`, this.httpOptions).pipe(
+      let search$ = this.http.get(`${this.baseUrl}/search/series?q=${search}&geo=${geo}&freq=${freq}&u=${this.portal.universe}&expand=true`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
@@ -307,11 +311,12 @@ export class UheroApiService {
     }
   }
 
-  fetchPackageSearch(search: string, geo: string, freq: string) {
+  fetchPackageSearch(search: string, geo: string, freq: string, noCache: boolean) {
     if (this.cachedPackageSearch[search + geo + freq]) {
       return observableOf(this.cachedPackageSearch[search + geo + freq]);
     } else {
-      let search$ = this.http.get(`${this.baseUrl}/package/search?q=${search}&u=${this.portal.universe}&geo=${geo}&freq=${freq}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let search$ = this.http.get(`${this.baseUrl}/package/search?q=${search}&u=${this.portal.universe}&geo=${geo}&freq=${freq}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
@@ -321,11 +326,12 @@ export class UheroApiService {
     }
   }
 
-  fetchPackageAnalyzer(ids: string) {
+  fetchPackageAnalyzer(ids: string, noCache: boolean) {
     if (this.cachedPackageAnalyzer[ids]) {
       return observableOf(this.cachedPackageAnalyzer[ids]);
     } else {
-      let analyzer$ = this.http.get(`${this.baseUrl}/package/analyzer?ids=${ids}&u=${this.portal.universe}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      let analyzer$ = this.http.get(`${this.baseUrl}/package/analyzer?ids=${ids}&u=${this.portal.universe}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedPackageAnalyzer[ids] = val;
@@ -336,11 +342,12 @@ export class UheroApiService {
   }
 
   // Gets observation data for a series
-  fetchObservations(id: number) {
+  fetchObservations(id: number, noCache: boolean) {
     if (this.cachedObservations[id]) {
       return observableOf(this.cachedObservations[id]);
     } else {
-      let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=${id}${this.caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : ''
+      let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=${id}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedObservations[id] = val;
