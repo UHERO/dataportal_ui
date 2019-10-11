@@ -49,12 +49,29 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
+              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
+            "staging-noCache": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stagingNoCache.ts"
                 }
               ]
             },
@@ -66,12 +83,29 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
+              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "production-noCache": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prodNoCache.ts"
                 }
               ]
             },
@@ -94,8 +128,14 @@
             "staging": {
               "browserTarget": "uhero:build:staging"
             },
+            "staging-noCache": {
+              "browserTarget": "uhero:build:staging-noCache"
+            },
             "production": {
               "browserTarget": "uhero:build:production"
+            },
+            "production-noCache": {
+              "browserTarget": "uhero:build:production-noCache"
             },
             "apiDev": {
               "browserTarget": "uhero:build:apiDev"
@@ -229,7 +269,7 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
+              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
@@ -238,7 +278,7 @@
                 }
               ]
             },
-            "production": {
+            "staging-noCache": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -251,7 +291,41 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stagingNoCache.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "production-noCache": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prodNoCache.ts"
                 }
               ]
             },
@@ -274,8 +348,14 @@
             "staging": {
               "browserTarget": "nta:build:staging"
             },
+            "staging-noCache": {
+              "browserTarget": "nta:build:staging-noCache"
+            },
             "production": {
               "browserTarget": "nta:build:production"
+            },
+            "production-noCache": {
+              "browserTarget": "nta:build:production-noCache"
             },
             "apiDev": {
               "browserTarget": "nta:build:apiDev"
@@ -409,12 +489,29 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
+              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.staging.ts"
+                }
+              ]
+            },
+            "staging-noCache": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stagingNoCache.ts"
                 }
               ]
             },
@@ -426,12 +523,29 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
+              "vendorChunk": true,
               "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "production-noCache": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prodNoCache.ts"
                 }
               ]
             },
@@ -454,8 +568,14 @@
             "staging": {
               "browserTarget": "coh:build:staging"
             },
+            "staging-noCache": {
+              "browserTarget": "coh:build:staging-noCache"
+            },
             "production": {
               "browserTarget": "coh:build:production"
+            },
+            "production-noCache": {
+              "browserTarget": "coh:build:production-noCache"
             },
             "apiDev": {
               "browserTarget": "coh:build:apiDev"
