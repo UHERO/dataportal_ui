@@ -27,6 +27,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private routeView: string;
   private routeYoy;
   private routeYtd;
+  private noCache: boolean;
   private routeStart;
   private routeEnd;
   private search = false;
@@ -80,6 +81,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeYtd = params['ytd'];
       this.routeStart = params['start'];
       this.routeEnd = params['end'];
+      this.noCache = params['nocache'] === 'true';
       if (this.id) { this.queryParams.id = this.id; };
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
@@ -87,7 +89,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-      this.categoryData = this.getData(this.id, this.dataListId, this.routeGeo, this.routeFreq);
+      if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
+      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
       this._helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
@@ -112,16 +115,16 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getData(id, dataListId, geo, freq) {
+  getData(id, noCache, dataListId, geo, freq) {
     if (geo && freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, dataListId, geo, freq) :
-        this._catHelper.initSearch(id, geo, freq);
+        this._catHelper.initContent(id, noCache, dataListId, geo, freq) :
+        this._catHelper.initSearch(id, noCache, geo, freq);
     }
     if (!geo && !freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, dataListId) :
-        this._catHelper.initSearch(id);
+        this._catHelper.initContent(id, noCache, dataListId) :
+        this._catHelper.initSearch(id, noCache);
     }
   }
 

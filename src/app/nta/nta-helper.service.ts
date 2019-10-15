@@ -27,22 +27,22 @@ export class NtaHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, dataListId: number, selectedMeasure?: string): Observable<any> {
+  initContent(catId: any, noCache: boolean, dataListId: number, selectedMeasure?: string): Observable<any> {
     const cacheId = NtaHelperService.setCacheId(catId, dataListId, selectedMeasure);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
-      this.getCategory(cacheId, catId, dataListId, selectedMeasure);
+      this.getCategory(cacheId, noCache, catId, dataListId, selectedMeasure);
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
-      this.getSearch(cacheId, catId);
+      this.getSearch(cacheId, noCache, catId);
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
-  getCategory(cacheId: string, catId: any, dataListId, selectedMeasure?: string) {
+  getCategory(cacheId: string, noCache: boolean, catId: any, dataListId, selectedMeasure?: string) {
     this.categoryData[cacheId] = <CategoryData>{};
     this._uheroAPIService.fetchCategories().subscribe((categories) => {
       if (catId === null) {
@@ -67,15 +67,15 @@ export class NtaHelperService {
           sublistCopy.push(Object.assign({}, sub));
         });
         this.categoryData[cacheId].sublist = sublistCopy;
-        this.getSubcategoryData(this.categoryData[cacheId], selectedMeasure);
+        this.getSubcategoryData(this.categoryData[cacheId], noCache, selectedMeasure);
       } else {
         this.categoryData[cacheId].invalid = 'Category does not exist.';
       }
     });
   }
 
-  getSubcategoryData(category, selectedMeasure?: string) {
-    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList.id).subscribe((measures) => {
+  getSubcategoryData(category, noCache: boolean, selectedMeasure?: string) {
+    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList.id, noCache).subscribe((measures) => {
       category.measurements = measures;
     },
       (error) => {
@@ -83,7 +83,7 @@ export class NtaHelperService {
       },
       () => {
         this.findSelectedMeasurement(category, selectedMeasure);
-        this.getSeriesData(category);
+        this.getSeriesData(category, noCache);
       });
   }
 
@@ -96,10 +96,10 @@ export class NtaHelperService {
   }
 
   // Get list of series belonging to each measurement
-  getSeriesData(category) {
+  getSeriesData(category, noCache: boolean) {
     const categoryDataArray = [];
     category.dateWrapper = { firstDate: '', endDate: '' };
-    this._uheroAPIService.fetchMeasurementSeries(category.currentMeasurement.id).subscribe((series) => {
+    this._uheroAPIService.fetchMeasurementSeries(category.currentMeasurement.id, noCache).subscribe((series) => {
       if (series) {
         category.series = series;
         this.formatCategoryData(category, categoryDataArray, false);
@@ -113,10 +113,10 @@ export class NtaHelperService {
       });
   }
 
-  getSearch(cacheId, catId) {
+  getSearch(cacheId, noCache: boolean, catId) {
     this.categoryData[cacheId] = <CategoryData>{};
     let freqGeos, freqs, obsEnd, obsStart;
-    this._uheroAPIService.fetchSearch(catId).subscribe((results) => {
+    this._uheroAPIService.fetchSearch(catId, noCache).subscribe((results) => {
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       freqs = results.freqs;
@@ -129,7 +129,7 @@ export class NtaHelperService {
       () => {
         if (obsEnd && obsStart) {
           const dateWrapper = <DateWrapper>{};
-          this.getSearchData(catId, cacheId, dateWrapper);
+          this.getSearchData(catId, noCache, cacheId, dateWrapper);
           this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
           this.categoryData[cacheId].selectedCategory = { id: catId, name: 'Search: ' + catId };
         } else {
@@ -138,10 +138,10 @@ export class NtaHelperService {
       });
   }
 
-  getSearchData(search: string, cacheId, dateWrapper: DateWrapper) {
+  getSearchData(search: string, noCache: boolean, cacheId, dateWrapper: DateWrapper) {
     let searchResults;
     // Get series for a requested search term
-    this._uheroAPIService.fetchSearchSeries(search).subscribe((searchRes) => {
+    this._uheroAPIService.fetchSearchSeries(search, noCache).subscribe((searchRes) => {
       searchResults = searchRes;
     },
       (error) => {
@@ -150,16 +150,16 @@ export class NtaHelperService {
       () => {
         if (searchResults) {
           const searchSeries = [];
-          this.getSearchObservations(searchResults, search, this.categoryData[cacheId]);
+          this.getSearchObservations(searchResults, noCache, search, this.categoryData[cacheId]);
         }
       });
   }
 
   // Get observations for series in search results
-  getSearchObservations(searchSeries, search, category) {
+  getSearchObservations(searchSeries, noCache: boolean, search, category) {
     let seriesTotal = searchSeries.length;
     searchSeries.forEach((series) => {
-      this._uheroAPIService.fetchObservations(series.id).subscribe((obs) => {
+      this._uheroAPIService.fetchObservations(series.id, noCache).subscribe((obs) => {
         series.seriesObservations = obs;
       },
         (error) => {

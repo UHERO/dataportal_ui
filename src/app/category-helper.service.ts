@@ -30,7 +30,7 @@ export class CategoryHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+  initContent(catId: any, noCache: boolean, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
@@ -52,7 +52,7 @@ export class CategoryHelperService {
           this.categoryData[cacheId].selectedCategoryId = cat.id;
           this.categoryData[cacheId].selectedCategory = cat;
           this.categoryData[cacheId].subcategories = categoryDataLists;
-          this.getDataListGeos(catId, selectedDataList, cacheId, routeGeo, routeFreq);
+          this.getDataListGeos(catId, noCache, selectedDataList, cacheId, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
           this.categoryData[cacheId].requestComplete = true;
@@ -62,7 +62,7 @@ export class CategoryHelperService {
     }
   }
 
-  getDataListGeos(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListGeos(catId: any, noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
       this.categoryData[cacheId].regions = geos ? geos : [dataList.defaults.geo];
     },
@@ -70,11 +70,11 @@ export class CategoryHelperService {
         console.log('check category geos error', error);
       },
       () => {
-        this.getDataListFreqs(catId, dataList, cacheId, routeGeo, routeFreq);
+        this.getDataListFreqs(catId, noCache, dataList, cacheId, routeGeo, routeFreq);
       });
   }
 
-  getDataListFreqs(catId: any, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListFreqs(catId: any, noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
       this.categoryData[cacheId].frequencies = freqs ? freqs : [dataList.defaults.freq];
     },
@@ -88,18 +88,18 @@ export class CategoryHelperService {
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
         }
         if (routeGeoExists && routeFreqExists) {
-          this.getData(catId, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
+          this.getData(catId, noCache, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
         }
         if (!routeGeoExists || !routeFreqExists) {
           const defaultFreq = dataList.defaults && dataList.defaults.freq ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
           const defaultGeo = dataList.defaults && dataList.defaults.geo ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
-          this.getData(catId, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
+          this.getData(catId, noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
         }
       });
   }
 
-  getData(catId: any, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
-    this._uheroAPIService.fetchExpanded(subId, geo, freq).subscribe((expandedCategory) => {
+  getData(catId: any, noCache: boolean, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
+    this._uheroAPIService.fetchExpanded(subId, geo, freq, noCache).subscribe((expandedCategory) => {
       if (expandedCategory) {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
@@ -190,7 +190,7 @@ export class CategoryHelperService {
   }
 
   // Set up search results
-  initSearch(search: string, routeGeo?: string, routeFreq?: string): Observable<any> {
+  initSearch(search: string, noCache?: boolean, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(search, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
@@ -198,7 +198,7 @@ export class CategoryHelperService {
       let obsEnd, obsStart;
       this.categoryData[cacheId] = <CategoryData>{};
       if (routeGeo && routeFreq) {
-        this._uheroAPIService.fetchPackageSearch(search, routeGeo, routeFreq).subscribe((results) => {
+        this._uheroAPIService.fetchPackageSearch(search, routeGeo, routeFreq, noCache).subscribe((results) => {
           const routeGeoExists = results.geos.find(geo => geo.handle === routeGeo);
           const routeFreqExists = results.freqs.find(freq => freq.freq === routeFreq);
           const defaultGeo = results.defaultGeo.handle;
@@ -209,19 +209,19 @@ export class CategoryHelperService {
             this.getSearchData(results, cacheId, search, routeGeo, routeFreq);
           }
           if (!routeFreqExists || !routeGeoExists) {
-            this.getSearchWithDefaults(search, cacheId);
+            this.getSearchWithDefaults(search, noCache, cacheId);
           }
         });
       }
       if (!routeGeo || !routeFreq) {
-        this.getSearchWithDefaults(search, cacheId);
+        this.getSearchWithDefaults(search, noCache, cacheId);
       }
       return observableForkJoin(observableOf(this.categoryData[cacheId]));
     }
   }
 
-  getSearchWithDefaults(search, cacheId) {
-    this._uheroAPIService.fetchPackageSearch(search, '', '').subscribe((results) => {
+  getSearchWithDefaults(search, noCache: boolean, cacheId) {
+    this._uheroAPIService.fetchPackageSearch(search, '', '', noCache).subscribe((results) => {
       const geo = results.defaultGeo.handle;
       const freq = results.defaultFreq.freq;
       this.getSearchData(results, cacheId, search, geo, freq);
