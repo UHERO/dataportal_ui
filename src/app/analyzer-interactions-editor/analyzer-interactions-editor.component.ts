@@ -15,8 +15,8 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   ngAfterViewInit() {
     setTimeout(() => {
-      $('.dropdown').dropdown('toggle')
-    })
+      $('.dropdown').dropdown('toggle');
+    });
   }
 
   agInit(params: any): void {
@@ -33,6 +33,10 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   invokeParentRemoveFromAnalyzer() {
     this.params.context.componentParent.removeFromAnalyzer(this.params.value);
+  }
+
+  toggleMenu() {
+    this.params.stopEditing();
   }
 
   getValue(): any {

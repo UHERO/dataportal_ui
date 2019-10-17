@@ -1,6 +1,6 @@
 <div class="dropdown" *ngIf="params">
   <button class="btn analyzer-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-    aria-expanded="false">
+    aria-expanded="false" (click)="toggleMenu()">
     &nbsp;
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -11,7 +11,7 @@
     <p *ngIf="params.value.showInChart">
       <i class="material-icons" [style.color]="params.value.color" (click)="invokeParentSwitchChartYAxes()">
         compare_arrows
-      </i> Switch Y-Axis
+      </i> Swap Y-axes
     </p>
     <p *ngIf="params.value.showInChart">
       <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
