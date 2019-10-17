@@ -22,6 +22,7 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
   private dataListId: number;
   private routeView: string;
   private routeC5ma;
+  private noCache: boolean;
   private search = false;
   private queryParams: any = {};
   private chartRange;
@@ -65,12 +66,14 @@ export class NtaLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeView = params['view'];
       this.routeC5ma = params['c5ma'];
       this.selectedMeasure = params['m'];
+      this.noCache = params['nocache'] === 'true';
       if (this.id) { this.queryParams.id = this.id; };
       if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; };
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
-      this.categoryData = this._ntaHelper.initContent(this.id, this.dataListId, this.selectedMeasure);
+      if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
+      this.categoryData = this._ntaHelper.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
