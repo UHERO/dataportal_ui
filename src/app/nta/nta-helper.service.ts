@@ -212,7 +212,7 @@ export class NtaHelperService {
     category.requestComplete = true;
     if (category.sublist) {
       category.sublist.forEach((sub) => {
-        this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
+        // this.initContent(sub.parentId, sub.id, category.currentMeasurement.name);
       });  
     }
   }

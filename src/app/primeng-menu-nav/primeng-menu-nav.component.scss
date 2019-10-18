@@ -224,6 +224,10 @@
             font-size: 1em;
           }
         }
+
+        a:focus {
+          outline-width: thin;
+        }
       }
 
       .ui-panelmenu-header.ui-state-active {
