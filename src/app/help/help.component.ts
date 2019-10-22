@@ -11,7 +11,7 @@ import { HelpService } from '../help.service';
   styleUrls: ['./help.component.scss']
 })
 export class HelpComponent implements AfterViewInit {
-  @ViewChild(HelpDirective) appHelp: HelpDirective;
+  @ViewChild(HelpDirective, { static: true }) appHelp: HelpDirective;
 
   constructor(@Inject('portal') private portal, private componentFactoryResolver: ComponentFactoryResolver, private _help: HelpService) { }
 

@@ -1,9 +1,9 @@
 import {map} from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
+// import { Http, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
+// import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 
 @Component({
   selector: 'app-feedback',
