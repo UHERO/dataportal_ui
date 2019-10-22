@@ -119,9 +119,9 @@ export class CategoryHelperService {
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
         this.categoryData[cacheId].noData = true;
       }
-      this.categoryData[cacheId].subcategories.forEach((sub) => {
+      /* this.categoryData[cacheId].subcategories.forEach((sub) => {
         this.getSiblingData(sub, catId, routeGeo, routeFreq);
-      });
+      }); */
     });
   }
 

@@ -17,6 +17,7 @@ declare var $: any;
 export class SingleSeriesComponent implements OnInit, AfterViewInit {
   private noSelection: string;
   private newTableData;
+  private tableHeaders;
   private summaryStats;
   private seasonallyAdjusted = false;
   private seasonalAdjustment;
@@ -151,9 +152,21 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
       }
     }
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
+    this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
     seriesDetail.currentFreq = { freq: seriesDetail.frequencyShort };
     this.summaryStats = this._series.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate);
+  }
+
+  createTableColumns = (portalSettings, seriesDetail) => {
+    const cols = [];
+    cols.push({ field: 'tableDate', header: 'Date' });
+    cols.push({ field: portalSettings.seriesTable.series1, header: 'Level' });
+    cols.push({ field: portalSettings.seriesTable.series2, header: seriesDetail.percent ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label });
+    if (seriesDetail.frequencyShort !== 'A' && portalSettings.seriesTable.columns === 4) {
+      cols.push({ field: portalSettings.seriesTable.series3, header: seriesDetail.percent ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label });
+    }
+    return cols;
   }
 
   formatValues = (values, decimal) => values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));

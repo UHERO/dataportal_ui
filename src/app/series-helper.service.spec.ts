@@ -1,7 +1,6 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
-import { XHRBackend, BaseRequestOptions, ConnectionBackend, Response, ResponseOptions } from '@angular/http';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { SeriesHelperService } from './series-helper.service';
 import { HelperService } from './helper.service';

@@ -100,8 +100,43 @@
 
 :host {
   ::ng-deep {
-    .ui-datatable {
+    .ui-table {
       background-color: transparent;
+      text-align: right;
+      font-family: 'Lucida Sans', sans-serif;
+      font-size: 0.9em;
+      border: 0;
+      border-right: 1px solid #E5E5E5;
+
+      .ui-sortable-column.ui-state-highlight {
+        background-color: #F4F4F4;
+        color: #333;
+
+        &:focus {
+          outline: none;
+        }
+
+        .ui-sortable-column-icon {
+          color: #848484;
+          vertical-align: middle;
+        }
+      }
+
+      .ui-table-thead {
+        tr {
+          th {
+            padding: .25em .5em;
+          }
+        }
+      }
+
+      .ui-table-tbody {
+        tr {
+          td {
+            padding: .25em .5em;
+          }
+        }
+      }
 
       .fa-spinner {
         color: $primary;
@@ -109,30 +144,22 @@
         font-size: 1.3em;
         margin-top: 20px;    
       }
-
-      th, td {
-        text-align: right;
-        font-family: 'Lucida Sans', sans-serif;
-        font-size: 0.9em;
-        border: 0;
-        border-right: 1px solid #E5E5E5;
-      }
   
-      .ui-datatable th.ui-state-default {
+      /* th.ui-state-default {
         background: #F5F5F5;
         border: 1px solid #E5E5E5;
         border-bottom: 0;
-      }
+      } */
 
       .ui-widget-overlay {
         background-color: transparent;
       }
   
-      th.ui-state-active {
+      /* th.ui-state-active {
         background: #ebedf0;
         color: $primary-text;
         outline: 0;
-      }
+      } */
   
       tr.ui-widget-content {
         border-top-color: transparent;

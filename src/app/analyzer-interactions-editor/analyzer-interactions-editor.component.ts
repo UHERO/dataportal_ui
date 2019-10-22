@@ -9,14 +9,14 @@ declare var $: any;
 })
 export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularComp, AfterViewInit {
   params: any;
-  @ViewChild('interaction-select', { read: ViewContainerRef }) public interactionSelect;
+  @ViewChild('interaction-select', { read: ViewContainerRef, static: false }) public interactionSelect;
 
   constructor() { }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      $('.dropdown').dropdown('toggle')
-    })
+      $('.dropdown').dropdown('toggle');
+    });
   }
 
   agInit(params: any): void {
@@ -33,6 +33,10 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   invokeParentRemoveFromAnalyzer() {
     this.params.context.componentParent.removeFromAnalyzer(this.params.value);
+  }
+
+  toggleMenu() {
+    this.params.stopEditing();
   }
 
   getValue(): any {
