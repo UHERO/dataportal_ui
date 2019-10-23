@@ -25,29 +25,59 @@ p {
     font-size: 0.9rem;
 }
 
+.help-view-topics-list {
+    a {
+        color: $primary-text;
+        text-decoration: underline;
+    }
+}
+
 ol {
-    counter-reset: item
+    counter-reset: item;
+    padding-inline-start: 15px;
 }
+
 li {
-    display: block
-}
-li:before {
-    content: counters(item, ".") ". ";
-    counter-increment: item
+    display: block;
+
+    &:before {
+        content: counters(item, ".") ". ";
+        counter-increment: item
+    }
 }
 
 #chart-view {
-    width: 884px;
+    width: 1428px;
+    max-width: 100%;
+}
+
+#chart-view2 {
+    width: 1428px;
     max-width: 100%;
 }
 
 #table-view {
-    width: 893px;
+    width: 1428px;
     max-width: 100%;
 }
 
 #series-view {
-    width: 925px;
+    width: 1428px;
+    max-width: 100%;
+}
+
+#analyzer-screenshot {
+    width: 1428px;
+    max-width: 100%;
+}
+
+#analyzer-screenshot2 {
+    width: 1428px;
+    max-width: 100%;
+}
+
+#analyzer-tables {
+    width: 1428px;
     max-width: 100%;
 }
 
