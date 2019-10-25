@@ -25,11 +25,9 @@ p {
     font-size: 0.9rem;
 }
 
-.help-view-topics-list {
-    a {
-        color: $primary-text;
-        text-decoration: underline;
-    }
+a {
+    color: $primary;
+    text-decoration: underline;
 }
 
 ol {
@@ -46,22 +44,22 @@ li {
     }
 }
 
-#chart-view {
+#chart-view-screenshot {
     width: 1428px;
     max-width: 100%;
 }
 
-#chart-view2 {
+#chart-view-screenshot2 {
     width: 1428px;
     max-width: 100%;
 }
 
-#table-view {
+#table-view-screenshot {
     width: 1428px;
     max-width: 100%;
 }
 
-#series-view {
+#series-view-screenshot {
     width: 1428px;
     max-width: 100%;
 }
@@ -84,4 +82,20 @@ li {
 #search-box {
     width: 615px;
     max-width: 100%;
+}
+
+.emphasis-blue {
+    color: blue;
+}
+
+.emphasis-green {
+    color: green;
+}
+
+.emphasis-red {
+    color: red;
+}
+
+.emphasis-orange {
+    color: orange;
 }
