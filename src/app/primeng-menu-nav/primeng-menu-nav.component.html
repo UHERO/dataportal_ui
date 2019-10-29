@@ -13,10 +13,10 @@
     <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText" class="mobile-logo">
     <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
     <p-panelMenu [model]="navMenuItems"></p-panelMenu>
-    <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
-      routerLink="/help">&nbsp; About</a>
     <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer"
       *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a>
+    <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
+      routerLink="/help">&nbsp; About</a>
   </div>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>

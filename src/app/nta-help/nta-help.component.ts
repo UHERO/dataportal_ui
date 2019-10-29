@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-nta-help',
@@ -8,7 +8,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 })
 export class NtaHelpComponent {
 
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(private route: ActivatedRoute) { }
 
   onContentsLinkClick() {
     this.route.fragment.subscribe((frag) => {
