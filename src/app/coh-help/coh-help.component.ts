@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-coh-help',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CohHelpComponent implements OnInit {
 
-  constructor() { }
+  constructor( private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
+  }
+
+  onContentsLinkClick() {
+    this.route.fragment.subscribe((frag) => {
+      const element = document.querySelector(`#${frag}`);
+      if (element) {
+        element.scrollIntoView({block: "end", behavior: "smooth"});
+      }
+    });
   }
 
 }

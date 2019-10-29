@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-nta-help',
@@ -7,6 +8,15 @@ import { Component } from '@angular/core';
 })
 export class NtaHelpComponent {
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) { }
+
+  onContentsLinkClick() {
+    this.route.fragment.subscribe((frag) => {
+      const element = document.querySelector(`#${frag}`);
+      if (element) {
+        element.scrollIntoView({block: "end", behavior: "smooth"});
+      }
+    });
+  }
 
 }
