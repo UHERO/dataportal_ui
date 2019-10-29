@@ -16,6 +16,7 @@
       </ol>
     </li>
     <li><a [routerLink]="['.']" fragment="search" (click)="onContentsLinkClick()">Search</a></li>
+    <li><a [routerLink]="['.']" fragment="notes" (click)="onContentsLinkClick()">Notes</a></li>
 </ol>
 
 <h2 class="mt-4" id="chart-view">Chart View</h2>
@@ -26,7 +27,7 @@
   In the menu on the left side of the screen you can select from different categories of data to display.
   For example, selecting <strong class="emphasis-blue">Age Structure</strong> will load the Support Ratio data, as well as, a list of additional related categories.
 </p>
-<img src="../../assets/nta/ChartView2.png" id="chart-view-screenshot2" alt="Screenshot of Economic Indicators Summary Chart View with drop down selectors circled and date slider circled?">
+<img src="../../assets/nta/ChartView2.png" id="chart-view-screenshot2" alt="Screenshot of Age Structure Summary Chart View with drop down selectors circled and date slider circled?">
 <p class="mt-3">In any view mode, at the top of the page is a selector for the <strong class="emphasis-red">measurements</strong> by which the data can be viewed by. In the screen shot above, the measurement is set to "Region". Using the pull-down 
   you can view the series by Region(s), Income Group(s), or All Countries. Next to the measurement selector is a toggle to switch to Table View (more on that below). The sample period displayed can be adjusted using the starting and ending period <strong class="emphasis-blue">sliders</strong>, or you can click in the <strong class="emphasis-green">date boxes</strong> on either side of the sliders to type your desired starting or ending period.  
 </p>
@@ -46,9 +47,9 @@
   To view a chart of a single series in Series View click on the series name, or any of the individual charts while in <a [routerLink]="['.']" fragment="chart-view" (click)="onContentsLinkClick()">Chart View</a>. The Series View plots a single series using a line measured on the right axis and the annual change displayed as bars measured on the left axis.
 </p>
 <p>
-  <strong>Header controls:</strong> At the top of the chart, there is a drop down to view the series for other regions/income groups, depending on the measurement that was selected in the Chart or Table View. In the example above, you can switch from Africa's Support Ratio to either Americas, Asia, Europe, Oceania, or World. These are the available series under the Region measurement which is the default selected measurement of the Chart and Table Views. The link button next to the frequency selector copies a static URL for the current chart. This URL can be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen. As in each of the other views, to add an indicator to the <a [routerLink]="['.']" fragment="analyzer" (click)="onContentsLinkClick()">Analyzer</a>, toggle the <b><strong class="emphasis-orange">star</strong></b>, located at the top of the chart following the indicator name.
+  <strong>Header controls:</strong> At the top of the chart, there is a drop down to view the series for other regions/income groups, depending on the measurement that was selected in the Chart or Table View. In the example above, you can switch from Africa's Support Ratio to either Americas, Asia, Europe, Oceania, or World. These are the available series under the Region measurement which is the default selected measurement of the Chart and Table Views. The link button to the right copies a static URL for the current chart. This URL can be bookmarked, shared or otherwise used to reproduce the chart as it appears on the screen. As in each of the other views, to add an indicator to the <a [routerLink]="['.']" fragment="analyzer" (click)="onContentsLinkClick()">Analyzer</a>, toggle the <b><strong class="emphasis-orange">star</strong></b>, located at the top of the chart following the indicator name.
 <p>
-  <strong>Sample selection:</strong> There are multiple controls for setting the range of the data viewed. There are the familiar date boxes in the upper right corner of the chart. In the top-left corner of the chart are links to zoom the displayed sample to the last year, the last five years, the last ten years, or all available data. The spark line below the main chart displays the entire range of data and has <strong class="emphasis-red">sliders</strong> to select any part of the full sample.
+  <strong>Sample selection:</strong> To change the range of data viewed, there are the familiar date boxes in the upper right corner of the chart. The spark line below the main chart also displays the entire range of data and has <strong class="emphasis-red">sliders</strong> to select any part of the full sample.
 </p>
 <p>
   <strong>Export:</strong> In the top-right corner of the chart area, click <strong class="emphasis-orange">Download</strong> to choose from
@@ -61,13 +62,13 @@
 <h2 class="mt-4" id="analyzer">Using the Analyzer Tool</h2>
 <img src="../../assets/nta/Analyzer.png" alt="Screenshot of Analyzer" id="analyzer-screenshot">
 <p class="mt-3">
-  In the previous two screen shots, we added Hawaii County Non-farm jobs and the Honolulu Core CPI Inflation rate to the Analyzer. Click on <strong>Analyzer(2)</strong> at the bottom of the left-hand menu. The number in the parentheses indicates the number of series you have starred.
+  In the above screen shot, we added Support Ratio (Africa) and Support Ratio (Americas) to the Analyzer. Click on <strong>Analyzer(2)</strong> at the bottom of the left-hand menu. The number in the parentheses indicates the number of series you have starred.
 </p>
 <p>
-  The Analyzer plots the starred series together in one graph and autmatically choses whether to use a two-scale or single-scale graph depending on the units of the indicators. For example, in the screen shot above, the inflation rate is plotted on the right axis in percent, and non-farm jobs are plotted on the left axis measured in thousands of jobs. If you have added (starred) more than two indicators, Analyzer plots only the first two indicators and lists all of the starred indicators in the table immediately below the chart in the order they were starred.
+  The Analyzer plots the starred series together in one graph and autmatically choses whether to use a two-scale or single-scale graph depending on the units of the indicators. If you have added (starred) more than two indicators, Analyzer plots only the first two indicators and lists all of the starred indicators in the table immediately below the chart in the order they were starred.
 </p>
 <p id="analyzer-controls">
-  <strong>Analyzer Chart Controls:</strong> The analyzer chart has all of the same controls discussed above for Series View, with the exception of region, frequency, and seasonal adjustment selectors. Those are not available because they are determined for each indicator when added to the Analyzer. New chart controls include three selectors at the bottom to toggle tool tips for <strong class="emphasis-blue">Series Name, Units, and Geography</strong>. The screen shot above shows the mouse hover over at 2005Q2 with the Units and Geography tool tips toggled on.
+  <strong>Analyzer Chart Controls:</strong> The analyzer chart has all of the same controls discussed above for Series View, with the exception of the measurement selector. New chart controls include three selectors at the bottom to toggle tool tips for <strong class="emphasis-blue">Series Name, Units, and Geography</strong>. The screen shot above shows the mouse hover over at 2051 with the Units and Geography tool tips toggled on.
 </p> 
 <p>
   Additional control over the indicators displayed in the chart is available using the gear icons next to each indicator name in the data table directly below the chart. As long as you have added at least two indicators to the Analyzer, clicking the gear icon gives you the options to <em>Removing from Analyzer</em> (the trashcan), <em>Swap Y-axes</em>, or <em>Remove from Chart</em> as shown in the screen shot below. If you have more than two indicators in your Analyzer list, the gear icon for indicators not currently displayed will offer an <em>Add to Chart</em> check box.
@@ -92,7 +93,7 @@
 </p>
 
 <div>
-    <h3>Notes</h3>
+    <h2 class="mt-4" id="notes">Notes</h2>
     <p>Suggested citation: NTA Network (2017) <em>NTA Indicators</em> accessed on [date], www.ntaccounts.org.</p>
     <p>These NTA indicators quantify the direct effect of changes in population size and age structure on selected macroeconomic
         measures. The indicators are constructed combining population projections with age profiles of consumption and labor
