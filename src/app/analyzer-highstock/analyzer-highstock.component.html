@@ -1,7 +1,7 @@
 <div *ngIf="alertMessage" class="alert alert-info alert-message" role="alert">
     <i class="material-icons">&#xE001;</i> {{alertMessage}}
 </div>
-<highcharts-chart id="analyzer-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
+<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
     [(update)]="updateChart" [callbackFunction]="chartCallback"></highcharts-chart>
 <div class="customize-tooltip">
     <p>Tooltip Display:</p>

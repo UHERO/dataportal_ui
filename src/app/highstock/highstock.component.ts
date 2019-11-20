@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -10,18 +10,17 @@ import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
-const exporting = require('../../../node_modules/highcharts/modules/exporting');
-const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
-const exportCSV = require('../csv-export');
-exporting(Highcharts);
-offlineExport(Highcharts);
-exportCSV(Highcharts);
+require('highcharts/modules/exporting')(Highcharts);
+require('highcharts/modules/offline-exporting')(Highcharts);
+require('../csv-export')(Highcharts);
+
 
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
   // Use styles defined in analyzer-highstock component
   styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;

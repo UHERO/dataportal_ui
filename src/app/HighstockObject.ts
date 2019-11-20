@@ -61,7 +61,7 @@ export interface HighstockObject {
     },
     filename: string,
     chartOptions: {
-      events: void,
+      events: any,
       navigator: {
         enabled: boolean
       },
@@ -82,7 +82,7 @@ export interface HighstockObject {
       },
       title: {
         text: string,
-        align: string
+        align: string,
       },
       subtitle?: {
         text: ''
