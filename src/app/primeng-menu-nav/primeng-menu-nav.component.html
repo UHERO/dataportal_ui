@@ -17,6 +17,10 @@
       *ngIf="analyzerSeries">&nbsp; Analyzer ({{analyzerSeries.length}})</a>
     <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
       routerLink="/help">&nbsp; About</a>
+    <span *ngIf="headerLogo.analyticsLogoSrc">
+      <p id="built-by">Built By</p>
+      <img class="analytics-logo" [src]="headerLogo.analyticsLogoSrc" [alt]="headerLogo.altText">
+    </span>
   </div>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
 </nav>

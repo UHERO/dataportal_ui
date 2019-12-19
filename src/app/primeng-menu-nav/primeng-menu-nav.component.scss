@@ -61,6 +61,20 @@
       background-color: $gray;
     }
 
+    #built-by {
+      color: $primary-text;
+      display: inline-block;
+      font-size: 0.8em;
+      margin-bottom: 0;
+      padding-left: 0.5em;
+      vertical-align: bottom;
+    }
+
+    .analytics-logo {
+      padding-left: 0.5em;
+      width: 60%;
+    }
+
     .mobile-logo {
       display: block;
       max-height: 55px;
@@ -110,10 +124,6 @@
 
       .mobile-divider, .mobile-logo {
         display: none;
-      }
-
-      #about-link {
-        // display: none;
       }
     }
   }

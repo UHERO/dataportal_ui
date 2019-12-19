@@ -433,6 +433,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       exportKey: 'Download Chart'
     };
     this.chartOptions.exporting = {
+      allowHTML: true,
       buttons: {
         contextButton: {
           enabled: false
@@ -449,6 +450,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       filename: 'chart',
       chartOptions: {
         events: null,
+        chart: {
+          events: {
+            load: function() {
+              // this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.5, 68 / 1.5).add();
+              this.renderer.text('<a href="data.uhero.hawaii.edu>logo.analyticsLogoSrc</a>', 490, 350, true).add()
+            }
+          },
+          spacingBottom: 40
+        },
         navigator: {
           enabled: false
         },
