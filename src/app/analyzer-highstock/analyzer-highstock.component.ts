@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, OnChanges, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../HighstockObject';
 import 'jquery';
@@ -41,7 +41,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   switchAxes;
   alertMessage;
 
-  constructor(private _highstockHelper: HighstockHelperService, private _analyzer: AnalyzerService, private cdr: ChangeDetectorRef) {
+  constructor(@Inject('logo') private logo,
+    private _highstockHelper: HighstockHelperService,
+    private _analyzer: AnalyzerService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.switchAxes = this._analyzer.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
     });
@@ -369,6 +373,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
     const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
+    const logo = this.logo;
     this.chartOptions.chart = {
       alignTicks: false,
       description: undefined,
@@ -453,8 +458,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         chart: {
           events: {
             load: function() {
-              // this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.5, 68 / 1.5).add();
-              this.renderer.text('<a href="data.uhero.hawaii.edu>logo.analyticsLogoSrc</a>', 490, 350, true).add()
+              if (logo.analyticsLogoSrc) {
+                this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
+              }
             }
           },
           spacingBottom: 40
@@ -471,7 +477,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         credits: {
           enabled: true,
           text: portalSettings.highstock.credits,
-          position: { align: 'right', x: -10, y: -5 }
+          position: {
+            align: 'right',
+            x: -35,
+            y: -5
+          }
         },
         title: {
           align: 'left',
