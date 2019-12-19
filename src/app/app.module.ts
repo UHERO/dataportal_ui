@@ -59,6 +59,7 @@ import { RouterModule } from '@angular/router';
       provide: 'logo',
       useValue: {
         altText: 'UHERO Data Portal Logo',
+        analyticsLogoSrc: '../../assets/Analytics_Logo.svg',
         displayImg: true,
         headerText: '',
         imgSrc: '../../assets/UHEROdata-Logo-color.svg',

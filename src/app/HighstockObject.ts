@@ -46,6 +46,7 @@ export interface HighstockObject {
     }
   },
   exporting: {
+    allowHTML: boolean,
     buttons: {
       contextButton: {
         enabled: boolean
@@ -61,7 +62,8 @@ export interface HighstockObject {
     },
     filename: string,
     chartOptions: {
-      events: void,
+      events: any,
+      chart: any,
       navigator: {
         enabled: boolean
       },
@@ -82,7 +84,7 @@ export interface HighstockObject {
       },
       title: {
         text: string,
-        align: string
+        align: string,
       },
       subtitle?: {
         text: ''

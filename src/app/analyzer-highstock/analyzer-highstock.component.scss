@@ -28,194 +28,196 @@
         vertical-align: sub;
     }
 }
-:host {
-  ::ng-deep {
-    #analyzer-chart, #single-series-chart {
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-      -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-      -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
-      display: block;
-      margin-top: 2%;
-      width: 100%;
-    }
 
-    .highcharts-background {
-      fill: $chart-background;
-    }
 
-    .highcharts-button, .highcharts-button-hover {
-      stroke: none;
-    }
 
-    .highcharts-button.highcharts-button-pressed {
-      fill: $highstock-series0;
-
-      text {
-        fill: $white;
-      }
-    }
-
-    input.highcharts-range-selector {
-      color: $primary-text;
-      font-size: 0.85em;
-    }
-
-    .highcharts-subtitle {
-      fill: $primary-text;
-      font-weight: bold;
-    }
-
-    .highcharts-markers.highcharts-color-0 {
-      path {
-        fill: $analyzer-series0;
-      }
-    }
-
-    .highcharts-markers.highcharts-color-1 {
-      path {
-        fill: $analyzer-series1;
-      }
-    }
-
-    .highcharts-markers.highcharts-color-2 {
-      path {
-        fill: $analyzer-series2;
-      }
-    }
-
-    .highcharts-markers.highcharts-color-3 {
-      path {
-        fill: $analyzer-series3;
-      }
-    }
-
-    .highcharts-markers.highcharts-color-4 {
-      path {
-        fill: $analyzer-series4;
-      }
-    }
-
-    .highcharts-navigator-handle {
-      stroke: #999999;
-    }
-
-    .highcharts-color-0 {
-      fill: $analyzer-series0;
-      stroke: $analyzer-series0;
-    }
-
-    .highcharts-color-1 {
-      fill: $analyzer-series1;
-      stroke: $analyzer-series1;
-    }
-
-    .highcharts-color-2 {
-      fill: $analyzer-series2;
-      stroke: $analyzer-series2;
-    }
-
-    .highcharts-color-3 {
-      fill: $analyzer-series3;
-      stroke: $analyzer-series3;
-    }
-
-    .highcharts-color-4 {
-      fill: $analyzer-series4;
-      stroke: $analyzer-series4;
-    }
-
-    .pseudoHistory {
-      stroke: #7CB5EC;
-      stroke-dasharray: 5, 10;
-    }
-
-    .highcharts-navigator-series {
-      .highcharts-graph {
-        color: #505050;
-        stroke: #505050;            
-      }
-
-      .highcharts-area {
-        fill: $highstock-series1;
-      }
-    }
-
-    .highcharts-column-series rect.highcharts-point {
-      stroke: none;
-    }
-
-    .highcharts-title {
-      fill: $primary-text;
-      font-family: sans-serif;
-    }
-
-    .highcharts-tooltip {
-      filter: none;
-
-      .series-0 {
-        fill: $analyzer-series0;
-      }
-        
-      .series-1 {
-        fill: $analyzer-series1;
-      }
-        
-      .series-2 {
-        fill: $analyzer-series2;
-      }
-
-      .series-3 {
-        fill: $analyzer-series3;
-      }
-
-      .series-4 {
-        fill: $analyzer-series4;
-      }
-
-      .highcharts-tooltip-box {
-        stroke-width: 0;
-      }
-    }
-
-    .highcharts-xaxis-labels {
-      text {
-        color: $highstock-series0;
-        fill: $highstock-series0;
-      }
-    }
-
-    .highcharts-yaxis-grid {
-      .highcharts-grid-line {
-        display: none;
-      }
-    }
-
-    .highcharts-yaxis-labels.series1 {
-      text {
-        color: $highstock-series0;
-        fill: $highstock-series0;
-      }
-    }
-
-    .highcharts-yaxis-labels.series2 {
-      text {
-        color: $highstock-series1;
-        fill: $highstock-series1;
-      }
-    }
-
-    .highcharts-yaxis.series1 {
-      .highcharts-axis-title {
-        color: $highstock-series0;
-        fill: $highstock-series0;
-      }
-    }
-
-    .highcharts-yaxis.series2 {
-      .highcharts-axis-title {
-        color: $highstock-series1;
-        fill: $highstock-series1;
-      }
-    }
+#stock-chart {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.15);
+  display: block;
+  margin-top: 2%;
+  width: 100%;
+}
+.highcharts-background {
+  fill: $chart-background;
+}
+  
+.highcharts-button, .highcharts-button-hover {
+  stroke: none;
+}
+  
+.highcharts-button.highcharts-button-pressed {
+  fill: $highstock-series0;
+  
+  text {
+    fill: $white;
   }
+}
+  
+input.highcharts-range-selector {
+  color: $primary-text;
+  font-size: 0.85em;
+}
+  
+.highcharts-subtitle {
+  fill: $primary-text;
+  font-weight: bold;
+}
+  
+.highcharts-markers.highcharts-color-0 {
+  path {
+    fill: $analyzer-series0;
+  }
+}
+  
+.highcharts-markers.highcharts-color-1 {
+  path {
+    fill: $analyzer-series1;
+  }
+}
+  
+.highcharts-markers.highcharts-color-2 {
+  path {
+    fill: $analyzer-series2;
+  }
+}
+  
+.highcharts-markers.highcharts-color-3 {
+  path {
+    fill: $analyzer-series3;
+  }
+}
+  
+.highcharts-markers.highcharts-color-4 {
+  path {
+    fill: $analyzer-series4;
+  }
+}
+  
+.highcharts-navigator-handle {
+  stroke: #999999;
+}
+  
+.highcharts-color-0 {
+  fill: $analyzer-series0;
+  stroke: $analyzer-series0;
+}
+  
+.highcharts-color-1 {
+  fill: $analyzer-series1;
+  stroke: $analyzer-series1;
+}
+  
+.highcharts-color-2 {
+  fill: $analyzer-series2;
+  stroke: $analyzer-series2;
+}
+  
+.highcharts-color-3 {
+  fill: $analyzer-series3;
+  stroke: $analyzer-series3;
+}
+  
+.highcharts-color-4 {
+  fill: $analyzer-series4;
+  stroke: $analyzer-series4;
+}
+  
+.pseudoHistory {
+  stroke: #7CB5EC;
+  stroke-dasharray: 5, 10;
+}
+  
+.highcharts-navigator-series {
+  .highcharts-graph {
+    color: #505050;
+    stroke: #505050;            
+  }
+  
+  .highcharts-area {
+    fill: $highstock-series1;
+  }
+}
+  
+.highcharts-column-series rect.highcharts-point {
+  stroke: none;
+}
+  
+.highcharts-title {
+  fill: $primary-text;
+  font-family: sans-serif;
+}
+  
+.highcharts-tooltip {
+  filter: none;
+  
+  .series-0 {
+    fill: $analyzer-series0;
+  }
+          
+  .series-1 {
+    fill: $analyzer-series1;
+  }
+          
+  .series-2 {
+    fill: $analyzer-series2;
+  }
+  
+  .series-3 {
+    fill: $analyzer-series3;
+  }
+  
+  .series-4 {
+    fill: $analyzer-series4;
+  }
+  
+  .highcharts-tooltip-box {
+    stroke-width: 0;
+  }
+}
+  
+.highcharts-xaxis-labels {
+  text {
+    color: $highstock-series0;
+    fill: $highstock-series0;
+  }
+}
+  
+.highcharts-yaxis-grid {
+  .highcharts-grid-line {
+    display: none;
+  }
+}
+  
+.highcharts-yaxis-labels.series1 {
+  text {
+    color: $highstock-series0;
+    fill: $highstock-series0;
+  }
+}
+  
+.highcharts-yaxis-labels.series2 {
+  text {
+    color: $highstock-series1;
+    fill: $highstock-series1;
+  }
+}
+  
+.highcharts-yaxis.series1 {
+  .highcharts-axis-title {
+    color: $highstock-series0;
+    fill: $highstock-series0;
+  }
+}
+  
+.highcharts-yaxis.series2 {
+  .highcharts-axis-title {
+    color: $highstock-series1;
+    fill: $highstock-series1;
+  }
+}
+
+.highcharts-credits {
+  font-size: 0.5em;
 }

@@ -1,5 +1,5 @@
 // Highstock chart component used for single-series view
-import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
 import { Geography } from '../geography';
 import { Frequency } from '../frequency';
 import { HighchartChartData } from '../highchart-chart-data';
@@ -10,18 +10,17 @@ import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
-const exporting = require('../../../node_modules/highcharts/modules/exporting');
-const offlineExport = require('../../../node_modules/highcharts/modules/offline-exporting');
-const exportCSV = require('../csv-export');
-exporting(Highcharts);
-offlineExport(Highcharts);
-exportCSV(Highcharts);
+require('highcharts/modules/exporting')(Highcharts);
+require('highcharts/modules/offline-exporting')(Highcharts);
+require('../csv-export')(Highcharts);
+
 
 @Component({
   selector: 'app-highstock',
   templateUrl: './highstock.component.html',
   // Use styles defined in analyzer-highstock component
   styleUrls: ['../analyzer-highstock/analyzer-highstock.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;
@@ -45,6 +44,7 @@ export class HighstockComponent implements OnChanges {
 
   constructor(
     @Inject('defaultRange') private defaultRange,
+    @Inject('logo') private logo,
     private _highstockHelper: HighstockHelperService
   ) { }
 
@@ -188,6 +188,7 @@ export class HighstockComponent implements OnChanges {
     const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
     const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
+    const logo = this.logo;
     this.chartOptions.chart = {
       alignTicks: false,
       zoomType: 'x',
@@ -223,6 +224,7 @@ export class HighstockComponent implements OnChanges {
     };
     this.chartOptions.lang = { exportKey: 'Download Chart' };
     this.chartOptions.exporting = {
+      allowHTML: true,
       buttons: {
         contextButton: { enabled: false },
         exportButton: {
@@ -237,6 +239,16 @@ export class HighstockComponent implements OnChanges {
       filename: name + '_' + geo.name + '_' + freq.label,
       chartOptions: {
         events: null,
+        chart: {
+          events: {
+            load: function() {
+              if (logo.analyticsLogoSrc) {
+                this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
+              }
+            }
+          },
+          spacingBottom: 40
+        },
         navigator: {
           enabled: false
         },
@@ -251,8 +263,8 @@ export class HighstockComponent implements OnChanges {
           text: portalSettings.highstock.credits,
           position: {
             align: 'right',
-            x: -115,
-            y: -41
+            x: -35,
+            y: -5
           }
         },
         title: {
