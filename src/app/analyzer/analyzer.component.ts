@@ -12,13 +12,9 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
   styleUrls: ['./analyzer.component.scss']
 })
 export class AnalyzerComponent implements OnInit {
-  private analyzerTableDates;
-  private analyzerChartSeries;
   private minDate;
   private maxDate;
   private portalSettings;
-  private alertUser;
-  private alertMessage = '';
   private tableYoy;
   private tableYtd;
   private tableC5ma;
@@ -33,11 +29,8 @@ export class AnalyzerComponent implements OnInit {
   constructor(
     @Inject('portal') private portal,
     private _analyzer: AnalyzerService,
-    private _series: SeriesHelperService,
     private _dataPortalSettings: DataPortalSettingsService,
     private route: ActivatedRoute,
-    private _router: Router,
-    private _helper: HelperService
   ) { }
 
   ngOnInit() {
