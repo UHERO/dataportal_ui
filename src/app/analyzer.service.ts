@@ -126,19 +126,8 @@ export class AnalyzerService {
   }
 
   checkFrequencies = (series) => {
-    let freq = 'A';
-    series.forEach((s) => {
-      if (s.currentFreq.freq === 'M') {
-        freq = 'M';
-      }
-      if (s.currentFreq.freq === 'Q') {
-        freq = 'Q';
-      }
-      if (s.currentFreq.freq === 'S') {
-        freq = 'S';
-      }
-    });
-    return freq;
+    const freqs = series.map((s) => s.currentFreq.freq);
+    return freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A'
   }
 
   createAnalyzerTable = (analyzerSeries) => {
@@ -291,7 +280,6 @@ export class AnalyzerService {
       }
       start.setMonth(start.getMonth() + 1);
     }
-    console.log('dateArray', dateArray)
     return dateArray;
   }
 

@@ -82,8 +82,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges() {
     const frequencies = [...new Set(this.series.map((series) => series.seriesDetail.frequencyShort))];
-    const newTableDates = this._analyzer.createAnalyzerDates(this.minDate, this.maxDate, frequencies, []);
-    this.columnDefs = this.setTableColumns(newTableDates);
+    if (this.minDate && this.maxDate) {
+      const newTableDates = this._analyzer.createAnalyzerDates(this.minDate, this.maxDate, frequencies, []);
+      this.columnDefs = this.setTableColumns(newTableDates);
+    }
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     if (this.minDate && this.maxDate) {
