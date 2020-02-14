@@ -81,7 +81,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       navigatorOptions = {
         frequency: this._analyzer.checkFrequencies(this.series),
         dateStart: this.allDates[0].date,
-        numberOfObservations: this.allDates.map(date => date.date).filter((d, i, a) => a.indexOf(d) === i).length
+        numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       }
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
     }
@@ -655,4 +655,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
   };
+
+  filterDatesForNavigator(allDates: Array<any>) {
+    return allDates.map(date => date.date).filter((d, i, a) => {
+      // If mixed frequencies are selected, filter out duplicated dates for annual observations, also check if date range only contains a partial year
+      return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
+    });
+  }
 }
