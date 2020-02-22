@@ -81,17 +81,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    // Update table as minDate & maxDate change
-    let tableEnd;
-    for (let i = this.allTableDates.length - 1; i > 0; i--) {
-      if (this.maxDate === this.allTableDates[i].date) {
-        tableEnd = i;
-        break;
-      }
+    const frequencies = [...new Set(this.series.map((series) => series.seriesDetail.frequencyShort))];
+    if (this.minDate && this.maxDate) {
+      const newTableDates = this._analyzer.createAnalyzerDates(this.minDate, this.maxDate, frequencies, []);
+      this.columnDefs = this.setTableColumns(newTableDates);
     }
-    tableEnd = tableEnd ? tableEnd : this.allTableDates.length - 1;
-    const tableStart = this.allTableDates.findIndex(item => item.date === this.minDate);
-    this.columnDefs = this.setTableColumns(this.allTableDates, tableStart, tableEnd);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     if (this.minDate && this.maxDate) {
@@ -174,7 +168,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     }];
   }
 
-  setTableColumns = (dates, tableStart, tableEnd) => {
+  setTableColumns = (dates) => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -196,7 +190,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       cellEditor: 'analyzerInteractionsEditor',
       cellClass: 'action-column',
     });
-    const tableDates = dates.slice(tableStart, tableEnd + 1);
+    const tableDates = dates;
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
       columns.push({ field: tableDates[i].tableDate, headerName: tableDates[i].tableDate, width: 125 });

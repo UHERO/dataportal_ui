@@ -126,19 +126,8 @@ export class AnalyzerService {
   }
 
   checkFrequencies = (series) => {
-    let freq = 'A';
-    series.forEach((s) => {
-      if (s.currentFreq.freq === 'M') {
-        freq = 'M';
-      }
-      if (s.currentFreq.freq === 'Q') {
-        freq = 'Q';
-      }
-      if (s.currentFreq.freq === 'S') {
-        freq = 'S';
-      }
-    });
-    return freq;
+    const freqs = series.map((s) => s.currentFreq.freq);
+    return freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A'
   }
 
   createAnalyzerTable = (analyzerSeries) => {
@@ -205,13 +194,9 @@ export class AnalyzerService {
   }
 
   setAnalyzerDates(analyzerSeries) {
-    const frequencies = [];
     const dateWrapper = { firstDate: '', endDate: '' };
+    const frequencies = [...new Set(analyzerSeries.map((series) => series.seriesDetail.frequencyShort))];
     analyzerSeries.forEach((series) => {
-      const freqExist = frequencies.find(freq => freq.freq === series.seriesDetail.frequencyShort);
-      if (!freqExist) {
-        frequencies.push({ freq: series.seriesDetail.frequencyShort, label: series.seriesDetail.frequency });
-      }
       // Get earliest start date and latest end date
       this.setDateWrapper(dateWrapper, series.observations.observationStart, series.observations.observationEnd);
     });
@@ -249,16 +234,16 @@ export class AnalyzerService {
     let sSelected = false;
     let mSelected = false;
     frequencies.forEach((freq) => {
-      if (freq.freq === 'A') {
+      if (freq === 'A') {
         aSelected = true;
       }
-      if (freq.freq === 'Q') {
+      if (freq === 'Q') {
         qSelected = true;
       }
-      if (freq.freq === 'S') {
+      if (freq === 'S') {
         sSelected = true;
       }
-      if (freq.freq === 'M') {
+      if (freq === 'M') {
         mSelected = true;
       }
     });
