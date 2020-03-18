@@ -55,6 +55,7 @@ export class HighstockHelperService {
     let maxCounter = selectedRange.length - 1;
     let minCounter = 0;
     let xMin, xMax;
+    console.log('SELECTED RANGE', selectedRange)
     while (!xMax || xMax > chartObject._selectedMax) {
       xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
       maxCounter--;
@@ -195,6 +196,7 @@ export class HighstockHelperService {
       return Date.parse(`${value}-01`);
     }
     if (freq === 'W') {
+      console.log('VALUE', value)
       return Date.parse(`${value}`);
     }
   };

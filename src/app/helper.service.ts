@@ -246,6 +246,7 @@ export class HelperService {
     if (freq === 'M' || freq === 'S') {
       return  year + '-' + month;
     }
+    return date.substr(0, 10);
   }
 
   formatNum(num: number, decimal: number) {

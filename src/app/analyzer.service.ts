@@ -127,7 +127,7 @@ export class AnalyzerService {
 
   checkFrequencies = (series) => {
     const freqs = series.map((s) => s.currentFreq.freq);
-    return freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A'
+    return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A'
   }
 
   createAnalyzerTable = (analyzerSeries) => {
@@ -138,6 +138,19 @@ export class AnalyzerService {
       this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
     });
+    let analyzerTable = [];
+    analyzerSeries.forEach((aSeries) => {
+      if (!analyzerTable.length) {
+        const seriesDates = aSeries.seriesTableData.lvl.map((date) => {
+          let dateObj = {};
+          dateObj['date'] = date.date;
+          dateObj['tableDate'] = date.tableDate;
+          return dateObj;
+        })
+        analyzerTable = analyzerTable.concat(seriesDates);
+      }
+    })
+    //this.analyzerData.analyzerTableDates = analyzerTable;
   }
 
   createSeriesTable = (transformations, tableDates, decimal) => {
@@ -226,13 +239,56 @@ export class AnalyzerService {
     }
   }
 
+  /* createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
+    const start = new Date(dateStart.replace(/-/g, '\/'));
+    const end = new Date(dateEnd.replace(/-/g, '\/'));
+    if (currentFreq === 'A') {
+      return this.addToDateArray(start, end, dateArray, currentFreq);
+    }
+    if (currentFreq === 'S') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 6);
+    }
+    if (currentFreq === 'Q') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 3);
+    }
+    if (currentFreq === 'M') {
+      return this.addToDateArray(start, end, dateArray, currentFreq, 1);
+    }
+    if (currentFreq === 'W') {
+      console.log('weekly')
+      return this.addToDateArray(start, end, dateArray, currentFreq);
+    }
+    return dateArray;
+  }
+
+  addToDateArray(start: Date, end: Date, dateArray: Array<any>, currentFreq: string, monthIncrease?: number) {
+    while (start <= end) {
+      const month = start.toISOString().substr(5, 2);
+      const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
+      const tableDate = this.getTableDate(start, currentFreq, q);
+      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate: tableDate });
+      if (currentFreq === 'A') {
+        start.setFullYear(start.getFullYear() + 1);
+      }
+      if (currentFreq !== 'A' && currentFreq !== 'W') {
+        start.setMonth(start.getMonth() + monthIncrease);
+      }
+      if (currentFreq === 'W') {
+        start.setDate(start.getDate() + 7)
+      }
+    }
+    console.log(dateArray)
+    return dateArray;
+  } */
+
   createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {
     const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'))
+    const end = new Date(dateEnd.replace(/-/g, '\/'));
     let aSelected = false;
     let qSelected = false;
     let sSelected = false;
     let mSelected = false;
+    let wSelected = false;
     frequencies.forEach((freq) => {
       if (freq === 'A') {
         aSelected = true;
@@ -246,8 +302,17 @@ export class AnalyzerService {
       if (freq === 'M') {
         mSelected = true;
       }
+      if (freq === 'W') {
+        wSelected = true;
+      }
     });
     while (start <= end) {
+      if (wSelected) {
+        dateArray.push({
+          date: start.toISOString().substr(0, 10),
+          tableDate: start.toISOString().substr(0, 10)
+        });
+      }
       if (mSelected) {
         dateArray.push({
           date: start.toISOString().substr(0, 10),
@@ -270,7 +335,7 @@ export class AnalyzerService {
         }
       }
       if (aSelected) {
-        const addAnnual = this.addAnnualObs(start.getMonth(), mSelected, qSelected, sSelected);
+        const addAnnual = this.addAnnualObs(start.getMonth(), mSelected, qSelected, sSelected, wSelected, start);
         if (addAnnual) {
           dateArray.push({
             date: start.toISOString().substr(0, 4) + '-01-01',
@@ -278,8 +343,9 @@ export class AnalyzerService {
           });
         }
       }
-      start.setMonth(start.getMonth() + 1);
+      wSelected ? start.setDate(start.getDate() + 7) : start.setMonth(start.getMonth() + 1);
     }
+    console.log('dateArray', dateArray)
     return dateArray;
   }
 
@@ -296,7 +362,12 @@ export class AnalyzerService {
     return addQ ? quarter : null;
   }
 
-  addAnnualObs(startMonth, monthSelected, quarterSelected, sSelected) {
+  addAnnualObs(startMonth, monthSelected, quarterSelected, sSelected, wSelected, date) {
+    if (wSelected) {
+      const newDate = new Date(date);
+      newDate.setDate(newDate.getDate() + 7);
+      return newDate.getMonth() === 0 ? true : false;
+    }
     // If a monthly series is selected, add annual date after month 12
     if (monthSelected && startMonth === 11) {
       return true;
@@ -306,10 +377,10 @@ export class AnalyzerService {
       return true;
     }
     // If only annual is selected, add to date array
-    if (!quarterSelected && !monthSelected && !sSelected && startMonth === 0) {
+    if (!quarterSelected && !monthSelected && !sSelected && !wSelected && startMonth === 0) {
       return true;
     }
-    if (!quarterSelected && !monthSelected && sSelected && startMonth === 6) {
+    if (!quarterSelected && !monthSelected && !wSelected && sSelected && startMonth === 6) {
       return true;
     }
     return false;

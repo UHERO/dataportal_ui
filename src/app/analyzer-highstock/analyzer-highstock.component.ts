@@ -76,6 +76,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries, yAxes, navigatorOptions;
+    console.log(this.allDates)
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
       navigatorOptions = {
@@ -94,8 +95,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         nav.update({
           data: new Array(navigatorOptions.numberOfObservations).fill(null),
           pointStart: Date.parse(navigatorOptions.dateStart),
-          pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
-          pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',  
+          pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
+          pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',  
         });
       }
     }
@@ -307,14 +308,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         pointStart: Date.parse(serie.chartData.dates[0].date),
-        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : 1,
-        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : 'month',
+        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : serie.seriesDetail.frequencyShort === 'W' ? 7 : 1,
+        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : serie.seriesDetail.frequencyShort === 'W' ? 'day' : 'month',
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
         includeInCSVExport: serie.showInChart ? true : false,
         showInLegend: serie.showInChart ? true : false,
         showInNavigator: false,
+        turboThreshold: 5000,
         events: {
           legendItemClick: function () {
             return false;
@@ -333,8 +335,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       className: 'navigator',
       data: new Array(navigatorOptions.numberOfObservations).fill(null),
       pointStart: Date.parse(navigatorOptions.dateStart),
-      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
-      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',
+      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
+      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',
       decimals: null,
       frequency: null,
       geography: null,
@@ -346,6 +348,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       showInNavigator: true,
       includeInCSVExport: false,
       name: 'Navigator',
+      turboThreshold: 5000,
       events: {
         legendItemClick: function () {
           return false;

@@ -98,6 +98,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     }
     // Display values in the range of dates selected
+    console.log('SERIES', this.series)
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
@@ -195,6 +196,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     for (let i = tableDates.length - 1; i >= 0; i--) {
       columns.push({ field: tableDates[i].tableDate, headerName: tableDates[i].tableDate, width: 125 });
     }
+    console.log('COLUMNS', columns)
     return columns;
   }
 
@@ -217,6 +219,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
+    console.log('SERIESDATA', seriesData)
     return seriesData;
   }
 
@@ -232,6 +235,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     formattedDates.forEach((d, index) => {
       data[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
+    console.log('DATA', data)
     return data;
   }
 
