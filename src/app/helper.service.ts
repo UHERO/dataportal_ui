@@ -286,6 +286,9 @@ export class HelperService {
     if (freq === 'M') {
       return { startIndex: this.getRangeStart(counter, range, 12), endIndex: counter };
     }
+    if (freq === 'W') {
+      return { startIndex: this.getRangeStart(counter, range, 52), endIndex: counter };
+    }
   }
 
   getRangeStart = (counter, range, multiplier) => {

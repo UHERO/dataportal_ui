@@ -67,6 +67,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       onChange: function (data) {
         $fromInput.prop('value', data.from_value);
         $toInput.prop('value', data.to_value);
+        console.log('date change', data.to_value)
       },
       onFinish: function (data) {
         updateChartsAndTables(data.from_value, data.to_value, freq);
@@ -166,6 +167,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       }
     }
     if (dateTo) {
+      console.log('DATE TO', dateTo)
       const dateToExists = this.checkDateExists(dateTo, dates, freq);
       if (dateToExists > -1) {
         endIndex = dateToExists;
@@ -198,6 +200,7 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
         dateToCheck = `${year}-10-01`;
       }
     }
+    console.log('dateToCheck', date)
     return dates.findIndex(date => date.date == dateToCheck);
   }
 
@@ -210,8 +213,11 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       const q = value.substring(5, 7);
       return `${value.substring(0, 4)}-${quarters[q]}-01`;
     }
-    if (freq === 'M') {
+    if (freq === 'M' || freq === 'S') {
       return `${value}-01`;
+    }
+    if (freq === 'W') {
+      return value;
     }
   }
 }
