@@ -63,6 +63,10 @@ export class HelperService {
     if (currentFreq === 'M') {
       return this.addToDateArray(start, end, dateArray, currentFreq, 1);
     }
+    if (currentFreq === 'W') {
+      console.log('weekly')
+      return this.addToDateArray(start, end, dateArray, currentFreq);
+    }
     return dateArray;
   }
 
@@ -75,10 +79,14 @@ export class HelperService {
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
       }
-      if (currentFreq !== 'A') {
+      if (currentFreq !== 'A' && currentFreq !== 'W') {
         start.setMonth(start.getMonth() + monthIncrease);
       }
+      if (currentFreq === 'W') {
+        start.setDate(start.getDate() + 7)
+      }
     }
+    console.log(dateArray)
     return dateArray;
   }
 
@@ -89,7 +97,10 @@ export class HelperService {
     if (currentFreq === 'Q') {
       return start.toISOString().substr(0, 4) + ' ' + q;
     }
-    return start.toISOString().substr(0, 7)
+    if (currentFreq === 'W') {
+      return start.toISOString().substr(0, 10);
+    }
+    return start.toISOString().substr(0, 7);
   }
 
   getTransformations(observations) {
@@ -132,9 +143,9 @@ export class HelperService {
     const ytd = transformations.ytd;
     const c5ma = transformations.c5ma;
     const levelValue = [];
-    const yoyValue = [];
-    const ytdValue = [];
-    const c5maValue = [];
+    let yoyValue = [];
+    let ytdValue = [];
+    let c5maValue = [];
     dateRange.forEach((date) => {
       if (level) {
         const levelIndex = this.binarySearch(level.dates, date.date);
@@ -153,6 +164,12 @@ export class HelperService {
         c5maIndex > -1 ? c5maValue.push(+c5ma.values[c5maIndex]) : c5maValue.push(null);
       }
     });
+    if (!yoyValue.length) {
+      yoyValue = new Array(level.dates.length - 1).fill(null);
+    }
+    if (!ytdValue.length) {
+      ytdValue = new Array(level.dates.length - 1).fill(null);
+    }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
   }
 

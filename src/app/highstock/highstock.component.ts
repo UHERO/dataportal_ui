@@ -50,6 +50,7 @@ export class HighstockComponent implements OnChanges {
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
+      console.log('chartData', this.chartData)
       this.showChart = true;
       this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
       this.updateChart = true;
@@ -112,8 +113,8 @@ export class HighstockComponent implements OnChanges {
       type: 'line',
       yAxis: 1,
       data: series0,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
       pointStart: Date.parse(seriesStart),
       states: {
         hover: {
@@ -131,8 +132,8 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
       pointStart: Date.parse(seriesStart),
       showInNavigator: false,
       dataGrouping: {
@@ -141,8 +142,8 @@ export class HighstockComponent implements OnChanges {
     }, {
       name: seriesLabels[portalSettings.highstock.series2Name],
       data: series2,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : 'month',
+      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
+      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
       pointStart: Date.parse(seriesStart),
       includeInCSVExport: freq.freq === 'A' ? false : true,
       visible: false,
@@ -207,7 +208,7 @@ export class HighstockComponent implements OnChanges {
       selected: null,
       buttons: chartButtons,
       buttonPosition: {
-        x: -30,
+        x: 0,
         y: 0
       },
       labelStyle: { visibility: 'hidden' },

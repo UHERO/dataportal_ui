@@ -41,6 +41,7 @@ export class SeriesHelperService {
     const analyzerSeries = this._analyzer.analyzerSeries;
     this._uheroAPIService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
+      console.log('DATA', data)
       // Check if series is in the analyzer
       const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
       this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
@@ -212,6 +213,9 @@ export class SeriesHelperService {
     }
     if (freq === 'M') {
       return (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100;
+    }
+    if (freq === 'W') {
+      return (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100;
     }
   }
 }

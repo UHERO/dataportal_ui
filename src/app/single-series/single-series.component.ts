@@ -151,6 +151,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
         tableEnd = i;
       }
     }
+    console.log('TABLE DATA', tableData)
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
@@ -166,6 +167,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     if (seriesDetail.frequencyShort !== 'A' && portalSettings.seriesTable.columns === 4) {
       cols.push({ field: portalSettings.seriesTable.series3, header: seriesDetail.percent ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label });
     }
+    console.log('cols', cols)
     return cols;
   }
 
