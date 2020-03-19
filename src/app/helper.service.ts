@@ -234,14 +234,23 @@ export class HelperService {
   formatDate(date: string, freq: string) {
     const year = date.substr(0, 4);
     const month = date.substr(5, 2);
-    const quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-    const qMonth = ['01', '04', '07', '10'];
     if (freq === 'A') {
       return year;
     }
     if (freq === 'Q') {
-      const monthIndex = qMonth.indexOf(month);
-      return  year + ' ' + quarter[monthIndex];
+      const month = new Date(date).getMonth();
+      if (month >= 0 && month <= 2) {
+        return `${year} Q1`;
+      }
+      if (month >= 3 && month <= 5) {
+        return `${year} Q2`;
+      }
+      if (month >= 6 && month <= 8) {
+        return `${year} Q3`;
+      }
+      if (month >= 9 && month <= 11) {
+        return `${year} Q4`;
+      }
     }
     if (freq === 'M' || freq === 'S') {
       return  year + '-' + month;

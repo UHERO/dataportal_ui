@@ -82,7 +82,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       navigatorOptions = {
         frequency: this._analyzer.checkFrequencies(this.series),
         dateStart: this.allDates[0].date,
-        numberOfObservations: this.filterDatesForNavigator(this.allDates).length
+        numberOfObservations: this.filterDatesForNavigator(this.allDates).map(date => Date.parse(date))
+        // numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       }
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
     }
@@ -93,10 +94,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const nav = this.chartObject.series.find(s => s.userOptions.className === 'navigator');
       if (nav) {
         nav.update({
-          data: new Array(navigatorOptions.numberOfObservations).fill(null),
-          pointStart: Date.parse(navigatorOptions.dateStart),
-          pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
-          pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',  
+          //data: navigatorOptions.numberOfObservations
+          // data: new Array(navigatorOptions.numberOfObservations).fill(null),
+          // pointStart: Date.parse(navigatorOptions.dateStart),
+          // pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
+          // pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',  
         });
       }
     }
@@ -307,9 +309,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         name: serie.chartDisplayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        pointStart: Date.parse(serie.chartData.dates[0].date),
+        /* pointStart: Date.parse(serie.chartData.dates[0].date),
         pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : serie.seriesDetail.frequencyShort === 'W' ? 7 : 1,
-        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : serie.seriesDetail.frequencyShort === 'W' ? 'day' : 'month',
+        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : serie.seriesDetail.frequencyShort === 'W' ? 'day' : 'month', */
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
@@ -331,12 +333,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visible: serie.showInChart ? true : false
       };
     });
-    chartSeries.push({
+    /* hartSeries.push({
       className: 'navigator',
-      data: new Array(navigatorOptions.numberOfObservations).fill(null),
-      pointStart: Date.parse(navigatorOptions.dateStart),
-      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
-      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',
+      // data: new Array(navigatorOptions.numberOfObservations).fill(null),
+      //pointStart: Date.parse(navigatorOptions.dateStart),
+      //pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
+      //pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',
       decimals: null,
       frequency: null,
       geography: null,
@@ -358,7 +360,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       seasonallyAdjusted: null,
       pseudoZones: null,
       visible: true
-    });
+    }); */
     return chartSeries;
   };
 
@@ -377,6 +379,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
+    const allDates = this.allDates;
+    let renderEnabled = true;
     this.chartOptions.chart = {
       alignTicks: false,
       description: undefined,
@@ -388,6 +392,17 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          console.log('CHART RENDER', this);
+          if (renderEnabled) {
+            const xAxes = this.xAxis;
+            const extremes = xAxes[0].getExtremes();
+            const range = extremes.max - extremes.min;
+            console.log('EXTREMES', extremes)
+            renderEnabled = false;
+            xAxes[1].setExtremes(Date.parse(allDates[0].date), Date.parse(allDates[allDates.length - 1].date));
+            console.log('XAXES 1', xAxes[1])
+            renderEnabled = true;
+          }
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
           }

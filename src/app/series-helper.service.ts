@@ -128,19 +128,13 @@ export class SeriesHelperService {
   }
 
   calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string) => {
-    let seriesStartDate = startDate;
-    let seriesEndDate = endDate;
     series.forEach((s) => {
-      if (s.observations.observationStart > seriesStartDate) {
-        seriesStartDate = s.observations.observationStart;
-      }
-      if (s.observations.observationEnd < seriesEndDate) {
-        seriesEndDate = s.observations.observationEnd;
-      }
+      s.seriesStartDate = s.observations.observationStart > startDate ? s.observations.observationStart : startDate;
+      s.seriesEndDate = s.observations.observationEnd > endDate ? s.observations.observationEnd : endDate;
     });
     const tableRows = [];
     series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, seriesStartDate, seriesEndDate);
+      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate);
       stats.series = s.displayName;
       stats.interactionSettings.showInChart = s.showInChart
       tableRows.push(stats);
@@ -171,19 +165,19 @@ export class SeriesHelperService {
     };
     formattedStats.range = this._helper.formatDate(startDate, freq) + ' - ' + this._helper.formatDate(endDate, freq);
     const decimals = seriesDetail.decimals;
-    const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
+    //const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
     const { dates, level } = chartData;
-    const start = dates.find(d => d.date >= startDate && d.date <= endDate);
-    const end = dates.slice().reverse().find(d => d.date >= startDate && d.date <= endDate);
-    const startIndex = dates.indexOf(start);
-    const endIndex = dates.indexOf(end);
-    const datesInRange = dates.slice(startIndex, endIndex + 1);
-    const valuesInRange = level.slice(startIndex, endIndex + 1);
+    console.log('START DATE', startDate);
+    console.log('END DATE', endDate)
+    const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
+    const valuesInRange = level.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
+    console.log(valuesInRange)
     if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
       formattedStats.missing = true;
       return formattedStats;
     }
     const minValue = Math.min(...valuesInRange);
+    console.log('minValue', minValue)
     const minValueIndex = valuesInRange.indexOf(minValue);
     formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' + this._helper.formatDate(datesInRange[minValueIndex].date, freq) + ')';
     const maxValue = Math.max(...valuesInRange);

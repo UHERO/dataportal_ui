@@ -45,6 +45,7 @@ export class HighstockHelperService {
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator');
+      return { min: new Date(chartObject._selectedMin).toISOString().split('T')[0], max: new Date(chartObject._selectedMax).toISOString().split('T')[0] }
     }
     if (selectedRange) {
       return this.findVisibleMinMax(selectedRange.points, chartObject);

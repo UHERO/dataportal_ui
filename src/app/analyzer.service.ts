@@ -150,8 +150,35 @@ export class AnalyzerService {
         analyzerTable = analyzerTable.concat(seriesDates);
       }
     })
-    //this.analyzerData.analyzerTableDates = analyzerTable;
+    this.analyzerData.analyzerTableDates = this.testAnalyzerTableDates(analyzerSeries);
   }
+
+  testAnalyzerTableDates = (series, start?, end?) => {
+    let allDates = [];
+    series.forEach(serie => {
+      const dates = serie.seriesTableData.lvl.map(date => {
+        let dateObj = {};
+        dateObj["date"] = date.date;
+        dateObj["tableDate"] = date.tableDate;
+        return dateObj;
+      });
+      allDates = allDates.concat(dates);
+    });
+    const filteredDates = allDates.filter((date, index, dates) => dates.findIndex(d => d.tableDate === date.tableDate) === index).sort((a, b) => {
+      if (a.date > b.date) {
+        return 1;
+      }
+      if (a.date < b.date) {
+        return -1;
+      }
+      return 0;
+    });
+    if (start && end) {
+      console.log('START && END', end);
+      return filteredDates.filter(date => date.date >= start && date.date <= end);
+    }
+    return filteredDates
+  };
 
   createSeriesTable = (transformations, tableDates, decimal) => {
     const categoryTable = {};
@@ -172,12 +199,17 @@ export class AnalyzerService {
       const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
       const transformationValues = [];
       if (!dateDiff.length) {
-        return transformation.values.map(Number);
+        //return transformation.values.map(Number);
+        dates.forEach((sDate) => {
+          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
+        });
+        return transformationValues;
       }
       if (dateDiff.length) {
         dates.forEach((sDate) => {
           const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
-          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
+          dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
         });
         return transformationValues;
       }
