@@ -64,7 +64,6 @@ export class HelperService {
       return this.addToDateArray(start, end, dateArray, currentFreq, 1);
     }
     if (currentFreq === 'W') {
-      console.log('weekly')
       return this.addToDateArray(start, end, dateArray, currentFreq);
     }
     return dateArray;
@@ -86,7 +85,6 @@ export class HelperService {
         start.setDate(start.getDate() + 7)
       }
     }
-    console.log(dateArray)
     return dateArray;
   }
 
@@ -149,19 +147,19 @@ export class HelperService {
     dateRange.forEach((date) => {
       if (level) {
         const levelIndex = this.binarySearch(level.dates, date.date);
-        levelIndex > -1 ? levelValue.push(+level.values[levelIndex]) : levelValue.push(null);
+        levelIndex > -1 ? levelValue.push([Date.parse(date.date), +level.values[levelIndex]]) : levelValue.push([Date.parse(date.date), null]);
       }
       if (yoy) {
         const yoyIndex = this.binarySearch(yoy.dates, date.date);
-        yoyIndex > -1 ? yoyValue.push(+yoy.values[yoyIndex]) : yoyValue.push(null);
+        yoyIndex > -1 ? yoyValue.push([Date.parse(date.date), +yoy.values[yoyIndex]]) : yoyValue.push([Date.parse(date.date), null]);
       }
       if (ytd) {
         const ytdIndex = this.binarySearch(ytd.dates, date.date);
-        ytdIndex > -1 ? ytdValue.push(+ytd.values[ytdIndex]) : ytdValue.push(null);
+        ytdIndex > -1 ? ytdValue.push([Date.parse(date.date), +ytd.values[ytdIndex]]) : ytdValue.push([Date.parse(date.date), null]);
       }
       if (c5ma) {
         const c5maIndex = this.binarySearch(c5ma.dates, date.date);
-        c5maIndex > -1 ? c5maValue.push(+c5ma.values[c5maIndex]) : c5maValue.push(null);
+        c5maIndex > -1 ? c5maValue.push([Date.parse(date.date), +c5ma.values[c5maIndex]]) : c5maValue.push([Date.parse(date.date), null]);
       }
     });
     if (!yoyValue.length) {

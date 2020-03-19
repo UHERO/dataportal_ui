@@ -14,6 +14,11 @@ require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/offline-exporting')(Highcharts);
 require('../csv-export')(Highcharts);
 
+Highcharts.setOptions({
+  lang: {
+    rangeSelectorZoom: ''
+  }
+});
 
 @Component({
   selector: 'app-highstock',

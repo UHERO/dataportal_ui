@@ -90,8 +90,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     if (this.minDate && this.maxDate) {
-      console.log('MINDATE', this.minDate);
-      console.log('MAXDATE', this.maxDate)
       this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
@@ -101,7 +99,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     }
     // Display values in the range of dates selected
-    console.log('SERIES', this.series)
     this.series.forEach((series) => {
       const transformations = this._helper.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
@@ -199,7 +196,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     for (let i = tableDates.length - 1; i >= 0; i--) {
       columns.push({ field: tableDates[i].tableDate, headerName: tableDates[i].tableDate, width: 125 });
     }
-    console.log('COLUMNS', columns)
     return columns;
   }
 
@@ -222,7 +218,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     formattedDates.forEach((d, index) => {
       seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
-    console.log('SERIESDATA', seriesData)
     return seriesData;
   }
 
@@ -238,7 +233,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     formattedDates.forEach((d, index) => {
       data[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
     });
-    console.log('DATA', data)
     return data;
   }
 

@@ -41,7 +41,6 @@ export class SeriesHelperService {
     const analyzerSeries = this._analyzer.analyzerSeries;
     this._uheroAPIService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
-      console.log('DATA', data)
       // Check if series is in the analyzer
       const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
       this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
@@ -167,17 +166,13 @@ export class SeriesHelperService {
     const decimals = seriesDetail.decimals;
     //const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
     const { dates, level } = chartData;
-    console.log('START DATE', startDate);
-    console.log('END DATE', endDate)
     const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
     const valuesInRange = level.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
-    console.log(valuesInRange)
     if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
       formattedStats.missing = true;
       return formattedStats;
     }
     const minValue = Math.min(...valuesInRange);
-    console.log('minValue', minValue)
     const minValueIndex = valuesInRange.indexOf(minValue);
     formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' + this._helper.formatDate(datesInRange[minValueIndex].date, freq) + ')';
     const maxValue = Math.max(...valuesInRange);

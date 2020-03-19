@@ -109,7 +109,6 @@ export class HighchartComponent implements OnChanges {
 
   setChartSeries = (portalSettings, series0, currentFreq, startDate, pseudoZones, series1) => {
     const chartSeries = [];
-    console.log('series1', series1)
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
       type: portalSettings.highcharts.series0Type,

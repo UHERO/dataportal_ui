@@ -76,7 +76,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   ngOnChanges() {
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries, yAxes, navigatorOptions;
-    console.log(this.allDates)
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
       navigatorOptions = {
@@ -307,6 +306,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return {
         className: serie.seriesDetail.id,
         name: serie.chartDisplayName,
+        shortName: serie.seriesDetail.title,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         /* pointStart: Date.parse(serie.chartData.dates[0].date),
@@ -392,15 +392,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
-          console.log('CHART RENDER', this);
           if (renderEnabled) {
             const xAxes = this.xAxis;
-            const extremes = xAxes[0].getExtremes();
-            const range = extremes.max - extremes.min;
-            console.log('EXTREMES', extremes)
             renderEnabled = false;
             xAxes[1].setExtremes(Date.parse(allDates[0].date), Date.parse(allDates[allDates.length - 1].date));
-            console.log('XAXES 1', xAxes[1])
             renderEnabled = true;
           }
           if (this._extremes) {
@@ -578,7 +573,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     const formatSeriesLabel = function (sName, sUnits, sGeo, point, seriesValue: number, date: string, pointX, s: string) {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = sName ? point.userOptions.name : '';
+      const displayName = sName ? point.userOptions.shortName : '';
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const unitsLabel = sUnits ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
       const geoLabel = sGeo ? point.userOptions.geography + '<br>' : '<br>';

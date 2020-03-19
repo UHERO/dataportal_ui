@@ -174,7 +174,6 @@ export class AnalyzerService {
       return 0;
     });
     if (start && end) {
-      console.log('START && END', end);
       return filteredDates.filter(date => date.date >= start && date.date <= end);
     }
     return filteredDates
@@ -377,7 +376,6 @@ export class AnalyzerService {
       }
       wSelected ? start.setDate(start.getDate() + 7) : start.setMonth(start.getMonth() + 1);
     }
-    console.log('dateArray', dateArray)
     return dateArray;
   }
 
