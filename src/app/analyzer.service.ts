@@ -131,52 +131,52 @@ export class AnalyzerService {
   }
 
   createAnalyzerTable = (analyzerSeries) => {
-    this.analyzerData.analyzerTableDates = this.setAnalyzerDates(analyzerSeries);
     analyzerSeries.forEach((aSeries) => {
       const decimal = aSeries.seriesDetail.decimals;
       const dateArray = [];
       this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
     });
-    let analyzerTable = [];
-    analyzerSeries.forEach((aSeries) => {
-      if (!analyzerTable.length) {
-        const seriesDates = aSeries.seriesTableData.lvl.map((date) => {
-          let dateObj = {};
-          dateObj['date'] = date.date;
-          dateObj['tableDate'] = date.tableDate;
-          return dateObj;
-        })
-        analyzerTable = analyzerTable.concat(seriesDates);
-      }
-    })
-    this.analyzerData.analyzerTableDates = this.testAnalyzerTableDates(analyzerSeries);
+    this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
   }
 
-  testAnalyzerTableDates = (series, start?, end?) => {
+  findSortedInsertIndex = (date, array) => {
+    let minIndex = 0;
+    let maxIndex = array.length - 1;
+    let currentIndex, currentElement;
+    while (minIndex <= maxIndex) {
+      currentIndex = (minIndex + maxIndex) / 2 | 0;
+      currentElement = array[currentIndex].date;
+      if (currentElement < date.date) {
+        minIndex = currentIndex + 1;
+      }
+      else if (currentElement > date.date) {
+        maxIndex = currentIndex - 1;
+      }
+      else {
+        const found = array.map(d => d.tableDate).includes(date.tableDate) ? true : false;
+        let index = currentIndex + 1;
+        if (date.tableDate.includes('Q') || date.tableDate.length === 4) index--;
+        return { found: found, index: index };
+      }
+    }
+    return { found: false, index: currentElement < date.date ? currentIndex + 1 : currentIndex };
+  }
+
+  createAnalyzerTableDates = (series, start?, end?) => {
     let allDates = [];
-    series.forEach(serie => {
-      const dates = serie.seriesTableData.lvl.map(date => {
-        let dateObj = {};
-        dateObj["date"] = date.date;
-        dateObj["tableDate"] = date.tableDate;
-        return dateObj;
+    series.forEach((serie) => {
+      serie.seriesTableData.lvl.forEach((date) => {
+        const insert = this.findSortedInsertIndex(date, allDates);
+        if (date.date === '2018-07-01') {
+        }
+        if (!insert.found) allDates.splice(this.findSortedInsertIndex(date, allDates).index, 0, date);
       });
-      allDates = allDates.concat(dates);
-    });
-    const filteredDates = allDates.filter((date, index, dates) => dates.findIndex(d => d.tableDate === date.tableDate) === index).sort((a, b) => {
-      if (a.date > b.date) {
-        return 1;
-      }
-      if (a.date < b.date) {
-        return -1;
-      }
-      return 0;
     });
     if (start && end) {
-      return filteredDates.filter(date => date.date >= start && date.date <= end);
+      allDates = allDates.filter(date => date.date >= start && date.date <= end);
     }
-    return filteredDates
+    return allDates;
   };
 
   createSeriesTable = (transformations, tableDates, decimal) => {
@@ -197,21 +197,11 @@ export class AnalyzerService {
     if (transformation) {
       const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
       const transformationValues = [];
-      if (!dateDiff.length) {
-        //return transformation.values.map(Number);
-        dates.forEach((sDate) => {
-          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
-          dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
-        });
-        return transformationValues;
-      }
-      if (dateDiff.length) {
-        dates.forEach((sDate) => {
-          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
-          dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
-        });
-        return transformationValues;
-      }
+      dates.forEach((sDate) => {
+        const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+        dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
+      });
+      return transformationValues;
     }
   }
 
@@ -237,17 +227,6 @@ export class AnalyzerService {
     return `${title} (${units}) (${geography}; ${frequency}${ending})`;
   }
 
-  setAnalyzerDates(analyzerSeries) {
-    const dateWrapper = { firstDate: '', endDate: '' };
-    const frequencies = [...new Set(analyzerSeries.map((series) => series.seriesDetail.frequencyShort))];
-    analyzerSeries.forEach((series) => {
-      // Get earliest start date and latest end date
-      this.setDateWrapper(dateWrapper, series.observations.observationStart, series.observations.observationEnd);
-    });
-    // Array of full range of dates for series selected in analyzer
-    return this.createAnalyzerDates(dateWrapper.firstDate, dateWrapper.endDate, frequencies, []);
-  }
-
   setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
     if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
       dateWrapper.firstDate = seriesStart;
@@ -262,159 +241,11 @@ export class AnalyzerService {
     if (seriesExist >= 0) {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
-      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+      this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });
-      this.analyzerData.analyzerTableDates = this.setAnalyzerDates(this.analyzerData.analyzerSeries);
+      this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
     }
   }
-
-  /* createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
-    const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'));
-    if (currentFreq === 'A') {
-      return this.addToDateArray(start, end, dateArray, currentFreq);
-    }
-    if (currentFreq === 'S') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 6);
-    }
-    if (currentFreq === 'Q') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 3);
-    }
-    if (currentFreq === 'M') {
-      return this.addToDateArray(start, end, dateArray, currentFreq, 1);
-    }
-    if (currentFreq === 'W') {
-      console.log('weekly')
-      return this.addToDateArray(start, end, dateArray, currentFreq);
-    }
-    return dateArray;
-  }
-
-  addToDateArray(start: Date, end: Date, dateArray: Array<any>, currentFreq: string, monthIncrease?: number) {
-    while (start <= end) {
-      const month = start.toISOString().substr(5, 2);
-      const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
-      const tableDate = this.getTableDate(start, currentFreq, q);
-      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate: tableDate });
-      if (currentFreq === 'A') {
-        start.setFullYear(start.getFullYear() + 1);
-      }
-      if (currentFreq !== 'A' && currentFreq !== 'W') {
-        start.setMonth(start.getMonth() + monthIncrease);
-      }
-      if (currentFreq === 'W') {
-        start.setDate(start.getDate() + 7)
-      }
-    }
-    console.log(dateArray)
-    return dateArray;
-  } */
-
-  createAnalyzerDates(dateStart: string, dateEnd: string, frequencies: Array<any>, dateArray: Array<any>) {
-    const start = new Date(dateStart.replace(/-/g, '\/'));
-    const end = new Date(dateEnd.replace(/-/g, '\/'));
-    let aSelected = false;
-    let qSelected = false;
-    let sSelected = false;
-    let mSelected = false;
-    let wSelected = false;
-    frequencies.forEach((freq) => {
-      if (freq === 'A') {
-        aSelected = true;
-      }
-      if (freq === 'Q') {
-        qSelected = true;
-      }
-      if (freq === 'S') {
-        sSelected = true;
-      }
-      if (freq === 'M') {
-        mSelected = true;
-      }
-      if (freq === 'W') {
-        wSelected = true;
-      }
-    });
-    while (start <= end) {
-      if (wSelected) {
-        dateArray.push({
-          date: start.toISOString().substr(0, 10),
-          tableDate: start.toISOString().substr(0, 10)
-        });
-      }
-      if (mSelected) {
-        dateArray.push({
-          date: start.toISOString().substr(0, 10),
-          tableDate: start.toISOString().substr(0, 7)
-        });
-      }
-      if (sSelected && !mSelected && (start.getMonth() === 0 || start.getMonth() === 6)) {
-        dateArray.push({
-          date: start.toISOString().substr(0, 10),
-          tableDate: start.toISOString().substr(0, 7)
-        });
-      }
-      if (qSelected) {
-        const addQuarter = this.addQuarterObs(start.getMonth(), mSelected);
-        if (addQuarter) {
-          dateArray.push({
-            date: start.toISOString().substr(0, 4) + '-' + addQuarter.m + '-01',
-            tableDate: start.toISOString().substr(0, 4) + ' ' + addQuarter.q
-          });
-        }
-      }
-      if (aSelected) {
-        const addAnnual = this.addAnnualObs(start.getMonth(), mSelected, qSelected, sSelected, wSelected, start);
-        if (addAnnual) {
-          dateArray.push({
-            date: start.toISOString().substr(0, 4) + '-01-01',
-            tableDate: start.toISOString().substr(0, 4)
-          });
-        }
-      }
-      wSelected ? start.setDate(start.getDate() + 7) : start.setMonth(start.getMonth() + 1);
-    }
-    return dateArray;
-  }
-
-  addQuarterObs(startMonth, monthSelected) {
-    // If a monthly series is not selected, add Q at months 0, 3, 6, 9 (i.e. startMonth === 0, 3, 6, 9)
-    // If a monthly series is selected, add Q after months 3, 6, 9, 12 (i.e. startMonth === 2, 5, 7, 11)
-    const qMonth = monthSelected ? startMonth - 2 : startMonth;
-    const addQ = this.checkStartMonth(qMonth);
-    let quarter = { m: '', q: '' };
-    if (addQ) {
-      quarter.q = qMonth === 0 ? 'Q1' : qMonth === 3 ? 'Q2' : qMonth === 6 ? 'Q3' : 'Q4';
-      quarter.m = qMonth === 0 ? '01' : qMonth === 3 ? '04' : qMonth === 6 ? '07' : '10';
-    }
-    return addQ ? quarter : null;
-  }
-
-  addAnnualObs(startMonth, monthSelected, quarterSelected, sSelected, wSelected, date) {
-    if (wSelected) {
-      const newDate = new Date(date);
-      newDate.setDate(newDate.getDate() + 7);
-      return newDate.getMonth() === 0 ? true : false;
-    }
-    // If a monthly series is selected, add annual date after month 12
-    if (monthSelected && startMonth === 11) {
-      return true;
-    }
-    // If a quarterly series is selected (w/o monthly), add annual date after 4th quarter
-    if (quarterSelected && !monthSelected && startMonth === 9) {
-      return true;
-    }
-    // If only annual is selected, add to date array
-    if (!quarterSelected && !monthSelected && !sSelected && !wSelected && startMonth === 0) {
-      return true;
-    }
-    if (!quarterSelected && !monthSelected && !wSelected && sSelected && startMonth === 6) {
-      return true;
-    }
-    return false;
-  }
-
-  checkStartMonth = (month) => month % 3 === 0 ? true : false;
 }

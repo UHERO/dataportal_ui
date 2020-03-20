@@ -53,8 +53,8 @@ export class SeriesHelperService {
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = geos ? geos : [data.series.geography];
       this.seriesData.frequencies = freqs ? freqs : [{ freq: data.series.frequencyShort, label: data.series.frequency }];
-      this.seriesData.yoyChange = data.series.percent === true ? 'Year/Year Change' : 'Year/Year % Change';
-      this.seriesData.ytdChange = data.series.percent === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
+      this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
+      this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
       this.seriesData.siblings = data.siblings;
       const geoFreqPair = this.findGeoFreqSibling(data.siblings, currentGeo.handle, currentFreq.freq);

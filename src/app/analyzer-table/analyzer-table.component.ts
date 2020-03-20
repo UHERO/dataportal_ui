@@ -83,8 +83,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges() {
     const frequencies = [...new Set(this.series.map((series) => series.seriesDetail.frequencyShort))];
     if (this.minDate && this.maxDate) {
-      //const newTableDates = this._analyzer.createAnalyzerDates(this.minDate, this.maxDate, frequencies, []);
-      const newTableDates = this._analyzer.testAnalyzerTableDates(this.series, this.minDate, this.maxDate)
+      const newTableDates = this._analyzer.createAnalyzerTableDates(this.series, this.minDate, this.maxDate)
       this.columnDefs = this.setTableColumns(newTableDates);
     }
     this.rows = [];
@@ -292,7 +291,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   toggleSeriesInChart(series) {
     this._analyzer.toggleSeriesInChart.emit(series);
-    this._analyzer.setAnalyzerDates(this._analyzer.analyzerData.analyzerSeries)
+    this._analyzer.createAnalyzerTableDates(this._analyzer.analyzerData.analyzerSeries)
   }
 
   removeFromAnalyzer(series) {

@@ -19,7 +19,7 @@
       routerLink="/help">&nbsp; About</a>
     <span *ngIf="headerLogo.analyticsLogoSrc">
       <p id="built-by">Built By</p>
-      <img class="analytics-logo" [src]="headerLogo.analyticsLogoSrc" [alt]="headerLogo.altText">
+      <a href="https://uhero.hawaii.edu/uhero-analytics/"><img class="analytics-logo" [src]="headerLogo.analyticsLogoSrc" [alt]="headerLogo.altText"></a>
     </span>
   </div>
   <div [class.overlay]="overlay" (click)="mobileMenuToggle()"></div>
