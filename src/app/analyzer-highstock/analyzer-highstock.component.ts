@@ -81,8 +81,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       navigatorOptions = {
         frequency: this._analyzer.checkFrequencies(this.series),
         dateStart: this.allDates[0].date,
-        numberOfObservations: this.filterDatesForNavigator(this.allDates).map(date => Date.parse(date))
-        // numberOfObservations: this.filterDatesForNavigator(this.allDates).length
+        numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       }
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
     }
@@ -93,11 +92,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const nav = this.chartObject.series.find(s => s.userOptions.className === 'navigator');
       if (nav) {
         nav.update({
-          //data: navigatorOptions.numberOfObservations
-          // data: new Array(navigatorOptions.numberOfObservations).fill(null),
-          // pointStart: Date.parse(navigatorOptions.dateStart),
-          // pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
-          // pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',  
+          data: this.allDates.map(d => [Date.parse(d.date), null]),
         });
       }
     }
@@ -306,19 +301,14 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return {
         className: serie.seriesDetail.id,
         name: serie.chartDisplayName,
-        shortName: serie.seriesDetail.title,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        /* pointStart: Date.parse(serie.chartData.dates[0].date),
-        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : serie.seriesDetail.frequencyShort === 'W' ? 7 : 1,
-        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : serie.seriesDetail.frequencyShort === 'W' ? 'day' : 'month', */
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
         includeInCSVExport: serie.showInChart ? true : false,
         showInLegend: serie.showInChart ? true : false,
         showInNavigator: false,
-        turboThreshold: 5000,
         events: {
           legendItemClick: function () {
             return false;
@@ -333,12 +323,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visible: serie.showInChart ? true : false
       };
     });
-    /* hartSeries.push({
+    chartSeries.push({
       className: 'navigator',
-      // data: new Array(navigatorOptions.numberOfObservations).fill(null),
-      //pointStart: Date.parse(navigatorOptions.dateStart),
-      //pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : navigatorOptions.frequency === 'W' ? 7 : 1,
-      //pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : navigatorOptions.frequency === 'W' ? 'day' : 'month',
+      data: this.allDates.map(d => [Date.parse(d.date), null]),
       decimals: null,
       frequency: null,
       geography: null,
@@ -350,7 +337,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       showInNavigator: true,
       includeInCSVExport: false,
       name: 'Navigator',
-      turboThreshold: 5000,
       events: {
         legendItemClick: function () {
           return false;
@@ -360,7 +346,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       seasonallyAdjusted: null,
       pseudoZones: null,
       visible: true
-    }); */
+    });
     return chartSeries;
   };
 
@@ -379,8 +365,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
-    const allDates = this.allDates;
-    let renderEnabled = true;
     this.chartOptions.chart = {
       alignTicks: false,
       description: undefined,
@@ -392,12 +376,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
-          if (renderEnabled) {
-            const xAxes = this.xAxis;
-            renderEnabled = false;
-            xAxes[1].setExtremes(Date.parse(allDates[0].date), Date.parse(allDates[allDates.length - 1].date));
-            renderEnabled = true;
-          }
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
           }
@@ -573,7 +551,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     const formatSeriesLabel = function (sName, sUnits, sGeo, point, seriesValue: number, date: string, pointX, s: string) {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = sName ? point.userOptions.shortName : '';
+      const displayName = sName ? point.userOptions.name : '';
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
       const unitsLabel = sUnits ? ' (' + point.userOptions.unitsLabelShort + ') <br>' : '<br>';
       const geoLabel = sGeo ? point.userOptions.geography + '<br>' : '<br>';

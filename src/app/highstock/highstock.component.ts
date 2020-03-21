@@ -55,7 +55,6 @@ export class HighstockComponent implements OnChanges {
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
-      console.log('chartData', this.chartData)
       this.showChart = true;
       this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
       this.updateChart = true;

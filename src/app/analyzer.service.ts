@@ -140,42 +140,23 @@ export class AnalyzerService {
     this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
   }
 
-  findSortedInsertIndex = (date, array) => {
-    let minIndex = 0;
-    let maxIndex = array.length - 1;
-    let currentIndex, currentElement;
-    while (minIndex <= maxIndex) {
-      currentIndex = (minIndex + maxIndex) / 2 | 0;
-      currentElement = array[currentIndex].date;
-      if (currentElement < date.date) {
-        minIndex = currentIndex + 1;
-      }
-      else if (currentElement > date.date) {
-        maxIndex = currentIndex - 1;
-      }
-      else {
-        const found = array.map(d => d.tableDate).includes(date.tableDate) ? true : false;
-        let index = currentIndex + 1;
-        if (date.tableDate.includes('Q') || date.tableDate.length === 4) index--;
-        return { found: found, index: index };
-      }
+  dateComparison = (a, b) => {
+    if (a.date === b.date) {
+      return a.tableDate < b.tableDate ? -1 : a.tableDate > b.tableDate ? 1 : 0;
     }
-    return { found: false, index: currentElement < date.date ? currentIndex + 1 : currentIndex };
+    return a.date < b.date ? -1 : 1;
   }
 
   createAnalyzerTableDates = (series, start?, end?) => {
     let allDates = [];
     series.forEach((serie) => {
       serie.seriesTableData.lvl.forEach((date) => {
-        const insert = this.findSortedInsertIndex(date, allDates);
-        if (date.date === '2018-07-01') {
-        }
-        if (!insert.found) allDates.splice(this.findSortedInsertIndex(date, allDates).index, 0, date);
+        const dateExists = allDates.map(d => d.tableDate).find(tableDate => tableDate === date.tableDate);
+        if (!dateExists) allDates.push(date);
       });
     });
-    if (start && end) {
-      allDates = allDates.filter(date => date.date >= start && date.date <= end);
-    }
+    allDates = allDates.sort(this.dateComparison);
+    if (start && end) allDates = allDates.filter(date => date.date >= start && date.date <= end);
     return allDates;
   };
 
@@ -195,7 +176,6 @@ export class AnalyzerService {
 
   createSeriesChartData = (transformation, dates) => {
     if (transformation) {
-      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
       const transformationValues = [];
       dates.forEach((sDate) => {
         const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
@@ -225,15 +205,6 @@ export class AnalyzerService {
       ending = '; Not Seasonally Adjusted';
     }
     return `${title} (${units}) (${geography}; ${frequency}${ending})`;
-  }
-
-  setDateWrapper(dateWrapper: DateWrapper, seriesStart: string, seriesEnd: string) {
-    if (dateWrapper.firstDate === '' || seriesStart < dateWrapper.firstDate) {
-      dateWrapper.firstDate = seriesStart;
-    }
-    if (dateWrapper.endDate === '' || seriesEnd > dateWrapper.endDate) {
-      dateWrapper.endDate = seriesEnd;
-    }
   }
 
   updateAnalyzer(seriesId) {

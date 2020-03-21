@@ -93,7 +93,7 @@ export class HelperService {
       return start.toISOString().substr(0, 4);
     }
     if (currentFreq === 'Q') {
-      return start.toISOString().substr(0, 4) + ' ' + q;
+      return `${start.toISOString().substr(0, 4)} ${q}`;
     }
     if (currentFreq === 'W') {
       return start.toISOString().substr(0, 10);
@@ -146,20 +146,16 @@ export class HelperService {
     let c5maValue = [];
     dateRange.forEach((date) => {
       if (level) {
-        const levelIndex = this.binarySearch(level.dates, date.date);
-        levelIndex > -1 ? levelValue.push([Date.parse(date.date), +level.values[levelIndex]]) : levelValue.push([Date.parse(date.date), null]);
+        levelValue.push(this.createDateValuePairs(level.dates, date.date, level.values));
       }
       if (yoy) {
-        const yoyIndex = this.binarySearch(yoy.dates, date.date);
-        yoyIndex > -1 ? yoyValue.push([Date.parse(date.date), +yoy.values[yoyIndex]]) : yoyValue.push([Date.parse(date.date), null]);
+        yoyValue.push(this.createDateValuePairs(yoy.dates, date.date, yoy.values));
       }
       if (ytd) {
-        const ytdIndex = this.binarySearch(ytd.dates, date.date);
-        ytdIndex > -1 ? ytdValue.push([Date.parse(date.date), +ytd.values[ytdIndex]]) : ytdValue.push([Date.parse(date.date), null]);
+        ytdValue.push(this.createDateValuePairs(ytd.dates, date.date, ytd.values));
       }
       if (c5ma) {
-        const c5maIndex = this.binarySearch(c5ma.dates, date.date);
-        c5maIndex > -1 ? c5maValue.push([Date.parse(date.date), +c5ma.values[c5maIndex]]) : c5maValue.push([Date.parse(date.date), null]);
+        c5maValue.push(this.createDateValuePairs(c5ma.dates, date.date, c5ma.values));
       }
     });
     if (!yoyValue.length) {
@@ -169,6 +165,11 @@ export class HelperService {
       ytdValue = new Array(level.dates.length - 1).fill(null);
     }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
+  }
+
+  createDateValuePairs = (transformationDates: Array<any>, date: string, values: Array<any>) => {
+    const transformationIndex = this.binarySearch(transformationDates, date);
+    return [ Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null ];
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
@@ -215,19 +216,6 @@ export class HelperService {
   }
 
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals);
-
-  setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
-    dateWrapper.firstDate = '';
-    dateWrapper.endDate = '';
-    displaySeries.forEach((series) => {
-      if (dateWrapper.firstDate === '' || series.seriesInfo.seriesObservations.observationStart < dateWrapper.firstDate) {
-        dateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
-      }
-      if (dateWrapper.endDate === '' || series.seriesInfo.seriesObservations.observationEnd > dateWrapper.endDate) {
-        dateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
-      }
-    });
-  }
 
   formatDate(date: string, freq: string) {
     const year = date.substr(0, 4);
