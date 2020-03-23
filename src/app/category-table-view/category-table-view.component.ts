@@ -118,10 +118,8 @@ export class CategoryTableViewComponent implements OnChanges {
   formatLvlData = (series, level, subcatIndex, parentId) => {
     const { dates, values } = level;
     const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
-    const tablePrefix = series.seriesInfo.tablePrefix ? series.seriesInfo.tablePrefix : '';
-    const tablePostfix = series.seriesInfo.tablePostfix ? series.seriesInfo.tablePostfix : '';
     const seriesData = {
-      series: `${tablePrefix} ${series.seriesInfo.displayName} ${tablePostfix} (${units})`,
+      series: `${series.seriesInfo.tablePrefix || ''} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix || ''} (${units})`,
       saParam: series.seriesInfo.saParam,
       seriesInfo: series.seriesInfo,
       lvlData: true,
@@ -170,7 +168,6 @@ export class CategoryTableViewComponent implements OnChanges {
     const exportColumns = [];
     const parentName = this.selectedCategory ? this.selectedCategory.name + ': ' : '';
     const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
-    // const geoAndFreq = this.geo ?  `${this.geo.name} - ${this.freqLabel}` : this.freqLabel;
     let geoAndFreq = '';
     if (this.geo) {
       geoAndFreq += `${this.geo.name}`;

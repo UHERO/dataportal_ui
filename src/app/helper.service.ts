@@ -63,6 +63,9 @@ export class HelperService {
     if (currentFreq === 'M') {
       return this.addToDateArray(start, end, dateArray, currentFreq, 1);
     }
+    if (currentFreq === 'W') {
+      return this.addToDateArray(start, end, dateArray, currentFreq);
+    }
     return dateArray;
   }
 
@@ -75,8 +78,11 @@ export class HelperService {
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
       }
-      if (currentFreq !== 'A') {
+      if (currentFreq !== 'A' && currentFreq !== 'W') {
         start.setMonth(start.getMonth() + monthIncrease);
+      }
+      if (currentFreq === 'W') {
+        start.setDate(start.getDate() + 7)
       }
     }
     return dateArray;
@@ -87,9 +93,12 @@ export class HelperService {
       return start.toISOString().substr(0, 4);
     }
     if (currentFreq === 'Q') {
-      return start.toISOString().substr(0, 4) + ' ' + q;
+      return `${start.toISOString().substr(0, 4)} ${q}`;
     }
-    return start.toISOString().substr(0, 7)
+    if (currentFreq === 'W') {
+      return start.toISOString().substr(0, 10);
+    }
+    return start.toISOString().substr(0, 7);
   }
 
   getTransformations(observations) {
@@ -132,28 +141,35 @@ export class HelperService {
     const ytd = transformations.ytd;
     const c5ma = transformations.c5ma;
     const levelValue = [];
-    const yoyValue = [];
-    const ytdValue = [];
-    const c5maValue = [];
+    let yoyValue = [];
+    let ytdValue = [];
+    let c5maValue = [];
     dateRange.forEach((date) => {
       if (level) {
-        const levelIndex = this.binarySearch(level.dates, date.date);
-        levelIndex > -1 ? levelValue.push(+level.values[levelIndex]) : levelValue.push(null);
+        levelValue.push(this.createDateValuePairs(level.dates, date.date, level.values));
       }
       if (yoy) {
-        const yoyIndex = this.binarySearch(yoy.dates, date.date);
-        yoyIndex > -1 ? yoyValue.push(+yoy.values[yoyIndex]) : yoyValue.push(null);
+        yoyValue.push(this.createDateValuePairs(yoy.dates, date.date, yoy.values));
       }
       if (ytd) {
-        const ytdIndex = this.binarySearch(ytd.dates, date.date);
-        ytdIndex > -1 ? ytdValue.push(+ytd.values[ytdIndex]) : ytdValue.push(null);
+        ytdValue.push(this.createDateValuePairs(ytd.dates, date.date, ytd.values));
       }
       if (c5ma) {
-        const c5maIndex = this.binarySearch(c5ma.dates, date.date);
-        c5maIndex > -1 ? c5maValue.push(+c5ma.values[c5maIndex]) : c5maValue.push(null);
+        c5maValue.push(this.createDateValuePairs(c5ma.dates, date.date, c5ma.values));
       }
     });
+    if (!yoyValue.length) {
+      yoyValue = new Array(level.dates.length - 1).fill(null);
+    }
+    if (!ytdValue.length) {
+      ytdValue = new Array(level.dates.length - 1).fill(null);
+    }
     return { level: levelValue, yoy: yoyValue, ytd: ytdValue, c5ma: c5maValue };
+  }
+
+  createDateValuePairs = (transformationDates: Array<any>, date: string, values: Array<any>) => {
+    const transformationIndex = this.binarySearch(transformationDates, date);
+    return [ Date.parse(date), transformationIndex > -1 ? +values[transformationIndex] : null ];
   }
 
   addToTable(valueArray, date, tableObj, value, formattedValue, decimals) {
@@ -201,34 +217,31 @@ export class HelperService {
 
   formattedValue = (value, decimals) => (value === null || value === Infinity) ? '' : this.formatNum(+value, decimals);
 
-  setDateWrapper(displaySeries: Array<any>, dateWrapper: DateWrapper) {
-    dateWrapper.firstDate = '';
-    dateWrapper.endDate = '';
-    displaySeries.forEach((series) => {
-      if (dateWrapper.firstDate === '' || series.seriesInfo.seriesObservations.observationStart < dateWrapper.firstDate) {
-        dateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
-      }
-      if (dateWrapper.endDate === '' || series.seriesInfo.seriesObservations.observationEnd > dateWrapper.endDate) {
-        dateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
-      }
-    });
-  }
-
   formatDate(date: string, freq: string) {
     const year = date.substr(0, 4);
     const month = date.substr(5, 2);
-    const quarter = ['Q1', 'Q2', 'Q3', 'Q4'];
-    const qMonth = ['01', '04', '07', '10'];
     if (freq === 'A') {
       return year;
     }
     if (freq === 'Q') {
-      const monthIndex = qMonth.indexOf(month);
-      return  year + ' ' + quarter[monthIndex];
+      const month = new Date(date).getMonth();
+      if (month >= 0 && month <= 2) {
+        return `${year} Q1`;
+      }
+      if (month >= 3 && month <= 5) {
+        return `${year} Q2`;
+      }
+      if (month >= 6 && month <= 8) {
+        return `${year} Q3`;
+      }
+      if (month >= 9 && month <= 11) {
+        return `${year} Q4`;
+      }
     }
     if (freq === 'M' || freq === 'S') {
       return  year + '-' + month;
     }
+    return date.substr(0, 10);
   }
 
   formatNum(num: number, decimal: number) {
@@ -268,6 +281,9 @@ export class HelperService {
     }
     if (freq === 'M') {
       return { startIndex: this.getRangeStart(counter, range, 12), endIndex: counter };
+    }
+    if (freq === 'W') {
+      return { startIndex: this.getRangeStart(counter, range, 52), endIndex: counter };
     }
   }
 

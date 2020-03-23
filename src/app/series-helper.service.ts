@@ -53,8 +53,8 @@ export class SeriesHelperService {
       this.seriesData.currentGeo = currentGeo;
       this.seriesData.regions = geos ? geos : [data.series.geography];
       this.seriesData.frequencies = freqs ? freqs : [{ freq: data.series.frequencyShort, label: data.series.frequency }];
-      this.seriesData.yoyChange = data.series.percent === true ? 'Year/Year Change' : 'Year/Year % Change';
-      this.seriesData.ytdChange = data.series.percent === true ? 'Year-to-Date Change' : 'Year-to-Date % Change';
+      this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
+      this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
       this.seriesData.currentFreq = currentFreq;
       this.seriesData.siblings = data.siblings;
       const geoFreqPair = this.findGeoFreqSibling(data.siblings, currentGeo.handle, currentFreq.freq);
@@ -127,19 +127,13 @@ export class SeriesHelperService {
   }
 
   calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string) => {
-    let seriesStartDate = startDate;
-    let seriesEndDate = endDate;
     series.forEach((s) => {
-      if (s.observations.observationStart > seriesStartDate) {
-        seriesStartDate = s.observations.observationStart;
-      }
-      if (s.observations.observationEnd < seriesEndDate) {
-        seriesEndDate = s.observations.observationEnd;
-      }
+      s.seriesStartDate = s.observations.observationStart > startDate ? s.observations.observationStart : startDate;
+      s.seriesEndDate = s.observations.observationEnd > endDate ? s.observations.observationEnd : endDate;
     });
     const tableRows = [];
     series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, seriesStartDate, seriesEndDate);
+      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate);
       stats.series = s.displayName;
       stats.interactionSettings.showInChart = s.showInChart
       tableRows.push(stats);
@@ -170,14 +164,10 @@ export class SeriesHelperService {
     };
     formattedStats.range = this._helper.formatDate(startDate, freq) + ' - ' + this._helper.formatDate(endDate, freq);
     const decimals = seriesDetail.decimals;
-    const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
+    //const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
     const { dates, level } = chartData;
-    const start = dates.find(d => d.date >= startDate && d.date <= endDate);
-    const end = dates.slice().reverse().find(d => d.date >= startDate && d.date <= endDate);
-    const startIndex = dates.indexOf(start);
-    const endIndex = dates.indexOf(end);
-    const datesInRange = dates.slice(startIndex, endIndex + 1);
-    const valuesInRange = level.slice(startIndex, endIndex + 1);
+    const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
+    const valuesInRange = level.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
     if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
       formattedStats.missing = true;
       return formattedStats;
@@ -212,6 +202,9 @@ export class SeriesHelperService {
     }
     if (freq === 'M') {
       return (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100;
+    }
+    if (freq === 'W') {
+      return (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100;
     }
   }
 }

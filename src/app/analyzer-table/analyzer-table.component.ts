@@ -83,7 +83,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges() {
     const frequencies = [...new Set(this.series.map((series) => series.seriesDetail.frequencyShort))];
     if (this.minDate && this.maxDate) {
-      const newTableDates = this._analyzer.createAnalyzerDates(this.minDate, this.maxDate, frequencies, []);
+      const newTableDates = this._analyzer.createAnalyzerTableDates(this.series, this.minDate, this.maxDate)
       this.columnDefs = this.setTableColumns(newTableDates);
     }
     this.rows = [];
@@ -103,15 +103,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level);
       this.rows.push(seriesData);
-      if (this.yoyChecked) {
+      if (this.yoyChecked && yoy) {
         const yoyData = this.formatTransformationData(series, yoy);
         this.rows.push(yoyData)
       }
-      if (this.ytdChecked) {
+      if (this.ytdChecked && ytd) {
         const ytdData = this.formatTransformationData(series, ytd);
         this.rows.push(ytdData)
       }
-      if (this.c5maChecked) {
+      if (this.c5maChecked && c5ma) {
         const c5maData = this.formatTransformationData(series, c5ma);
         this.rows.push(c5maData)
       }
@@ -291,7 +291,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   toggleSeriesInChart(series) {
     this._analyzer.toggleSeriesInChart.emit(series);
-    this._analyzer.setAnalyzerDates(this._analyzer.analyzerData.analyzerSeries)
+    this._analyzer.createAnalyzerTableDates(this._analyzer.analyzerData.analyzerSeries)
   }
 
   removeFromAnalyzer(series) {

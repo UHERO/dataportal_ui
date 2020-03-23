@@ -5,7 +5,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { Frequency } from '../frequency';
 import { Geography } from '../geography';
-import { HelperService } from '../helper.service';
 
 declare var $: any;
 
@@ -65,7 +64,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
 
   constructor(
     @Inject('portal') private portal,
-    private _helper: HelperService,
     private _dataPortalSettings: DataPortalSettingsService,
     private _series: SeriesHelperService,
     private _analyzer: AnalyzerService,
