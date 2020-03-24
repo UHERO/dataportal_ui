@@ -40,7 +40,7 @@ import { ClipboardService } from '../clipboard.service';
     HttpClientModule,
     HighchartsChartModule,
     TableModule,
-    SharedModule,
+    //SharedModule,
   ],
   entryComponents: [
     NtaHelpComponent

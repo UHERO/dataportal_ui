@@ -75,7 +75,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule,
-    TableModule, SharedModule,
+    TableModule, //SharedModule,
     TableModule,
     PanelMenuModule,
     PaginatorModule,

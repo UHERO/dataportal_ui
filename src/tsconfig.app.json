@@ -16,8 +16,13 @@
     "baseUrl": "",
     "types": []
   },
+  "angularCompilerOptions": {
+    "enableIvy": false
+  },
   "files": [
     "main.ts",
+    "hawaiiMain.ts",
+    "ntaMain.ts",
     "polyfills.ts"
   ],
   "include": [
