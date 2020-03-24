@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { Shared } from '../shared/shared.module';
 import { routing } from '../nta.routes';
-import { SharedModule } from 'primeng/shared';
+//import { SharedModule } from 'primeng/shared';
 import { TableModule } from 'primeng/table';
 import { UheroApiService } from '../uhero-api.service';
 import { NtaHelperService } from './nta-helper.service';
@@ -40,7 +40,7 @@ import { ClipboardService } from '../clipboard.service';
     HttpClientModule,
     HighchartsChartModule,
     TableModule,
-    SharedModule,
+    //SharedModule,
   ],
   entryComponents: [
     NtaHelpComponent

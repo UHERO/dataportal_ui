@@ -9,7 +9,7 @@ declare var $: any;
 })
 export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularComp, AfterViewInit {
   params: any;
-  @ViewChild('interaction-select', { read: ViewContainerRef, static: false }) public interactionSelect;
+  @ViewChild('interaction-select', { read: ViewContainerRef }) public interactionSelect;
 
   constructor() { }
 
