@@ -45,6 +45,7 @@ export class HighstockHelperService {
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator');
+      return { min: new Date(chartObject._selectedMin).toISOString().split('T')[0], max: new Date(chartObject._selectedMax).toISOString().split('T')[0] }
     }
     if (selectedRange) {
       return this.findVisibleMinMax(selectedRange.points, chartObject);
@@ -78,6 +79,9 @@ export class HighstockHelperService {
     if (freq === 'M' || freq === 'S') {
       return `${date.substr(0, 7)}-01`;
     }
+    if (freq === 'W') {
+      return date;
+    }
   }
 
   getQuarterMonths = (month) => {
@@ -98,6 +102,7 @@ export class HighstockHelperService {
   getTooltipFreqLabel = (frequency, date) => {
     const year = Highcharts.dateFormat('%Y', date);
     const month = Highcharts.dateFormat('%b', date);
+    const day = Highcharts.dateFormat('%d', date);
     if (frequency === 'A') {
       return year;
     }
@@ -106,6 +111,9 @@ export class HighstockHelperService {
     }
     if (frequency === 'M' || frequency === 'S') {
       return `${Highcharts.dateFormat('%b', date)} ${year}`;
+    }
+    if (frequency === 'W') {
+      return `${month} ${day}, ${year}`;
     }
   };
 
@@ -142,6 +150,9 @@ export class HighstockHelperService {
     if (freq === 'Q') {
       return '%Y %Q';
     }
+    if (freq === 'W') {
+      return '%b %d %Y';
+    }
     return '%b %Y';
   };
 
@@ -151,6 +162,9 @@ export class HighstockHelperService {
     }
     if (freq === 'Q') {
       return '%Y %Q';
+    }
+    if (freq === 'W') {
+      return '%Y-%m-%d';
     }
     return '%Y-%m';
   };
@@ -180,6 +194,9 @@ export class HighstockHelperService {
         return Date.parse(`${year}-${month}-01`)
       }
       return Date.parse(`${value}-01`);
+    }
+    if (freq === 'W') {
+      return Date.parse(`${value}`);
     }
   };
 }

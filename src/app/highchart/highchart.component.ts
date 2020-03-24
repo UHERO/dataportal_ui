@@ -114,8 +114,8 @@ export class HighchartComponent implements OnChanges {
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
       data: series0,
-      pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
-      pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
+      pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : currentFreq === 'W' ? 7 : 1,
+      pointIntervalUnit: currentFreq === 'A' ? 'year' : currentFreq === 'W' ? 'day' : 'month',
       pointStart: startDate,
       states: {
         hover: {
@@ -134,8 +134,8 @@ export class HighchartComponent implements OnChanges {
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
         data: series1,
-        pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : 1,
-        pointIntervalUnit: currentFreq === 'A' ? 'year' : 'month',
+        pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : currentFreq === 'W' ? 7 : 1,
+        pointIntervalUnit: currentFreq === 'A' ? 'year' : currentFreq === 'W' ? 'day' : 'month',
         pointStart: startDate,
         dataGrouping: {
           enabled: false
@@ -286,6 +286,7 @@ export class HighchartComponent implements OnChanges {
           if (freq === 'M' || freq === 'S') {
             return Highcharts.dateFormat('%b', date) + ' ';
           }
+          return Highcharts.dateFormat('%b %d', date) + ' ';
         };
         const getSeriesLabel = (points, s) => {
           points.forEach((point) => {

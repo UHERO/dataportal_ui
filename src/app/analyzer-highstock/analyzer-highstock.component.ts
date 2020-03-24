@@ -92,10 +92,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const nav = this.chartObject.series.find(s => s.userOptions.className === 'navigator');
       if (nav) {
         nav.update({
-          data: new Array(navigatorOptions.numberOfObservations).fill(null),
-          pointStart: Date.parse(navigatorOptions.dateStart),
-          pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
-          pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',  
+          data: this.allDates.map(d => [Date.parse(d.date), null]),
         });
       }
     }
@@ -306,9 +303,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         name: serie.chartDisplayName,
         data: serie.chartData.level,
         yAxis: axis ? axis.id : null,
-        pointStart: Date.parse(serie.chartData.dates[0].date),
-        pointInterval: serie.seriesDetail.frequencyShort === 'Q' ? 3 : serie.seriesDetail.frequencyShort === 'S' ? 6 : 1,
-        pointIntervalUnit: serie.seriesDetail.frequencyShort === 'A' ? 'year' : 'month',
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
@@ -331,10 +325,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
     chartSeries.push({
       className: 'navigator',
-      data: new Array(navigatorOptions.numberOfObservations).fill(null),
-      pointStart: Date.parse(navigatorOptions.dateStart),
-      pointInterval: navigatorOptions.frequency === 'Q' ? 3 : navigatorOptions.frequency === 'S' ? 6 : 1,
-      pointIntervalUnit: navigatorOptions.frequency === 'A' ? 'year' : 'month',
+      data: this.allDates.map(d => [Date.parse(d.date), null]),
       decimals: null,
       frequency: null,
       geography: null,

@@ -210,8 +210,11 @@ export class DateSliderComponent implements OnInit, AfterViewInit {
       const q = value.substring(5, 7);
       return `${value.substring(0, 4)}-${quarters[q]}-01`;
     }
-    if (freq === 'M') {
+    if (freq === 'M' || freq === 'S') {
       return `${value}-01`;
+    }
+    if (freq === 'W') {
+      return value;
     }
   }
 }
