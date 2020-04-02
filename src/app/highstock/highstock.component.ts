@@ -345,7 +345,10 @@ export class HighstockComponent implements OnChanges {
       showLastLabel: true
     }];
     this.chartOptions.plotOptions = {
-      series: { cropThreshold: 0 }
+      series: {
+        cropThreshold: 0,
+        turboThreshold: 0
+      }
     };
     this.chartOptions.series = series;
   }

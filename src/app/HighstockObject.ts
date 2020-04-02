@@ -117,6 +117,7 @@ export interface HighstockObject {
   plotOptions: {
     series: {
       cropThreshold: number,
+      turboThreshold?: number,
     }
   },
   series: Array<any>

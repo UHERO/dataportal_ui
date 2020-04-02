@@ -524,7 +524,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.yAxis = yAxis;
     this.chartOptions.plotOptions = {
       series: {
-        cropThreshold: 0
+        cropThreshold: 0,
+        turboThreshold: 0
       }
     };
     this.chartOptions.series = series;
