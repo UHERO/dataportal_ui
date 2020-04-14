@@ -47,7 +47,7 @@
     "highcharts-angular": "^2.4.0",
     "highcharts-export-csv": "^1.4.3",
     "ion-rangeslider": "^2.3.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "ng-recaptcha": "^5.0.0",
     "popper.js": "^1.16.1",
     "primeicons": "^2.0.0",
