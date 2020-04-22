@@ -82,8 +82,8 @@ export class AnalyzerService {
     };
     const abbreviatedNameDetails = {
       title: series.title,
-      geography: series.geography.handle,
-      frequency: series.frequencyShort,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
       seasonalAdjustment: series.seasonalAdjustment,
       units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
     };

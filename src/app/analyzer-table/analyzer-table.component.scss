@@ -77,11 +77,17 @@
     }
 
     .ag-theme-balham .ag-header-cell-label {
-      display: block;
-      float: right;
+      //display: block;
+      //float: right;
 
       span {
         float: right;
+      }
+    }
+
+    .ag-theme-balham.summary-table {
+      .ag-header-cell-label {
+        justify-content: flex-end;
       }
     }
 
