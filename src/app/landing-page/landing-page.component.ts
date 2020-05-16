@@ -27,6 +27,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private routeView: string;
   private routeYoy;
   private routeYtd;
+  private routeSa;
   private noCache: boolean;
   private routeStart;
   private routeEnd;
@@ -40,7 +41,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private displaySeries;
   private seriesInAnalyzer;
   private toggleSeriesInAnalyzer;
-
+  viewSeasonallyAdjusted: boolean = false;
   // Variables for geo and freq selectors
   public currentGeo: Geography;
   public currentFreq: Frequency;
@@ -79,6 +80,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeView = params['view'];
       this.routeYoy = params['yoy'];
       this.routeYtd = params['ytd'];
+      this.routeSa = params['sa'];
       this.routeStart = params['start'];
       this.routeEnd = params['end'];
       this.noCache = params['nocache'] === 'true';
@@ -87,6 +89,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
       if (this.routeView) { this.queryParams.view = this.routeView; };
+      if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { delete this.queryParams.sa; }
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
@@ -181,11 +184,19 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateRoute() {
-    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
+    this.queryParams.id = this.queryParams.id || this.id;
+    this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;
+  }
+
+  toggleSASeries(e) {
+    this.loading = true;
+    setTimeout(() => {
+      this.queryParams.sa = e.target.checked;
+      this.updateRoute();
+    }, 10);
   }
 }

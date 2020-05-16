@@ -108,9 +108,10 @@ export class CategoryHelperService {
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-        const displaySeries = this.getDisplaySeries(series, this.categoryData[cacheId].currentFreq.freq);
-        this.categoryData[cacheId].displaySeries = displaySeries;
+        const displaySeries = this.filterSeriesResults(series, this.categoryData[cacheId].currentFreq.freq);
+        this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
         this.categoryData[cacheId].series = series;
+        this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
         this.categoryData[cacheId].requestComplete = true;
       }
       if (!expandedCategory) {
@@ -236,8 +237,10 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
-      const displaySeries = this.getDisplaySeries(results.series, freq);
-      this.categoryData[cacheId].displaySeries = displaySeries;
+      //const displaySeries = this.getDisplaySeries(results.series, freq);
+      const displaySeries = this.filterSeriesResults(results.series, this.categoryData[cacheId].currentFreq.freq);
+      this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
+      this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this._helper.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
@@ -278,6 +281,10 @@ export class CategoryHelperService {
     return filtered
   }
 
+  findNonSeasonalSeries = (categorySeries: Array<any>) => {
+    return categorySeries.some(s => s.seriesInfo.seasonalAdjustment === 'not_seasonally_adjusted');
+  }
+
   getDisplaySeries(allSeries, freq: string) {
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data
@@ -293,9 +300,9 @@ export class CategoryHelperService {
         measurements.set(measurementKey, series);
         return;
       }
-      if (series.seasonalAdjustment !== 'not_seasonally_adjusted') {
+      /* if (series.seasonalAdjustment !== 'not_seasonally_adjusted') {
         measurements.set(measurementKey, series);
-      }
+      } */
     });
     measurements.forEach((measurement) => displaySeries.push(measurement));
     // Filter out series that do not have level data

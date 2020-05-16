@@ -28,6 +28,8 @@ export class CategoryTableViewComponent implements OnChanges {
   @Input() tableEnd;
   @Input() portalSettings;
   @Input() seriesInAnalyzer;
+  @Input() showSeasonal: boolean;
+  @Input() hasNonSeasonal: boolean;
   private gridApi;
   private columnDefs;
   private rows;
@@ -39,6 +41,7 @@ export class CategoryTableViewComponent implements OnChanges {
   paginationSize: number;
   disablePrevious: boolean;
   disableNext: boolean;
+  noSeriesToDisplay;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -56,25 +59,27 @@ export class CategoryTableViewComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
+          series.display = this._helper.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasNonSeasonal);
           series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
           const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.selectedDataList ? this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) : this.formatLvlData(series, level, this.subcatIndex, null);
-          this.rows.push(seriesData);
+          if (series.display) { this.rows.push(seriesData); }
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
-            this.rows.push(yoyData)
+            if (series.display) { this.rows.push(yoyData); }
           }
           if (this.ytdActive && this.freq !== 'A') {
             const ytdData = this.formatTransformationData(series, ytd, 'ytd');
-            this.rows.push(ytdData)
+            if (series.display) { this.rows.push(ytdData); }
           }
           if (this.c5maActive) {
             const c5maData = this.formatTransformationData(series, c5ma, 'c5ma');
-            this.rows.push(c5maData)
+            if (series.display) { this.rows.push(c5maData); }
           }
         }
       });
+      this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     }
   }
 

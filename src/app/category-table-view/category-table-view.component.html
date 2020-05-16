@@ -1,7 +1,7 @@
-<ng-template ngIf [ngIf]="noSeries">
-  <p *ngIf="noSeries" class="no-data">No data available for current selection.</p>
+<ng-template ngIf [ngIf]="noSeriesToDisplay">
+  <p *ngIf="noSeriesToDisplay" class="no-data">No data available for current selection.</p>
 </ng-template>
-<ng-template ngIf [ngIf]="!noSeries">
+<ng-template ngIf [ngIf]="!noSeriesToDisplay">
   <button class="csv-export-button" (click)="onExport()">Download CSV
     <i class="far fa-file-excel"></i>
   </button>

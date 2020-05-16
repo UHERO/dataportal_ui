@@ -36,7 +36,7 @@
 		<app-category-charts *ngIf="routeView !== 'table' && displaySeries && data.requestComplete" [search]="search"
 			[portalSettings]="portalSettings" [chartStart]="data.seriesStart" [selectedDataList]="data.selectedDataList"
 			[chartEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
-			[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [params]="queryParams"
+			[freq]="data.currentFreq?.freq" [noSeries]="data.noData"
 			[findMinMax]="data.findMinMax" [seriesInAnalyzer]="seriesInAnalyzer"
 			(updateURLFragment)="updateRoute($event)">
 		</app-category-charts>

@@ -104,12 +104,12 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   // Redraw chart when selecting a new region or frequency
-  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean) => {
-    this.seasonallyAdjusted = sa;
+  goToSeries = (siblings: Array<any>, freq: string, geo: string, sa) => {
+    this.seasonallyAdjusted = sa.target ? sa.target.checked : sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
     const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
-    const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
+    const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, this.seasonallyAdjusted, freq) : null;
     if (id) {
       const queryParams = {
         id: id,
