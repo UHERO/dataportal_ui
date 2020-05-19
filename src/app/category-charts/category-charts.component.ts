@@ -46,8 +46,8 @@ export class CategoryChartsComponent implements OnChanges {
           chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
         }
       });
-      this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     }
+    this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {

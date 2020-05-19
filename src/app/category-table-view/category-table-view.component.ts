@@ -54,9 +54,10 @@ export class CategoryTableViewComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
+    //this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
+      this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           series.display = this._helper.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasNonSeasonal);
@@ -79,8 +80,8 @@ export class CategoryTableViewComponent implements OnChanges {
           }
         }
       });
-      this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     }
+    this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
   }
 
   setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
