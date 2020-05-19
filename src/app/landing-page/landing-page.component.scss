@@ -19,7 +19,6 @@
 
     .sliders {
       display: inline-block;
-      width: 360px;
       vertical-align: bottom;
       margin-left: 10px;
       margin-right: 10px;
@@ -146,6 +145,7 @@
     text-decoration: none;
     font-size: 0.85em;
     color: $primary;
+    margin-right: 5px;
     vertical-align: middle;
     cursor: pointer;
 

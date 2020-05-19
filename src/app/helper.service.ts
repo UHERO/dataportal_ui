@@ -18,6 +18,20 @@ export class HelperService {
     this.categoryData.next(data)
   }
 
+  toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasNonSeasonal: boolean) => {
+    if (!hasNonSeasonal) {
+      return true; // Display all series if no non-seasonal series exists
+    }
+    if (series.seriesInfo.seasonallyAdjusted === undefined && !showSeasonal) {
+      return true;
+    }
+    return series.seriesInfo.seasonallyAdjusted === showSeasonal;
+  }
+
+  checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
+    return noData || !data.some(s => s.display);
+  }
+
   findSelectedDataList = (dataList, dataListId, dataListName) => {
     for (let i = 0; i < dataList.length; i++) {
       let name = dataListName || '';

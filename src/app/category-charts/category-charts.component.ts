@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, Inject, ChangeDetectionStrategy, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, Inject, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
 import { HelperService } from '../helper.service';
@@ -17,10 +17,8 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() selectedDataList;
   @Input() freq;
   @Input() noSeries;
-  @Input() nsaActive;
-  @Input() yoyActive;
-  @Input() ytdActive;
-  @Input() params;
+  @Input() showSeasonal;
+  @Input() hasNonSeasonal;
   @Input() chartStart;
   @Input() chartEnd;
   @Input() search;
@@ -30,23 +28,25 @@ export class CategoryChartsComponent implements OnChanges {
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
+  noSeriesToDisplay;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private _helper: HelperService,
     private googleAES: GoogleAnalyticsEventsService,
     private _analyzer: AnalyzerService,
-    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnChanges() {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
+          chartSeries.display = this._helper.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasNonSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
           chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
         }
       });
+      this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     }
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
