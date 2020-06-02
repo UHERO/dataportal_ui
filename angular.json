@@ -25,7 +25,8 @@
             },
             "assets": [
               "src/assets",
-              "src/manoa.jpg"
+              "src/manoa.jpg",
+              "src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -156,7 +157,8 @@
             },
             "assets": [
               "src/assets",
-              "src/manoa.jpg"
+              "src/manoa.jpg",
+              "src/outage.html"
             ]
           }
         },
@@ -225,7 +227,8 @@
             },
             "assets": [
               "src/assets",
-              "src/nta-logo.png"
+              "src/nta-logo.png",
+              "src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -356,7 +359,8 @@
             },
             "assets": [
               "src/assets",
-              "src/nta-logo.png"
+              "src/nta-logo.png",
+              "src/outage.html"
             ]
           }
         },
@@ -425,7 +429,8 @@
             },
             "assets": [
               "src/assets",
-              "src/hawaii-county-seal.png"
+              "src/hawaii-county-seal.png",
+              "src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -556,7 +561,8 @@
             },
             "assets": [
               "src/assets",
-              "src/hawaii-county-seal.png"
+              "src/hawaii-county-seal.png",
+              "src/outage.html"
             ]
           }
         },
