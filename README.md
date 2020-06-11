@@ -3,16 +3,45 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.1.
 
 ## Development server
+### UHERO Data Portal
+Run `npm run start-uhero-dev` for a dev server of the UHERO data portal. Navigate to `http://localhost:4200/`.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### NTA Data Portal
+Run `npm run start-nta-dev` for a dev server of the NTA data portal. Navigate to `http://localhost:4200/`.
+
+### COH Data Portal
+Run `npm run start-coh-dev` for a dev server of the COH data portal. Navigate to `http://localhost:4200/`.
+
+## Staging server
+### UHERO Data Portal
+Run `npm run start-uhero-staging` to run the UHERO data portal in the staging server.
+
+### NTA Data Portal
+Run `npm run start-nta-staging` to run the NTA data portal in the staging server.
+
+### COH Data Portal
+Run `npm run start-coh-staging` to run the NTA data portal in the staging server.
 
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
 ## Build
+### UHERO Data Portal
+Run `npm run build-uhero` for the production build of the UHERO Data Portal. The build artifacts will be stored in the `dist/` directory.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+For the staging server build, run `npm run  build-uhero-staging`.
+
+### NTA Data Portal
+Run `npm run build-nta` for the production build of the NTA Data Portal. The build artifacts will be stored in the `ntaDist/` directory.
+
+For the staging server build, run `npm run build-nta-staging`.
+
+### COH Data Portal
+Run `npm run build-coh` for the production build of the COH Data Portal. The build artifacts will be stored in the `ntaDist/` directory.
+
+For the staging server build, run `npm run build-coh-staging`.
+
 
 ## Running unit tests
 
