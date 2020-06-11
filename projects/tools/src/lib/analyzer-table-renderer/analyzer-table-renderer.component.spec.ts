@@ -1,0 +1,25 @@
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AnalyzerTableRendererComponent } from './analyzer-table-renderer.component';
+
+describe('AnalyzerTableRendererComponent', () => {
+  let component: AnalyzerTableRendererComponent;
+  let fixture: ComponentFixture<AnalyzerTableRendererComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ AnalyzerTableRendererComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AnalyzerTableRendererComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

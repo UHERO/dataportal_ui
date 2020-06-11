@@ -1,0 +1,45 @@
+.analyze-button {
+  color: #B5B5B5;
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 1.2em;
+  //visibility: hidden;
+} 
+
+.analyze-chart {
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 1.2em;
+}
+
+span {
+  float: left;
+  max-width: 75%;
+
+  a {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #505050;
+    vertical-align: top;
+  }
+}
+
+.info {
+  float: right;
+  color: #505050;
+  cursor: pointer;
+  width: initial;
+  margin: auto;
+
+  &:focus {
+    outline: 0;
+  }
+
+  .info-icon {
+    font-size: 1.2em;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+}

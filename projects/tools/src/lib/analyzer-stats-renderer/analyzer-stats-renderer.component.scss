@@ -1,0 +1,29 @@
+.analyze-button {
+  color: #B5B5B5;
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 1.2em;
+} 
+
+.analyze-chart {
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: 1.2em;
+}
+
+span {
+  a {
+    display: inline-block;
+    max-width: 75%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #505050;
+    vertical-align: top;
+  }
+
+  &:hover {
+    .analyze-button {
+      visibility: visible;
+    }
+  }
+}

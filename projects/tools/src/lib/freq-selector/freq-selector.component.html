@@ -1,0 +1,5 @@
+<select [ngModel]="selectedFreq?.freq" (ngModelChange)="onChange($event)" class="custom-select" aria-label="frequency-selector">
+  <option [ngValue]="freq?.freq" *ngFor="let freq of freqs">
+     {{(freq.label.length > 0) ? freq.label : freq.freq}}
+  </option>
+</select>

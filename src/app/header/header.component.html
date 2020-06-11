@@ -1,7 +1,0 @@
-<header id="header" class="navbar navbar-fixed-top navbar-light">
-    <a class="navbar-brand" id="uhero-header" routerLink="/">
-        <img *ngIf="headerLogo.displayImg" [src]="headerLogo.imgSrc" [alt]="headerLogo.altText">
-        <p>{{headerLogo.headerText}}</p>
-    </a>
-    <app-search-bar (onSearch)="onSearch($event)"></app-search-bar>
-</header>
