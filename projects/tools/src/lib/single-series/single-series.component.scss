@@ -1,0 +1,155 @@
+.single-series-view {
+  margin: 18% 0 2% 0;
+  vertical-align: top;
+  display: inline-block;
+
+  @media (min-width: 768px) {
+    margin-top: 70px;
+    margin-bottom: 15px;
+  }
+
+  .form-check {
+    display: inline-block;
+    margin-left: 10px;
+    margin-bottom: 0;
+    font-size: 0.9em;
+    
+    input {
+      margin-right: 0.25rem;
+    }
+  }
+
+  .series-title {
+    display: block;
+    font-size: 1.5em;
+    letter-spacing: 0.05em;
+
+    @media (min-width: 768px) {
+      margin: auto 10px auto 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  .analyzer-toggle {
+    color: #505050;
+    cursor: pointer;
+    vertical-align: middle;
+    left: 10px;
+    margin-right: 10px;
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  .remove-button {
+    color: #505050;
+  }
+
+  .source {
+    width: 100%;
+    padding: 10px 10px 0 10px;
+    font-size: 0.9em;
+    margin-top: 1%;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    .source_detail {
+      margin-bottom: 0;
+    }
+  }
+
+  .summary-stats {
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+    padding: 10px 0;
+    margin: 1% 0;
+    
+    .stat {
+      display: table-cell;
+      text-align: center;
+      font-size: 0.9em;
+
+      p {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .selectors {
+    margin: 0 auto;
+
+    .geo-selector, .freq-selector {
+      display: inline-block;
+    }
+  }
+
+  .single-chart-container {
+    margin: 2% 3%;
+  }
+}
+
+:host {
+  ::ng-deep {
+    .ui-table {
+      background-color: transparent;
+      text-align: right;
+      font-family: 'Lucida Sans', sans-serif;
+      font-size: 0.9em;
+      border: 0;
+      border-right: 1px solid #E5E5E5;
+
+      .ui-sortable-column.ui-state-highlight {
+        background-color: #F4F4F4;
+        color: #333;
+
+        &:focus {
+          outline: none;
+        }
+
+        .ui-sortable-column-icon {
+          color: #848484;
+          vertical-align: middle;
+        }
+      }
+
+      .ui-table-thead {
+        tr {
+          th {
+            padding: .25em .5em;
+          }
+        }
+      }
+
+      .ui-table-tbody {
+        tr {
+          td {
+            padding: .25em .5em;
+          }
+        }
+      }
+
+      .fa-spinner {
+        display: block;
+        font-size: 1.3em;
+        margin-top: 20px;    
+      }
+
+      .ui-widget-overlay {
+        background-color: transparent;
+      }
+  
+      tr.ui-widget-content {
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+        border-left: 1px solid #E5E5E5;
+        border-right: 1px solid #E5E5E5;
+      }
+  
+      tr:last-child {
+        border-bottom: 1px solid #E5E5E5;
+      }
+    }
+  }
+}

@@ -1,0 +1,73 @@
+.multi-charts-row {
+  display: block;
+  margin-bottom: 40px;
+
+  .no-data {
+    margin-bottom: 0;
+    margin-top: 10px;
+    font-size: 0.9em;
+  }
+
+  ul.available-geos, ul.available-freqs {
+    li {
+      font-size: 0.9em;
+    }
+  }
+}
+
+.multi-charts {
+  display: inline-block;
+  padding: 0 3px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  margin: 10px 10px 10px 3px;
+  background: #FAFAFB;
+  max-height: 206px;
+
+  a {
+    color: #000;
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+    
+  .analyzer-toggle {
+    color: #505050;
+    cursor: pointer;
+    position: relative;
+    top: -25px;
+    vertical-align: middle;
+    left: 10px;
+    font-size: 1em;
+  }
+
+  .add-analyze-button {
+    text-shadow: 1px 2px 6px #E5E5E5, 0 0 0 #000, 1px 2px 6px #E5E5E5;
+
+    &:hover::after {
+      color: #9E9E9E;
+      content: ' Add to Analyzer';
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.8em;
+      font-family: 'Lucida Sans', sans-serif;
+      text-shadow: none;
+    }
+  }
+
+  .remove-analyze-button {
+    color: #505050;
+
+    &:hover::after {
+      color: #9E9E9E;
+      content: ' Remove from Analyzer';
+      vertical-align: text-bottom;
+      font-weight: bold;
+      font-size: 0.8em;
+      font-family: 'Lucida Sans', sans-serif;
+      text-shadow: none;
+    }
+  }
+}

@@ -1,0 +1,3 @@
+<input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[start]" (change)="inputChange($event, 'from')" />
+<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true" (onChange)="slideChange($event)" (onSlideEnd)="slideEnd($event)"></p-slider>
+<input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[end]" (change)="inputChange($event, 'to')" />

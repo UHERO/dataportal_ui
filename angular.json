@@ -4,74 +4,54 @@
   "newProjectRoot": "projects",
   "projects": {
     "uhero": {
-      "root": "",
-      "sourceRoot": "src",
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/uhero",
+      "sourceRoot": "projects/uhero/src",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "outputPath": "dist/uhero",
+            "index": "projects/uhero/src/index.html",
+            "main": "projects/uhero/src/main.ts",
+            "polyfills": "projects/uhero/src/polyfills.ts",
+            "tsConfig": "projects/uhero/tsconfig.app.json",
             "aot": true,
-            "outputPath": "dist",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
-            "es5BrowserSupport": true,
-            "polyfills": "src/polyfills.ts",
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/assets/uhero"
-              ]
-            },
             "assets": [
-              "src/assets",
-              "src/manoa.jpg",
-              "src/outage.html"
+              "projects/uhero/src/manoa.jpg",
+              "projects/uhero/src/assets",
+              "projects/uhero/src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
+              "projects/uhero/src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
           "configurations": {
-            "staging": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ]
-            },
             "production": {
-              "budgets": [
+              "fileReplacements": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "replace": "projects/uhero/src/environments/environment.ts",
+                  "with": "projects/uhero/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -79,28 +59,19 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
+              "vendorChunk": false,
               "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
-            },
-            "apiDev": {
               "budgets": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "fileReplacements": [
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.apiDev.ts"
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ]
             }
@@ -112,14 +83,8 @@
             "browserTarget": "uhero:build"
           },
           "configurations": {
-            "staging": {
-              "browserTarget": "uhero:build:staging"
-            },
             "production": {
               "browserTarget": "uhero:build:production"
-            },
-            "apiDev": {
-              "browserTarget": "uhero:build:apiDev"
             }
           }
         },
@@ -132,33 +97,26 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
+            "main": "projects/uhero/src/test.ts",
+            "polyfills": "projects/uhero/src/polyfills.ts",
+            "tsConfig": "projects/uhero/tsconfig.spec.json",
+            "karmaConfig": "projects/uhero/karma.conf.js",
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ],
+            "assets": [
+              "projects/uhero/src/manoa.jpg",
+              "projects/uhero/src/assets",
+              "projects/uhero/src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/highcharts/css/highcharts.css",
               "src/styles.scss"
-            ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/assets/uhero"
-              ]
-            },
-            "assets": [
-              "src/assets",
-              "src/manoa.jpg",
-              "src/outage.html"
             ]
           }
         },
@@ -166,316 +124,78 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
+              "projects/uhero/tsconfig.app.json",
+              "projects/uhero/tsconfig.spec.json",
+              "projects/uhero/e2e/tsconfig.json"
             ],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist-server",
-            "main": "main.server.ts",
-            "tsConfig": "tsconfig.server.json"
-          }
-        }
-      }
-    },
-    "uhero-e2e": {
-      "root": "",
-      "sourceRoot": "e2e",
-      "projectType": "application",
-      "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "./protractor.conf.js",
+            "protractorConfig": "projects/uhero/e2e/protractor.conf.js",
             "devServerTarget": "uhero:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
-            "exclude": []
-          }
-        }
-      }
-    },
-    "nta": {
-      "root": "",
-      "sourceRoot": "src",
-      "projectType": "application",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "aot": true,
-            "outputPath": "ntaDist",
-            "index": "src/index.html",
-            "main": "src/ntaMain.ts",
-            "tsConfig": "src/tsconfig.app.json",
-            "es5BrowserSupport": true,
-            "polyfills": "src/polyfills.ts",
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/assets/nta"
-              ]
-            },
-            "assets": [
-              "src/assets",
-              "src/nta-logo.png",
-              "src/outage.html"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova-light/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
-            ]
           },
           "configurations": {
-            "staging": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ]
-            },
             "production": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
-            },
-            "apiDev": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.apiDev.ts"
-                }
-              ]
+              "devServerTarget": "uhero:serve:production"
             }
-          }
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "nta:build"
-          },
-          "configurations": {
-            "staging": {
-              "browserTarget": "nta:build:staging"
-            },
-            "production": {
-              "browserTarget": "nta:build:production"
-            },
-            "apiDev": {
-              "browserTarget": "nta:build:apiDev"
-            }
-          }
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "nta:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
-            ],
-            "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/primeng/resources/themes/nova-light/theme.css",
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
-            ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/assets/nta"
-              ]
-            },
-            "assets": [
-              "src/assets",
-              "src/nta-logo.png",
-              "src/outage.html"
-            ]
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
-            ],
-            "exclude": []
-          }
-        },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist-server",
-            "main": "main.server.ts",
-            "tsConfig": "tsconfig.server.json"
-          }
-        }
-      }
-    },
-    "nta-e2e": {
-      "root": "",
-      "sourceRoot": "e2e",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "nta:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
-            "exclude": []
           }
         }
       }
     },
     "coh": {
-      "root": "",
-      "sourceRoot": "src",
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/coh",
+      "sourceRoot": "projects/coh/src",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "outputPath": "dist/coh",
+            "index": "projects/coh/src/index.html",
+            "main": "projects/coh/src/main.ts",
+            "polyfills": "projects/coh/src/polyfills.ts",
+            "tsConfig": "projects/coh/tsconfig.app.json",
             "aot": true,
-            "outputPath": "cohDist",
-            "index": "src/index.html",
-            "main": "src/hawaiiMain.ts",
-            "tsConfig": "src/tsconfig.app.json",
-            "es5BrowserSupport": true,
-            "polyfills": "src/polyfills.ts",
+            "assets": [
+              "projects/coh/src/hawaii-county-seal.png",
+              "projects/coh/src/assets",
+              "projects/coh/src/outage.html"
+            ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "src/assets/coh"
+                "src/assets"
               ]
             },
-            "assets": [
-              "src/assets",
-              "src/hawaii-county-seal.png",
-              "src/outage.html"
-            ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
+              "projects/coh/src/styles.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
           "configurations": {
-            "staging": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ]
-            },
             "production": {
-              "budgets": [
+              "fileReplacements": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "replace": "projects/coh/src/environments/environment.ts",
+                  "with": "projects/coh/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -483,28 +203,19 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": true,
+              "vendorChunk": false,
               "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
-            },
-            "apiDev": {
               "budgets": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "fileReplacements": [
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.apiDev.ts"
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ]
             }
@@ -516,14 +227,8 @@
             "browserTarget": "coh:build"
           },
           "configurations": {
-            "staging": {
-              "browserTarget": "coh:build:staging"
-            },
             "production": {
               "browserTarget": "coh:build:production"
-            },
-            "apiDev": {
-              "browserTarget": "coh:build:apiDev"
             }
           }
         },
@@ -536,33 +241,216 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+            "main": "projects/coh/src/test.ts",
+            "polyfills": "projects/coh/src/polyfills.ts",
+            "tsConfig": "projects/coh/tsconfig.spec.json",
+            "karmaConfig": "projects/coh/karma.conf.js",
+            "assets": [
+              "projects/coh/src/hawaii-county-seal.png",
+              "projects/coh/src/assets",
+              "projects/coh/src/outage.html"
+            ],
+            "styles": [
+              "projects/coh/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/coh/tsconfig.app.json",
+              "projects/coh/tsconfig.spec.json",
+              "projects/coh/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/coh/e2e/protractor.conf.js",
+            "devServerTarget": "coh:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "coh:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "nta": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/nta",
+      "sourceRoot": "projects/nta/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/nta",
+            "index": "projects/nta/src/index.html",
+            "main": "projects/nta/src/main.ts",
+            "polyfills": "projects/nta/src/polyfills.ts",
+            "tsConfig": "projects/nta/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/nta/src/nta-logo.png",
+              "projects/nta/src/assets",
+              "projects/nta/src/outage.html"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/primeng/resources/themes/nova-light/theme.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/highcharts/css/highcharts.css",
-              "src/styles.scss"
+              "projects/nta/src/styles.scss"
             ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/assets/coh"
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/nta/src/environments/environment.ts",
+                  "with": "projects/nta/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
               ]
-            },
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "nta:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "nta:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "nta:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/nta/src/test.ts",
+            "polyfills": "projects/nta/src/polyfills.ts",
+            "tsConfig": "projects/nta/tsconfig.spec.json",
+            "karmaConfig": "projects/nta/karma.conf.js",
             "assets": [
-              "src/assets",
-              "src/hawaii-county-seal.png",
-              "src/outage.html"
+              "projects/nta/src/nta-logo.png",
+              "projects/nta/src/assets",
+              "projects/nta/src/outage.html"
+            ],
+            "styles": [
+              "projects/nta/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/nta/tsconfig.app.json",
+              "projects/nta/tsconfig.spec.json",
+              "projects/nta/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/nta/e2e/protractor.conf.js",
+            "devServerTarget": "nta:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "nta:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "tools": {
+      "projectType": "library",
+      "root": "projects/tools",
+      "sourceRoot": "projects/tools/src",
+      "prefix": "lib",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss" 
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/tools/tsconfig.lib.json",
+            "project": "projects/tools/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/tools/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/tools/src/test.ts",
+            "tsConfig": "projects/tools/tsconfig.spec.json",
+            "karmaConfig": "projects/tools/karma.conf.js",
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           }
         },
@@ -570,56 +458,15 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
+              "projects/tools/tsconfig.lib.json",
+              "projects/tools/tsconfig.spec.json"
             ],
-            "exclude": []
-          }
-        },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist-server",
-            "main": "main.server.ts",
-            "tsConfig": "tsconfig.server.json"
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
-    },
-    "coh-e2e": {
-      "root": "",
-      "sourceRoot": "e2e",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "coh:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
-            "exclude": []
-          }
-        }
-      }
-    }
-  },
-  "defaultProject": "uhero",
-  "schematics": {
-    "@schematics/angular:component": {
-      "inlineTemplate": false,
-      "skipTests": false,
-      "prefix": "app",
-      "style": "scss"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
-    }
-  }
+    }},
+  "defaultProject": "uhero"
 }
