@@ -1,5 +1,0 @@
-<select [ngModel]="selectedGeo?.handle" (ngModelChange)="onChange($event)" class="custom-select" aria-label="geo-selector">
-    <option [ngValue]="region?.handle" *ngFor="let region of regions">
-        {{region.shortName ? region.shortName : (region.name.length > 0) ? region.name : region.handle}}
-    </option>
-</select>

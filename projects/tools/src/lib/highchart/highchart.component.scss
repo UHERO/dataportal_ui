@@ -1,0 +1,87 @@
+:host {
+  ::ng-deep {
+    .multi-chart {
+      width:200px;
+      height: 200px;
+      display: block;
+    }
+    .highcharts-tooltip {
+      filter: none !important;
+    }
+
+    .highcharts-background {
+      fill: #FAFAFB;
+    }
+
+    .highcharts-grid-line, .highcharts-axis-line {
+      stroke: none;
+    }
+
+    .highcharts-label {
+      .highcharts-label-box.highcharts-tooltip-box {
+        stroke: none;
+      }
+    }
+
+    .highcharts-series-0 {
+      .highcharts-graph {
+        stroke-width: 2.5px;
+      }
+    }
+
+    path.highcharts-graph.highcharts-zone-graph-0.pseudoHistory {
+      stroke: #7CB5EC;
+    }
+
+    path.highcharts-color-0.highcharts-point.pseudoHistory {
+      color: #7CB5EC;
+      fill: #7CB5EC;
+      stroke: #7CB5EC;
+      stroke-dasharray: 5;
+    }
+
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: none;
+      }
+
+      // Transparent column charts for UHERO data portal
+      rect.highcharts-point {
+        stroke: none;
+        fill: none;
+      }
+    }
+
+    .highcharts-no-data {
+      font-size: 0.85em !important;
+    }
+
+    .highcharts-title, .highcharts-subtitle {
+      font-size: 0.9em;
+      letter-spacing: 0.05em;
+    }
+
+    .single-point {
+      .highcharts-subtitle {
+        tspan:first-of-type {
+          font-size: 2em;
+        }    
+      }
+    }
+
+    .highcharts-tooltip {
+      filter: none !important;
+      font-size: 0.9em;
+      line-height: 1.25em;
+        
+      span {
+        white-space: normal !important;
+        width: 180px;
+      }
+
+      .highcharts-tooltip-box {
+        fill: none;
+      }
+    }
+  }
+}

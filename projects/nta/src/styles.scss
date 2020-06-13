@@ -1,0 +1,397 @@
+@import './assets/app_colors';
+@import '~ag-grid-community/dist/styles/ag-grid.css';
+@import '~ag-grid-community/dist/styles/ag-theme-balham.css';
+/* You can add global styles to this file, and also import other style files */
+body {
+  position: relative;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: 'Lucida Sans', sans-serif;
+   font-size: 16px;
+
+  .custom-select {
+    color: $primary;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8em;
+    height: calc(1.75rem - 2px);
+    padding: 0.175rem 1.75rem 0.175rem 0.75rem;
+    background: $white url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+    background-size: 8px 10px;
+    margin-right: 0.25em;
+    width: unset;
+  }
+
+  .fa-spinner {
+    color: $primary;
+  }
+
+  .filters {
+    color: $primary;
+  }
+
+  .selected-category {
+    color: $primary;
+  }
+
+  .selected-data-list {
+    color: $primary;
+  }
+  
+  .sublist {
+    color: $primary;
+  }
+
+  .sublist-separator {
+    background-color: $primary;
+  }
+
+  .material-icons.md-18 {
+    color: $secondary;
+  }
+
+  .switch-view {
+    color: $primary;
+  }
+
+  .popover {
+    .arrow {
+      display: none;
+    }
+
+    .popover-header {
+      font-size: 0.85em;
+      font-weight: bold;
+      padding: 10px;
+
+      .close-info {
+        font-size: 1.1em;
+        float: right;
+        cursor: pointer;
+      }
+    }
+
+    .popover-body {
+      font-size: 0.9em;
+    }
+  }
+
+  #loading {
+    padding-left: 10px;
+    margin-top: 65px;
+  }
+
+  #sidebar-nav {
+    p {
+      @media (max-width: 767px) {
+        color: $primary;
+      }
+    }
+
+    .ui-panelmenu {
+      .ui-panelmenu-header.ui-state-active {
+        a {
+          color: $primary;
+
+          &:hover {
+            color: $primary;
+  
+            .ui-panelmenu-icon {
+              color: $primary;
+            }
+          }
+  
+          .ui-panelmenu-icon {
+            color: $primary;
+          }
+        }
+      }
+    }
+  }
+
+  lib-search-bar {
+    .btn {
+      background-color: $primary;
+    }
+  }
+
+  lib-share-link {
+    .share-link {
+      color: $primary;
+    }
+  }
+
+  lib-single-series {
+    .series-title {
+      color: $primary;
+    }
+
+    .source {
+      a {
+        color: $primary;
+      }
+    }
+
+    .summary-stats {
+      .stat {
+        p {
+          color: $primary;
+        }
+      }
+    }
+
+    .ui-table {
+      .fa-spinner {
+        color: $primary;
+      }
+    }
+  }
+
+  .navbar-side {
+    .selectedCategory {
+      background-color: $primary;
+    }
+  }
+
+
+  lib-header {
+    #header {
+      p {
+        color: $primary;
+      }
+    }
+  }
+
+  lib-measurement-landing-page {
+    .multi-series-container {
+      .material-icons.md-18 {
+        color: $secondary;
+      }
+    }
+
+    lib-date-slider {
+      p-slider {
+        .ui-slider .ui-slider-range {
+          background-color: $primary;
+        }
+
+        .ui-slider:not(.ui-state-disabled) .ui-slider-handle:hover, .ui-slider .ui-slider-handle {
+          border-color: $primary;
+        }
+      }
+    }
+
+    .highcharts-series-0 {
+      .highcharts-graph {
+        stroke: $highcharts-series0;
+      }
+    }
+
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: $highcharts-series1;
+      }
+    }
+
+    .highcharts-markers.highcharts-series-0 {
+      path {
+        fill: $highcharts-series0;
+        stroke: none;
+      }
+    }
+    
+    .highcharts-markers.highcharts-series-1 {
+      path {
+        fill: $highcharts-series1;
+        stroke: none;
+      }
+    }
+
+    .highcharts-no-data {
+      color: $primary-text !important;
+    }
+
+    .highcharts-title, .highcharts-subtitle {
+      fill: $primary-text;        
+    }
+
+    .single-point {
+      .highcharts-subtitle {
+        fill: $primary;    
+      }
+    }
+  }
+
+  lib-analyzer {
+    h3 {
+      color: $primary;
+    }
+
+    .csv-export-button {
+      color: $primary;
+    }
+  }
+
+  .analyzer-chart, .single-series-chart {
+    .highcharts-background {
+      fill: $chart-background;
+    }
+      
+    .highcharts-button.highcharts-button-pressed {
+      fill: $highstock-series0;
+      
+      text {
+        fill: $white;
+      }
+    }
+      
+    .highcharts-markers.highcharts-color-0 {
+      path {
+        fill: $analyzer-series0;
+      }
+    }
+      
+    .highcharts-markers.highcharts-color-1 {
+      path {
+        fill: $analyzer-series1;
+      }
+    }
+      
+    .highcharts-markers.highcharts-color-2 {
+      path {
+        fill: $analyzer-series2;
+      }
+    }
+      
+    .highcharts-markers.highcharts-color-3 {
+      path {
+        fill: $analyzer-series3;
+      }
+    }
+      
+    .highcharts-markers.highcharts-color-4 {
+      path {
+        fill: $analyzer-series4;
+      }
+    }
+      
+    .highcharts-color-0 {
+      fill: $analyzer-series0;
+      stroke: $analyzer-series0;
+    }
+      
+    .highcharts-color-1 {
+      fill: $analyzer-series1;
+      stroke: $analyzer-series1;
+    }
+      
+    .highcharts-color-2 {
+      fill: $analyzer-series2;
+      stroke: $analyzer-series2;
+    }
+      
+    .highcharts-color-3 {
+      fill: $analyzer-series3;
+      stroke: $analyzer-series3;
+    }
+      
+    .highcharts-color-4 {
+      fill: $analyzer-series4;
+      stroke: $analyzer-series4;
+    }
+      
+    .highcharts-navigator-series {
+      .highcharts-area {
+        fill: $highstock-series1;
+      }
+    }
+      
+    .highcharts-tooltip {
+      .series-0 {
+        fill: $analyzer-series0;
+      }
+              
+      .series-1 {
+        fill: $analyzer-series1;
+      }
+              
+      .series-2 {
+        fill: $analyzer-series2;
+      }
+      
+      .series-3 {
+        fill: $analyzer-series3;
+      }
+      
+      .series-4 {
+        fill: $analyzer-series4;
+      }
+    }
+      
+    .highcharts-xaxis-labels {
+      text {
+        color: $highstock-series0;
+        fill: $highstock-series0;
+      }
+    }
+      
+    .highcharts-yaxis-labels.series1 {
+      text {
+        color: $highstock-series0;
+        fill: $highstock-series0;
+      }
+    }
+      
+    .highcharts-yaxis-labels.series2 {
+      text {
+        color: $highstock-series1;
+        fill: $highstock-series1;
+      }
+    }
+      
+    .highcharts-yaxis.series1 {
+      .highcharts-axis-title {
+        color: $highstock-series0;
+        fill: $highstock-series0;
+      }
+    }
+      
+    .highcharts-yaxis.series2 {
+      .highcharts-axis-title {
+        color: $highstock-series1;
+        fill: $highstock-series1;
+      }
+    }
+  }
+
+  .single-series-chart {
+    .highcharts-markers.highcharts-color-2 {
+      path {
+        fill: none;
+      }
+    }
+
+    .highcharts-color-2 {
+      fill: none;
+      stroke: none;
+    }
+
+    .highcharts-tooltip {
+      .series-2 {
+        fill: none;
+      }
+    }
+  }
+  
+  .form-check-inline {
+    padding-left: 0;
+    vertical-align: middle;
+    font-size: 0.85em;
+    margin-bottom: 0;
+  
+    input {
+      margin-right: 0.25rem;
+      margin-left: 0rem;
+      vertical-align: middle;
+    }
+  }
+}
