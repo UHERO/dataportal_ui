@@ -8,13 +8,14 @@ import { HighstockObject } from '../tools.models';
 import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
-import * as Highcharts from 'highcharts/highstock';
-import Exporting from 'highcharts/modules/exporting';
-import ExportData from 'highcharts/modules/export-data';
-import  OfflineExporting from 'highcharts/modules/offline-exporting';
-Exporting(Highcharts);
-ExportData(Highcharts);
-OfflineExporting(Highcharts);
+declare var require: any;
+const Highcharts = require('highcharts/highstock');
+const exporting = require('highcharts/modules/exporting');
+const exportData = require('highcharts/modules/export-data')
+const offlineExport = require('highcharts/modules/offline-exporting');
+exporting(Highcharts);
+exportData(Highcharts);
+offlineExport(Highcharts);
 
 Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
   // Add metadata to top of CSV export

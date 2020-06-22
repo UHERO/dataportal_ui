@@ -6,10 +6,10 @@ import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
 const Highcharts = require('highcharts/highstock');
-const exporting = require('highcharts/modules/exporting');
+/* const exporting = require('highcharts/modules/exporting');
 const offlineExport = require('highcharts/modules/offline-exporting');
 exporting(Highcharts);
-offlineExport(Highcharts);
+offlineExport(Highcharts); */
 
 @Component({
   selector: 'lib-analyzer-highstock',
