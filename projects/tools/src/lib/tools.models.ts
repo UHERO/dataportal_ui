@@ -141,7 +141,7 @@ export interface HighstockObject {
   }
   navigator: {
     series: {
-      includeInCSVExport: boolean
+      includeInDataExport: boolean
     }
   },
   exporting: {

@@ -9,22 +9,9 @@ import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
-import Exporting from 'highcharts/modules/exporting';
-import ExportData from 'highcharts/modules/export-data';
-import  OfflineExporting from 'highcharts/modules/offline-exporting';
-Exporting(Highcharts);
-ExportData(Highcharts);
-OfflineExporting(Highcharts);
-
-Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
-  // Add metadata to top of CSV export
-  let seriesMetaData = '';
-  this.userOptions.labels.items.forEach((label) => {
-    seriesMetaData+= label.html ? `${label.html} \n` : '';
-  });
-  const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
-  return seriesMetaData + '\n\n' + result
-});
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
+import offlineExport from 'highcharts/modules/offline-exporting';
 
 @Component({
   selector: 'lib-highstock',
@@ -56,7 +43,23 @@ export class HighstockComponent implements OnChanges {
     @Inject('defaultRange') private defaultRange,
     @Inject('logo') private logo,
     private _highstockHelper: HighstockHelperService
-  ) { }
+  ) {
+    // workaround to include exporting module in production build
+    exporting(this.Highcharts);
+    exportData(this.Highcharts);
+    offlineExport(this.Highcharts);
+    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
+      // Add metadata to top of CSV export
+      const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+      let seriesMetaData = '';
+      this.userOptions.labels.items.forEach((label) => {
+        if (!result.includes(label.html)) {
+          seriesMetaData+= label.html ? `${label.html} \n` : '';
+        }
+      });
+      return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
+    });
+  }
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
