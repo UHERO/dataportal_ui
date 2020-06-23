@@ -4,12 +4,10 @@ import { HighstockObject } from '../tools.models';
 import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
-declare var require: any;
-const Highcharts = require('highcharts/highstock');
-const exporting = require('highcharts/modules/exporting');
-const offlineExport = require('highcharts/modules/offline-exporting');
-exporting(Highcharts);
-offlineExport(Highcharts);
+import * as Highcharts from 'highcharts/highstock';
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
+import offlineExport from 'highcharts/modules/offline-exporting';
 
 @Component({
   selector: 'lib-analyzer-highstock',
@@ -43,6 +41,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     private _analyzer: AnalyzerService,
     private cdr: ChangeDetectorRef
   ) {
+    // workaround to include exporting module in production build
+    exporting(this.Highcharts);
+    exportData(this.Highcharts);
+    offlineExport(this.Highcharts);
+    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
+      // Add metadata to top of CSV export
+      const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+      let seriesMetaData = '';
+      this.userOptions.labels.items.forEach((label) => {
+        if (!result.includes(label.html)) {
+          seriesMetaData+= label.html ? `${label.html} \n` : '';
+        }
+      });
+      return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
+    });
     this.switchAxes = this._analyzer.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
     });
@@ -115,7 +128,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     seriesInChart.update({
       visible: !seriesInChart.userOptions.visible,
       showInLegend: !seriesInChart.userOptions.showInLegend,
-      includeInCSVExport: !seriesInChart.userOptions.includeInCSVExport
+      includeInDataExport: !seriesInChart.userOptions.includeInDataExport
     }, false);
     const seriesAxis = this.chartObject.get(seriesInChart.userOptions.yAxis);
     const visibleSeriesDifferentUnits = seriesAxis.series.filter(s => s.userOptions.unitsLabelShort !== seriesInChart.userOptions.unitsLabelShort && s.userOptions.className !== 'navigator' && s.userOptions.visible);
@@ -303,7 +316,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
         geography: serie.seriesDetail.geography.name,
-        includeInCSVExport: serie.showInChart ? true : false,
+        includeInDataExport: serie.showInChart ? true : false,
         showInLegend: serie.showInChart ? true : false,
         showInNavigator: false,
         events: {
@@ -332,7 +345,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       },
       showInLegend: false,
       showInNavigator: true,
-      includeInCSVExport: false,
+      includeInDataExport: false,
       name: 'Navigator',
       events: {
         legendItemClick: function () {
@@ -346,6 +359,16 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
     return chartSeries;
   };
+
+  // Labels used for metadata in CSV download
+  /* formatChartLabels = (portalSettings) => {
+    const labelItems = [{
+        html: portalSettings.highstock.labels.portal
+      }, {
+        html: portalSettings.highstock.labels.portalLink
+      }]
+    return { items: labelItems, style: { display: 'none' } };
+  } */
 
   initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
     const startDate = this.start ? this.start : null;
@@ -363,6 +386,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const chartCallback = this.chartCallback;
+    //const labelItems = this.formatChartLabels(portalSettings);
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -389,13 +413,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.chartOptions.labels = {
       items: [
-        { html: '' },
-        { html: '' },
-        { html: '' },
-        { html: '' },
         { html: portalSettings.highstock.labels.portal },
         { html: portalSettings.highstock.labels.portalLink },
-        { html: '' }
       ],
       style: {
         display: 'none'
