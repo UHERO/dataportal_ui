@@ -22,7 +22,7 @@
             "main": "projects/uhero/src/main.ts",
             "polyfills": "projects/uhero/src/polyfills.ts",
             "tsConfig": "projects/uhero/tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
