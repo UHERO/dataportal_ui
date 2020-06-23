@@ -415,8 +415,10 @@ body {
     }
 
     .highcharts-color-2 {
-      fill: none;
-      stroke: none;
+      fill: #fff;
+      stroke: #fff;
+      stroke-opacity: 0;
+      fill-opacity: 0;
     }
 
     .highcharts-tooltip {
