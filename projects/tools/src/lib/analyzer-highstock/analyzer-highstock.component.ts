@@ -360,16 +360,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return chartSeries;
   };
 
-  // Labels used for metadata in CSV download
-  /* formatChartLabels = (portalSettings) => {
-    const labelItems = [{
-        html: portalSettings.highstock.labels.portal
-      }, {
-        html: portalSettings.highstock.labels.portalLink
-      }]
-    return { items: labelItems, style: { display: 'none' } };
-  } */
-
   initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
@@ -386,7 +376,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const chartCallback = this.chartCallback;
-    //const labelItems = this.formatChartLabels(portalSettings);
 
     this.chartOptions.chart = {
       alignTicks: false,
