@@ -9,13 +9,17 @@ import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 declare var require: any;
-const Highcharts = require('highcharts/highstock');
+/* const Highcharts = require('highcharts/highstock');
 const exporting = require('highcharts/modules/exporting');
 const exportData = require('highcharts/modules/export-data')
 const offlineExport = require('highcharts/modules/offline-exporting');
 exporting(Highcharts);
 exportData(Highcharts);
-offlineExport(Highcharts);
+offlineExport(Highcharts); */
+import * as Highcharts from 'highcharts/highstock';
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
+import offlineExport from 'highcharts/modules/offline-exporting';
 
 Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
   // Add metadata to top of CSV export
@@ -57,7 +61,11 @@ export class HighstockComponent implements OnChanges {
     @Inject('defaultRange') private defaultRange,
     @Inject('logo') private logo,
     private _highstockHelper: HighstockHelperService
-  ) { }
+  ) {
+    exporting(this.Highcharts);
+    exportData(this.Highcharts);
+    offlineExport(this.Highcharts);
+  }
 
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
