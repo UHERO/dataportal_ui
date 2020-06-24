@@ -49,6 +49,7 @@ export class CategoryChartsComponent implements OnChanges {
         }
       });
     }
+    console.log(this.noSeries)
     this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results

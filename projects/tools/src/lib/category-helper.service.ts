@@ -71,11 +71,11 @@ export class CategoryHelperService {
         console.log('check category geos error', error);
       },
       () => {
-        this.getDataListFreqs(catId, noCache, dataList, cacheId, routeGeo, routeFreq);
+        this.getDataListFreqs(noCache, dataList, cacheId, routeGeo, routeFreq);
       });
   }
 
-  getDataListFreqs(catId: any, noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListFreqs(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this._uheroAPIService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
       this.categoryData[cacheId].frequencies = freqs ? freqs : [dataList.defaults.freq];
     },
@@ -89,17 +89,17 @@ export class CategoryHelperService {
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
         }
         if (routeGeoExists && routeFreqExists) {
-          this.getData(catId, noCache, dataList.id, routeGeo, routeFreq, cacheId, routeGeo, routeFreq);
+          this.getData(noCache, dataList.id, routeGeo, routeFreq, cacheId);
         }
         if (!routeGeoExists || !routeFreqExists) {
           const defaultFreq = dataList.defaults && dataList.defaults.freq ? dataList.defaults.freq : this.categoryData[cacheId].frequencies[0];
           const defaultGeo = dataList.defaults && dataList.defaults.geo ? dataList.defaults.geo : this.categoryData[cacheId].regions[0];
-          this.getData(catId, noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultGeo.handle, defaultFreq.freq);
+          this.getData(noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId);
         }
       });
   }
 
-  getData(catId: any, noCache: boolean, subId: number, geo: string, freq: string, cacheId: string, routeGeo: string, routeFreq: string) {
+  getData(noCache: boolean, subId: number, geo: string, freq: string, cacheId: string) {
     this._uheroAPIService.fetchExpanded(subId, geo, freq, noCache).subscribe((expandedCategory) => {
       if (expandedCategory) {
         const series = expandedCategory;
@@ -109,7 +109,7 @@ export class CategoryHelperService {
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         this.categoryData[cacheId].currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
-        const displaySeries = this.filterSeriesResults(series, this.categoryData[cacheId].currentFreq.freq);
+        const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
         this.categoryData[cacheId].series = series;
         this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
@@ -121,9 +121,6 @@ export class CategoryHelperService {
         this.categoryData[cacheId].currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
         this.categoryData[cacheId].noData = true;
       }
-      /* this.categoryData[cacheId].subcategories.forEach((sub) => {
-        this.getSiblingData(sub, catId, routeGeo, routeFreq);
-      }); */
     });
   }
 
@@ -197,16 +194,11 @@ export class CategoryHelperService {
     if (this.categoryData[cacheId]) {
       return observableOf([this.categoryData[cacheId]]);
     } else {
-      let obsEnd, obsStart;
       this.categoryData[cacheId] = <CategoryData>{};
       if (routeGeo && routeFreq) {
         this._uheroAPIService.fetchPackageSearch(search, routeGeo, routeFreq, noCache).subscribe((results) => {
           const routeGeoExists = results.geos.find(geo => geo.handle === routeGeo);
           const routeFreqExists = results.freqs.find(freq => freq.freq === routeFreq);
-          const defaultGeo = results.defaultGeo.handle;
-          const defaultFreq = results.defaultFreq.freq;
-          obsStart = results.observationStart;
-          obsEnd = results.observationEnd;
           if (routeFreqExists && routeGeoExists) {
             this.getSearchData(results, cacheId, search, routeGeo, routeFreq);
           }
@@ -231,15 +223,14 @@ export class CategoryHelperService {
   }
 
   getSearchData(results, cacheId, search, geo, freq) {
-    if (results.observationStart && results.observationEnd) {
+    if (results.observationStart && results.observationEnd && results.series) {
       const categoryDateWrapper = { firstDate: '', endDate: '' };
       this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].currentGeo = results.geos.find(g => g.handle === geo);
       this.categoryData[cacheId].frequencies = results.freqs;
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
-      //const displaySeries = this.getDisplaySeries(results.series, freq);
-      const displaySeries = this.filterSeriesResults(results.series, this.categoryData[cacheId].currentFreq.freq);
+      const displaySeries = this.filterSeriesResults(results.series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
       this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
       const catWrapper = this.getSearchDates(displaySeries);
@@ -249,7 +240,7 @@ export class CategoryHelperService {
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
     }
-    if (!results.observationStart || !results.observationEnd) {
+    if (!results.observationStart || !results.observationEnd || !results.series) {
       this.categoryData[cacheId].invalid = search;
     }
   }
@@ -267,7 +258,7 @@ export class CategoryHelperService {
     return categoryDateWrapper;
   }
 
-  filterSeriesResults(results: Array<any>, freq: string) {
+  filterSeriesResults(results: Array<any>) {
     const filtered = [];
     results.forEach((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
@@ -286,7 +277,7 @@ export class CategoryHelperService {
     return categorySeries.some(s => s.seriesInfo.seasonalAdjustment === 'not_seasonally_adjusted');
   }
 
-  getDisplaySeries(allSeries, freq: string) {
+  getDisplaySeries(allSeries) {
     // Check if (non-annual) category has seasonally adjusted data
     // Returns true for annual data
     const displaySeries = [];
@@ -301,13 +292,10 @@ export class CategoryHelperService {
         measurements.set(measurementKey, series);
         return;
       }
-      /* if (series.seasonalAdjustment !== 'not_seasonally_adjusted') {
-        measurements.set(measurementKey, series);
-      } */
     });
     measurements.forEach((measurement) => displaySeries.push(measurement));
     // Filter out series that do not have level data
-    const filtered = this.filterSeriesResults(displaySeries, freq);
+    const filtered = this.filterSeriesResults(displaySeries);
     return filtered.length ? filtered : null;
   }
 }

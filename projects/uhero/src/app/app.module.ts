@@ -43,10 +43,10 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'logo',
       useValue: {
         altText: 'UHERO Data Portal Logo',
-        analyticsLogoSrc: '../assets/Analytics_Logo.svg',
+        analyticsLogoSrc: 'assets/Analytics_Logo.svg',
         displayImg: true,
         headerText: '',
-        imgSrc: '../assets/UHEROdata-Logo-color.svg',
+        imgSrc: 'assets/UHEROdata-Logo-color.svg',
         mobileLogo: true
       }
     },
