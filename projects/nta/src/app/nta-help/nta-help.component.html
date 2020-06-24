@@ -22,12 +22,12 @@
 <h2 class="mt-4" id="chart-view">Chart View</h2>
 <p> The Data Portal has three basic view modes: Chart View, Table View and Series View. By default, the Data Portal loads the "Key Indicators" in Chart View.</p>  
 
-<img src="../../assets/ChartView1.png" alt="Screenshot of Chart View" id="chart-view-screenshot">
+<img src="assets/ChartView1.png" alt="Screenshot of Chart View" id="chart-view-screenshot">
 <p class="mt-3">
   In the menu on the left side of the screen you can select from different categories of data to display.
   For example, selecting <strong class="emphasis-blue">Age Structure</strong> will load the Support Ratio data, as well as, a list of additional related categories.
 </p>
-<img src="../../assets/ChartView2.png" id="chart-view-screenshot2" alt="Screenshot of Age Structure Summary Chart View with drop down selectors circled and date slider circled?">
+<img src="assets/ChartView2.png" id="chart-view-screenshot2" alt="Screenshot of Age Structure Summary Chart View with drop down selectors circled and date slider circled?">
 <p class="mt-3">In any view mode, at the top of the page is a selector for the <strong class="emphasis-red">measurements</strong> by which the data can be viewed by. In the screen shot above, the measurement is set to "Region". Using the pull-down 
   you can view the series by Region(s), Income Group(s), or All Countries. Next to the measurement selector is a toggle to switch to Table View (more on that below). The sample period displayed can be adjusted using the starting and ending period <strong class="emphasis-blue">sliders</strong>, or you can click in the <strong class="emphasis-green">date boxes</strong> on either side of the sliders to type your desired starting or ending period.  
 </p>
@@ -36,13 +36,13 @@
 </p>
 <p>From Chart View, you can toggle to a Table View of the currently displayed indicators using the icon to the right of the measurement selector.</p>
 <h2 class="mt-4" id="table-view">Table View</h2>
-<img src="../../assets/TableView2.png" alt="Screenshot of Table View" id="table-view-screenshot">
+<img src="assets/TableView2.png" alt="Screenshot of Table View" id="table-view-screenshot">
 <p class="mt-3">
   In Table View, in addition to the selectors described above, there are toggles for switching back to chart view and to display annual change. You can change your sample size using the same controls available in Chart View. If the sample selected is too large to fit on the screen, you can scroll the table horizontally to display the remaining observations. (<em>Note that in some browsers the horizontal scroll bar is hidden until you actually begin scrolling.</em>) The <strong class="emphasis-blue">Download CSV</strong> link saves a Comma Separated Values formatted file of the table to your downloads folder. A CSV file easily loads in Excel or other software programs. Any indicator in the table can be added to the <a [routerLink]="['.']" fragment="analyzer" (click)="onContentsLinkClick()">Analyzer</a> by selecting the <strong class="emphasis-orange">Analyzer star</strong>, located to the right of the name of each indicator. Selecting the information icon next to the star pops up a box with more information about the selected indidator including a description and source links.
 </p>
 
 <h2 class="mt-4" id="series-view">Series View</h2>
-<img src="../../assets/seriesview2.png" alt="Screenshot of Series View" id="series-view-screenshot">
+<img src="assets/seriesview2.png" alt="Screenshot of Series View" id="series-view-screenshot">
 <p class="mt-3">
   To view a chart of a single series in Series View click on the series name, or any of the individual charts while in <a [routerLink]="['.']" fragment="chart-view" (click)="onContentsLinkClick()">Chart View</a>. The Series View plots a single series using a line measured on the right axis and the annual change displayed as bars measured on the left axis.
 </p>
@@ -60,7 +60,7 @@
 </p>
   
 <h2 class="mt-4" id="analyzer">Using the Analyzer Tool</h2>
-<img src="../../assets/Analyzer.png" alt="Screenshot of Analyzer" id="analyzer-screenshot">
+<img src="assets/Analyzer.png" alt="Screenshot of Analyzer" id="analyzer-screenshot">
 <p class="mt-3">
   In the above screen shot, we added Support Ratio (Africa) and Support Ratio (Americas) to the Analyzer. Click on <strong>Analyzer(2)</strong> at the bottom of the left-hand menu. The number in the parentheses indicates the number of series you have starred.
 </p>
@@ -73,7 +73,7 @@
 <p>
   Additional control over the indicators displayed in the chart is available using the gear icons next to each indicator name in the data table directly below the chart. As long as you have added at least two indicators to the Analyzer, clicking the gear icon gives you the options to <em>Removing from Analyzer</em> (the trashcan), <em>Swap Y-axes</em>, or <em>Remove from Chart</em> as shown in the screen shot below. If you have more than two indicators in your Analyzer list, the gear icon for indicators not currently displayed will offer an <em>Add to Chart</em> check box.
 </p>
-<img alt="Screenshot of Analyzer 2" src="../../assets/Analyzer2.png" id="analyzer-screenshot2">
+<img alt="Screenshot of Analyzer 2" src="assets/Analyzer2.png" id="analyzer-screenshot2">
 <p class="mt-3">
   <strong>Switching Axis:</strong> If all of your selected series use the same units and similar scale, the Switch Y-Axis option will toggle between displaying the data with a single y-axis, versus two separate y-axes (left and right). Otherwise, the option swaps the axis on which the indicators are measured. The legend below the chart indicates which axis each series is plotted on. You may choose to display as many series as you wish, but of course there are only two y-axes, so it is possible to create graphs that are not very useful for series with very different orders of magnitude.
 </p>
@@ -83,7 +83,7 @@
 <p id="analyzer-data-table">
   <strong>Data Table</strong>: The data table below the Analyzer chart has the same features as the tables in Table View.
 </p>
-<img alt="Screenshot of Analyzer Tables" src="../../assets/AnalyzerTables.png" id="analyzer-tables">
+<img alt="Screenshot of Analyzer Tables" src="assets/AnalyzerTables.png" id="analyzer-tables">
 <p>
   <strong>Summary Stats</strong>: Below the data table is a group of summary statistics for each indicator over the date range selected. Statistics inclued the <strong class="emphasis-blue">minimum and maximum</strong> values over the sample,  and by scrolling to the right, the percentage or absolute change in the indicator from start to end of the sample, and the total (sum), average value, and <a href="https://en.wikipedia.org/wiki/Compound_annual_growth_rate">Compound Annual Growth Rate</a> (CAGR) over the selected sample.
 </p>    
