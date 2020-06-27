@@ -1,14 +1,13 @@
 import { Component, OnInit, OnChanges, Input, Inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ClipboardService } from '../clipboard.service';
-import { AnalyzerService } from '../analyzer.service';
 
 @Component({
   selector: 'lib-share-link',
   templateUrl: './share-link.component.html',
   styleUrls: ['./share-link.component.scss']
 })
-export class ShareLinkComponent implements OnInit {
+export class ShareLinkComponent implements OnInit, OnChanges {
   @Input() startDate;
   @Input() endDate;
   // View -- 'analyzer' or 'series'
@@ -36,22 +35,19 @@ export class ShareLinkComponent implements OnInit {
   shareLink;
 
   constructor(
-    @Inject('portal') private portal,
     @Inject('environment') private environment,
     private route: ActivatedRoute,
-    private _router: Router,
     private clipboard: ClipboardService,
-    private _analyzer: AnalyzerService
   ) { }
 
   ngOnInit() {
     if (this.route) {
       this.route.queryParams.subscribe(params => {
-        this.id = params['id'];
-        this.geo = params['geo'] ? params['geo'] : null;
-        this.freq = params['freq'] ? params['freq'] : null;
-        this.sa = params['sa'] ? params['sa'] : null;
-        this.seriesCat = params['seriesCat'] ? params['seriesCat'] : null;
+        this.id = params[`id`];
+        this.geo = params[`geo`] ? params[`geo`] : null;
+        this.freq = params[`freq`] ? params[`freq`] : null;
+        this.sa = params[`sa`] ? params[`sa`] : null;
+        this.seriesCat = params[`seriesCat`] ? params[`seriesCat`] : null;
         this.shareLink = this.createSeriesShareLink();
       });
     }
@@ -67,12 +63,12 @@ export class ShareLinkComponent implements OnInit {
     if (this.view === 'series') {
       const seriesUrl = '/series';
       const urlParams = this.getSeriesUrlParams(start, end, seriesUrl);
-      return this.environment['portalUrl'] + urlParams;
+      return this.environment[`portalUrl`] + urlParams;
     }
     if (this.view === 'analyzer') {
       const seriesUrl = '/analyzer';
       const urlParams = this.getAnalyzerParams(start, end, seriesUrl);
-      return this.environment['portalUrl'] + urlParams;
+      return this.environment[`portalUrl`] + urlParams;
     }
   }
 

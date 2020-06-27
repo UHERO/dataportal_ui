@@ -33,8 +33,6 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'portal',
       useValue: {
         universe: 'uhero',
-        title: 'Data Portal',
-        favicon: 'manoa.jpg',
         feedback: true,
         categoryTabs: true // Display subcategory navigation tabs in category chart/table view
       }

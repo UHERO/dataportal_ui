@@ -14,7 +14,7 @@ export class UheroHelpComponent {
     this.route.fragment.subscribe((frag) => {
       const element = document.querySelector(`#${frag}`);
       if (element) {
-        element.scrollIntoView({block: "end", behavior: "smooth"});
+        element.scrollIntoView({block: 'end', behavior: 'smooth'});
       }
     });
   }

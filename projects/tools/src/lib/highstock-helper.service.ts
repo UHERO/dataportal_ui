@@ -4,7 +4,7 @@ declare var require: any;
 const Highcharts = require('highcharts/highstock');
 
 Highcharts.dateFormats = {
-  Q: function (timestamp) {
+  Q(timestamp) {
     const month = +new Date(timestamp).toISOString().split('T')[0].substr(5, 2);
     if (1 <= month && month <= 3) {
       return 'Q1';
@@ -40,23 +40,27 @@ export class HighstockHelperService {
     if (selectedRange.length && chartObject._selectedMin && chartObject._selectedMax) {
       return this.findVisibleMinMax(selectedRange, chartObject);
     }
-  };
+  }
 
   getAnalyzerChartExtremes = (chartObject) => {
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator');
-      return { min: new Date(chartObject._selectedMin).toISOString().split('T')[0], max: new Date(chartObject._selectedMax).toISOString().split('T')[0] }
+      return {
+        min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
+        max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
+      };
     }
     if (selectedRange) {
       return this.findVisibleMinMax(selectedRange.points, chartObject);
     }
-  };
+  }
 
   findVisibleMinMax = (selectedRange, chartObject) => {
     let maxCounter = selectedRange.length - 1;
     let minCounter = 0;
-    let xMin, xMax;
+    let xMin;
+    let xMax;
     while (!xMax || xMax > chartObject._selectedMax) {
       xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
       maxCounter--;
@@ -66,7 +70,7 @@ export class HighstockHelperService {
       minCounter++;
     }
     return { min: xMin, max: xMax };
-  };
+  }
 
   setDateToFirstOfMonth = (freq, date) => {
     const month = +date.substr(5, 2);
@@ -116,7 +120,7 @@ export class HighstockHelperService {
     if (frequency === 'W') {
       return `${month} ${day}, ${year}`;
     }
-  };
+  }
 
   xAxisLabelFormatter = (chart, freq) => {
     let s = '';
@@ -126,7 +130,7 @@ export class HighstockHelperService {
     const last = Highcharts.dateFormat('%Y', chart.axis.userMax);
     s = ((last - first) <= 5) && freq === 'Q' ? year + this.getQuarterLabel(month) : year;
     return freq === 'Q' ? s : chart.axis.defaultLabelFormatter.call(chart);
-  };
+  }
 
   getQuarterLabel = (month: string) => {
     if (month === 'Jan') {
@@ -142,7 +146,7 @@ export class HighstockHelperService {
       return ' Q4';
     }
     return '';
-  };
+  }
 
   inputDateFormatter = (freq: string) => {
     if (freq === 'A') {
@@ -155,7 +159,7 @@ export class HighstockHelperService {
       return '%b %d %Y';
     }
     return '%b %Y';
-  };
+  }
 
   inputEditDateFormatter = (freq: string) => {
     if (freq === 'A') {
@@ -168,7 +172,7 @@ export class HighstockHelperService {
       return '%Y-%m-%d';
     }
     return '%Y-%m';
-  };
+  }
 
   inputDateParserFormatter = (value: string, freq: string) => {
     const year = value.substr(0, 4);
@@ -192,12 +196,12 @@ export class HighstockHelperService {
     if (freq === 'M' || freq === 'S') {
       if (!value.includes('-')) { // i.e. monthly frequency where user removes '-'
         const month = value.substr(4, 2);
-        return Date.parse(`${year}-${month}-01`)
+        return Date.parse(`${year}-${month}-01`);
       }
       return Date.parse(`${value}-01`);
     }
     if (freq === 'W') {
       return Date.parse(`${value}`);
     }
-  };
+  }
 }

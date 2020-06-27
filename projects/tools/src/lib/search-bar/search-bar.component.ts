@@ -8,7 +8,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 export class SearchBarComponent implements OnInit {
   @Output() onSearch = new EventEmitter();
 
-  constructor(/* private googleAES: GoogleAnalyticsEventsService */) { }
+  constructor() { }
 
   ngOnInit() {
   }
@@ -16,16 +16,10 @@ export class SearchBarComponent implements OnInit {
   search(searchTerm: HTMLInputElement): void {
     if (searchTerm.value) {
       this.onSearch.emit(searchTerm.value);
-      this.submitGAEvent(searchTerm.value);
       searchTerm.value = '';
     }
     if (!searchTerm.value) {
       return;
     }
-  }
-
-  // Google Analytics: Track search event
-  submitGAEvent(searchTerm) {
-    //this.googleAES.emitEvent('Search', 'search', searchTerm);
   }
 }

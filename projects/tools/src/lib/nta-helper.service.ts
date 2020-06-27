@@ -25,7 +25,7 @@ export class NtaHelperService {
     return id;
   }
 
-  constructor(private _uheroAPIService: ApiService, private _helper: HelperService) { }
+  constructor(private apiService: ApiService, private helperService: HelperService) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
@@ -36,17 +36,17 @@ export class NtaHelperService {
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
       this.getCategory(cacheId, noCache, catId, dataListId, selectedMeasure);
-      return observableForkJoin(observableOf(this.categoryData[cacheId]));
+      return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
     if (!this.categoryData[cacheId] && typeof catId === 'string') {
       this.getSearch(cacheId, noCache, catId);
-      return observableForkJoin(observableOf(this.categoryData[cacheId]));
+      return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }
 
   getCategory(cacheId: string, noCache: boolean, catId: any, dataListId, selectedMeasure?: string) {
-    this.categoryData[cacheId] = <CategoryData>{};
-    this._uheroAPIService.fetchCategories().subscribe((categories) => {
+    this.categoryData[cacheId] = {} as CategoryData;
+    this.apiService.fetchCategories().subscribe((categories) => {
       if (catId === null) {
         catId = categories[0].id;
       }
@@ -57,7 +57,9 @@ export class NtaHelperService {
           this.categoryData[cacheId].defaultDataList = dataListId;
         }
         const categoryDataLists = cat.children;
-        const selectedDataList = dataListId ? this._helper.findSelectedDataList(categoryDataLists, dataListId, '') : this._helper.getCategoryDataLists(categoryDataLists[0], '');
+        const selectedDataList = dataListId ?
+          this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
+          this.helperService.getCategoryDataLists(categoryDataLists[0], '');
         this.categoryData[cacheId].selectedDataList = selectedDataList;
         this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
         this.categoryData[cacheId].selectedCategory = cat;
@@ -77,7 +79,7 @@ export class NtaHelperService {
   }
 
   getSubcategoryData(category, noCache: boolean, selectedMeasure?: string) {
-    this._uheroAPIService.fetchCategoryMeasurements(category.selectedDataList.id, noCache).subscribe((measures) => {
+    this.apiService.fetchCategoryMeasurements(category.selectedDataList.id, noCache).subscribe((measures) => {
       category.measurements = measures;
     },
       (error) => {
@@ -101,7 +103,7 @@ export class NtaHelperService {
   getSeriesData(category, noCache: boolean) {
     const categoryDataArray = [];
     category.dateWrapper = { firstDate: '', endDate: '' };
-    this._uheroAPIService.fetchMeasurementSeries(category.currentMeasurement.id, noCache).subscribe((series) => {
+    this.apiService.fetchMeasurementSeries(category.currentMeasurement.id, noCache).subscribe((series) => {
       if (series) {
         category.series = series;
         this.formatCategoryData(category, categoryDataArray, false);
@@ -116,9 +118,12 @@ export class NtaHelperService {
   }
 
   getSearch(cacheId, noCache: boolean, catId) {
-    this.categoryData[cacheId] = <CategoryData>{};
-    let freqGeos, freqs, obsEnd, obsStart;
-    this._uheroAPIService.fetchSearch(catId, noCache).subscribe((results) => {
+    this.categoryData[cacheId] = {} as CategoryData;
+    let freqGeos;
+    let freqs;
+    let obsEnd;
+    let obsStart;
+    this.apiService.fetchSearch(catId, noCache).subscribe((results) => {
       this.defaults = results.defaults;
       freqGeos = results.freqGeos;
       freqs = results.freqs;
@@ -130,7 +135,7 @@ export class NtaHelperService {
       },
       () => {
         if (obsEnd && obsStart) {
-          const dateWrapper = <DateWrapper>{};
+          const dateWrapper = {} as DateWrapper;
           this.getSearchData(catId, noCache, cacheId, dateWrapper);
           this.categoryData[cacheId].currentFreq = freqGeos ? freqGeos[0] : freqs[0];
           this.categoryData[cacheId].selectedCategory = { id: catId, name: 'Search: ' + catId };
@@ -143,7 +148,7 @@ export class NtaHelperService {
   getSearchData(search: string, noCache: boolean, cacheId, dateWrapper: DateWrapper) {
     let searchResults;
     // Get series for a requested search term
-    this._uheroAPIService.fetchSearchSeries(search, noCache).subscribe((searchRes) => {
+    this.apiService.fetchSearchSeries(search, noCache).subscribe((searchRes) => {
       searchResults = searchRes;
     },
       (error) => {
@@ -161,7 +166,7 @@ export class NtaHelperService {
   getSearchObservations(searchSeries, noCache: boolean, search, category) {
     let seriesTotal = searchSeries.length;
     searchSeries.forEach((series) => {
-      this._uheroAPIService.fetchObservations(series.id, noCache).subscribe((obs) => {
+      this.apiService.fetchObservations(series.id, noCache).subscribe((obs) => {
         series.seriesObservations = obs;
       },
         (error) => {
@@ -177,7 +182,7 @@ export class NtaHelperService {
             };
             category.dateWrapper = { firstDate: '', endDate: '' };
             category.id = 'search';
-            category.series = searchSeries
+            category.series = searchSeries;
             this.formatCategoryData(category, [], true);
             category.sublist = [sublist];
           }
@@ -205,19 +210,20 @@ export class NtaHelperService {
   }
 
   // Format series data for chart and table displays
-  formatCategoryData(category, subcategoryDateArray: Array<any>, search: Boolean) {
+  formatCategoryData(category, subcategoryDateArray: Array<any>, search: boolean) {
     const dateWrapper = category.dateWrapper;
     category.displaySeries = this.filterSeries(category.series, category, search);
-    category.dateArray = this._helper.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
-    category.sliderDates = this._helper.getTableDates(category.dateArray);
+    category.dateArray = this.helperService.createDateArray(dateWrapper.firstDate, dateWrapper.endDate, 'A', subcategoryDateArray);
+    category.sliderDates = this.helperService.getTableDates(category.dateArray);
     category.findMinMax = true;
     category.requestComplete = true;
   }
 
-  filterSeries(seriesArray: Array<any>, category, search: Boolean) {
+  filterSeries(seriesArray: Array<any>, category, search: boolean) {
     const filtered = [];
     seriesArray.forEach((res) => {
-      let seriesDates = [], series;
+      let seriesDates = [];
+      let series;
       const levelData = res.seriesObservations.transformationResults[0].observations;
       const newLevelData = res.seriesObservations.transformationResults[0].dates;
       const decimals = res.decimals ? res.decimals : 1;
@@ -227,12 +233,12 @@ export class NtaHelperService {
         const seriesObsEnd = res.seriesObservations.observationEnd;
         category.dateWrapper.firstDate = this.setStartDate(category.dateWrapper, seriesObsStart);
         category.dateWrapper.endDate = this.setEndDate(category.dateWrapper, seriesObsEnd);
-        seriesDates = this._helper.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
+        seriesDates = this.helperService.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
         series = {};
         res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
         series.seriesInfo = res;
-        series.seriesInfo.title;
-        series.seriesInfo.displayName = search ? series.seriesInfo.title + ' (' + series.seriesInfo.geography.name + ')' : series.seriesInfo.geography.name;
+        series.seriesInfo.displayName = search ?
+          `${series.seriesInfo.title} (${series.seriesInfo.geography.name})` : series.seriesInfo.geography.name;
         filtered.push(series);
       }
     });

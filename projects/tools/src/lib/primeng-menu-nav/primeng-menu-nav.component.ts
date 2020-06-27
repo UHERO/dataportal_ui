@@ -25,35 +25,35 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   private defaultCategory;
   private packageCatData;
   private expand = true;
-  analyzerSeriesCount
+  analyzerSeriesCount;
 
   navMenuItems: MenuItem[];
 
   constructor(
     @Inject('logo') private logo,
-    private _uheroAPIService: ApiService,
-    public _analyzerService: AnalyzerService,
-    private route: ActivatedRoute,
-    private _router: Router
+    private apiService: ApiService,
+    public analyzerService: AnalyzerService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
-    this.analyzerSeriesCount = this._analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
+    this.analyzerSeriesCount = this.analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
       this.analyzerSeries = data;
     });
   }
 
   ngOnInit() {
-    this._uheroAPIService.fetchCategories().subscribe((categories) => {
+    this.apiService.fetchCategories().subscribe((categories) => {
       this.categories = categories;
       this.navMenuItems = [];
       categories.forEach((category) => {
-        let subMenu = this.createSubmenuItems(category.children, category.id);
+        const subMenu = this.createSubmenuItems(category.children, category.id);
         this.navMenuItems.push({
           id: '' + category.id,
           label: category.name,
           icon: 'pi pi-pw',
           items: subMenu,
           command: (event) => {
-            this.navToFirstDataList(event.item, category.id)
+            this.navToFirstDataList(event.item, category.id);
           }
         });
       });
@@ -63,23 +63,23 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       },
       () => {
         this.defaultCategory = this.categories[0].id;
-        this.route.queryParams.subscribe((params) => {
-          this.id = params['id'];
-          this.view = params['view'] ? params['view'] : 'chart';
-          this.yoy = params['yoy'] ? params['yoy'] : 'false';
-          this.ytd = params['ytd'] ? params['ytd'] : 'false';
-          this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this._router.url);
+        this.activatedRoute.queryParams.subscribe((params) => {
+          this.id = params[`id`];
+          this.view = params[`view`] ? params[`view`] : 'chart';
+          this.yoy = params[`yoy`] ? params[`yoy`] : 'false';
+          this.ytd = params[`ytd`] ? params[`ytd`] : 'false';
+          this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this.router.url);
           this.navMenuItems.forEach((item) => {
             if (this.id) {
               item.expanded = item.id === this.id ? true : false;
             }
             if (!this.id && this.selectedCategory !== 'analyzer' && this.selectedCategory !== 'help') {
-              item.expanded = +item.id === this.defaultCategory ? true : false; 
+              item.expanded = +item.id === this.defaultCategory ? true : false;
             }
           });
         });
       });
-    this._router.events.subscribe((event) => {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.selectedCategory = this.checkRoute(this.id, event.url);
       }
@@ -102,24 +102,24 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   }
 
   createSubmenuItems(subcategories, categoryId) {
-    let subMenu = [];
+    const subMenu = [];
     subcategories.forEach((sub) => {
-      let subMenuItem: MenuItem = {};
+      const subMenuItem: MenuItem = {};
       subMenuItem.label = sub.name;
       subMenuItem.icon = sub.children ? 'pi pi-pw' : '';
       subMenuItem.id = sub.id;
       if (sub.children) {
         subMenuItem.command = (event) => {
           this.navToFirstDataList(event.item, categoryId);
-        }
+        };
         subMenuItem.items = this.createSubmenuItems(sub.children, categoryId);
       }
       if (!sub.children) {
         subMenuItem.command = (event) => {
-          this.navigate(categoryId, sub.id)
-        }
+          this.navigate(categoryId, sub.id);
+        };
       }
-      subMenu.push(subMenuItem)
+      subMenu.push(subMenuItem);
     });
     return subMenu;
   }
@@ -168,10 +168,10 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
         geography: null
       };
       if (subId) {
-        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
+        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       if (!subId) {
-        this._router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
+        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
       }
       this.loading = false;
     }, 15);
@@ -188,7 +188,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       units: null,
       geography: null
     };
-    this._router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
+    this.router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 
   mobileMenuToggle(): void {

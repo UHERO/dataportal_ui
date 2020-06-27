@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 })
 export class HelperService {
   private categoryData = new Subject();
-  
+
   constructor() { }
 
   getCatData() {
@@ -14,7 +14,7 @@ export class HelperService {
   }
 
   updateCatData(data) {
-    this.categoryData.next(data)
+    this.categoryData.next(data);
   }
 
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasNonSeasonal: boolean) => {
@@ -32,15 +32,15 @@ export class HelperService {
   }
 
   findSelectedDataList = (dataList, dataListId, dataListName) => {
-    for (let i = 0; i < dataList.length; i++) {
+    for (const list of dataList) {
       let name = dataListName || '';
-      if (dataList[i].id === dataListId) {
-        dataList[i].dataListName = `${name} ${dataList[i].name}`;
-        return dataList[i];
+      if (list.id === dataListId) {
+        list.dataListName = `${name} ${list.name}`;
+        return list;
       } else {
-        if (dataList[i].children && Array.isArray(dataList[i].children)) {
-          name += `${dataList[i].name} > `;
-          const selected = this.findSelectedDataList(dataList[i].children, dataListId, name);
+        if (list.children && Array.isArray(list.children)) {
+          name += `${list.name} > `;
+          const selected = this.findSelectedDataList(list.children, dataListId, name);
           if (selected) {
             return selected;
           }
@@ -87,7 +87,7 @@ export class HelperService {
       const month = start.toISOString().substr(5, 2);
       const q = month === '01' ? 'Q1' : month === '04' ? 'Q2' : month === '07' ? 'Q3' : 'Q4';
       const tableDate = this.getTableDate(start, currentFreq, q);
-      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate: tableDate });
+      dateArray.push({ date: start.toISOString().substr(0, 10), tableDate });
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
       }
@@ -95,7 +95,7 @@ export class HelperService {
         start.setMonth(start.getMonth() + monthIncrease);
       }
       if (currentFreq === 'W') {
-        start.setDate(start.getDate() + 7)
+        start.setDate(start.getDate() + 7);
       }
     }
     return dateArray;
@@ -115,7 +115,10 @@ export class HelperService {
   }
 
   getTransformations(observations) {
-    let level, yoy, ytd, c5ma;
+    let level;
+    let yoy;
+    let ytd;
+    let c5ma;
     observations.transformationResults.forEach((obj) => {
       if (obj.transformation === 'lvl') {
         level = obj.dates ? obj : level;
@@ -130,7 +133,7 @@ export class HelperService {
         c5ma = obj.dates ? obj : c5ma;
       }
     });
-    return { level: level, yoy: yoy, ytd: ytd, c5ma: c5ma };
+    return { level, yoy, ytd, c5ma };
   }
 
   binarySearch = (valueList, date) => {
@@ -237,17 +240,17 @@ export class HelperService {
       return year;
     }
     if (freq === 'Q') {
-      const month = new Date(date).getMonth();
-      if (month >= 0 && month <= 2) {
+      const m = new Date(date).getMonth();
+      if (m >= 0 && m <= 2) {
         return `${year} Q1`;
       }
-      if (month >= 3 && month <= 5) {
+      if (m >= 3 && m <= 5) {
         return `${year} Q2`;
       }
-      if (month >= 6 && month <= 8) {
+      if (m >= 6 && m <= 8) {
         return `${year} Q3`;
       }
-      if (month >= 9 && month <= 11) {
+      if (m >= 9 && m <= 11) {
         return `${year} Q4`;
       }
     }
@@ -271,7 +274,8 @@ export class HelperService {
   }
 
   setDefaultSliderRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
+    const defaultEnd = defaults.end ?
+      defaults.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     // https://github.com/IonDen/ion.rangeSlider/issues/298
     // Slider values being converted from strings to numbers for annual dates

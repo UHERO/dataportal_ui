@@ -34,10 +34,10 @@ export interface HighchartsObject {
       render: () => void,
     },
     styledMode: true,
-  },
+  };
   exporting: {
     enabled: boolean,
-  },
+  };
   title: {
     text: string,
     useHTML: boolean,
@@ -48,7 +48,7 @@ export interface HighchartsObject {
     style: {
       margin: number
     }
-  },
+  };
   tooltip: {
     positioner: () => {},
     shadow: boolean,
@@ -56,13 +56,13 @@ export interface HighchartsObject {
     shared: boolean,
     formatter: () => string,
     useHTML: boolean,
-  },
+  };
   legend: {
     enabled: boolean,
-  },
+  };
   credits: {
     enabled: boolean,
-  },
+  };
   xAxis: {
     type: string,
     labels: {
@@ -70,8 +70,8 @@ export interface HighchartsObject {
     },
     lineWidth: number,
     tickLength: number
-  },
-  yAxis: Array<any>,
+  };
+  yAxis: Array<any>;
   plotOptions: {
     line: {
       marker: {
@@ -79,11 +79,11 @@ export interface HighchartsObject {
         radius: number
       }
     }
-  },
-  series: Array<any>,
+  };
+  series: Array<any>;
   lang: {
     noData: string
-  }
+  };
 }
 
 export interface HighchartChartData {
@@ -106,13 +106,13 @@ export interface HighstockObject {
     zoomType: string,
     styledMode: boolean,
     description: string, // used in xAxis label formatter
-  },
+  };
   labels: {
     items: Array<any>,
     style: {
       display: string
     }
-  },
+  };
   rangeSelector: {
     selected: number,
     buttons: Array<any>,
@@ -131,19 +131,19 @@ export interface HighstockObject {
       x: number,
       y: number
     }
-  },
+  };
   lang: {
     exportKey: string
-  },
+  };
   legend?: {
     enabled: boolean,
     labelFormatter: () => string
-  }
+  };
   navigator: {
     series: {
       includeInDataExport: boolean
     }
-  },
+  };
   exporting: {
     allowHTML: boolean,
     buttons: {
@@ -189,17 +189,17 @@ export interface HighstockObject {
         text: ''
       }
     }
-  },
+  };
   tooltip: {
     borderWidth: number,
     shadow: false,
     followPointer: boolean,
     shared?: boolean,
     formatter: (args: any) => any
-  },
+  };
   credits: {
     enabled: boolean
-  },
+  };
   xAxis: {
     events: {
       afterSetExtremes: () => void
@@ -211,15 +211,15 @@ export interface HighstockObject {
     labels?: {
       formatter: () => string
     }
-  },
-  yAxis: Array<any>,
+  };
+  yAxis: Array<any>;
   plotOptions: {
     series: {
       cropThreshold: number,
       turboThreshold?: number,
     }
-  },
-  series: Array<any>
+  };
+  series: Array<any>;
 }
 
 export interface Series {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Frequency } from '../tools.models';
 
 @Component({
@@ -6,17 +6,14 @@ import { Frequency } from '../tools.models';
   templateUrl: './freq-selector.component.html',
   styleUrls: ['./freq-selector.component.scss']
 })
-export class FreqSelectorComponent implements OnInit {
+export class FreqSelectorComponent {
   @Input() freqs: Array<Frequency>;
   @Input() selectedFreq: Frequency;
   @Output() selectedFreqChange = new EventEmitter();
 
   constructor() { }
 
-  ngOnInit() {
-  }
-
- onChange(newFreq: Object) {
+  onChange(newFreq: string) {
     this.selectedFreq = this.freqs.find(freq => freq.freq === newFreq);
     this.selectedFreqChange.emit(this.selectedFreq);
   }

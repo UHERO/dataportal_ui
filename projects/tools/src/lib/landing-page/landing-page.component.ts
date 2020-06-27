@@ -2,7 +2,6 @@
 import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
-import { ApiService } from '../api.service';
 import { AnalyzerService } from '../analyzer.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
@@ -17,7 +16,7 @@ declare var $: any;
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit {
+export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private sub;
   private defaultCategory;
   private id: number;
@@ -50,15 +49,15 @@ export class LandingPageComponent implements OnInit {
   private userEvent;
   constructor(
     @Inject('portal') public portal,
-    private _analyzer: AnalyzerService,
-    private _dataPortalSettings: DataPortalSettingsService,
-    private _catHelper: CategoryHelperService,
-    private _helperService: HelperService,
-    private route: ActivatedRoute,
-    private _router: Router,
+    private analyzerService: AnalyzerService,
+    private dataPortalSettingsServ: DataPortalSettingsService,
+    private catHelper: CategoryHelperService,
+    private helperService: HelperService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
     private cdRef: ChangeDetectorRef
   ) {
-    this.toggleSeriesInAnalyzer = this._analyzer.updateAnalyzerCount.subscribe((data: any) => {
+    this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
       this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
     });
   }
@@ -66,34 +65,34 @@ export class LandingPageComponent implements OnInit {
   ngOnInit(): void {
     this.currentGeo = { fips: null, name: null, shortName: null, handle: null };
     this.currentFreq = { freq: null, label: null };
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
   ngAfterViewInit() {
-    this.sub = this.route.queryParams.subscribe((params) => {
-      this.id = this.getIdParam(params['id']);
-      this.dataListId = this.getIdParam(params['data_list_id']);
+    this.sub = this.activatedRoute.queryParams.subscribe((params) => {
+      this.id = this.getIdParam(params[`id`]);
+      this.dataListId = this.getIdParam(params[`data_list_id`]);
       this.search = typeof this.id === 'string' ? true : false;
-      this.routeGeo = params['geo'];
-      this.routeFreq = params['freq'];
-      this.routeView = params['view'];
-      this.routeYoy = params['yoy'];
-      this.routeYtd = params['ytd'];
-      this.routeSa = params['sa'];
-      this.routeStart = params['start'];
-      this.routeEnd = params['end'];
-      this.noCache = params['nocache'] === 'true';
-      if (this.id) { this.queryParams.id = this.id; };
-      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; };
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; };
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; };
-      if (this.routeView) { this.queryParams.view = this.routeView; };
+      this.routeGeo = params[`geo`];
+      this.routeFreq = params[`freq`];
+      this.routeView = params[`view`];
+      this.routeYoy = params[`yoy`];
+      this.routeYtd = params[`ytd`];
+      this.routeSa = params[`sa`];
+      this.routeStart = params[`start`];
+      this.routeEnd = params[`end`];
+      this.noCache = params[`nocache`] === 'true';
+      if (this.id) { this.queryParams.id = this.id; }
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
+      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
+      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
+      if (this.routeView) { this.queryParams.view = this.routeView; }
       if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
-      this._helperService.updateCatData(this.categoryData);
+      this.helperService.updateCatData(this.categoryData);
       // Run change detection explicitly after the change:
       this.cdRef.detectChanges();
     });
@@ -121,13 +120,13 @@ export class LandingPageComponent implements OnInit {
   getData(id, noCache, dataListId, geo, freq) {
     if (geo && freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, noCache, dataListId, geo, freq) :
-        this._catHelper.initSearch(id, noCache, geo, freq);
+        this.catHelper.initContent(id, noCache, dataListId, geo, freq) :
+        this.catHelper.initSearch(id, noCache, geo, freq);
     }
     if (!geo && !freq) {
       return (typeof id === 'number' || id === null) ?
-        this._catHelper.initContent(id, noCache, dataListId) :
-        this._catHelper.initSearch(id, noCache);
+        this.catHelper.initContent(id, noCache, dataListId) :
+        this.catHelper.initSearch(id, noCache);
     }
   }
 
@@ -187,7 +186,7 @@ export class LandingPageComponent implements OnInit {
     this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
     this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
-    this._router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
+    this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;
   }
