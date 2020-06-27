@@ -13,7 +13,7 @@ declare var $: any;
   templateUrl: './single-series.component.html',
   styleUrls: ['./single-series.component.scss']
 })
-export class SingleSeriesComponent implements OnInit {
+export class SingleSeriesComponent implements OnInit, AfterViewInit {
   noSelection: string;
   newTableData;
   tableHeaders;
@@ -64,41 +64,41 @@ export class SingleSeriesComponent implements OnInit {
 
   constructor(
     @Inject('portal') public portal,
-    private _dataPortalSettings: DataPortalSettingsService,
-    private _series: SeriesHelperService,
-    private _analyzer: AnalyzerService,
+    private dataPortalSettings: DataPortalSettingsService,
+    private seriesHelper: SeriesHelperService,
+    private analyzerService: AnalyzerService,
     private route: ActivatedRoute,
-    private _router: Router,
+    private router: Router,
     private cdRef: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
     this.currentGeo = { fips: null, handle: null, name: null , shortName: null };
     this.currentFreq = { freq: null, label: null };
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
+    this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
   ngAfterViewInit() {
     this.route.queryParams.subscribe(params => {
-      const seriesId = Number.parseInt(params['id']);
+      const seriesId = Number(params[`id`]);
       let categoryId;
       let noCache: boolean;
-      if (params['sa'] !== undefined) {
-        this.seasonallyAdjusted = (params['sa'] === 'true');
+      if (params[`sa`] !== undefined) {
+        this.seasonallyAdjusted = (params[`sa`] === 'true');
       }
-      if (params['data_list_id']) {
-        categoryId = Number.parseInt(params['data_list_id']);
+      if (params[`data_list_id`]) {
+        categoryId = Number(params[`data_list_id`]);
       }
-      if (params['start']) {
-        this.startDate = params['start'];
+      if (params[`start`]) {
+        this.startDate = params[`start`];
       }
-      if (params['end']) {
-        this.endDate = params['end'];
+      if (params[`end`]) {
+        this.endDate = params[`end`];
       }
-      if (params['nocache']) {
-        noCache = params['nocache'] === 'true';
+      if (params[`nocache`]) {
+        noCache = params[`nocache`] === 'true';
       }
-      this.seriesData = this._series.getSeriesData(seriesId, noCache, categoryId);
+      this.seriesData = this.seriesHelper.getSeriesData(seriesId, noCache, categoryId);
     });
     this.cdRef.detectChanges();
   }
@@ -108,26 +108,26 @@ export class SingleSeriesComponent implements OnInit {
     this.seasonallyAdjusted = sa;
     this.noSelection = null;
     // Get array of siblings for selected geo and freq
-    const geoFreqSib = this._series.findGeoFreqSibling(siblings, geo, freq);
+    const geoFreqSib = this.seriesHelper.findGeoFreqSibling(siblings, geo, freq);
     const id = geoFreqSib.length ? SingleSeriesComponent.selectSibling(geoFreqSib, sa, freq) : null;
     if (id) {
       const queryParams = {
-        id: id,
+        id,
         sa: this.seasonallyAdjusted,
-        geo: geo,
-        freq: freq
+        geo,
+        freq
       };
       this.startDate = this.chartStart;
       this.endDate = this.chartEnd;
-      this._router.navigate(['/series/'], { queryParams: queryParams, queryParamsHandling: 'merge' });
+      this.router.navigate(['/series/'], { queryParams, queryParamsHandling: 'merge' });
     } else {
       this.noSelection = 'Selection Not Available';
     }
   }
 
   updateAnalyze(seriesInfo) {
-    this._analyzer.updateAnalyzer(seriesInfo.id);
-    seriesInfo.analyze = this._analyzer.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id);
+    this.analyzerService.updateAnalyzer(seriesInfo.id);
+    seriesInfo.analyze = this.analyzerService.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id);
   }
 
   updateChartExtremes(e) {
@@ -138,7 +138,10 @@ export class SingleSeriesComponent implements OnInit {
   // Update table when selecting new ranges in the chart
   redrawTable = (e, seriesDetail, tableData, freq, chartData) => {
     const deciamls = seriesDetail.decimals ? seriesDetail.decimals : 1;
-    let minDate, maxDate, tableStart, tableEnd;
+    let minDate;
+    let maxDate;
+    let tableStart;
+    let tableEnd;
     minDate = e.minDate;
     maxDate = e.maxDate;
     for (let i = 0; i < tableData.length; i++) {
@@ -153,19 +156,23 @@ export class SingleSeriesComponent implements OnInit {
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
     seriesDetail.currentFreq = { freq: seriesDetail.frequencyShort };
-    this.summaryStats = this._series.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate);
+    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate);
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {
     const cols = [];
     cols.push({ field: 'tableDate', header: 'Date' });
     cols.push({ field: portalSettings.seriesTable.series1, header: 'Level' });
-    cols.push({ field: portalSettings.seriesTable.series2, header: seriesDetail.percent ? portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label });
+    cols.push({
+      field: portalSettings.seriesTable.series2, header: seriesDetail.percent ?
+        portalSettings.seriesTable.series2PercLabel : portalSettings.seriesTable.series2Label
+    });
     if (seriesDetail.frequencyShort !== 'A' && portalSettings.seriesTable.columns === 4) {
-      cols.push({ field: portalSettings.seriesTable.series3, header: seriesDetail.percent ? portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label });
+      cols.push({
+        field: portalSettings.seriesTable.series3, header: seriesDetail.percent ?
+        portalSettings.seriesTable.series3PercLabel : portalSettings.seriesTable.series3Label
+      });
     }
     return cols;
   }
-
-  formatValues = (values, decimal) => values.map(i => i === '' ? '' : +i).map(i => i.toLocaleString('en-US', { minimumFractionDigits: decimal, maximumFractionDigits: decimal }));
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-//import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import 'jquery';
 declare var $: any;
 
@@ -8,38 +7,7 @@ declare var $: any;
 })
 export class TableHelperService {
 
-  constructor(/* private googleAES: GoogleAnalyticsEventsService */) { }
-
-  checkContainerHeight(previousHeight) {
-    const container = $('.multi-series-container');
-    const heightDiff = (previousHeight !== container.height());
-    previousHeight = container.height();
-    return { scroll: heightDiff, previousHeight: previousHeight };
-  }
-
-  checkTableWidth(tableWidths) {
-    const tables = $('.table');
-    const widths = tableWidths;
-    if (tables) {
-      tables.each(function (index) {
-        const widthDiff = (tableWidths[index] !== tables[index].scrollWidth);
-        if (widthDiff) {
-          tables[index].scrollLeft = tables[index].scrollWidth;
-        }
-        widths[index] = tables[index].scrollWidth;
-      });
-    }
-  }
-
-  tableScroll(tableEl): void {
-    try {
-      tableEl._results.forEach((el) => {
-        el.nativeElement.scrollLeft = el.nativeElement.scrollWidth;
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  constructor() { }
 
   showPopover(seriesInfo, subcatIndex?) {
     $('[data-toggle="tooltip"]').tooltip('hide');
@@ -48,14 +16,14 @@ export class TableHelperService {
       trigger: 'manual',
       html: true,
       placement: 'left',
-      title: function () {
+      title() {
         let title = seriesInfo.title;
         title += ' (' + seriesInfo.geography.shortName + '; ' + seriesInfo.frequency + ')';
         title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
         title += '<i class="material-icons close-info">&#xE14C;</i>';
         return title;
       },
-      content: function () {
+      content() {
         let info = '';
         if (seriesInfo.seasonalAdjustment === 'seasonally_adjusted') {
           info += 'Seasonally Adjusted<br>';
@@ -71,28 +39,16 @@ export class TableHelperService {
         }
         return info;
       }
-    }).on('show.bs.popover', function (e) {
+    }).on('show.bs.popover', (e) => {
       // Display only one popover at a time
       $('.popover').not(e.target).popover('dispose');
       setTimeout(() => {
         // Close popover on next click (source link in popover is still clickable)
-        $('body').one('click', function () {
+        $('body').one('click', () => {
           popover.popover('dispose');
         });
       }, 1);
     });
     popover.popover('toggle');
   }
-
-  hideInfo(seriesId) {
-    // this.submitGAEvent(seriesId);
-    $('[data-toggle="tooltip"]').tooltip('hide');
-    $('.popover').popover('dispose');
-  }
-
-  // Google Analytics: Track clicking on series
-  /* submitGAEvent(seriesId) {
-    const id = seriesId.toString();
-    this.googleAES.emitEvent('series', 'click', id);
-  } */
 }

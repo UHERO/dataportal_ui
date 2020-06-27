@@ -10,7 +10,7 @@ export class HeaderComponent implements OnInit {
   public headerLogo;
   public logoText;
 
-  constructor(@Inject('logo') private logo, private _router: Router) { }
+  constructor(@Inject('logo') private logo, private router: Router) { }
 
   ngOnInit() {
     this.headerLogo = this.logo;
@@ -27,6 +27,6 @@ export class HeaderComponent implements OnInit {
       units: null,
       geography: null
     };
-    this._router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
+    this.router.navigate(['/search'], { queryParams: searchQParams, queryParamsHandling: 'merge' });
   }
 }

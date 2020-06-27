@@ -1,5 +1,5 @@
 import { of as observableOf, forkJoin as observableForkJoin,  Observable } from 'rxjs';
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AnalyzerService } from './analyzer.service';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
@@ -16,20 +16,22 @@ export class SeriesHelperService {
   private seriesData;
 
   constructor(
-    private _uheroAPIService: ApiService,
-    private _analyzer: AnalyzerService,
-    private _helper: HelperService
+    private apiService: ApiService,
+    private analyzerService: AnalyzerService,
+    private helperService: HelperService
   ) { }
 
   getSeriesData(id: number, noCache: boolean, catId?: number): Observable<any> {
-    let currentFreq, currentGeo, decimals;
+    let currentFreq;
+    let currentGeo;
+    let decimals;
     this.seriesData = {
       seriesDetail: {},
       saPairAvail: null,
       regions: [],
-      currentGeo: <Geography>{},
+      currentGeo: {} as Geography,
       frequencies: [],
-      currentFreq: <Frequency>{},
+      currentFreq: {} as Frequency,
       chartData: [],
       seriesTableData: [],
       siblings: [],
@@ -38,8 +40,8 @@ export class SeriesHelperService {
       requestComplete: false
     };
     const dateArray = [];
-    const analyzerSeries = this._analyzer.analyzerSeries;
-    this._uheroAPIService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
+    const analyzerSeries = this.analyzerService.analyzerSeries;
+    this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
       // Check if series is in the analyzer
       const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
@@ -67,7 +69,7 @@ export class SeriesHelperService {
       const obsEnd = obs.observationEnd;
       if (levelData && levelData.length) {
         // Use to format dates for table
-        this._helper.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this.helperService.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
         const formattedData = this.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = formattedData.chartData;
         this.seriesData.seriesTableData = formattedData.tableData;
@@ -82,14 +84,14 @@ export class SeriesHelperService {
         this.seriesData.eror = true;
         this.seriesData.requestComplete = true;
       });
-    return observableForkJoin(observableOf(this.seriesData));
+    return observableForkJoin([observableOf(this.seriesData)]);
   }
 
   dataTransform(seriesObs, dates, decimals) {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const transformations = this._helper.getTransformations(observations);
+    const transformations = this.helperService.getTransformations(observations);
     const level = transformations.level;
     const pseudoZones = [];
     if (level.pseudoHistory) {
@@ -99,10 +101,10 @@ export class SeriesHelperService {
         }
       });
     }
-    const seriesTable = this._helper.createSeriesTable(dates, transformations, decimals);
-    const chart = this._helper.createSeriesChart(dates, transformations);
-    const chartData = { level: chart.level, pseudoZones: pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates: dates };
-    const results = { chartData: chartData, tableData: seriesTable, start: start, end: end };
+    const seriesTable = this.helperService.createSeriesTable(dates, transformations, decimals);
+    const chart = this.helperService.createSeriesChart(dates, transformations);
+    const chartData = { level: chart.level, pseudoZones, yoy: chart.yoy, ytd: chart.ytd, c5ma: chart.c5ma, dates };
+    const results = { chartData, tableData: seriesTable, start, end };
     return results;
   }
 
@@ -135,7 +137,7 @@ export class SeriesHelperService {
     series.forEach((s) => {
       const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate);
       stats.series = s.displayName;
-      stats.interactionSettings.showInChart = s.showInChart
+      stats.interactionSettings.showInChart = s.showInChart;
       tableRows.push(stats);
     });
     return tableRows;
@@ -162,9 +164,8 @@ export class SeriesHelperService {
         seriesInfo: seriesDetail
       }
     };
-    formattedStats.range = this._helper.formatDate(startDate, freq) + ' - ' + this._helper.formatDate(endDate, freq);
+    formattedStats.range = `${this.helperService.formatDate(startDate, freq)} - ${this.helperService.formatDate(endDate, freq)}`;
     const decimals = seriesDetail.decimals;
-    //const transformations = this._helper.getTransformations(seriesDetail.seriesObservations);
     const { dates, level } = chartData;
     const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
     const valuesInRange = level.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
@@ -174,19 +175,21 @@ export class SeriesHelperService {
     }
     const minValue = Math.min(...valuesInRange);
     const minValueIndex = valuesInRange.indexOf(minValue);
-    formattedStats.minValue = this._helper.formatNum(Math.min(...valuesInRange), decimals) + ' (' + this._helper.formatDate(datesInRange[minValueIndex].date, freq) + ')';
+    formattedStats.minValue = `${this.helperService.formatNum(Math.min(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[minValueIndex].date, freq)})`;
     const maxValue = Math.max(...valuesInRange);
     const maxValueIndex = valuesInRange.indexOf(maxValue);
-    formattedStats.maxValue = this._helper.formatNum(Math.max(...valuesInRange), decimals) + ' (' + this._helper.formatDate(datesInRange[maxValueIndex].date, freq) + ')';
-    formattedStats.percChange = seriesDetail.percent ? null : this._helper.formatNum(((valuesInRange[valuesInRange.length - 1] - valuesInRange[0]) / valuesInRange[0]) * 100, decimals);
-    formattedStats.levelChange = this._helper.formatNum(valuesInRange[valuesInRange.length - 1] - valuesInRange[0], decimals);
-    const sum = valuesInRange.reduce((a, b) => a + b, 0)
-    formattedStats.total = this._helper.formatNum(sum, decimals);
-    formattedStats.avg = this._helper.formatNum(sum / valuesInRange.length, decimals);
+    formattedStats.maxValue = `${this.helperService.formatNum(Math.max(...valuesInRange), decimals)} (${this.helperService.formatDate(datesInRange[maxValueIndex].date, freq)})`;
+    const diff = valuesInRange[valuesInRange.length - 1] - valuesInRange[0];
+    const percChange = this.helperService.formatNum((diff / valuesInRange[0]) * 100, decimals);
+    formattedStats.percChange = seriesDetail.percent ? null : percChange;
+    formattedStats.levelChange = this.helperService.formatNum(diff, decimals);
+    const sum = valuesInRange.reduce((a, b) => a + b, 0);
+    formattedStats.total = this.helperService.formatNum(sum, decimals);
+    formattedStats.avg = this.helperService.formatNum(sum / valuesInRange.length, decimals);
     const periods = valuesInRange.length - 1;
     const cagr = this.calculateCAGR(valuesInRange[0], valuesInRange[valuesInRange.length - 1], freq, periods);
-    formattedStats.cagr = this._helper.formatNum(cagr, decimals);
-    return formattedStats
+    formattedStats.cagr = this.helperService.formatNum(cagr, decimals);
+    return formattedStats;
   }
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {

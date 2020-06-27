@@ -39,10 +39,10 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     @Inject('portal') private portal,
-    private _dataPortalSettings: DataPortalSettingsService,
-    private _analyzer: AnalyzerService,
-    private _series: SeriesHelperService,
-    private _helper: HelperService,
+    private dataPortalSettingsServ: DataPortalSettingsService,
+    private analyzerService: AnalyzerService,
+    private seriesHelper: SeriesHelperService,
+    private helperService: HelperService,
   ) {
     this.frameworkComponents = {
       analyzerTableRenderer: AnalyzerTableRendererComponent,
@@ -50,19 +50,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       analyzerInteractionsEditor: AnalyzerInteractionsEditorComponent,
       analyzerInteractionsRenderer: AnalyzerInteractionsRendererComponent
     };
-    this.gridOptions = <GridOptions>{
+    this.gridOptions = {
       context: {
         componentParent: this
-      }
+      } as GridOptions
     };
-    this.statGridOptions = <GridOptions>{
+    this.statGridOptions = {
       context: {
         componentParent: this
-      }
-    }
-    this.toggleSeries = this._analyzer.toggleSeriesInChart.subscribe((data: any) => {
+      } as GridOptions
+    };
+    this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
       const chartSeries = this.series.filter(s => s.showInChart);
-      const toggleDisplay = this._analyzer.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
+      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
       if (toggleDisplay) {
         const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === data.seriesInfo.id);
         const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === data.seriesInfo.id);
@@ -76,19 +76,19 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
   ngOnChanges() {
     const frequencies = [...new Set(this.series.map((series) => series.seriesDetail.frequencyShort))];
     if (this.minDate && this.maxDate) {
-      const newTableDates = this._analyzer.createAnalyzerTableDates(this.series, this.minDate, this.maxDate)
+      const newTableDates = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
       this.columnDefs = this.setTableColumns(newTableDates);
     }
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     if (this.minDate && this.maxDate) {
-      this.summaryRows = this._series.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
+      this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
         statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
@@ -98,21 +98,21 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     }
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      const transformations = this._helper.getTransformations(series.observations);
+      const transformations = this.helperService.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level);
       this.rows.push(seriesData);
       if (this.yoyChecked && yoy) {
         const yoyData = this.formatTransformationData(series, yoy);
-        this.rows.push(yoyData)
+        this.rows.push(yoyData);
       }
       if (this.ytdChecked && ytd) {
         const ytdData = this.formatTransformationData(series, ytd);
-        this.rows.push(ytdData)
+        this.rows.push(ytdData);
       }
       if (this.c5maChecked && c5ma) {
         const c5maData = this.formatTransformationData(series, c5ma);
-        this.rows.push(c5maData)
+        this.rows.push(c5maData);
       }
     });
   }
@@ -137,7 +137,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       pinned: 'left',
       width: 250,
       cellRenderer: 'analyzerStatsRenderer',
-      tooltipValueGetter: function (params) {
+      tooltipValueGetter(params) {
         return params.value;
       }
     }, {
@@ -175,7 +175,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       pinned: 'left',
       width: 250,
       cellRenderer: 'analyzerTableRenderer',
-      tooltipValueGetter: function (params) {
+      tooltipValueGetter(params) {
         return params.value;
       }
     });
@@ -200,7 +200,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   formatLvlData = (series, level) => {
     const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
     const { dates, values } = level;
-    const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
     const seriesData = {
       series: series.displayName,
       lockPosition: true,
@@ -212,24 +212,24 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
         seriesInfo: series.seriesDetail
       },
       lvlData: true,
-    }
+    };
     formattedDates.forEach((d, index) => {
-      seriesData[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
+      seriesData[d] = this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
     });
     return seriesData;
   }
 
   formatTransformationData = (series, transformation) => {
     const { dates, values } = transformation;
-    const formattedDates = dates.map(d => this._helper.formatDate(d, series.seriesDetail.frequencyShort));
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
     const displayName = this.formatTransformationName(transformation.transformation, series.seriesDetail.percent);
     const data = {
       series: displayName,
       seriesInfo: series.seriesDetail,
       lvlData: false
-    }
+    };
     formattedDates.forEach((d, index) => {
-      data[d] = this._helper.formatNum(+values[index], series.seriesDetail.decimals);
+      data[d] = this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
     });
     return data;
   }
@@ -260,7 +260,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       columnKeys: exportColumns,
       fileName: 'analyzer',
       customHeader: this.portalSettings.catTable.portalSource + '\n\n'
-    }
+    };
     this.gridApi.exportDataAsCsv(params);
   }
 
@@ -285,15 +285,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   switchChartYAxes(series) {
-    this._analyzer.switchYAxes.emit(series);
+    this.analyzerService.switchYAxes.emit(series);
   }
 
   toggleSeriesInChart(series) {
-    this._analyzer.toggleSeriesInChart.emit(series);
-    this._analyzer.createAnalyzerTableDates(this._analyzer.analyzerData.analyzerSeries)
+    this.analyzerService.toggleSeriesInChart.emit(series);
+    this.analyzerService.createAnalyzerTableDates(this.analyzerService.analyzerData.analyzerSeries);
   }
 
   removeFromAnalyzer(series) {
-    this._analyzer.updateAnalyzer(series.seriesInfo.id);
+    this.analyzerService.updateAnalyzer(series.seriesInfo.id);
   }
 }

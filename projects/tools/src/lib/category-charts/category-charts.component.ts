@@ -31,25 +31,25 @@ export class CategoryChartsComponent implements OnChanges {
   minValue;
   maxValue;
   noSeriesToDisplay;
-  routeSubscription
+  routeSubscription;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
-    private _helper: HelperService,
-    private _analyzer: AnalyzerService,
+    private helperService: HelperService,
+    private analyzerService: AnalyzerService,
   ) { }
 
   ngOnChanges() {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
-          chartSeries.display = this._helper.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasNonSeasonal);
+          chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasNonSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
-          chartSeries.seriesInfo.analyze = this._analyzer.checkAnalyzer(chartSeries.seriesInfo);
+          chartSeries.seriesInfo.analyze = this.analyzerService.checkAnalyzer(chartSeries.seriesInfo);
         }
       });
     }
-    this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
+    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {
@@ -64,12 +64,12 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   formatCategoryChartData = (observations, dates, portalSettings) => {
-    const transformations = this._helper.getTransformations(observations);
+    const transformations = this.helperService.getTransformations(observations);
     const { series0Name, series1Name } = portalSettings.highcharts;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    let series0 = this.formatSeriesData(transformations[series0Name], dates);
-    let series1 = this.formatSeriesData(transformations[series1Name], dates);
+    const series0 = this.formatSeriesData(transformations[series0Name], dates);
+    const series1 = this.formatSeriesData(transformations[series1Name], dates);
     const pseudoZones = [];
     const level = transformations.level;
     if (level.pseudoHistory) {
@@ -79,8 +79,8 @@ export class CategoryChartsComponent implements OnChanges {
         }
       });
     }
-    const chartData = { series0: series0, series1: series1, pseudoZones: pseudoZones, dates: dates };
-    return { start: start, end: end, chartData: chartData };
+    const chartData = { series0, series1, pseudoZones, dates };
+    return { start, end, chartData };
   }
 
   formatSeriesData = (transformation, dates: Array<any>) => {
@@ -92,7 +92,7 @@ export class CategoryChartsComponent implements OnChanges {
       }
       if (dateDiff.length) {
         dates.forEach((sDate) => {
-          const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
+          const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
           dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
         });
         return transformationValues;
@@ -131,7 +131,7 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   updateAnalyze(seriesInfo) {
-    this._analyzer.updateAnalyzerSeriesCount(seriesInfo);
+    this.analyzerService.updateAnalyzerSeriesCount(seriesInfo);
   }
 
   trackBySeries(index, item) {

@@ -11,7 +11,7 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
   public params: any;
 
   constructor(
-    private _table: TableHelperService
+    private tableHelper: TableHelperService
   ) { }
 
   agInit(params: any): void {
@@ -31,6 +31,6 @@ export class AnalyzerTableRendererComponent implements ICellRendererAngularComp 
   }
 
   showPopover = (seriesInfo) => {
-    return this._table.showPopover(seriesInfo);
+    return this.tableHelper.showPopover(seriesInfo);
   }
 }

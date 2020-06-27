@@ -24,13 +24,18 @@ export class ApiService {
   private cachedPackageAnalyzer = [];
   private cachedObservations = [];
 
-  constructor(@Inject('environment') private environment, @Inject('rootCategory') private rootCategory, @Inject('portal') private portal, private http: HttpClient) {
+  constructor(
+    @Inject('environment') private environment,
+    @Inject('rootCategory') private rootCategory,
+    @Inject('portal') private portal,
+    private http: HttpClient
+  ){
     this.baseUrl = this.environment.apiUrl;
     this.headers = new HttpHeaders({});
     this.headers.append('Authorization', 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M=');
     this.httpOptions = {
       headers: new HttpHeaders({
-        'Authorization': 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M='
+        Authorization: 'Bearer -VI_yuv0UzZNy4av1SM5vQlkfPK_JKnpGfMzuJR7d0M='
       })
     };
   }
@@ -84,8 +89,9 @@ export class ApiService {
     if (this.cachedExpanded[id + geo + freq]) {
       return observableOf(this.cachedExpanded[id + geo + freq]);
     } else {
-      const caching = noCache ? '&nocache' : ''
-      let expanded$ = this.http.get(`${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}&expand=true${caching}`, this.httpOptions).pipe(
+      const caching = noCache ? '&nocache' : '';
+      const url = `${this.baseUrl}/category/series?id=${id}&geo=${geo}&freq=${freq}&expand=true${caching}`;
+      let expanded$ = this.http.get(url, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedExpanded[id + geo + freq] = val;
@@ -100,7 +106,8 @@ export class ApiService {
       return observableOf(this.cachedPackageSeries[id]);
     } else {
       const caching = noCache ? '&nocache' : '';
-      let series$ = this.http.get(`${this.baseUrl}/package/series?id=${id}&u=${this.portal.universe}&cat=${catId}${caching}`, this.httpOptions).pipe(map(mapData),
+      const url = `${this.baseUrl}/package/series?id=${id}&u=${this.portal.universe}&cat=${catId}${caching}`;
+      let series$ = this.http.get(url, this.httpOptions).pipe(map(mapData),
         tap(val => {
           this.cachedPackageSeries[id] = val;
           series$ = null;
@@ -174,7 +181,8 @@ export class ApiService {
       return observableOf(this.cachedPackageSearch[search + geo + freq]);
     } else {
       const caching = noCache ? '&nocache' : '';
-      let search$ = this.http.get(`${this.baseUrl}/package/search?q=${search}&u=${this.portal.universe}&geo=${geo}&freq=${freq}${caching}`, this.httpOptions).pipe(
+      const url = `${this.baseUrl}/package/search?q=${search}&u=${this.portal.universe}&geo=${geo}&freq=${freq}${caching}`;
+      let search$ = this.http.get(url, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearchExpand[search + geo + freq] = val;
@@ -189,7 +197,8 @@ export class ApiService {
       return observableOf(this.cachedPackageAnalyzer[ids]);
     } else {
       const caching = noCache ? '&nocache' : '';
-      let analyzer$ = this.http.get(`${this.baseUrl}/package/analyzer?ids=${ids}&u=${this.portal.universe}${caching}`, this.httpOptions).pipe(
+      const url = `${this.baseUrl}/package/analyzer?ids=${ids}&u=${this.portal.universe}${caching}`;
+      let analyzer$ = this.http.get(url, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedPackageAnalyzer[ids] = val;
@@ -204,7 +213,7 @@ export class ApiService {
     if (this.cachedObservations[id]) {
       return observableOf(this.cachedObservations[id]);
     } else {
-      const caching = noCache ? '&nocache' : ''
+      const caching = noCache ? '&nocache' : '';
       let observations$ = this.http.get(`${this.baseUrl}/series/observations?id=${id}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
@@ -221,7 +230,7 @@ export class ApiService {
 // And side bar navigation on single-series & table views
 function mapCategories(response): Array<Category> {
   const categories = response.data;
-  const dataMap = categories.reduce((map, value) => (map[value.id] = value, map), {});
+  const dataMap = categories.reduce((m, value) => (m[value.id] = value, m), {});
   const categoryTree = [];
   categories.forEach((value) => {
     const parent = dataMap[value.parentId];

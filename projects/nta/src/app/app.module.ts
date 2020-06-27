@@ -43,8 +43,6 @@ import { NtaHelpComponent } from './nta-help/nta-help.component';
       provide: 'portal',
       useValue: {
         universe: 'nta',
-        title: 'NTA Data Portal',
-        favicon: 'nta-logo.png',
         feedback: false,
         categoryTabs: false // Display subcategory navigation tabs in category chart/table view
       }

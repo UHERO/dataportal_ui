@@ -21,7 +21,7 @@ export class DateSliderComponent implements OnInit {
 
   constructor(
     @Inject('defaultRange') private defaultRange,
-    private _helper: HelperService,
+    private helperService: HelperService,
   ) { }
 
   ngOnInit() {
@@ -40,13 +40,15 @@ export class DateSliderComponent implements OnInit {
     const newValue = e.target.value.toUpperCase();
     const formattedValue = this.formatInput(newValue, this.freq);
     this.sliderDates = this.dates.map(d => d.tableDate); // Changing inputs seems to alter original array?
-    const validInputs = input === 'from' ? this.checkValidInputs(formattedValue, this.sliderDates[this.end], input, this.freq) : this.checkValidInputs(formattedValue, this.sliderDates[this.start], input, this.freq);
+    const validInputs = input === 'from' ?
+      this.checkValidInputs(formattedValue, this.sliderDates[this.end], input, this.freq) :
+      this.checkValidInputs(formattedValue, this.sliderDates[this.start], input, this.freq);
     const valueIndex = this.sliderDates.indexOf(formattedValue);
     if (valueIndex >= 0 && validInputs) {
       this.start = input === 'from' ? this.sliderDates.indexOf(formattedValue) : this.start;
       this.end = input === 'to' ? this.sliderDates.indexOf(formattedValue) : this.end;
       this.sliderSelectedRange = [this.start, this.end];
-      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);  
+      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
     }
   }
 
@@ -66,7 +68,7 @@ export class DateSliderComponent implements OnInit {
     const seriesStart = this.formatChartDate(from, freq);
     const seriesEnd = this.formatChartDate(to, freq);
     const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
-    this.updateRange.emit({ seriesStart: seriesStart, seriesEnd: seriesEnd, endOfSample: endOfSample });
+    this.updateRange.emit({ seriesStart, seriesEnd, endOfSample });
   }
 
   updateRanges(from, to, freq: string) {
@@ -80,7 +82,7 @@ export class DateSliderComponent implements OnInit {
       return /^\d{4}$/.test(value);
     }
     if (freq === 'Q') {
-      return /^\d{4}( |)[Q]\d{1}$/.test(value); 
+      return /^\d{4}( |)[Q]\d{1}$/.test(value);
     }
     if (freq === 'M' || freq === 'S') {
       return /^\d{4}(|-)\d{2}$/.test(value);
@@ -112,7 +114,7 @@ export class DateSliderComponent implements OnInit {
 
   findDefaultRange = (dates: Array<any>, freq: string, defaultRange, dateFrom, dateTo) => {
     const sliderDates = dates.map(date => date.tableDate);
-    const defaultRanges = this._helper.setDefaultSliderRange(freq, sliderDates, defaultRange);
+    const defaultRanges = this.helperService.setDefaultSliderRange(freq, sliderDates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     if (dateFrom) {
       const dateFromExists = this.checkDateExists(dateFrom, dates, freq);
@@ -132,7 +134,7 @@ export class DateSliderComponent implements OnInit {
         endIndex = dates.length - 1;
       }
     }
-    return { start: startIndex, end: endIndex, sliderDates: sliderDates };
+    return { start: startIndex, end: endIndex, sliderDates };
   }
 
   checkDateExists = (date: string, dates: Array<any>, freq: string) => {
@@ -147,16 +149,16 @@ export class DateSliderComponent implements OnInit {
         dateToCheck = `${year}-01-01`;
       }
       if (month >= 4 && month <= 6) {
-        dateToCheck = `${year}-04-01`
+        dateToCheck = `${year}-04-01`;
       }
       if (month >= 7 && month <= 9) {
-        dateToCheck = `${year}-07-01`
+        dateToCheck = `${year}-07-01`;
       }
       if (month >= 10 && month <= 12) {
         dateToCheck = `${year}-10-01`;
       }
     }
-    return dates.findIndex(date => date.date == dateToCheck);
+    return dates.findIndex(d => d.date === dateToCheck);
   }
 
   formatChartDate = (value, freq) => {

@@ -24,12 +24,12 @@ export class AnalyzerService {
 
   @Output() public updateAnalyzerCount: EventEmitter<any> = new EventEmitter();
 
-  constructor(private _uheroAPIService: ApiService, private _helper: HelperService) { }
+  constructor(private apiService: ApiService, private helperService: HelperService) { }
 
   checkSeriesUnits(chartSeries, units) {
     // List of units for series in analyzer chart
     const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
-    const uniqueUnits = allUnits.filter((unit, index, units) => units.indexOf(unit) === index);
+    const uniqueUnits = allUnits.filter((unit, index, u) => u.indexOf(unit) === index);
     if (uniqueUnits.length === 2) {
       // If two different units are already in use, check if the current series unit is in the list
       const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === units);
@@ -46,23 +46,24 @@ export class AnalyzerService {
   updateAnalyzerSeriesCount(seriesInfo) {
     this.updateAnalyzer(seriesInfo.id);
     // Update analyze button on category charts/tables
-    // Emits click event to parent (landing-page.component) to trigger change detection in for a series that may show up in multiple places on a page
+    // Emits click event to parent (landing-page.component) to trigger change
+    // detection for a series that may show up in multiple places on a page
     this.updateAnalyzerCount.emit(seriesInfo);
   }
 
   getAnalyzerData(aSeries, noCache: boolean) {
     this.analyzerData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
-    this._uheroAPIService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
+    this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
         const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
         this.analyzerData.analyzerSeries.push(seriesData);
       });
-      this.createAnalyzerTable(this.analyzerData.analyzerSeries)
+      this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
     });
-    return observableForkJoin(observableOf(this.analyzerData));
+    return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
@@ -70,8 +71,8 @@ export class AnalyzerService {
     const aSeriesMatch = aSeries.find(a => a.id === series.id);
     const seriesData = {
       seriesDetail: series,
-      currentGeo: <Geography>{},
-      currentFreq: <Frequency>{},
+      currentGeo: {} as Geography,
+      currentFreq: {} as Frequency,
       chartData: {},
       displayName: '',
       chartDisplayName: '',
@@ -118,9 +119,9 @@ export class AnalyzerService {
         });
       }
       // Use to format dates for table
-      this._helper.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-      const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray)
-      seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones: pseudoZones }
+      this.helperService.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
+      const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray);
+      seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
     } else {
       seriesData.noData = 'Data not available';
     }
@@ -129,14 +130,14 @@ export class AnalyzerService {
 
   checkFrequencies = (series) => {
     const freqs = series.map((s) => s.currentFreq.freq);
-    return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A'
+    return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
   }
 
   createAnalyzerTable = (analyzerSeries) => {
     analyzerSeries.forEach((aSeries) => {
       const decimal = aSeries.seriesDetail.decimals;
       const dateArray = [];
-      this._helper.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
     });
     this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
@@ -154,13 +155,13 @@ export class AnalyzerService {
     series.forEach((serie) => {
       serie.seriesTableData.lvl.forEach((date) => {
         const dateExists = allDates.map(d => d.tableDate).find(tableDate => tableDate === date.tableDate);
-        if (!dateExists) allDates.push(date);
+        if (!dateExists) { allDates.push(date); }
       });
     });
     allDates = allDates.sort(this.dateComparison);
-    if (start && end) allDates = allDates.filter(date => date.date >= start && date.date <= end);
+    if (start && end) { allDates = allDates.filter(date => date.date >= start && date.date <= end); }
     return allDates;
-  };
+  }
 
   createSeriesTable = (transformations, tableDates, decimal) => {
     const categoryTable = {};
@@ -168,8 +169,10 @@ export class AnalyzerService {
       const { transformation, dates, values, pseudoHistory } = t;
       if (dates && values) {
         categoryTable[`${transformation}`] = tableDates.map((date) => {
-          const dateExists = this._helper.binarySearch(dates, date.date);
-          return dateExists > -1 ? { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } : { date: date.date, tableDate: date.tableDate, value: Infinity, formattedValue: '' };
+          const dateExists = this.helperService.binarySearch(dates, date.date);
+          return dateExists > -1 ?
+            { date: date.date, tableDate: date.tableDate, value: +values[dateExists], formattedValue: '' } :
+            { date: date.date, tableDate: date.tableDate, value: Infinity, formattedValue: '' };
         });
       }
     });
@@ -180,8 +183,10 @@ export class AnalyzerService {
     if (transformation) {
       const transformationValues = [];
       dates.forEach((sDate) => {
-        const dateExists = this._helper.binarySearch(transformation.dates, sDate.date);
-        dateExists > -1 ? transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) : transformationValues.push([Date.parse(sDate.date), null]);
+        const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
+        dateExists > -1 ?
+          transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) :
+          transformationValues.push([Date.parse(sDate.date), null]);
       });
       return transformationValues;
     }

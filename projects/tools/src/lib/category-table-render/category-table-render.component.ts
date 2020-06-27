@@ -14,8 +14,8 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
   public params: any;
 
   constructor(
-    private _table: TableHelperService,
-    private _analyzer: AnalyzerService
+    private tableHelper: TableHelperService,
+    private analyzerService: AnalyzerService
   ) { }
 
   agInit(params: any): void {
@@ -27,10 +27,10 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
   }
 
   showPopover = (seriesInfo, subcatIndex) => {
-    return this._table.showPopover(seriesInfo, subcatIndex);
+    return this.tableHelper.showPopover(seriesInfo, subcatIndex);
   }
 
   updateAnalyze = (seriesInfo) => {
-    this._analyzer.updateAnalyzerSeriesCount(seriesInfo);
+    this.analyzerService.updateAnalyzerSeriesCount(seriesInfo);
   }
 }

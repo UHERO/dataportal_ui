@@ -33,8 +33,6 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'portal',
       useValue: {
         universe: 'uhero',
-        title: 'Data Portal',
-        favicon: 'manoa.jpg',
         feedback: true,
         categoryTabs: true // Display subcategory navigation tabs in category chart/table view
       }
@@ -43,10 +41,10 @@ import { UheroHelpComponent } from './uhero-help/uhero-help.component';
       provide: 'logo',
       useValue: {
         altText: 'UHERO Data Portal Logo',
-        analyticsLogoSrc: '../assets/Analytics_Logo.svg',
+        analyticsLogoSrc: 'assets/Analytics_Logo.svg',
         displayImg: true,
         headerText: '',
-        imgSrc: '../assets/UHEROdata-Logo-color.svg',
+        imgSrc: 'assets/UHEROdata-Logo-color.svg',
         mobileLogo: true
       }
     },

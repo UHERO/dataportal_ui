@@ -45,26 +45,27 @@ export class CategoryTableViewComponent implements OnChanges {
 
   constructor(
     @Inject('defaultRange') private defaultRange,
-    private _analyzer: AnalyzerService,
-    private _helper: HelperService,
+    private analyzerService: AnalyzerService,
+    private helperService: HelperService,
   ) {
     this.frameworkComponents = {
       categoryTableRender: CategoryTableRenderComponent
-    }
+    };
   }
 
   ngOnChanges() {
-    //this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
     this.rows = [];
     if (this.data) {
       this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
-          series.display = this._helper.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasNonSeasonal);
-          series.seriesInfo.analyze = this._analyzer.checkAnalyzer(series.seriesInfo);
-          const transformations = this._helper.getTransformations(series.seriesInfo.seriesObservations);
+          series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasNonSeasonal);
+          series.seriesInfo.analyze = this.analyzerService.checkAnalyzer(series.seriesInfo);
+          const transformations = this.helperService.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
-          const seriesData = this.selectedDataList ? this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) : this.formatLvlData(series, level, this.subcatIndex, null);
+          const seriesData = this.selectedDataList ?
+            this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) :
+            this.formatLvlData(series, level, this.subcatIndex, null);
           if (series.display) { this.rows.push(seriesData); }
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
@@ -81,7 +82,7 @@ export class CategoryTableViewComponent implements OnChanges {
         }
       });
     }
-    this.noSeriesToDisplay = this._helper.checkIfSeriesAvailable(this.noSeries, this.data);
+    this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
   }
 
   setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
@@ -91,19 +92,18 @@ export class CategoryTableViewComponent implements OnChanges {
       headerName: 'Series',
       pinned: 'left',
       width: 275,
-      cellRenderer: "categoryTableRender",
-      tooltipValueGetter: function (params) {
+      cellRenderer: 'categoryTableRender',
+      tooltipValueGetter(params) {
         return params.value;
       }
     });
-    const defaultRanges = this._helper.setDefaultCategoryRange(freq, dates, defaultRange);
+    const defaultRanges = this.helperService.setDefaultCategoryRange(freq, dates, defaultRange);
     let { startIndex, endIndex } = defaultRanges;
     dates.forEach((date, index) => {
-      // Range slider is converting annual year strings to numbers
-      if (date.date == tableStart) {
+      if (date.date === tableStart) {
         startIndex = index;
       }
-      if (date.date == tableEnd) {
+      if (date.date === tableEnd) {
         endIndex = index;
       }
     });
@@ -130,9 +130,9 @@ export class CategoryTableViewComponent implements OnChanges {
       seriesInfo: series.seriesInfo,
       lvlData: true,
       categoryId: parentId
-    }
+    };
     dates.forEach((d, index) => {
-      seriesData[d] = this._helper.formatNum(+values[index], series.seriesInfo.decimals);
+      seriesData[d] = this.helperService.formatNum(+values[index], series.seriesInfo.decimals);
     });
     return seriesData;
   }
@@ -145,8 +145,8 @@ export class CategoryTableViewComponent implements OnChanges {
     };
     if (transformation) {
       const { dates, values } = transformation;
-      const displayName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
-      data.series = displayName;
+      const disName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
+      data.series = disName;
       dates.forEach((d, index) => {
         data[d] = values[index];
       });
@@ -190,9 +190,9 @@ export class CategoryTableViewComponent implements OnChanges {
     const params = {
       columnKeys: exportColumns,
       suppressQuotes: false,
-      fileName: fileName,
+      fileName,
       customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
-    }
+    };
     this.gridApi.exportDataAsCsv(params);
   }
 

@@ -43,8 +43,6 @@ import { CohHelpComponent } from './coh-help/coh-help.component';
       provide: 'portal',
       useValue: {
         universe: 'coh',
-        title: 'County of Hawaii Data Portal',
-        favicon: 'hawaii-county-seal.png',
         feedback: false,
         categoryTabs: false // Display subcategory navigation tabs in category chart/table view
       }

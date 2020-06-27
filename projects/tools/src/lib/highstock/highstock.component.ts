@@ -34,7 +34,7 @@ export class HighstockComponent implements OnChanges {
   @Output() chartExtremes = new EventEmitter(true);
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  chartOptions = <HighstockObject>{};
+  chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
   showChart = false;
@@ -42,19 +42,19 @@ export class HighstockComponent implements OnChanges {
   constructor(
     @Inject('defaultRange') private defaultRange,
     @Inject('logo') private logo,
-    private _highstockHelper: HighstockHelperService
+    private highstockHelper: HighstockHelperService
   ) {
     // workaround to include exporting module in production build
     exporting(this.Highcharts);
     exportData(this.Highcharts);
     offlineExport(this.Highcharts);
-    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function (proceed) {
+    Highcharts.wrap(Highcharts.Chart.prototype, 'getCSV', function(proceed) {
       // Add metadata to top of CSV export
       const result = proceed.apply(this, Array.prototype.slice.call(arguments, 1));
       let seriesMetaData = '';
       this.userOptions.labels.items.forEach((label) => {
         if (!result.includes(label.html)) {
-          seriesMetaData+= label.html ? `${label.html} \n` : '';
+          seriesMetaData += label.html ? `${label.html} \n` : '';
         }
       });
       return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
@@ -107,7 +107,7 @@ export class HighstockComponent implements OnChanges {
         html: portalSettings.highstock.labels.portal
       }, {
         html: portalSettings.highstock.labels.portalLink
-      }]
+      }];
     return { items: labelItems, style: { display: 'none' } };
   }
 
@@ -168,7 +168,8 @@ export class HighstockComponent implements OnChanges {
 
   setEndDate = (end: string, chartRange, chartData: HighchartChartData) => {
     // Check if end is only a year. This should occur when switching between geos/freqs for a particular series.
-    // (Ex: If the max date selected in an annual series is 2015, switching to the quarterly frequency should select up to 2015 Q4 rather than 2015 Q1)
+    // (Ex: If the max date selected in an annual series is 2015,
+    // switching to the quarterly frequency should select up to 2015 Q4 rather than 2015 Q1)
     if (end && end.length === 4) {
       const dateExists = chartData.dates.slice().reverse().find(date => date.date.includes(end));
       return dateExists ? dateExists.date : null;
@@ -177,7 +178,7 @@ export class HighstockComponent implements OnChanges {
       return end;
     }
     return chartRange ? chartRange.end : null;
-  };
+  }
 
   drawChart = (chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) => {
     const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
@@ -189,18 +190,18 @@ export class HighstockComponent implements OnChanges {
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
-    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;    
+    const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
     const tableExtremes = this.tableExtremes;
     const chartExtremes = this.chartExtremes;
-    const formatTooltip = (points, x, pseudoZones, decimals, freq) => this.formatTooltip(points, x, pseudoZones, decimals, freq);
-    const getChartExtremes = (chartObject) => this._highstockHelper.getChartExtremes(chartObject);
-    const xAxisFormatter = (chart, freq) => this._highstockHelper.xAxisLabelFormatter(chart, freq);
-    const setInputDateFormat = freq => this._highstockHelper.inputDateFormatter(freq);
-    const setInputEditDateFormat = freq => this._highstockHelper.inputEditDateFormatter(freq);
-    const setInputDateParser = (value, freq) => this._highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth = (freq, date) => this._highstockHelper.setDateToFirstOfMonth(freq, date);
+    const formatTooltip = (points, x, pseudoZ, dec, frequency) => this.formatTooltip(points, x, pseudoZ, dec, frequency);
+    const getChartExtremes = (chartObject) => this.highstockHelper.getChartExtremes(chartObject);
+    const xAxisFormatter = (chart, frequency) => this.highstockHelper.xAxisLabelFormatter(chart, frequency);
+    const setInputDateFormat = frequency => this.highstockHelper.inputDateFormatter(frequency);
+    const setInputEditDateFormat = frequency => this.highstockHelper.inputEditDateFormatter(frequency);
+    const setInputDateParser = (value, frequency) => this.highstockHelper.inputDateParserFormatter(value, frequency);
+    const setDateToFirstOfMonth = (frequency, date) => this.highstockHelper.setDateToFirstOfMonth(frequency, date);
     const logo = this.logo;
     this.chartOptions.chart = {
       alignTicks: false,
@@ -208,7 +209,7 @@ export class HighstockComponent implements OnChanges {
       description: freq.freq,
       className: 'single-series-chart',
       events: {
-        render: function () {
+        render() {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
@@ -228,7 +229,7 @@ export class HighstockComponent implements OnChanges {
       inputEnabled: true,
       inputDateFormat: setInputDateFormat(freq.freq),
       inputEditDateFormat: setInputEditDateFormat(freq.freq),
-      inputDateParser: function (value) {
+      inputDateParser(value) {
         return setInputDateParser(value, freq.freq);
       },
       inputPosition: {
@@ -255,7 +256,7 @@ export class HighstockComponent implements OnChanges {
         events: null,
         chart: {
           events: {
-            load: function() {
+            load() {
               if (logo.analyticsLogoSrc) {
                 this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
               }
@@ -291,14 +292,14 @@ export class HighstockComponent implements OnChanges {
       borderWidth: 0,
       shadow: false,
       followPointer: true,
-      formatter: function (args) {
-        return formatTooltip(this.points, this.x, pseudoZones, decimals, freq)
+      formatter(args) {
+        return formatTooltip(this.points, this.x, pseudoZones, decimals, freq);
       }
     };
     this.chartOptions.credits = { enabled: false };
     this.chartOptions.xAxis = {
       events: {
-        afterSetExtremes: function () {
+        afterSetExtremes() {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
@@ -308,7 +309,11 @@ export class HighstockComponent implements OnChanges {
           const lastDate = seriesDetail.seriesObservations.observationEnd;
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
-            chartExtremes.emit({ minDate: this._extremes.min, maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max, endOfSample: lastDate === this._extremes.max ? true : false })
+            chartExtremes.emit({
+              minDate: this._extremes.min,
+              maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max,
+              endOfSample: lastDate === this._extremes.max ? true : false
+            });
             // use setExtremes to snap dates to first of the month
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
           }
@@ -318,7 +323,7 @@ export class HighstockComponent implements OnChanges {
       max: Date.parse(endDate),
       ordinal: false,
       labels: {
-        formatter: function () {
+        formatter() {
           return xAxisFormatter(this, this.chart.options.chart.description);
         }
       }
@@ -326,7 +331,7 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.yAxis = [{
       className: 'series2',
       labels: {
-        formatter: function () {
+        formatter() {
           return Highcharts.numberFormat(this.value, decimals, '.', ',');
         }
       },
@@ -343,7 +348,7 @@ export class HighstockComponent implements OnChanges {
         text: units
       },
       labels: {
-        formatter: function () {
+        formatter() {
           return Highcharts.numberFormat(this.value, decimals, '.', ',');
         }
       },
@@ -363,7 +368,7 @@ export class HighstockComponent implements OnChanges {
   }
 
   formatTooltip = (points, x, pseudoZones, decimals, freq) => {
-    const getFreqLabel = (frequency, date) => this._highstockHelper.getTooltipFreqLabel(frequency, date);
+    const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const pseudo = 'Pseudo History ';
     let s = `<b>${getFreqLabel(freq.freq, x)}</b>`;
     points.forEach((point) => {
@@ -389,7 +394,7 @@ export class HighstockComponent implements OnChanges {
       }
     });
     return s;
-  };
+  }
 
   getSelectedChartRange = (userStart, userEnd, dates, defaults) => {
     const defaultEnd = defaults.end ? defaults.end : dates[dates.length - 1].date.substr(0, 4);
@@ -403,6 +408,6 @@ export class HighstockComponent implements OnChanges {
     if (start > end) {
       start = defaultStartYear + dates[counter].date.substr(4, 6);
     }
-    return { start: start, end: end };
+    return { start, end };
   }
 }

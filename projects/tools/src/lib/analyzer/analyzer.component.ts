@@ -25,69 +25,69 @@ export class AnalyzerComponent implements OnInit {
 
   constructor(
     @Inject('portal') private portal,
-    private _analyzer: AnalyzerService,
-    private _dataPortalSettings: DataPortalSettingsService,
+    private analyzerService: AnalyzerService,
+    private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
   ) { }
 
   ngOnInit() {
     if (this.route) {
       this.route.queryParams.subscribe(params => {
-        if (params['analyzerSeries']) {
+        if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params);
         }
-        if (params['chartSeries']) {
+        if (params[`chartSeries`]) {
           this.storeUrlChartSeries(params);
         }
-        if (params['start']) {
-          this.startDate = params['start'];
+        if (params[`start`]) {
+          this.startDate = params[`start`];
         }
-        if (params['end']) {
-          this.endDate = params['end'];
+        if (params[`end`]) {
+          this.endDate = params[`end`];
         }
-        if (params['name']) {
-          this.tooltipName = (params['name'] === 'true');
+        if (params[`name`]) {
+          this.tooltipName = (params[`name`] === 'true');
         }
-        if (params['units']) {
-          this.tooltipUnits = (params['units'] === 'true');
+        if (params[`units`]) {
+          this.tooltipUnits = (params[`units`] === 'true');
         }
-        if (params['geography']) {
-          this.tooltipGeo = (params['geography'] === 'true');
+        if (params[`geography`]) {
+          this.tooltipGeo = (params[`geography`] === 'true');
         }
-        if (params['yoy']) {
-          this.tableYoy = (params['yoy'] === 'true');
+        if (params[`yoy`]) {
+          this.tableYoy = (params[`yoy`] === 'true');
         }
-        if (params['ytd']) {
-          this.tableYtd = (params['ytd'] === 'true');
+        if (params[`ytd`]) {
+          this.tableYtd = (params[`ytd`] === 'true');
         }
-        if (params['c5ma']) {
-          this.tableC5ma = (params['c5ma'] === 'true');
+        if (params[`c5ma`]) {
+          this.tableC5ma = (params[`c5ma`] === 'true');
         }
-        if(params['nocache']) {
-          this.noCache = params['nocache'] === 'true';
+        if (params[`nocache`]) {
+          this.noCache = params[`nocache`] === 'true';
         }
       });
     }
-    this.portalSettings = this._dataPortalSettings.dataPortalSettings[this.portal.universe];
-    if (this._analyzer.analyzerSeries.length) {
-      this.analyzerData = this._analyzer.getAnalyzerData(this._analyzer.analyzerSeries, this.noCache);
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+    if (this.analyzerService.analyzerSeries.length) {
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache);
     }
   }
 
   storeUrlSeries(params) {
-    const urlASeries = params['analyzerSeries'].split('-').map(Number);
+    const urlASeries = params[`analyzerSeries`].split('-').map(Number);
     urlASeries.forEach((uSeries) => {
-      const seriesExists = this._analyzer.analyzerSeries.find(s => s.id === uSeries);
+      const seriesExists = this.analyzerService.analyzerSeries.find(s => s.id === uSeries);
       if (!seriesExists) {
-        this._analyzer.analyzerSeries.push({ id: uSeries, showInChart: false });
+        this.analyzerService.analyzerSeries.push({ id: uSeries, showInChart: false });
       }
     });
   }
 
   storeUrlChartSeries(params) {
-    const urlCSeries = params['chartSeries'].split('-').map(Number);
+    const urlCSeries = params[`chartSeries`].split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
-      const aSeries = this._analyzer.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+      const aSeries = this.analyzerService.analyzerSeries.find(analyzer => analyzer.id === cSeries);
       aSeries.showInChart = true;
     });
   }
