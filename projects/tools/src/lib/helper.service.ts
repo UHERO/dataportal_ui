@@ -76,7 +76,7 @@ export class HelperService {
     if (currentFreq === 'M') {
       return this.addToDateArray(start, end, dateArray, currentFreq, 1);
     }
-    if (currentFreq === 'W') {
+    if (currentFreq === 'W' || currentFreq === 'D') {
       return this.addToDateArray(start, end, dateArray, currentFreq);
     }
     return dateArray;
@@ -91,11 +91,14 @@ export class HelperService {
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
       }
-      if (currentFreq !== 'A' && currentFreq !== 'W') {
+      if (currentFreq === 'M' || currentFreq === 'S' || currentFreq === 'Q') {
         start.setMonth(start.getMonth() + monthIncrease);
       }
       if (currentFreq === 'W') {
         start.setDate(start.getDate() + 7);
+      }
+      if (currentFreq === 'D') {
+        start.setDate(start.getDate() + 1);
       }
     }
     return dateArray;
@@ -108,7 +111,7 @@ export class HelperService {
     if (currentFreq === 'Q') {
       return `${start.toISOString().substr(0, 4)} ${q}`;
     }
-    if (currentFreq === 'W') {
+    if (currentFreq === 'W' || currentFreq === 'D') {
       return start.toISOString().substr(0, 10);
     }
     return start.toISOString().substr(0, 7);
@@ -301,6 +304,9 @@ export class HelperService {
     }
     if (freq === 'W') {
       return { startIndex: this.getRangeStart(counter, range, 52), endIndex: counter };
+    }
+    if (freq === 'D') {
+      return { startIndex: this.getRangeStart(counter, range, 365), endIndex: counter };
     }
   }
 

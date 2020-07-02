@@ -173,7 +173,7 @@ export class DateSliderComponent implements OnInit {
     if (freq === 'M' || freq === 'S') {
       return `${value}-01`;
     }
-    if (freq === 'W') {
+    if (freq === 'W' || freq === 'D') {
       return value;
     }
   }

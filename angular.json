@@ -47,6 +47,29 @@
             ]
           },
           "configurations": {
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/uhero/src/environments/environment.ts",
+                  "with": "projects/uhero/src/environments/environment.prod.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -74,6 +97,14 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/uhero/src/environments/environment.ts",
+                  "with": "projects/uhero/src/environments/environment.apiDev.ts"
+                }
+              ]
             }
           }
         },
@@ -83,8 +114,14 @@
             "browserTarget": "uhero:build"
           },
           "configurations": {
+            "staging": {
+              "browserTarget": "uhero:build:staging"
+            },
             "production": {
               "browserTarget": "uhero:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "uhero:build:apiDev"
             }
           }
         },
@@ -191,6 +228,29 @@
             ]
           },
           "configurations": {
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/coh/src/environments/environment.ts",
+                  "with": "projects/coh/src/environments/environment.prod.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -218,6 +278,14 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/coh/src/environments/environment.ts",
+                  "with": "projects/coh/src/environments/environment.apiDev.ts"
+                }
+              ]
             }
           }
         },
@@ -227,8 +295,14 @@
             "browserTarget": "coh:build"
           },
           "configurations": {
+            "staging": {
+              "browserTarget": "coh:build:staging"
+            },
             "production": {
               "browserTarget": "coh:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "coh:build:apiDev"
             }
           }
         },
@@ -327,6 +401,29 @@
             ]
           },
           "configurations": {
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/nta/src/environments/environment.ts",
+                  "with": "projects/nta/src/environments/environment.prod.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -354,6 +451,14 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/nta/src/environments/environment.ts",
+                  "with": "projects/nta/src/environments/environment.apiDev.ts"
+                }
+              ]
             }
           }
         },
@@ -363,8 +468,14 @@
             "browserTarget": "nta:build"
           },
           "configurations": {
+            "staging": {
+              "browserTarget": "nta:build:staging"
+            },
             "production": {
               "browserTarget": "nta:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "nta:build:apiDev"
             }
           }
         },
