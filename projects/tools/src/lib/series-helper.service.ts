@@ -210,7 +210,7 @@ export class SeriesHelperService {
       return (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100;
     }
     if (freq === 'D') {
-      return (Math.pow((lastValue / firstValue), 356 / periods) - 1) * 100;
+      return (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100;
     }
   }
 }
