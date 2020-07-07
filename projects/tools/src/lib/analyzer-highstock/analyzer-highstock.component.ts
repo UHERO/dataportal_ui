@@ -340,7 +340,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         },
         unitsLabelShort: serie.seriesDetail.unitsLabelShort,
-        seasonallyAdjusted: serie.seriesDetail.seasonallyAdjusted,
+        seasonallyAdjusted: serie.seriesDetail.seasonalAdjustment === 'seasonally_adjusted',
         dataGrouping: {
           enabled: false
         },

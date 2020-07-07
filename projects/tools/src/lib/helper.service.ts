@@ -21,10 +21,10 @@ export class HelperService {
     if (!hasNonSeasonal) {
       return true; // Display all series if no non-seasonal series exists
     }
-    if (series.seriesInfo.seasonallyAdjusted === undefined && !showSeasonal) {
+    if (series.seriesInfo.seasonalAdjustment !== 'seasonally_adjusted' && !showSeasonal) {
       return true;
     }
-    return series.seriesInfo.seasonallyAdjusted === showSeasonal;
+    return showSeasonal && series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted';
   }
 
   checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
