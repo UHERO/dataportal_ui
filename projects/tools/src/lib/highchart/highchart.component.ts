@@ -2,6 +2,7 @@ import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
+import { HighstockHelperService } from '../highstock-helper.service';
 
 @Component({
   selector: 'lib-highchart',
@@ -32,7 +33,11 @@ export class HighchartComponent implements OnChanges {
     return counter;
   }
 
-  constructor(@Inject('defaultRange') private defaultRange, private helperService: HelperService) { }
+  constructor(
+    @Inject('defaultRange') private defaultRange,
+    private helperService: HelperService,
+    private highstockHelper: HighstockHelperService
+  ) { }
 
   ngOnChanges() {
     if (this.seriesData.seriesInfo === 'No data available') {
@@ -114,8 +119,8 @@ export class HighchartComponent implements OnChanges {
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
       data: series0,
-      pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : currentFreq === 'W' ? 7 : 1,
-      pointIntervalUnit: currentFreq === 'A' ? 'year' : currentFreq === 'W' ? 'day' : 'month',
+      pointInterval: this.highstockHelper.freqInterval(currentFreq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
       pointStart: startDate,
       states: {
         hover: {
@@ -134,8 +139,8 @@ export class HighchartComponent implements OnChanges {
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
         data: series1,
-        pointInterval: currentFreq === 'Q' ? 3 : currentFreq === 'S' ? 6 : currentFreq === 'W' ? 7 : 1,
-        pointIntervalUnit: currentFreq === 'A' ? 'year' : currentFreq === 'W' ? 'day' : 'month',
+        pointInterval: this.highstockHelper.freqInterval(currentFreq),
+        pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
         pointStart: startDate,
         dataGrouping: {
           enabled: false

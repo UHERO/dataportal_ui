@@ -125,8 +125,8 @@ export class HighstockComponent implements OnChanges {
       type: 'line',
       yAxis: 1,
       data: series0,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
       states: {
         hover: {
@@ -144,8 +144,8 @@ export class HighstockComponent implements OnChanges {
       name: seriesLabels[portalSettings.highstock.series1Name],
       type: portalSettings.highstock.series1Type,
       data: series1,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
       showInNavigator: false,
       dataGrouping: {
@@ -154,8 +154,8 @@ export class HighstockComponent implements OnChanges {
     }, {
       name: seriesLabels[portalSettings.highstock.series2Name],
       data: series2,
-      pointInterval: freq.freq === 'Q' ? 3 : freq.freq === 'S' ? 6 : freq.freq === 'W' ? 7 : 1,
-      pointIntervalUnit: freq.freq === 'A' ? 'year' : freq.freq === 'W' ? 'day' : 'month',
+      pointInterval: this.highstockHelper.freqInterval(freq.freq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(freq.freq),
       pointStart: Date.parse(seriesStart),
       includeInDataExport: freq.freq === 'A' ? false : true,
       visible: true,

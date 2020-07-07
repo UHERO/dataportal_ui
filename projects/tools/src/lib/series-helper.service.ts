@@ -209,5 +209,8 @@ export class SeriesHelperService {
     if (freq === 'W') {
       return (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100;
     }
+    if (freq === 'D') {
+      return (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100;
+    }
   }
 }

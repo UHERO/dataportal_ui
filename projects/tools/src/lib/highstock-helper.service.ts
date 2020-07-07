@@ -27,6 +27,30 @@ Highcharts.dateFormats = {
 export class HighstockHelperService {
   constructor() { }
 
+  freqInterval = (freq) => {
+    switch (freq) {
+      case 'Q':
+        return 3;
+      case 'S':
+        return 6;
+      case 'W':
+        return 7;
+      default:
+        return 1;
+    }
+  }
+  freqIntervalUnit = (freq) => {
+    switch (freq) {
+      case 'A':
+        return 'year';
+      case 'W':
+      case 'D':
+        return 'day';
+      default:
+        return 'month';
+    }
+  }
+
   getChartExtremes = (chartObject) => {
     // Gets range of x values to emit
     // Used to redraw table in the single series view
@@ -84,7 +108,7 @@ export class HighstockHelperService {
     if (freq === 'M' || freq === 'S') {
       return `${date.substr(0, 7)}-01`;
     }
-    if (freq === 'W') {
+    if (freq === 'W' || freq === 'D') {
       return date;
     }
   }
@@ -117,7 +141,7 @@ export class HighstockHelperService {
     if (frequency === 'M' || frequency === 'S') {
       return `${Highcharts.dateFormat('%b', date)} ${year}`;
     }
-    if (frequency === 'W') {
+    if (frequency === 'W' || frequency === 'D') {
       return `${month} ${day}, ${year}`;
     }
   }
@@ -155,7 +179,7 @@ export class HighstockHelperService {
     if (freq === 'Q') {
       return '%Y %Q';
     }
-    if (freq === 'W') {
+    if (freq === 'W' || freq === 'D') {
       return '%b %d %Y';
     }
     return '%b %Y';
@@ -168,7 +192,7 @@ export class HighstockHelperService {
     if (freq === 'Q') {
       return '%Y %Q';
     }
-    if (freq === 'W') {
+    if (freq === 'W' || freq === 'D') {
       return '%Y-%m-%d';
     }
     return '%Y-%m';
@@ -200,7 +224,7 @@ export class HighstockHelperService {
       }
       return Date.parse(`${value}-01`);
     }
-    if (freq === 'W') {
+    if (freq === 'W' || freq === 'D') {
       return Date.parse(`${value}`);
     }
   }
