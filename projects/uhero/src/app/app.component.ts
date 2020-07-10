@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import * as $ from 'jquery';
 
 declare var gtag: (str: string, gaId: string, path: object) => void;
@@ -12,17 +12,21 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
 })
 export class AppComponent implements OnInit {
   private isBrowser;
+  private sub;
+  viewFullUI: boolean = true;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
     @Inject('portal') public portal,
     @Inject('GoogleAnalyticsId') private gaId,
-    public router: Router
+    public router: Router,
+    private activatedRoute: ActivatedRoute,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     if (this.isBrowser) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
+          this.viewFullUI = !event.url.includes('/graph');
           gtag('config', this.gaId, { page_path: event.urlAfterRedirects });
         }
       });

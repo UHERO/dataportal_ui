@@ -27,7 +27,7 @@ export class HighstockComponent implements OnChanges {
   @Input() seriesDetail;
   @Input() start;
   @Input() end;
-
+  @Input() showTitle;
   // Async EventEmitter, emit tableExtremes on load to render table
   @Output() tableExtremes = new EventEmitter(true);
   // When user updates range selected, emit chartExtremes to update URL params
@@ -365,6 +365,10 @@ export class HighstockComponent implements OnChanges {
       }
     };
     this.chartOptions.series = series;
+    this.chartOptions.title = {
+      text: this.showTitle ? `${name} (${geo.name}, ${freq.label})` : '',
+      align: 'left'
+    }
   }
 
   formatTooltip = (points, x, pseudoZones, decimals, freq) => {

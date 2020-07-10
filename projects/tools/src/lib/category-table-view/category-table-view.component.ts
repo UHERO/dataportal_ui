@@ -64,8 +64,8 @@ export class CategoryTableViewComponent implements OnChanges {
           const transformations = this.helperService.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.selectedDataList ?
-            this.formatLvlData(series, level, this.subcatIndex, this.selectedDataList.id) :
-            this.formatLvlData(series, level, this.subcatIndex, null);
+            this.formatLvlData(series, level, this.selectedDataList.id) :
+            this.formatLvlData(series, level, null);
           if (series.display) { this.rows.push(seriesData); }
           if (this.yoyActive) {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
@@ -121,7 +121,7 @@ export class CategoryTableViewComponent implements OnChanges {
     return columns;
   }
 
-  formatLvlData = (series, level, subcatIndex, parentId) => {
+  formatLvlData = (series, level, parentId) => {
     const { dates, values } = level;
     const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
     const seriesData = {
