@@ -17,9 +17,9 @@ export class HelperService {
     this.categoryData.next(data);
   }
 
-  toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasNonSeasonal: boolean) => {
-    if (!hasNonSeasonal) {
-      return true; // Display all series if no non-seasonal series exists
+  toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
+    if (!hasSeasonal) {
+      return true;
     }
     if (series.seriesInfo.seasonalAdjustment !== 'seasonally_adjusted' && !showSeasonal) {
       return true;
