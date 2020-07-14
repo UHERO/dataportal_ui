@@ -30,6 +30,7 @@ export class CategoryTableViewComponent implements OnChanges {
   @Input() seriesInAnalyzer;
   @Input() showSeasonal: boolean;
   @Input() hasNonSeasonal: boolean;
+  @Input() hasSeasonal;
   private gridApi;
   columnDefs;
   rows;
@@ -42,6 +43,7 @@ export class CategoryTableViewComponent implements OnChanges {
   disablePrevious: boolean;
   disableNext: boolean;
   noSeriesToDisplay;
+  gridOptions;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -55,11 +57,16 @@ export class CategoryTableViewComponent implements OnChanges {
 
   ngOnChanges() {
     this.rows = [];
+    this.gridOptions = {
+      localeText: {
+        noRowsToShow: 'Current selections do not return any data, please try a different combination'
+      }
+    };
     if (this.data) {
       this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
-          series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasNonSeasonal);
+          series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
           series.seriesInfo.analyze = this.analyzerService.checkAnalyzer(series.seriesInfo);
           const transformations = this.helperService.getTransformations(series.seriesInfo.seriesObservations);
           const { level, yoy, ytd, c5ma } = transformations;

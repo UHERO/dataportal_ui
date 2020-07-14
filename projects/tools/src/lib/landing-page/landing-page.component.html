@@ -39,7 +39,7 @@
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'"
 						(change)="ytdActive($event)">Year-to-Date
 				</label>
-				<label *ngIf="data.hasNonSeasonal" class="form-check-inline">
+				<label *ngIf="data.hasSeasonal" class="form-check-inline">
 					<input type="checkbox" name="seasonal_toggle" [checked]="queryParams.sa === 'true'"
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
@@ -55,13 +55,13 @@
 		[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList" [data]="data.displaySeries"
 		[geo]="data.currentGeo" [freq]="data.currentFreq?.freq" [freqLabel]="data.currentFreq?.label"
 		[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData"
-		[params]="queryParams" [showSeasonal]="queryParams.sa === 'true'" [hasNonSeasonal]="data.hasNonSeasonal" [seriesInAnalyzer]="seriesInAnalyzer">
+		[params]="queryParams" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [seriesInAnalyzer]="seriesInAnalyzer">
 		</lib-category-table-view>
 		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings"
 		[chartStart]="seriesStart" [chartEnd]="seriesEnd" [data]="data.displaySeries"
 		[selectedDataList]="data.selectedDataList" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
 		[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [seriesInAnalyzer]="seriesInAnalyzer"
-		[showSeasonal]="queryParams.sa === 'true'" [hasNonSeasonal]="data.hasNonSeasonal" (updateURLFragment)="updateRoute()">
+		[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" (updateURLFragment)="updateRoute()">
 		</lib-category-charts>
 	</ng-template>
 </div>

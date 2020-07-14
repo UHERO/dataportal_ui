@@ -17,6 +17,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() noSeries;
   @Input() showSeasonal;
   @Input() hasNonSeasonal;
+  @Input() hasSeasonal;
   @Input() nsaActive;
   @Input() yoyActive;
   @Input() ytdActive;
@@ -43,7 +44,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
-          chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasNonSeasonal);
+          chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
           chartSeries.seriesInfo.analyze = this.analyzerService.checkAnalyzer(chartSeries.seriesInfo);
         }

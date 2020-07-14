@@ -116,7 +116,7 @@ export class CategoryHelperService {
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
         this.categoryData[cacheId].series = series;
-        this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
+        this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
         this.categoryData[cacheId].requestComplete = true;
       }
       if (!expandedCategory) {
@@ -236,7 +236,7 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentFreq = results.freqs.find(f => f.freq === freq);
       const displaySeries = this.filterSeriesResults(results.series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
-      this.categoryData[cacheId].hasNonSeasonal = this.findNonSeasonalSeries(displaySeries);
+      this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
       const catWrapper = this.getSearchDates(displaySeries);
       const categoryDateArray = [];
       this.helperService.createDateArray(catWrapper.firstDate, catWrapper.endDate, freq, categoryDateArray);
@@ -268,7 +268,7 @@ export class CategoryHelperService {
       const levelData = res.seriesObservations.transformationResults[0].dates;
       if (levelData) {
         const series = { seriesInfo: { displayName: '' } };
-        res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
+        res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
         series.seriesInfo = res;
         series.seriesInfo.displayName = res.title;
         filtered.push(series);
@@ -277,9 +277,7 @@ export class CategoryHelperService {
     return filtered;
   }
 
-  findNonSeasonalSeries = (categorySeries: Array<any>) => {
-    return categorySeries.some(s => s.seriesInfo.seasonalAdjustment === 'not_seasonally_adjusted');
-  }
+  findSeasonalSeries = (categorySeries: Array<any>) => categorySeries.some(s => s.seriesInfo.seasonalAdjustment === 'seasonally_adjusted');
 
   getDisplaySeries(allSeries) {
     // Check if (non-annual) category has seasonally adjusted data
