@@ -17,6 +17,10 @@ export class AnalyzerService {
     analyzerTableDates: [],
     analyzerSeries: [],
   };
+  public embedData = {
+    analyzerTableDates: [],
+    analyzerSeries: [],
+  };
 
   @Output() public switchYAxes: EventEmitter<any> = new EventEmitter();
 
@@ -67,26 +71,21 @@ export class AnalyzerService {
   }
 
   getAnalyzerEmbedData(aSeries, noCache: boolean) {
-    const embedAnalyzerSeries = {
-      analyzerSeries: []
-    };
+    this.embedData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
-        const seriesData = this.formatSeriesForAnalyzerEmbed(s, aSeries);
-        embedAnalyzerSeries.analyzerSeries.push(seriesData);
+        const seriesData = this.formatSeriesForAnalyzerEmbed(s);
+        s.showInChart = true;
+        this.embedData.analyzerSeries.push(seriesData);
       });
+      this.createEmbedTable(this.embedData.analyzerSeries);
     });
-    return observableForkJoin([observableOf(embedAnalyzerSeries)]);
+    return observableForkJoin([observableOf(this.embedData)]);
   }
 
-  formatSeriesForAnalyzerEmbed = (series, aSeries) => {
-    console.log('aSeries', aSeries);
-    console.log('series', series)
-    let decimals;
-    const aSeriesMatch = aSeries.find(a => a.id === series.id);
-    console.log('aSeriesMatch', aSeriesMatch)
+  formatSeriesForAnalyzerEmbed = (series) => {
     const seriesData = {
       seriesDetail: series,
       currentGeo: {} as Geography,
@@ -118,7 +117,7 @@ export class AnalyzerService {
     seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
     seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
     seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
-    decimals = series.decimals ? series.decimals : 1;
+    const decimals = series.decimals ? series.decimals : 1;
     seriesData.currentGeo = series.geography;
     seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
     seriesData.observations = series.seriesObservations;
@@ -221,6 +220,16 @@ export class AnalyzerService {
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
     });
     this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
+  }
+
+  createEmbedTable = (analyzerSeries) => {
+    analyzerSeries.forEach((aSeries) => {
+      const decimal = aSeries.seriesDetail.decimals;
+      const dateArray = [];
+      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+      aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
+    });
+    this.embedData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
   }
 
   dateComparison = (a, b) => {

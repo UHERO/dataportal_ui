@@ -36,6 +36,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
+  @Input() y0;
+  @Input() y1;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
@@ -100,6 +102,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     let selectedAnalyzerSeries;
     let yAxes;
     let navigatorOptions;
+    console.log('ANALYZER HIGHSTOCK series', this.series)
     if (this.series.length) {
       yAxes = this.setYAxes(this.series);
       navigatorOptions = {
@@ -108,6 +111,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, yAxes, navigatorOptions);
+      console.log('selectedAnalyzerSeries', selectedAnalyzerSeries)
     }
     if (this.chartObject) {
       // Check for series that need to be added or removed from the chart.
@@ -269,20 +273,35 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       yAxis0: [],
       yAxis1: []
     };
-    series.reduce((obj, serie) => {
-      if (!obj.yAxis0.length) {
-        obj.yAxis0.push(serie);
+    console.log('setYAxes', series);
+    if (this.y0 && this.y1) {
+      console.log('y0', this.y0);
+      console.log('y1', this.y1)
+      series.forEach((s) => {
+        if (this.y0.includes(s.seriesDetail.id)) {
+          axisIds.yAxis0.push(s);
+        }
+        if (this.y1.includes(s.seriesDetail.id)) {
+          axisIds.yAxis1.push(s);
+        }
+      });
+    }
+    if (!this.y0 && !this.y1) {
+      series.reduce((obj, serie) => {
+        if (!obj.yAxis0.length) {
+          obj.yAxis0.push(serie);
+          return obj;
+        }
+        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
+        if (serie.seriesDetail.unitsLabelShort === y0Units) {
+          obj.yAxis0.push(serie);
+        }
+        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
+          obj.yAxis1.push(serie);
+        }
         return obj;
-      }
-      const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
-      if (serie.seriesDetail.unitsLabelShort === y0Units) {
-        obj.yAxis0.push(serie);
-      }
-      if (serie.seriesDetail.unitsLabelShort !== y0Units) {
-        obj.yAxis1.push(serie);
-      }
-      return obj;
-    }, axisIds);
+      }, axisIds);
+    }
     const yAxes = Object.keys(axisIds).map((axis, index) => {
       const atLeastOneSeriesVisible = axisIds[axis].find(s => s.showInChart);
       return {
@@ -304,6 +323,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visible: atLeastOneSeriesVisible ? true : false
       };
     });
+    console.log('yAxes', yAxes)
     return yAxes;
   }
 
@@ -376,6 +396,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
+    console.log('init chart series', series)
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;

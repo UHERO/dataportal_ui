@@ -12,9 +12,13 @@ import { AnalyzerService } from '../analyzer.service';
 export class EmbedGraphComponent implements OnInit {
   private seriesId;
   private chartSeries;
+  startDate;
+  endDate;
   seriesData;
   analyzerData;
   portalSettings;
+  y0;
+  y1;
   
   constructor(
     @Inject('portal') public portal,
@@ -33,9 +37,20 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`chartSeries`]) {
         this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: series, showInChart: true }));
       }
+      if (params[`start`]) {
+        this.startDate = params[`start`];
+      }
+      if (params[`end`]) {
+        this.endDate = params[`end`];
+      }
+      if (params[`y0`]) {
+        this.y0 = params[`y0`].split('-');
+      }
+      if (params[`y1`]) {
+        this.y1 = params[`y1`].split('-');
+        console.log(this.y1)
+      }
     });
-    console.log('seriesId', this.seriesId);
-    console.log('chartSeries', this.chartSeries)
     if (this.seriesId) {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
