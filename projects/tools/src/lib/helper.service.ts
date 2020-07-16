@@ -243,7 +243,7 @@ export class HelperService {
       return year;
     }
     if (freq === 'Q') {
-      const m = new Date(date).getMonth();
+      const m = +month;
       if (m >= 0 && m <= 2) {
         return `${year} Q1`;
       }
@@ -258,7 +258,7 @@ export class HelperService {
       }
     }
     if (freq === 'M' || freq === 'S') {
-      return  year + '-' + month;
+      return `${year}-${month}`;
     }
     return date.substr(0, 10);
   }
