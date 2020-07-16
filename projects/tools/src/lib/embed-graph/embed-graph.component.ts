@@ -55,7 +55,7 @@ export class EmbedGraphComponent implements OnInit {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
     if (this.chartSeries) {
-      this.analyzerData = this.analyzerService.getAnalyzerEmbedData(this.chartSeries, true);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, true);
     }
   }
 

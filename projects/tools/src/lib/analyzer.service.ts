@@ -55,99 +55,30 @@ export class AnalyzerService {
     this.updateAnalyzerCount.emit(seriesInfo);
   }
 
-  getAnalyzerData(aSeries, noCache: boolean) {
-    this.analyzerData.analyzerSeries = [];
+  getAnalyzerData(aSeries, noCache: boolean, embed: boolean) {
+    // this.analyzerData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
-        const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
-        this.analyzerData.analyzerSeries.push(seriesData);
+        const showInChart = embed ? true : aSeries.find(a => a.id === s.id).showInChart;
+        const seriesData = this.formatSeriesForAnalyzer(s, showInChart);
+        //this.analyzerData.analyzerSeries.push(seriesData);
+        embed ? this.embedData.analyzerSeries.push(seriesData) : this.analyzerData.analyzerSeries.push(seriesData);
       });
-      this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      this.checkAnalyzerChartSeries();
-    });
-    return observableForkJoin([observableOf(this.analyzerData)]);
-  }
-
-  getAnalyzerEmbedData(aSeries, noCache: boolean) {
-    this.embedData.analyzerSeries = [];
-    const ids = aSeries.map(s => s.id).join();
-    this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
-      const series = results.series;
-      series.forEach((s) => {
-        const seriesData = this.formatSeriesForAnalyzerEmbed(s);
-        s.showInChart = true;
-        this.embedData.analyzerSeries.push(seriesData);
-      });
-      this.createEmbedTable(this.embedData.analyzerSeries);
-    });
-    return observableForkJoin([observableOf(this.embedData)]);
-  }
-
-  formatSeriesForAnalyzerEmbed = (series) => {
-    const seriesData = {
-      seriesDetail: series,
-      currentGeo: {} as Geography,
-      currentFreq: {} as Frequency,
-      chartData: {},
-      displayName: '',
-      chartDisplayName: '',
-      seriesTableData: [],
-      error: null,
-      saParam: false,
-      noData: '',
-      observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-      showInChart: true
-    };
-    const abbreviatedNameDetails = {
-      title: series.title,
-      geography: series.geography.shortName,
-      frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
-    };
-    const chartNameDetails = {
-      title: series.title,
-      geography: series.geography.shortName,
-      frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
-    };
-    seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
-    seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
-    seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
-    const decimals = series.decimals ? series.decimals : 1;
-    seriesData.currentGeo = series.geography;
-    seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
-    seriesData.observations = series.seriesObservations;
-    const levelDates = seriesData.observations.transformationResults[0].dates;
-    const obsStart = seriesData.observations.observationStart;
-    const obsEnd = seriesData.observations.observationEnd;
-    const dateArray = [];
-    if (levelDates) {
-      const pseudoZones = [];
-      const level = seriesData.observations.transformationResults[0].values;
-      if (level.pseudoHistory) {
-        level.pseudoHistory.forEach((obs, index) => {
-          if (obs && !level.pseudoHistory[index + 1]) {
-            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-          }
-        });
+      if (embed) {
+        this.createAnalyzerTable(this.embedData.analyzerSeries, this.embedData)
       }
-      // Use to format dates for table
-      this.helperService.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-      const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray);
-      seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
-    } else {
-      seriesData.noData = 'Data not available';
-    }
-    return seriesData;
+      if (!embed) { 
+        this.createAnalyzerTable(this.analyzerData.analyzerSeries, this.analyzerData)
+        this.checkAnalyzerChartSeries();
+      }
+    });
+    return embed ? observableForkJoin([observableOf(this.embedData)]) : observableForkJoin([observableOf(this.analyzerData)]);
   }
 
-  formatSeriesForAnalyzer = (series, aSeries) => {
-    let decimals;
-    const aSeriesMatch = aSeries.find(a => a.id === series.id);
+  formatSeriesForAnalyzer = (series, showInChart: boolean) => {
+    // const aSeriesMatch = aSeries.find(a => a.id === series.id);
     const seriesData = {
       seriesDetail: series,
       currentGeo: {} as Geography,
@@ -160,7 +91,7 @@ export class AnalyzerService {
       saParam: false,
       noData: '',
       observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-      showInChart: aSeriesMatch.showInChart
+      showInChart: showInChart
     };
     const abbreviatedNameDetails = {
       title: series.title,
@@ -179,7 +110,6 @@ export class AnalyzerService {
     seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
     seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
     seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
-    decimals = series.decimals ? series.decimals : 1;
     seriesData.currentGeo = series.geography;
     seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
     seriesData.observations = series.seriesObservations;
@@ -212,24 +142,14 @@ export class AnalyzerService {
     return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
   }
 
-  createAnalyzerTable = (analyzerSeries) => {
-    analyzerSeries.forEach((aSeries) => {
+  createAnalyzerTable = (series, analyzerData) => {
+    series.forEach((aSeries) => {
       const decimal = aSeries.seriesDetail.decimals;
       const dateArray = [];
       this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
     });
-    this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
-  }
-
-  createEmbedTable = (analyzerSeries) => {
-    analyzerSeries.forEach((aSeries) => {
-      const decimal = aSeries.seriesDetail.decimals;
-      const dateArray = [];
-      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
-      aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
-    });
-    this.embedData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
+    analyzerData.analyzerTableDates = this.createAnalyzerTableDates(series);
   }
 
   dateComparison = (a, b) => {

@@ -70,7 +70,8 @@ export class AnalyzerComponent implements OnInit {
     }
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     if (this.analyzerService.analyzerSeries.length) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache);
+      console.log('ANALYZERSERVICE ANALYZER SERIES', this.analyzerService.analyzerSeries)
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, false);
     }
   }
 

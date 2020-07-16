@@ -278,10 +278,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       console.log('y0', this.y0);
       console.log('y1', this.y1)
       series.forEach((s) => {
-        if (this.y0.includes(s.seriesDetail.id)) {
+        if (this.y0.includes(s.seriesDetail.id.toString())) {
           axisIds.yAxis0.push(s);
         }
-        if (this.y1.includes(s.seriesDetail.id)) {
+        if (this.y1.includes(s.seriesDetail.id.toString())) {
           axisIds.yAxis1.push(s);
         }
       });
