@@ -22,6 +22,10 @@ export class AnalyzerComponent implements OnInit {
   tooltipUnits;
   tooltipGeo;
   analyzerData;
+  y0;
+  y1;
+  y0Series;
+  y1Series;
 
   constructor(
     @Inject('portal') private portal,
@@ -63,6 +67,12 @@ export class AnalyzerComponent implements OnInit {
         if (params[`c5ma`]) {
           this.tableC5ma = (params[`c5ma`] === 'true');
         }
+        if (params[`y0`]) {
+          this.y0Series = params[`y0`];
+        }
+        if (params[`y1`]) {
+          this.y1Series = params[`y1`];
+        }
         if (params[`nocache`]) {
           this.noCache = params[`nocache`] === 'true';
         }
@@ -71,7 +81,7 @@ export class AnalyzerComponent implements OnInit {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     if (this.analyzerService.analyzerSeries.length) {
       console.log('ANALYZERSERVICE ANALYZER SERIES', this.analyzerService.analyzerSeries)
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, false);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
     }
   }
 
@@ -97,6 +107,11 @@ export class AnalyzerComponent implements OnInit {
   setTableDates(e) {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
+  }
+
+  setYAxesSeries(e) {
+    this.y0 = e.y0.map(s => s.toString()).join('-');
+    this.y1 = e.y1.map(s => s.toString()).join('-');
   }
 
   checkTooltip(e) {

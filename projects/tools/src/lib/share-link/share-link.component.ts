@@ -23,7 +23,8 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   @Input() yoy;
   @Input() ytd;
   @Input() c5ma;
-
+  @Input() y0;
+  @Input() y1;
   // Series view params
   private id;
   private geo;
@@ -48,6 +49,8 @@ export class ShareLinkComponent implements OnInit, OnChanges {
         this.freq = params[`freq`] ? params[`freq`] : null;
         this.sa = params[`sa`] ? params[`sa`] : null;
         this.seriesCat = params[`seriesCat`] ? params[`seriesCat`] : null;
+        this.y0 = params[`y0`] ? params[`y0`] : null;
+        this.y1 = params[`y1`] ? params[`y1`] : null;
         this.shareLink = this.createSeriesShareLink();
       });
     }
@@ -92,6 +95,8 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     seriesUrl += this.yoy ? '&yoy=' + this.yoy : '';
     seriesUrl += this.ytd ? '&ytd=' + this.ytd : '';
     seriesUrl += this.c5ma ? '&c5ma=' + this.c5ma : '';
+    seriesUrl += this.y0 ? `&y0=${this.y0}` : '';
+    seriesUrl += this.y1 ? `&y1=${this.y1}` : '';
     return seriesUrl;
   }
 
