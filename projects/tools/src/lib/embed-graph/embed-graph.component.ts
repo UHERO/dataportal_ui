@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
@@ -35,7 +35,7 @@ export class EmbedGraphComponent implements OnInit {
         this.seriesId = Number(params[`id`]);
       }
       if (params[`chartSeries`]) {
-        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: series, showInChart: true }));
+        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, showInChart: true }));
       }
       if (params[`start`]) {
         this.startDate = params[`start`];
@@ -44,10 +44,10 @@ export class EmbedGraphComponent implements OnInit {
         this.endDate = params[`end`];
       }
       if (params[`y0`]) {
-        this.y0 = params[`y0`].split('-');
+        this.y0 = params[`y0`]//.split('-');
       }
       if (params[`y1`]) {
-        this.y1 = params[`y1`].split('-');
+        this.y1 = params[`y1`]//.split('-');
         console.log(this.y1)
       }
     });
@@ -55,8 +55,19 @@ export class EmbedGraphComponent implements OnInit {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
     if (this.chartSeries) {
-      //this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y0, this.y1);
     }
+  }
+
+  ngOnDestroy() {
+    this.analyzerService.analyzerData = {
+      analyzerTableDates: [],
+      analyzerSeries: [],
+      yAxes: [],
+      highstockSeriesOptions: [],
+      y0Series: null,
+      y1Series: null
+    };
   }
 
 }

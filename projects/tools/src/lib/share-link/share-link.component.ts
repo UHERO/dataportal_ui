@@ -1,6 +1,7 @@
 import { Component, OnInit, OnChanges, Input, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ClipboardService } from '../clipboard.service';
+import { AnalyzerService } from '../analyzer.service';
 
 @Component({
   selector: 'lib-share-link',
@@ -39,6 +40,7 @@ export class ShareLinkComponent implements OnInit, OnChanges {
     @Inject('environment') private environment,
     private route: ActivatedRoute,
     private clipboard: ClipboardService,
+    private analyzerService: AnalyzerService
   ) { }
 
   ngOnInit() {
@@ -78,6 +80,7 @@ export class ShareLinkComponent implements OnInit, OnChanges {
   getAnalyzerParams(start, end, seriesUrl) {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
+    console.log('SHARE LINK', this.analyzerService.analyzerData)
     if (this.analyzerSeries.length) {
       const chartSeries = this.analyzerSeries.filter(s => s.showInChart);
       this.analyzerSeries.forEach((series, index) => {

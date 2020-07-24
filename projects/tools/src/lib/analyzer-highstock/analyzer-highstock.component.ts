@@ -114,7 +114,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         dateStart: this.allDates[0].date,
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
-      selectedAnalyzerSeries = this.seriesOptions;//this.formatSeriesData(this.series, this.allDates, yAxes);
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, this.yAxes)//this.seriesOptions;
       console.log('selectedAnalyzerSeries', selectedAnalyzerSeries)
     }
     if (this.chartObject) {
@@ -247,10 +247,64 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       }
     });
     this.yAxesSeries.emit({ y0: y0, y1: y1 });
-    console.log('y0', y0);
-    console.log('y1', y1)
-    console.log('switch yAxes', yAxes);
-    console.log('switchYAxis chartObject', chartObject)
+  }
+
+  formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>) => {
+    console.log('FORMAT SERIES DATA', yAxes);
+    const chartSeries = series.map((serie) => {
+      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
+      return {
+        className: serie.seriesDetail.id,
+        name: serie.chartDisplayName,
+        tooltipName: serie.seriesDetail.title,
+        data: serie.chartData.level,
+        yAxis: axis ? axis.id : null,
+        decimals: serie.seriesDetail.decimals,
+        frequency: serie.seriesDetail.frequencyShort,
+        geography: serie.seriesDetail.geography.name,
+        includeInDataExport: serie.showInChart ? true : false,
+        showInLegend: serie.showInChart ? true : false,
+        showInNavigator: false,
+        events: {
+          legendItemClick() {
+            return false;
+          }
+        },
+        unitsLabelShort: serie.seriesDetail.unitsLabelShort,
+        seasonallyAdjusted: serie.seriesDetail.seasonalAdjustment === 'seasonally_adjusted',
+        dataGrouping: {
+          enabled: false
+        },
+        pseudoZones: serie.chartData.pseudoZones,
+        visible: serie.showInChart ? true : false
+      };
+    });
+    chartSeries.push({
+      className: 'navigator',
+      data: dates.map(d => [Date.parse(d.date), null]),
+      decimals: null,
+      tooltipName: '',
+      frequency: null,
+      geography: null,
+      yAxis: 'yAxis0',
+      dataGrouping: {
+        enabled: false
+      },
+      showInLegend: false,
+      showInNavigator: true,
+      includeInDataExport: false,
+      name: 'Navigator',
+      events: {
+        legendItemClick() {
+          return false;
+        }
+      },
+      unitsLabelShort: null,
+      seasonallyAdjusted: null,
+      pseudoZones: null,
+      visible: true
+    });
+    return chartSeries;
   }
 
   swapAllSeriesAndAxes(visibleUnits: Array<any>, chartObject, yAxes: Array<any>) {

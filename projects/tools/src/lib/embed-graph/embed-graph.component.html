@@ -5,6 +5,6 @@
 </ng-template>
 <ng-template ngFor let-data [ngForOf]="analyzerData | async">
 <lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [allDates]="data.analyzerTableDates"
-  [series]="data.analyzerSeries" [start]="startDate" [end]="endDate"
+  [series]="data.analyzerSeries" [yAxes]="data.yAxes" [start]="startDate" [end]="endDate"
   [nameChecked]="true" [unitsChecked]="true" [geoChecked]="true" [y0]="y0" [y1]="y1"></lib-analyzer-highstock>
 </ng-template>
