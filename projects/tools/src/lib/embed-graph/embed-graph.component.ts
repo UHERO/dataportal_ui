@@ -19,6 +19,9 @@ export class EmbedGraphComponent implements OnInit {
   portalSettings;
   y0;
   y1;
+  tooltipGeo: boolean = true;
+  tooltipName: boolean = true;
+  tooltipUnits: boolean = true;
   
   constructor(
     @Inject('portal') public portal,
@@ -70,4 +73,15 @@ export class EmbedGraphComponent implements OnInit {
     };
   }
 
+  checkTooltip(e) {
+    if (e.label === 'name') {
+      this.tooltipName = e.value;
+    }
+    if (e.label === 'units') {
+      this.tooltipUnits = e.value;
+    }
+    if (e.label === 'geo') {
+      this.tooltipGeo = e.value;
+    }
+  }
 }

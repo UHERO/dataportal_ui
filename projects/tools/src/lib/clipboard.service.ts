@@ -13,7 +13,25 @@ export class ClipboardService {
   }
 
   public copy(value: string) {
-    const promise = new Promise((resolve, reject) => {
+    console.log('copy value', value);
+    //let textarea = null;
+    // a selection is needed in order to copy to clipboard
+        // create a textarea to select text to be copied
+        const textarea = this.dom.createElement('textarea');
+        textarea.style.height = '0px';
+        textarea.style.left = '-100px';
+        textarea.style.opacity = '0';
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-100px';
+        textarea.style.width = '0px';
+        this.dom.body.appendChild(textarea);
+        textarea.value = value;
+        textarea.select();
+        console.log('textarea', textarea.value)
+        // copy value to clipboard
+        this.dom.execCommand('copy');
+        //resolve(value);
+    /* const promise = new Promise((resolve, reject) => {
       let textarea = null;
       try {
         // a selection is needed in order to copy to clipboard
@@ -28,6 +46,7 @@ export class ClipboardService {
         this.dom.body.appendChild(textarea);
         textarea.value = value;
         textarea.select();
+        console.log('textarea', textarea.value)
         // copy value to clipboard
         this.dom.execCommand('copy');
         resolve(value);
@@ -37,6 +56,7 @@ export class ClipboardService {
         }
       }
     });
-    return(promise);
+    console.log('promise', promise)
+    return(promise); */
   }
 }

@@ -1,7 +1,7 @@
 <div class="analyzer-view col-xs-12 col-xl-11">
   <h3>Analyzer</h3>
   <ng-template ngFor let-data [ngForOf]="analyzerData | async">
-    <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries"
+    <lib-share-link *ngIf="data.analyzerSeries.length" [embedCode]="embedCode" [shareLink]="analyzerShareLink" [analyzerSeries]="data.analyzerSeries"
       [view]="'analyzer'" [name]="tooltipName" [units]="tooltipUnits" [geography]="tooltipGeo" [yoy]="tableYoy" [ytd]="tableYtd"
       [c5ma]="tableC5ma" [startDate]="minDate" [endDate]="maxDate" [y0]="y0" [y1]="y1"></lib-share-link>
     <lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [allDates]="data.analyzerTableDates"

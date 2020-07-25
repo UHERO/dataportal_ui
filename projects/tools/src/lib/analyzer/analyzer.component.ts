@@ -26,8 +26,11 @@ export class AnalyzerComponent implements OnInit {
   y1;
   y0Series;
   y1Series;
+  analyzerShareLink: string;
+  embedCode: string;
 
   constructor(
+    @Inject('environment') private environment,
     @Inject('portal') private portal,
     private analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
@@ -80,8 +83,10 @@ export class AnalyzerComponent implements OnInit {
     }
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
     if (this.analyzerService.analyzerSeries.length) {
-      console.log('ANALYZERSERVICE ANALYZER SERIES', this.analyzerService.analyzerSeries)
       this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
+      this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+      console.log('embedsnippet', this.formatEmbedSnippet(this.minDate, this.maxDate))
+      this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
     }
   }
 
@@ -107,11 +112,15 @@ export class AnalyzerComponent implements OnInit {
   setTableDates(e) {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   setYAxesSeries(e) {
     this.y0 = e.y0.map(s => s.toString()).join('-');
     this.y1 = e.y1.map(s => s.toString()).join('-');
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   checkTooltip(e) {
@@ -124,6 +133,8 @@ export class AnalyzerComponent implements OnInit {
     if (e.label === 'geo') {
       this.tooltipGeo = e.value;
     }
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   checkTransforms(e) {
@@ -136,5 +147,53 @@ export class AnalyzerComponent implements OnInit {
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
     }
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+  }
+
+  formatShareLink = (start: string, end: string) => this.environment[`portalUrl`] + this.getAnalyzerParams(start, end, '/analyzer');
+
+  getAnalyzerParams(start, end, seriesUrl) {
+    let aSeries = '?analyzerSeries=';
+    let cSeries = '&chartSeries=';
+    if (this.analyzerService.analyzerSeries.length) {
+      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
+      this.analyzerService.analyzerData.analyzerSeries.forEach((series, index) => {
+        aSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
+      });
+      chartSeries.forEach((series, index) => {
+        cSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
+      });
+    }
+    seriesUrl += aSeries + cSeries;
+    seriesUrl += `&start=${start}&end=${end}`;
+    seriesUrl += this.tooltipName ? `&name=${this.tooltipName}` : '';
+    seriesUrl += this.tooltipUnits ? `&units${this.tooltipUnits}` : '';
+    seriesUrl += this.tooltipGeo ? `&geography=${this.tooltipGeo}` : '';
+    seriesUrl += this.tableYoy ? `&yoy=${this.tableYoy}` : '';
+    seriesUrl += this.tableYtd ? `&ytd=${this.tableYtd}` : '';
+    seriesUrl += this.tableC5ma ? `&c5ma=${this.tableC5ma}` : '';
+    seriesUrl += this.y0 ? `&y0=${this.y0}` : '';
+    seriesUrl += this.y1 ? `&y1=${this.y1}` : '';
+    return seriesUrl;
+  }
+
+  formatEmbedSnippet(start: string, end: string) {
+    let cSeries = '';
+    if (this.analyzerService.analyzerSeries.length) {
+      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
+      console.log('chartSeries', chartSeries)
+      chartSeries.forEach((series, index) => {
+        cSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
+      });
+    }
+    let params = `?chartSeries=${cSeries}`;
+    if (start) {
+      params += `&start=${start}`;
+    }
+    if (end) {
+      params += `&end=${end}`;
+    }
+    return `<iframe src="${this.environment[`portalUrl`]}/graph${params}"></iframe>`
   }
 }
