@@ -60,35 +60,9 @@ export class AnalyzerService {
     this.updateAnalyzerCount.emit(seriesInfo);
   }
 
-  /* getAnalyzerData(aSeries, noCache: boolean, embed: boolean) {
-    // this.analyzerData.analyzerSeries = [];
-    const ids = aSeries.map(s => s.id).join();
-    this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
-      const series = results.series;
-      series.forEach((s) => {
-        //const showInChart = embed ? true : aSeries.find(a => a.id === s.id).showInChart;
-        const seriesData = this.formatSeriesForAnalyzer(s, showInChart);
-        //this.analyzerData.analyzerSeries.push(seriesData);
-        embed ? this.embedData.analyzerSeries.push(seriesData) : this.analyzerData.analyzerSeries.push(seriesData);
-      });
-      if (embed) {
-        this.createAnalyzerTable(this.embedData.analyzerSeries, this.embedData)
-      }
-      if (!embed) { 
-        this.createAnalyzerTable(this.analyzerData.analyzerSeries, this.analyzerData);
-        this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries);
-        console.log('analyzerData yAxes', this.analyzerData.yAxes)
-        this.checkAnalyzerChartSeries();
-      }
-    });
-    return embed ? observableForkJoin([observableOf(this.embedData)]) : observableForkJoin([observableOf(this.analyzerData)]);
-  } */
-
   getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
     this.analyzerData.analyzerSeries = [];
-    console.log('ASERIES', aSeries)
     const ids = aSeries.map(s => s.id).join();
-    console.log('ids', ids)
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       series.forEach((s) => {
@@ -98,17 +72,13 @@ export class AnalyzerService {
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
       this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, y0Series, y1Series);
-      console.log('Y0SERIES', y0Series)
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
-      console.log('ANALYZER DATA', this.analyzerData)
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
-    console.log('FORMAT SERIES', series);
-    console.log('FORMAT aSERIES', aSeries)
     const aSeriesMatch = aSeries.find(a => a.id === series.id);
     const seriesData = {
       seriesDetail: series,
@@ -172,16 +142,6 @@ export class AnalyzerService {
     const freqs = series.map((s) => s.currentFreq.freq);
     return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
   }
-
-  /* createAnalyzerTable = (series, analyzerData) => {
-    series.forEach((aSeries) => {
-      const decimal = aSeries.seriesDetail.decimals;
-      const dateArray = [];
-      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
-      aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
-    });
-    analyzerData.analyzerTableDates = this.createAnalyzerTableDates(series);
-  } */
 
   createAnalyzerTable = (analyzerSeries) => {
     analyzerSeries.forEach((aSeries) => {
@@ -333,7 +293,6 @@ export class AnalyzerService {
         visible: visibleSeries ? true : false
       };
     });
-    console.log('yAxes', yAxes)
     return yAxes;
   }
 }

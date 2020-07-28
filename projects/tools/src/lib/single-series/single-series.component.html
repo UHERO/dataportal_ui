@@ -15,7 +15,7 @@
       [(selectedFreq)]="data.currentFreq"
       (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)"
       class="freq-selector"></lib-freq-selector>
-    <lib-share-link [view]="'series'" [shareLink]="seriesShareLink" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
+    <lib-share-link [view]="'series'" [embedCode]="seriesEmbedCode" [shareLink]="seriesShareLink" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"

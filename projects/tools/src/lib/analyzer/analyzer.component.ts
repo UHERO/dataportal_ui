@@ -85,7 +85,6 @@ export class AnalyzerComponent implements OnInit {
     if (this.analyzerService.analyzerSeries.length) {
       this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
       this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-      console.log('embedsnippet', this.formatEmbedSnippet(this.minDate, this.maxDate))
       this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
     }
   }
@@ -182,7 +181,6 @@ export class AnalyzerComponent implements OnInit {
     let cSeries = '';
     if (this.analyzerService.analyzerSeries.length) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
-      console.log('chartSeries', chartSeries)
       chartSeries.forEach((series, index) => {
         cSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
       });
@@ -194,6 +192,7 @@ export class AnalyzerComponent implements OnInit {
     if (end) {
       params += `&end=${end}`;
     }
-    return `<iframe src="${this.environment[`portalUrl`]}/graph${params}"></iframe>`
+    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;">
+      <iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params}" scrolling="no"></iframe></div>`;
   }
 }

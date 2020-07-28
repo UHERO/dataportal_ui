@@ -105,7 +105,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     let selectedAnalyzerSeries;
     let yAxes;
     let navigatorOptions;
-    console.log('ANALYZER HIGHSTOCK series', this.series)
     if (this.series.length) {
       //yAxes = this.setYAxes(this.series);
       yAxes = this.yAxes;
@@ -114,8 +113,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         dateStart: this.allDates[0].date,
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
-      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, this.yAxes)//this.seriesOptions;
-      console.log('selectedAnalyzerSeries', selectedAnalyzerSeries)
+      selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, this.yAxes);
     }
     if (this.chartObject) {
       // Check for series that need to be added or removed from the chart.
@@ -188,7 +186,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   switchYAxes(data: any, chartObject) {
-    console.log('switchYAxes data', data);
     const yAxes = chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
     const series = chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
     const y0 = [];
@@ -250,7 +247,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>) => {
-    console.log('FORMAT SERIES DATA', yAxes);
     const chartSeries = series.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       return {
@@ -363,7 +359,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
-    console.log('init chart series', series)
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;

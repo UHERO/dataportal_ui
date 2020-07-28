@@ -1,30 +1,42 @@
-.share {
-  //display: inline-block;
-  margin-left: 5px;
-  vertical-align: middle;
-
-  span.input-group-addon {
-    background-color: #FAFAFB;
-    border: 1px solid #CED4DA;
-    border-right: 0;
-    border-radius: 0.25em;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    cursor: pointer;
-    padding: 0.175rem;
-    height: calc(1.75rem - 2px);
-
-    .share-link {
-        font-size: 16px;
-        line-height: 1;
-        vertical-align: baseline;
-      }
+#shareModal{
+  .modal-title {
+    font-weight: bold;
+    color: #505050;
   }
 
-  input.form-control {
-    font-size: 0.85em;
-    height: calc(1.75rem - 2px);
-    padding: 0.175rem;
-    z-index: unset;
+  .share {
+    margin-bottom: 1rem;
+    vertical-align: middle;
+
+    span {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #505050;
+    }
+  
+    span.input-group-addon {
+      background-color: #FAFAFB;
+      border: 1px solid #CED4DA;
+      border-right: 0;
+      border-radius: 0.25em;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      cursor: pointer;
+      padding: 0.175rem;
+      height: calc(1.75rem - 2px);
+  
+      .share-link {
+          font-size: 16px;
+          line-height: 1;
+          vertical-align: baseline;
+        }
+    }
+  
+    input.form-control {
+      font-size: 0.85em;
+      height: calc(1.75rem - 2px);
+      padding: 0.175rem;
+      z-index: unset;
+    }
   }
 }

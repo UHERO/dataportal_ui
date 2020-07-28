@@ -13,6 +13,7 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
 export class AppComponent implements OnInit {
   private isBrowser;
   private sub;
+  displayBrowserAlert: boolean = true;
   viewFullUI: boolean = true;
 
   constructor(
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit {
           $('.browser').hide();
         }, 5000);
       } else {
+        this.displayBrowserAlert = false;
         $('.browser').hide();
       }
     }

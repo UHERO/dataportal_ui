@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { ClipboardService } from '../clipboard.service';
 
 @Component({
   selector: 'lib-share-link',
@@ -27,19 +26,16 @@ export class ShareLinkComponent {
   @Input() shareLink: string;
   @Input() embedCode: string;
 
-  constructor(
-    private clipboard: ClipboardService
-  ) { }
+  constructor() { }
 
   copyLink(inputValue) {
-    $('.share-link').attr('title', 'Link Copied');
-    // this.clipboard.copy(linkUrl);
+    $('.share-link').attr('title', 'Copied');
     inputValue.select();
     document.execCommand('copy');
     inputValue.setSelectionRange(0, 0);
     setTimeout(() => {
       // Reset share link title
-      $('.share-link').attr('title', 'Copy Link');
+      $('.share-link').attr('title', 'Copy');
     }, 3000);
   }
 }

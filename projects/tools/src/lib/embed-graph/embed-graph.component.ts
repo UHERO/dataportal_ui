@@ -10,15 +10,15 @@ import { AnalyzerService } from '../analyzer.service';
   styleUrls: ['./embed-graph.component.scss']
 })
 export class EmbedGraphComponent implements OnInit {
-  private seriesId;
-  private chartSeries;
-  startDate;
-  endDate;
-  seriesData;
-  analyzerData;
-  portalSettings;
-  y0;
-  y1;
+  private seriesId: number;
+  private chartSeries: string;
+  startDate: string;
+  endDate: string;
+  seriesData: any;
+  analyzerData: any;
+  portalSettings: any;
+  y0: string;
+  y1: string;
   tooltipGeo: boolean = true;
   tooltipName: boolean = true;
   tooltipUnits: boolean = true;
@@ -47,11 +47,10 @@ export class EmbedGraphComponent implements OnInit {
         this.endDate = params[`end`];
       }
       if (params[`y0`]) {
-        this.y0 = params[`y0`]//.split('-');
+        this.y0 = params[`y0`];
       }
       if (params[`y1`]) {
-        this.y1 = params[`y1`]//.split('-');
-        console.log(this.y1)
+        this.y1 = params[`y1`];
       }
     });
     if (this.seriesId) {
