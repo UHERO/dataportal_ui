@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './tools.models';
 import { Geography } from './tools.models';
+import * as Highcharts from 'highcharts/highstock';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,14 @@ export class AnalyzerService {
   private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeries.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
   public analyzerData = {
+    analyzerTableDates: [],
+    analyzerSeries: [],
+    yAxes: [],
+    highstockSeriesOptions: [],
+    y0Series: null,
+    y1Series: null
+  };
+  public embedData = {
     analyzerTableDates: [],
     analyzerSeries: [],
   };
@@ -51,7 +60,7 @@ export class AnalyzerService {
     this.updateAnalyzerCount.emit(seriesInfo);
   }
 
-  getAnalyzerData(aSeries, noCache: boolean) {
+  getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
     this.analyzerData.analyzerSeries = [];
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
@@ -62,12 +71,14 @@ export class AnalyzerService {
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
+      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, y0Series, y1Series);
+      this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
+      this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
-    let decimals;
     const aSeriesMatch = aSeries.find(a => a.id === series.id);
     const seriesData = {
       seriesDetail: series,
@@ -100,7 +111,6 @@ export class AnalyzerService {
     seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
     seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
     seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
-    decimals = series.decimals ? series.decimals : 1;
     seriesData.currentGeo = series.geography;
     seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
     seriesData.observations = series.seriesObservations;
@@ -220,12 +230,69 @@ export class AnalyzerService {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
       this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
+      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, this.analyzerData.y0Series, this.analyzerData.y1Series);
       this.analyzerSeriesCount.next(this.analyzerSeries.length);
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });
       this.analyzerSeriesCount.next(this.analyzerSeries.length);
       this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
+      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, this.analyzerData.y0Series, this.analyzerData.y1Series);
     }
+  }
+
+  setYAxes = (series, y0Series, y1Series) => {
+    // Group series by their units
+    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
+    const axisIds = {
+      yAxis0: [],
+      yAxis1: []
+    };
+    series.reduce((obj, serie) => {
+      if (y0Series && y0Series.includes(serie.seriesDetail.id)) {
+        obj.yAxis0.push(serie);
+        return obj;
+      }
+      if (y1Series && y1Series.includes(serie.seriesDetail.id)) {
+        obj.yAxis1.push(serie);
+        return obj;
+      }
+      if (!y0Series || !y1Series) {
+        if (!obj.yAxis0.length) {
+          obj.yAxis0.push(serie);
+          return obj;
+        }
+        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
+        if (serie.seriesDetail.unitsLabelShort === y0Units) {
+          obj.yAxis0.push(serie);
+        }
+        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
+          obj.yAxis1.push(serie);
+        }
+        return obj;
+      }
+    }, axisIds);
+    const yAxes = Object.keys(axisIds).map((axis, index) => {
+      const visibleSeries = axisIds[axis].find(s => s.showInChart);
+      return {
+        labels: {
+          formatter() {
+            return Highcharts.numberFormat(this.value, 2, '.', ',');
+          }
+        },
+        id: axis,
+        title: {
+          text: visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
+        },
+        opposite: index === 0 ? false : true,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01,
+        showEmpty: false,
+        series: axisIds[axis],
+        visible: visibleSeries ? true : false
+      };
+    });
+    return yAxes;
   }
 }

@@ -5,6 +5,7 @@ import { LandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
 import { UheroHelpComponent } from './uhero-help/uhero-help.component';
+import { EmbedGraphComponent } from 'tools';
 
 const routes: Routes = [
   // map / to the landing page
@@ -31,6 +32,10 @@ const routes: Routes = [
   {
     path: 'help',
     component: UheroHelpComponent
+  },
+  {
+    path: 'graph',
+    component: EmbedGraphComponent
   }
 ];
 

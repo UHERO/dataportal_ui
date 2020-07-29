@@ -4,6 +4,7 @@ import { MeasurementLandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
 import { NtaHelpComponent } from './nta-help/nta-help.component';
+import { EmbedGraphComponent } from 'tools';
 
 const routes: Routes = [
   // map / to the landing page
@@ -30,6 +31,10 @@ const routes: Routes = [
   {
     path: 'help',
     component: NtaHelpComponent
+  },
+  {
+    path: 'graph',
+    component: EmbedGraphComponent
   }
 ];
 

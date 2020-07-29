@@ -15,7 +15,7 @@
       [(selectedFreq)]="data.currentFreq"
       (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)"
       class="freq-selector"></lib-freq-selector>
-    <lib-share-link [view]="'series'" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
+    <lib-share-link [view]="'series'" [embedCode]="seriesEmbedCode" [shareLink]="seriesShareLink" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
@@ -28,7 +28,7 @@
     <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"
       [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [currentFreq]="data.currentFreq"
       [currentGeo]="data.currentGeo" (chartExtremes)="updateChartExtremes($event)"
-      (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.currentFreq, data.chartData)">
+      (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.chartData)">
     </lib-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
       {{data.seriesDetail.source_description}}<br><a href="{{data.seriesDetail.source_link}}"

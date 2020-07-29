@@ -44,21 +44,21 @@
 						(change)="toggleSASeries($event)">Seasonally Adjusted
 				</label>
 				<lib-date-slider *ngIf="data.displaySeries" class="sliders" [portalSettings]="portalSettings"
-					[dates]="data.categoryDates" [dateFrom]="seriesStart ? seriesStart : null"
-					[dateTo]="seriesEnd ? seriesEnd: null" [freq]="data.currentFreq?.freq"
+					[dates]="data.categoryDates" [dateFrom]="routeStart ? routeStart : null"
+					[dateTo]="routeEnd ? routeEnd: null" [freq]="data.currentFreq?.freq"
 					(updateRange)="changeRange($event)"></lib-date-slider>
 			</div>
 		</ng-template>
 		<i *ngIf="!search && !data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<lib-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
-		[dates]="data.categoryDates" [tableStart]="seriesStart" [tableEnd]="seriesEnd"
+		[dates]="data.categoryDates" [tableStart]="routeStart" [tableEnd]="routeEnd"
 		[selectedCategory]="data.selectedCategory" [selectedDataList]="data.selectedDataList" [data]="data.displaySeries"
 		[geo]="data.currentGeo" [freq]="data.currentFreq?.freq" [freqLabel]="data.currentFreq?.label"
 		[yoyActive]="queryParams.yoy === 'true'" [ytdActive]="queryParams.ytd === 'true'" [noSeries]="data.noData"
 		[params]="queryParams" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [seriesInAnalyzer]="seriesInAnalyzer">
 		</lib-category-table-view>
 		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [portalSettings]="portalSettings"
-		[chartStart]="seriesStart" [chartEnd]="seriesEnd" [data]="data.displaySeries"
+		[chartStart]="routeStart" [chartEnd]="routeEnd" [data]="data.displaySeries"
 		[selectedDataList]="data.selectedDataList" [dateWrapper]="data.categoryDateWrapper" [dates]="data.categoryDates"
 		[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [seriesInAnalyzer]="seriesInAnalyzer"
 		[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" (updateURLFragment)="updateRoute()">

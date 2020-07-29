@@ -11,3 +11,4 @@ export * from './lib/landing-page/landing-page.component';
 export * from './lib/single-series/single-series.component';
 export * from './lib/analyzer/analyzer.component';
 export * from './lib/measurement-landing-page/measurement-landing-page.component';
+export * from './lib/embed-graph/embed-graph.component';

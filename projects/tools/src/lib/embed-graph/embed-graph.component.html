@@ -1,0 +1,11 @@
+<ng-template ngFor let-data [ngForOf]="seriesData | async">
+  <lib-highstock *ngIf="!data.noData" [portalSettings]="portalSettings"
+  [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [currentFreq]="data.currentFreq"
+  [currentGeo]="data.currentGeo" [showTitle]="true" [start]="startDate" [end]="endDate"></lib-highstock>
+</ng-template>
+<ng-template ngFor let-data [ngForOf]="analyzerData | async">
+<div><lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [allDates]="data.analyzerTableDates"
+  [series]="data.analyzerSeries" [yAxes]="data.yAxes" [start]="startDate" [end]="endDate"
+  [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" (tooltipOptions)="checkTooltip($event)"></lib-analyzer-highstock>
+</div>
+</ng-template>

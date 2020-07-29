@@ -28,8 +28,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private routeYtd;
   private routeSa;
   private noCache: boolean;
-  private routeStart;
-  private routeEnd;
+  routeStart;
+  routeEnd;
   search = false;
   queryParams: any = {};
   private tableStart;
@@ -177,9 +177,12 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   changeRange(e) {
-    this.seriesStart = e.seriesStart;
-    this.seriesEnd = e.endOfSample ? null : e.seriesEnd;
+    this.routeStart = e.seriesStart;
+    this.routeEnd = e.endOfSample ? null : e.seriesEnd;
     this.displaySeries = true;
+    this.queryParams.start = this.routeStart;
+    this.queryParams.end = this.routeEnd;
+    this.updateRoute();
   }
 
   updateRoute() {

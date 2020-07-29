@@ -32,6 +32,7 @@ import { AnalyzerStatsRendererComponent } from './analyzer-stats-renderer/analyz
 import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyzer-table-renderer.component';
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
+import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MeasurementSelectorComponent } from './measurement-selector/measurement
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
+    EmbedGraphComponent,
   ],
   imports: [
     CommonModule,

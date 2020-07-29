@@ -220,6 +220,10 @@ export interface HighstockObject {
     }
   };
   series: Array<any>;
+  title?: {
+    text: string,
+    align: string
+  }
 }
 
 export interface Series {

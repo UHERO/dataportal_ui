@@ -12,6 +12,8 @@ declare var gtag: (str: string, gaId: string, path: object) => void;
 })
 export class AppComponent implements OnInit {
   private isBrowser;
+  displayBrowserAlert: boolean = true;
+  viewFullUI: boolean = true;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
@@ -23,6 +25,7 @@ export class AppComponent implements OnInit {
     if (this.isBrowser) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
+          this.viewFullUI = !event.url.includes('/graph');
           gtag('config', this.gaId, { page_path: event.urlAfterRedirects });
         }
       });
@@ -37,6 +40,7 @@ export class AppComponent implements OnInit {
           $('.browser').hide();
         }, 5000);
       } else {
+        this.displayBrowserAlert = false;
         $('.browser').hide();
       }
     }
