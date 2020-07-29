@@ -4,6 +4,7 @@ import { LandingPageComponent } from 'tools';
 import { SingleSeriesComponent } from 'tools';
 import { AnalyzerComponent } from 'tools';
 import { CohHelpComponent } from './coh-help/coh-help.component';
+import { EmbedGraphComponent } from 'tools';
 
 const routes: Routes = [
   // map / to the landing page
@@ -31,6 +32,10 @@ const routes: Routes = [
     path: 'help',
     component: CohHelpComponent,
   },
+  {
+    path: 'graph',
+    component: EmbedGraphComponent
+  }
 ];
 
 @NgModule({

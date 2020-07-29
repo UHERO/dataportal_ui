@@ -213,6 +213,11 @@ export class HighstockComponent implements OnChanges {
           if (!this.chartObject || this.chartObject.series.length < 4) {
             this.chartObject = Object.assign({}, this);
           }
+        },
+        load() {
+          if (logo.analyticsLogoSrc) {
+            this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
+          }
         }
       },
       styledMode: true,
@@ -222,7 +227,7 @@ export class HighstockComponent implements OnChanges {
       selected: null,
       buttons: chartButtons,
       buttonPosition: {
-        x: 0,
+        x: 20,
         y: 0
       },
       labelStyle: { visibility: 'hidden' },
@@ -310,7 +315,7 @@ export class HighstockComponent implements OnChanges {
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             chartExtremes.emit({
-              minDate: this._extremes.min,
+              minDate: freq.freq === 'A' ? this._extremes.min.substr(0, 4) : this._extremes.min,
               maxDate: freq.freq === 'A' ? this._extremes.max.substr(0, 4) : this._extremes.max,
               endOfSample: lastDate === this._extremes.max ? true : false
             });
@@ -367,7 +372,7 @@ export class HighstockComponent implements OnChanges {
     this.chartOptions.series = series;
     this.chartOptions.title = {
       text: this.showTitle ? `${name} (${geo.name}, ${freq.label})` : '',
-      align: 'left'
+      align: 'center'
     }
   }
 

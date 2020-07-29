@@ -393,6 +393,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         },
         load() {
           chartCallback(this);
+          if (logo.analyticsLogoSrc) {
+            this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
+          }
         }
       },
       styledMode: true,
@@ -417,8 +420,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       selected: !startDate && !endDate ? 3 : null,
       buttons,
       buttonPosition: {
-        x: 0,
-        y: 5
+        x: 20,
+        y: 0
       },
       labelStyle: {
         visibility: 'hidden'

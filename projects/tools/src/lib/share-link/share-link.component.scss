@@ -1,3 +1,8 @@
+.share-button {
+  height: calc(1.75rem - 2px);
+  margin-left: 0.25em;
+  padding: 0.175rem 0.75rem 0.175rem 0.75rem;
+}
 #shareModal{
   .modal-title {
     font-weight: bold;

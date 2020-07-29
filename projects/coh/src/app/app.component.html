@@ -1,4 +1,4 @@
-<div id="wrapper">
+<div id="wrapper" *ngIf="viewFullUI">
     <lib-header></lib-header>
     <div class="container">
         <div class="row">
@@ -8,7 +8,7 @@
                 </div>
             </div>
             <div class="col-xs-12 col-md-8 col-lg-9 col-xl-10 content-col">
-                <div class="alert alert-info alert-dismissible fade show browser" role="alert">
+                <div *ngIf="displayBrowserAlert" class="alert alert-info alert-dismissible fade show browser" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -19,3 +19,6 @@
         </div>
     </div>
 </div>
+<ng-template ngIf [ngIf]="!viewFullUI">
+    <router-outlet></router-outlet>
+</ng-template>

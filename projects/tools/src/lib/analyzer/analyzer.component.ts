@@ -178,21 +178,7 @@ export class AnalyzerComponent implements OnInit {
   }
 
   formatEmbedSnippet(start: string, end: string) {
-    let cSeries = '';
-    if (this.analyzerService.analyzerSeries.length) {
-      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
-      chartSeries.forEach((series, index) => {
-        cSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
-      });
-    }
-    let params = `?chartSeries=${cSeries}`;
-    if (start) {
-      params += `&start=${start}`;
-    }
-    if (end) {
-      params += `&end=${end}`;
-    }
-    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;">
-      <iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params}" scrolling="no"></iframe></div>`;
+    const embedURL = this.getAnalyzerParams(start, end, '/graph');
+    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}${embedURL}" scrolling="no"></iframe></div>`;
   }
 }
