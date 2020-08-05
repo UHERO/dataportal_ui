@@ -31,6 +31,8 @@ export class AnalyzerService {
 
   @Output() public toggleSeriesInChart: EventEmitter<any> = new EventEmitter();
 
+  @Output() public toggleIndexedData: EventEmitter<any> = new EventEmitter();
+
   @Output() public updateAnalyzerCount: EventEmitter<any> = new EventEmitter();
 
   constructor(private apiService: ApiService, private helperService: HelperService) { }

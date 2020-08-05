@@ -28,6 +28,7 @@ export class AnalyzerComponent implements OnInit {
   y1Series;
   analyzerShareLink: string;
   embedCode: string;
+  indexSeries: boolean = false;
 
   constructor(
     @Inject('environment') private environment,
@@ -134,6 +135,11 @@ export class AnalyzerComponent implements OnInit {
     }
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+  }
+
+  indexActive(e) {
+    this.indexSeries = e.target.checked;
+    this.analyzerService.toggleIndexedData.emit(this.indexSeries);
   }
 
   checkTransforms(e) {

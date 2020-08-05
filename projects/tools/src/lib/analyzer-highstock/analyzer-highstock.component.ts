@@ -38,6 +38,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
+  @Input() indexChecked;
   @Input() y0;
   @Input() y1;
   @Output() tableExtremes = new EventEmitter(true);
@@ -49,8 +50,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   updateChart = false;
   chartObject;
   toggleSeries;
+  toggleIndexed;
   switchAxes;
   alertMessage;
+  indexed: boolean;
+
 
   constructor(
     @Inject('logo') private logo,
@@ -83,6 +87,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         this.toggleSeriesDisplay(data);
         const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
         if (seriesToUpdate) {
+          console.log('seriesToUpdate', seriesToUpdate)
           seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
         }
       }
@@ -101,10 +106,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
+    console.log('indexed', this.indexChecked)
     // Series in the analyzer that have been selected to be displayed in the chart
     let selectedAnalyzerSeries;
     let yAxes;
     let navigatorOptions;
+    console.log('toggle series')
     if (this.series.length) {
       //yAxes = this.setYAxes(this.series);
       yAxes = this.yAxes;
@@ -116,17 +123,41 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       selectedAnalyzerSeries = this.formatSeriesData(this.series, this.allDates, this.yAxes);
     }
     if (this.chartObject) {
+      console.log('on changes chart object')
       // Check for series that need to be added or removed from the chart.
       // (workaround to make sure x-axis updates when navigator dates change)
-      // this.removeSeriesFromChart(this.chartObject.series, selectedAnalyzerSeries);
       const nav = this.chartObject.series.find(s => s.userOptions.className === 'navigator');
       if (nav) {
         nav.update({
           data: this.allDates.map(d => [Date.parse(d.date), null]),
         });
       }
+      if (this.indexed != this.indexChecked) {
+        this.indexed = this.indexChecked
+        this.chartObject._indexed = this.indexChecked;
+      console.log('toggle chart object', this.chartObject);
+      const yAxes = this.chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
+      yAxes.forEach((axis) => {
+        const visibleSeries = axis.series.find(s => s.userOptions.className !== 'navigator');
+        console.log('visible series', visibleSeries)
+        axis.update({
+          title: {
+            text: this.indexChecked ? 'Index' : visibleSeries ? visibleSeries.userOptions.unitsLabelShort : null
+          }
+        })
+      })
+      console.log('yAxes', yAxes)
+      this.chartObject.series.forEach((serie) => {
+        if (serie.userOptions.className !== 'navigator') {
+          serie.update({
+            data: this.indexChecked ? this.getIndexedValues(serie.userOptions.data, this.chartObject._selectedMin) : serie.userOptions.levelData
+          });
+        }
+      });
+      }
     }
-    if (selectedAnalyzerSeries) {
+    if (selectedAnalyzerSeries && !this.chartObject) {
+      console.log('selectedAnalyzerSeries')
       const chartButtons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       this.initChart(selectedAnalyzerSeries, yAxes, this.portalSettings, chartButtons, navigatorOptions);
       this.updateChart = true;
@@ -254,6 +285,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         name: serie.chartDisplayName,
         tooltipName: serie.seriesDetail.title,
         data: serie.chartData.level,
+        levelData: serie.chartData.level,
         yAxis: axis ? axis.id : null,
         decimals: serie.seriesDetail.decimals,
         frequency: serie.seriesDetail.frequencyShort,
@@ -278,6 +310,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     chartSeries.push({
       className: 'navigator',
       data: dates.map(d => [Date.parse(d.date), null]),
+      levelData: [],
       decimals: null,
       tooltipName: '',
       frequency: null,
@@ -301,6 +334,16 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       visible: true
     });
     return chartSeries;
+  }
+
+  getIndexedValues(values, start) {
+    console.log('start', start);
+    console.log('values', values);
+
+    return values.map((curr, ind, arr) => {
+      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === start);
+      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
+    });
   }
 
   swapAllSeriesAndAxes(visibleUnits: Array<any>, chartObject, yAxes: Array<any>) {
@@ -359,6 +402,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
+    console.log('INIT CHART')
     const startDate = this.start ? this.start : null;
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
@@ -374,6 +418,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const chartCallback = this.chartCallback;
+    const getIndexedValues = (values, start) => this.getIndexedValues(values, start);
+    const updateIndexed = (chartObject) => chartObject._indexed = this.indexed;
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -516,14 +562,25 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          this._indexed = updateIndexed(this);
           if (this._extremes) {
+            if (this._indexed) {
+              this.series.forEach((serie) => {
+                if (serie.userOptions.className !== 'navigator') {
+                  serie.update({
+                    data: getIndexedValues(serie.userOptions.data, this._extremes.min)
+                  })
+                }
+              });
+            }
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to first of the month
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
           }
         }
       },
-      minRange: 1000 * 3600 * 24 * 30 * 12,
+      //minRange: 1000 * 3600 * 24 * 30 * 12,
+      minRange: 1000 * 3600 * 24 * 30,
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false,
