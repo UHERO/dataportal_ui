@@ -139,6 +139,8 @@ export class AnalyzerComponent implements OnInit {
 
   indexActive(e) {
     this.indexSeries = e.target.checked;
+    console.log('index active MIN DATE', this.minDate);
+    console.log('index active MAX DATE', this.maxDate)
     this.analyzerService.toggleIndexedData.emit(this.indexSeries);
   }
 
