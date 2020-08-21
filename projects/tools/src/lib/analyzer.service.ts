@@ -17,7 +17,6 @@ export class AnalyzerService {
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
-    yAxes: [],
     highstockSeriesOptions: [],
     y0Series: null,
     y1Series: null
@@ -73,7 +72,6 @@ export class AnalyzerService {
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
-      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, y0Series, y1Series);
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
     });
@@ -142,7 +140,7 @@ export class AnalyzerService {
 
   checkFrequencies = (series) => {
     const freqs = series.map((s) => s.currentFreq.freq);
-    return freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
+    return freqs.includes('D') ? 'D' : freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
   }
 
   createAnalyzerTable = (analyzerSeries) => {
@@ -232,69 +230,12 @@ export class AnalyzerService {
       this.analyzerSeries.splice(seriesExist, 1);
       this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
       this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
-      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, this.analyzerData.y0Series, this.analyzerData.y1Series);
       this.analyzerSeriesCount.next(this.analyzerSeries.length);
     }
     if (seriesExist < 0) {
       this.analyzerSeries.push({ id: seriesId });
       this.analyzerSeriesCount.next(this.analyzerSeries.length);
       this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
-      this.analyzerData.yAxes = this.setYAxes(this.analyzerData.analyzerSeries, this.analyzerData.y0Series, this.analyzerData.y1Series);
     }
-  }
-
-  setYAxes = (series, y0Series, y1Series) => {
-    // Group series by their units
-    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    const axisIds = {
-      yAxis0: [],
-      yAxis1: []
-    };
-    series.reduce((obj, serie) => {
-      if (y0Series && y0Series.includes(serie.seriesDetail.id)) {
-        obj.yAxis0.push(serie);
-        return obj;
-      }
-      if (y1Series && y1Series.includes(serie.seriesDetail.id)) {
-        obj.yAxis1.push(serie);
-        return obj;
-      }
-      if (!y0Series || !y1Series) {
-        if (!obj.yAxis0.length) {
-          obj.yAxis0.push(serie);
-          return obj;
-        }
-        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
-        if (serie.seriesDetail.unitsLabelShort === y0Units) {
-          obj.yAxis0.push(serie);
-        }
-        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
-          obj.yAxis1.push(serie);
-        }
-        return obj;
-      }
-    }, axisIds);
-    const yAxes = Object.keys(axisIds).map((axis, index) => {
-      const visibleSeries = axisIds[axis].find(s => s.showInChart);
-      return {
-        labels: {
-          formatter() {
-            return Highcharts.numberFormat(this.value, 2, '.', ',');
-          }
-        },
-        id: axis,
-        title: {
-          text: visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
-        },
-        opposite: index === 0 ? false : true,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01,
-        showEmpty: false,
-        series: axisIds[axis],
-        visible: visibleSeries ? true : false
-      };
-    });
-    return yAxes;
   }
 }

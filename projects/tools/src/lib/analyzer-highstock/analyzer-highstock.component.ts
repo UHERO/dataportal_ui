@@ -33,7 +33,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() portalSettings;
   @Input() start;
   @Input() end;
-  @Input() yAxes: Array<any>;
   @Input() seriesOptions: Array<any>;
   @Input() nameChecked;
   @Input() unitsChecked;
@@ -50,7 +49,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   updateChart = false;
   chartObject;
   toggleSeries;
-  toggleIndexed;
   switchAxes;
   alertMessage;
   indexed: boolean = false;
@@ -79,6 +77,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
     this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
       this.switchYAxes(data, this.chartObject);
+      this.chartOptions.xAxis = null;
+      this.updateChart = true;
     });
     this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
       const chartSeries = this.series.filter(s => s.showInChart);
@@ -88,12 +88,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           if (seriesToUpdate) {
             seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
           }
-          const yAxes = this.analyzerService.setYAxes(this.series, '', '');
-          this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, this.yAxes, this.chartObject._extremes.min);
+          const yAxes = this.setYAxes(this.series, '', '');
+          this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
           this.chartOptions.yAxis = yAxes;
           this.chartOptions.rangeSelector.selected = null
           this.updateChart = true;
-          this.chartObject.redraw()
+          this.chartOptions.xAxis = null;
+          this.chartObject.redraw();
       }
       if (!toggleDisplay) {
         this.alertMessage = 'Chart may only display up to two different units.';
@@ -111,26 +112,34 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   
 
   ngOnChanges() {
-    console.log(this.chartObject)
     if (this.series.length && this.chartObject) {
       this.chartObject._indexed = this.indexChecked;
-      console.log('CHANGE IN SERIES', this.series);
-      const yAxes = this.analyzerService.setYAxes(this.series, '', '');
-      this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, this.yAxes, this.chartObject._extremes.min);
+      const y0 = [];
+      const y1 = [];
+      this.chartObject.series.forEach((s) => {
+        if (s.userOptions.className !== 'navigator' && s.userOptions.yAxis === 'yAxis0') {
+          y0.push(s.userOptions.className);
+        }
+        if (s.userOptions.className !== 'navigator' && s.userOptions.yAxis === 'yAxis1') {
+          y1.push(s.userOptions.className);
+        }
+      });
+      const yAxes = this.setYAxes(this.series, y0.join('-'), y1.join('-'));
       this.chartOptions.yAxis = yAxes;
-      console.log(this.formatSeriesData(this.series, this.allDates, this.yAxes, this.chartObject._extremes.min));
-      this.chartOptions.rangeSelector.selected = null
+      this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
+      this.chartOptions.rangeSelector.selected = null;
+      this.chartOptions.xAxis = null;
       this.updateChart = true;
     }
     if(this.series.length && !this.chartObject) {
-      console.log('on changes')
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const navigatorOptions = {
         frequency: this.analyzerService.checkFrequencies(this.series),
         dateStart: this.allDates[0].date,
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
-      this.initChart(this.series, this.yAxes, this.portalSettings, buttons, navigatorOptions)
+      const yAxes = this.setYAxes(this.series, this.y0, this.y1);
+      this.initChart(this.series, yAxes, this.portalSettings, buttons, navigatorOptions);
     }
   }
 
@@ -141,49 +150,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   chartCallback = (chart) => {
     this.chartObject = chart;
-  }
-
-  toggleSeriesDisplay(data) {
-    const yAxes = this.chartObject.yAxis.slice().filter(axis => axis.userOptions.id !== 'navigator-y-axis');
-    const seriesInChart = this.chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
-    seriesInChart.update({
-      visible: !seriesInChart.userOptions.visible,
-      showInLegend: !seriesInChart.userOptions.showInLegend,
-      includeInDataExport: !seriesInChart.userOptions.includeInDataExport
-    }, false);
-    const seriesAxis = this.chartObject.get(seriesInChart.userOptions.yAxis);
-    const visibleSeriesDifferentUnits = seriesAxis.series.filter(s => s.userOptions.unitsLabelShort !== seriesInChart.userOptions.unitsLabelShort && s.userOptions.className !== 'navigator' && s.userOptions.visible);
-    if (visibleSeriesDifferentUnits.length) {
-      // If the series being made visible is associated with an axis that is currently being used with different units,
-      // (i.e., 2 axes are being used with series that have 'Thous' as their units)
-      // move the currently drawn series to the opposite axis first
-      const oppositeAxis = seriesInChart.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0';
-      visibleSeriesDifferentUnits.forEach((s) => {
-        s.update({
-          yAxis: seriesInChart.userOptions.yAxis === 'yAxis0' ? 'yAxis1' : 'yAxis0'
-        });
-      });
-      this.chartObject.get(oppositeAxis).update({
-        title: {
-          text: visibleSeriesDifferentUnits[0].userOptions.unitsLabelShort
-        },
-        visible: true
-      });
-    }
-    seriesAxis.update({
-      title: {
-        text: seriesInChart.userOptions.unitsLabelShort
-      },
-      visible: seriesAxis.series.find(s => s.userOptions.visible) ? true : false
-    });
-    yAxes.forEach((a) => {
-      const axisSeries = a.series.filter(s => s.userOptions.className !== 'navigator' && s.userOptions.visible);
-      if (!axisSeries.length) {
-        a.update({
-          visible: false,
-        }, false);
-      }
-    });
   }
 
   switchYAxes(data: any, chartObject) {
@@ -247,8 +213,66 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.yAxesSeries.emit({ y0: y0, y1: y1 });
   }
 
+  setYAxes = (series, y0Series, y1Series) => {
+    // Group series by their units
+    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
+    const axisIds = {
+      yAxis0: [],
+      yAxis1: []
+    };
+    series.reduce((obj, serie) => {
+      if (y0Series && y0Series.includes(serie.seriesDetail.id)) {
+        obj.yAxis0.push(serie);
+        return obj;
+      }
+      if (y1Series && y1Series.includes(serie.seriesDetail.id)) {
+        obj.yAxis1.push(serie);
+        return obj;
+      }
+      if (!y0Series || !y1Series) {
+        if (!obj.yAxis0.length) {
+          obj.yAxis0.push(serie);
+          return obj;
+        }
+        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
+        if (serie.seriesDetail.unitsLabelShort === y0Units) {
+          obj.yAxis0.push(serie);
+        }
+        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
+          obj.yAxis1.push(serie);
+        }
+        return obj;
+      }
+    }, axisIds);
+    const yAxes = Object.keys(axisIds).map((axis, index) => {
+      const visibleSeries = axisIds[axis].find(s => s.showInChart);
+      return {
+        labels: {
+          formatter() {
+            return Highcharts.numberFormat(this.value, 2, '.', ',');
+          }
+        },
+        id: axis,
+        title: {
+          text: this.indexChecked ? 'Index' : visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
+        },
+        opposite: index === 0 ? false : true,
+        minPadding: 0,
+        maxPadding: 0,
+        minTickInterval: 0.01,
+        showEmpty: false,
+        series: axisIds[axis],
+        visible: visibleSeries ? true : false
+        //visible: true
+      };
+    });
+    return yAxes;
+  }
+
   formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
-    const chartSeries = series.map((serie) => {
+    // create copy to prevent original data from being altered if calculating indexed values
+    const seriesCopy = JSON.parse(JSON.stringify(series));
+    const chartSeries = seriesCopy.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       return {
         className: serie.seriesDetail.id,
@@ -285,7 +309,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       tooltipName: '',
       frequency: null,
       geography: null,
-      yAxis: 'yAxis0',
+      yAxis: 'yAxis1',
       dataGrouping: {
         enabled: false
       },
@@ -307,9 +331,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   getIndexedValues(values, start) {
-    console.log('start', start);
-    console.log('values', values);
-
     return values.map((curr, ind, arr) => {
       const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === start);
       return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
@@ -522,8 +543,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.credits = {
       enabled: false
     };
-    this.chartOptions.series = this.formatSeriesData(series, this.allDates, yAxis, this.start)
-    this.chartOptions.yAxis = this.yAxes;
+    this.chartOptions.series = this.formatSeriesData(series, this.allDates, yAxis, this.start);
+    this.chartOptions.yAxis = yAxis;
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
@@ -535,11 +556,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._extremes = getChartExtremes(this);
           this._indexed = updateIndexed(this);
           if (this._extremes) {
-            console.log('this._extremes', this._extremes)
             if (this._indexed) {
               this.series.forEach((serie) => {
                 if (serie.userOptions.className !== 'navigator') {
-                  console.log('SET EXTREMES INDEXED')
                   serie.update({
                     data: getIndexedValues(serie.userOptions.levelData, this._extremes.min)
                   })
@@ -552,8 +571,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         }
       },
-      //minRange: 1000 * 3600 * 24 * 30 * 12,
-      minRange: 1000 * 3600 * 24 * 30,
+      minRange: this.calculateMinRange(navigatorOptions.frequency),
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false,
@@ -571,8 +589,28 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
   }
 
+  calculateMinRange = (freq: string) => {
+    if (freq === 'A') {
+      return 1000 * 3600 * 24 * 30 * 12;
+    }
+    if (freq === 'S') {
+      return 1000 * 3600 * 24 * 30 * 6;
+    }
+    if (freq === 'Q') {
+      return 1000 * 3600 * 24 * 30 * 3;
+    }
+    if (freq === 'M') {
+      return 1000 * 3600 * 24 * 30;
+    }
+    if (freq === 'W') {
+      return 1000 * 3600 * 24 * 7;
+    }
+    if (freq === 'D') {
+      return 1000 * 3600 * 24;
+    }
+  }
+
   formatTooltip(args, points, x, name: boolean, units: boolean, geo: boolean) {
-    console.log('FORMAT TOOLTIP GEO', geo)
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = (cSeries: Array<any>, freq: string) => {
@@ -595,7 +633,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const seriesColor = getSeriesColor(point.colorIndex);
       const displayName = sName ? point.userOptions.tooltipName : '';
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
-      const unitsLabel = sUnits ? ` (${point.userOptions.unitsLabelShort}) `: '';
+      const unitsLabel = sUnits ? this.indexChecked ? `(Index)` : ` (${point.userOptions.unitsLabelShort}) `: '';
       const geoLabel = sGeo ? `${point.userOptions.geography}` : '';
       const label = `${displayName} ${date}: ${value} ${unitsLabel}`;
       const pseudoZones = point.userOptions.pseudoZones;
@@ -681,18 +719,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
-    this.chartOptions.rangeSelector.selected = null;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    this.chartOptions.tooltip = {
-      borderWidth: 0,
-      shadow: false,
-      shared: true,
-      followPointer: true,
-      formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-      }
-    };
-    this.updateChart = true;
+    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
   }
 
   unitsActive(e) {
@@ -701,18 +728,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
-    this.chartOptions.rangeSelector.selected = null;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    this.chartOptions.tooltip = {
-      borderWidth: 0,
-      shadow: false,
-      shared: true,
-      followPointer: true,
-      formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-      }
-    };
-    this.updateChart = true;
+    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
   }
 
   geoActive(e) {
@@ -721,18 +737,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
-    this.chartOptions.rangeSelector.selected = null;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    this.chartOptions.tooltip = {
-      borderWidth: 0,
-      shadow: false,
-      shared: true,
-      followPointer: true,
-      formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-      }
-    };
-    this.updateChart = true;
+    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
   }
 
   filterDatesForNavigator(allDates: Array<any>) {
@@ -743,4 +748,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
   }
 
+  updateTooltipOptions(tooltipName: boolean, tooltipUnits: boolean, tooltipGeo: boolean) {
+    this.chartOptions.rangeSelector.selected = null;
+    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
+    this.chartOptions.tooltip = {
+      borderWidth: 0,
+      shadow: false,
+      shared: true,
+      followPointer: true,
+      formatter(args) {
+        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+      }
+    };
+    this.updateChart = true;
+  }
 }

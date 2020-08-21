@@ -24,6 +24,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
+  @Input() indexChecked;
   portalSettings;
   missingSummaryStat = false;
   tableDates;
@@ -80,8 +81,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    console.log('table mindate', this.minDate);
-    console.log('table maxdate', this.maxDate)
     if (this.minDate && this.maxDate) {
       const newTableDates = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
       this.columnDefs = this.setTableColumns(newTableDates);
@@ -89,7 +88,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
     if (this.minDate && this.maxDate) {
-      this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate);
+      this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
         statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
@@ -101,7 +100,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
-      const seriesData = this.formatLvlData(series, level);
+      const seriesData = this.formatLvlData(series, level, this.minDate);
       this.rows.push(seriesData);
       if (this.yoyChecked && yoy) {
         const yoyData = this.formatTransformationData(series, yoy);
@@ -198,10 +197,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     return columns;
   }
 
-  formatLvlData = (series, level) => {
+  formatLvlData = (series, level, minDate) => {
     const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
+    const indexedValues = this.getIndexedValues(values, dates, minDate);
     const seriesData = {
       series: series.displayName,
       lockPosition: true,
@@ -215,9 +215,16 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       lvlData: true,
     };
     formattedDates.forEach((d, index) => {
-      seriesData[d] = this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
+      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.seriesDetail.decimals) : this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
     });
     return seriesData;
+  }
+
+  getIndexedValues(values, dates, start) {
+    return values.map((curr, ind, arr) => {
+      const dateIndex = dates.findIndex(date => date === start);
+      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
+    });
   }
 
   formatTransformationData = (series, transformation) => {

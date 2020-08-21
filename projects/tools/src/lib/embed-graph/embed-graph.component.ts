@@ -65,7 +65,6 @@ export class EmbedGraphComponent implements OnInit {
     this.analyzerService.analyzerData = {
       analyzerTableDates: [],
       analyzerSeries: [],
-      yAxes: [],
       highstockSeriesOptions: [],
       y0Series: null,
       y1Series: null
