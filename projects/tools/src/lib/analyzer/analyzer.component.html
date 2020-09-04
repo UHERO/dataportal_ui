@@ -9,7 +9,7 @@
     </label>
     <lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [allDates]="data.analyzerTableDates"
       [series]="data.analyzerSeries" [seriesOptions]="data.highstockSeriesOptions" [start]="startDate" [end]="endDate"
-      [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [y0]="y0" [y1]="y1" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries" (yAxesSeries)="setYAxesSeries($event)" (tooltipOptions)="checkTooltip($event)"
+      [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [y0]="y0Series" [y1]="y1Series" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries" (yAxesSeries)="setYAxesSeries($event)" (tooltipOptions)="checkTooltip($event)"
       (tableExtremes)="setTableDates($event)"></lib-analyzer-highstock>
     <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="minDate" [maxDate]="maxDate" [yoyChecked]="tableYoy"
       [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [indexChecked]="indexSeries" [series]="data.analyzerSeries" [allTableDates]="data.analyzerTableDates"

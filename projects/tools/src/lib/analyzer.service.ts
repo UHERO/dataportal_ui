@@ -87,6 +87,7 @@ export class AnalyzerService {
       chartData: {},
       displayName: '',
       chartDisplayName: '',
+      indexDisplayName: '',
       seriesTableData: [],
       error: null,
       saParam: false,
@@ -108,8 +109,16 @@ export class AnalyzerService {
       seasonalAdjustment: series.seasonalAdjustment,
       units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
     };
+    const indexNameDetails = {
+      title: series.title,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: 'Index'
+    }
     seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
     seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
+    seriesData.indexDisplayName = this.formatDisplayName(indexNameDetails);
     seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
     seriesData.currentGeo = series.geography;
     seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };

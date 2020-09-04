@@ -37,6 +37,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   summaryRows;
   public gridOptions: GridOptions;
   public statGridOptions: GridOptions;
+  rtlScroll: boolean;
 
   constructor(
     @Inject('portal') private portal,
@@ -78,6 +79,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+    // Temp. turn off RTL scroll for Chrome
+    this.rtlScroll = navigator.userAgent.search('Chrome') === -1;
   }
 
   ngOnChanges() {
@@ -203,7 +206,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
     const indexedValues = this.getIndexedValues(values, dates, minDate);
     const seriesData = {
-      series: series.displayName,
+      series: this.indexChecked ? series.indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series.seriesDetail,

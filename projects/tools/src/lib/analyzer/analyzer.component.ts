@@ -142,6 +142,10 @@ export class AnalyzerComponent implements OnInit {
 
   indexActive(e) {
     this.indexSeries = e.target.checked;
+    if (this.indexSeries) {
+      this.y0 = null;
+      this.y1 = null;
+    }
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
     // this.analyzerService.toggleIndexedData.emit(this.indexSeries);

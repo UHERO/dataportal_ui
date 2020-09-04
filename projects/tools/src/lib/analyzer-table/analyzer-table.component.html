@@ -14,7 +14,7 @@
     <i class="far fa-file-excel"></i>
   </button>
   <ag-grid-angular style="width: 100%;" class="ag-theme-balham" [rowData]="rows" [columnDefs]="columnDefs" domLayout="autoHeight"
-    [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="true" [suppressDragLeaveHidesColumns]="true"
+    [frameworkComponents]="frameworkComponents" [gridOptions]="gridOptions" [enableRtl]="rtlScroll" [suppressDragLeaveHidesColumns]="true"
     (gridReady)="onGridReady($event)" [singleClickEdit]="true">
   </ag-grid-angular>
   <p class="stat-note">*Scroll to the right for additional statistics</p>
