@@ -76,26 +76,39 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
     });
     this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
-      this.switchYAxes(data, this.chartObject);
-      this.chartOptions.xAxis = null;
-      this.updateChart = true;
-      this.chartObject.redraw();
+      if (this.indexChecked) {
+        this.alertMessage = 'Unavailable while series are indexed.';
+        if (this.alertMessage) {
+          // Timeout warning message alerting user if too many units are being added to the chart
+          setTimeout(() => {
+            this.alertMessage = '';
+            this.cdr.detectChanges();
+          }, 4000);
+        }
+        this.cdr.detectChanges();
+      }
+      if (!this.indexChecked) {
+        this.switchYAxes(data, this.chartObject);
+        this.chartOptions.xAxis = null;
+        this.updateChart = true;
+        this.chartObject.redraw();
+      }
     });
     this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
       const chartSeries = this.series.filter(s => s.showInChart);
       const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
       if (toggleDisplay) {
-          const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
-          if (seriesToUpdate) {
-            seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
-          }
-          const yAxes = this.setYAxes(this.series, '', '');
-          this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
-          this.chartOptions.yAxis = yAxes;
-          this.chartOptions.rangeSelector.selected = null
-          this.updateChart = true;
-          this.chartOptions.xAxis = null;
-          this.chartObject.redraw();
+        const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
+        if (seriesToUpdate) {
+          seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
+        }
+        const yAxes = this.setYAxes(this.series, '', '');
+        this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
+        this.chartOptions.yAxis = yAxes;
+        this.chartOptions.rangeSelector.selected = null
+        this.updateChart = true;
+        this.chartOptions.xAxis = null;
+        this.chartObject.redraw();
       }
       if (!toggleDisplay) {
         this.alertMessage = 'Chart may only display up to two different units.';

@@ -22,6 +22,7 @@ export class EmbedGraphComponent implements OnInit {
   tooltipGeo: boolean = true;
   tooltipName: boolean = true;
   tooltipUnits: boolean = true;
+  indexSeries: boolean = true;
   
   constructor(
     @Inject('portal') public portal,
@@ -51,6 +52,9 @@ export class EmbedGraphComponent implements OnInit {
       }
       if (params[`y1`]) {
         this.y1 = params[`y1`];
+      }
+      if (params[`index`]) {
+        this.indexSeries = params[`index`];
       }
     });
     if (this.seriesId) {

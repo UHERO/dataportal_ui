@@ -6,6 +6,6 @@
 <ng-template ngFor let-data [ngForOf]="analyzerData | async">
 <div><lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings" [allDates]="data.analyzerTableDates"
   [series]="data.analyzerSeries" [start]="startDate" [end]="endDate"
-  [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" (tooltipOptions)="checkTooltip($event)"></lib-analyzer-highstock>
+  [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries" (tooltipOptions)="checkTooltip($event)"></lib-analyzer-highstock>
 </div>
 </ng-template>
