@@ -128,14 +128,14 @@ export class SeriesHelperService {
     return false;
   }
 
-  calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string) => {
+  calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string, indexed) => {
     series.forEach((s) => {
       s.seriesStartDate = s.observations.observationStart > startDate ? s.observations.observationStart : startDate;
       s.seriesEndDate = s.observations.observationEnd > endDate ? s.observations.observationEnd : endDate;
     });
     const tableRows = [];
     series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate);
+      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate, indexed);
       stats.series = s.displayName;
       stats.interactionSettings.showInChart = s.showInChart;
       tableRows.push(stats);
@@ -143,7 +143,14 @@ export class SeriesHelperService {
     return tableRows;
   }
 
-  calculateSeriesSummaryStats = (seriesDetail, chartData, startDate: string, endDate: string) => {
+  getIndexedValues(values, start) {
+    return values.map((curr, ind, arr) => {
+      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === start);
+      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
+    });
+  }
+
+  calculateSeriesSummaryStats = (seriesDetail, chartData, startDate: string, endDate: string, indexed: boolean) => {
     const freq = seriesDetail.frequencyShort;
     const formattedStats = {
       series: '',
@@ -167,8 +174,9 @@ export class SeriesHelperService {
     formattedStats.range = `${this.helperService.formatDate(startDate, freq)} - ${this.helperService.formatDate(endDate, freq)}`;
     const decimals = seriesDetail.decimals;
     const { dates, level } = chartData;
+    const values = indexed ? this.getIndexedValues(level, startDate) : level;
     const datesInRange = dates.filter(date => date.date >= startDate && date.date <= endDate);
-    const valuesInRange = level.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
+    const valuesInRange = values.filter(l => new Date(l[0]).toISOString().split('T')[0] >= startDate && new Date(l[0]).toISOString().split('T')[0] <= endDate).map(value => value[1]);
     if (valuesInRange.includes(null) || !datesInRange.length || !valuesInRange.length) {
       formattedStats.missing = true;
       return formattedStats;

@@ -1,5 +1,4 @@
-import { Component, Inject, OnChanges, Input, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRenderComponent } from '../category-table-render/category-table-render.component';
 import { AnalyzerService } from '../analyzer.service';
@@ -49,15 +48,10 @@ export class CategoryTableViewComponent implements OnChanges {
   rtlScroll: boolean;
 
   constructor(
-    //@Inject(PLATFORM_ID) private platformId: object,
     @Inject('defaultRange') private defaultRange,
     private analyzerService: AnalyzerService,
     private helperService: HelperService,
   ) {
-    this.isBrowser = isPlatformBrowser(PLATFORM_ID);
-    if (this.isBrowser) {
-      console.log(this.isBrowser)
-    }
     this.frameworkComponents = {
       categoryTableRender: CategoryTableRenderComponent
     };

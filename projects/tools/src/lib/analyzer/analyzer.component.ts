@@ -28,6 +28,7 @@ export class AnalyzerComponent implements OnInit {
   y1Series;
   analyzerShareLink: string;
   embedCode: string;
+  indexSeries: boolean;
 
   constructor(
     @Inject('environment') private environment,
@@ -51,6 +52,9 @@ export class AnalyzerComponent implements OnInit {
         }
         if (params[`end`]) {
           this.endDate = params[`end`];
+        }
+        if (params[`index`]) {
+          this.indexSeries = params[`index`];
         }
         if (params[`name`]) {
           this.tooltipName = (params[`name`] === 'true');
@@ -136,6 +140,17 @@ export class AnalyzerComponent implements OnInit {
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
+  indexActive(e) {
+    this.indexSeries = e.target.checked;
+    if (this.indexSeries) {
+      this.y0 = null;
+      this.y1 = null;
+    }
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+    // this.analyzerService.toggleIndexedData.emit(this.indexSeries);
+  }
+
   checkTransforms(e) {
     if (e.label === 'yoy') {
       this.tableYoy = e.value;
@@ -166,6 +181,7 @@ export class AnalyzerComponent implements OnInit {
     }
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;
+    seriesUrl += this.indexSeries ? `&index=${this.indexSeries}` : '';
     seriesUrl += this.tooltipName ? `&name=${this.tooltipName}` : '';
     seriesUrl += this.tooltipUnits ? `&units${this.tooltipUnits}` : '';
     seriesUrl += this.tooltipGeo ? `&geography=${this.tooltipGeo}` : '';

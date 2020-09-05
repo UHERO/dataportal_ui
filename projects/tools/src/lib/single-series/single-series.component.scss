@@ -92,7 +92,7 @@
 
 :host {
   ::ng-deep {
-    .ui-table {
+    .p-datatable {
       background-color: transparent;
       text-align: right;
       font-family: 'Lucida Sans', sans-serif;
@@ -100,7 +100,7 @@
       border: 0;
       border-right: 1px solid #E5E5E5;
 
-      .ui-sortable-column.ui-state-highlight {
+      .p-sortable-column.p-highlight {
         background-color: #F4F4F4;
         color: #333;
 
@@ -108,24 +108,26 @@
           outline: none;
         }
 
-        .ui-sortable-column-icon {
+        .p-sortable-column-icon {
           color: #848484;
           vertical-align: middle;
         }
       }
 
-      .ui-table-thead {
+      .p-datatable-thead {
         tr {
           th {
             padding: .25em .5em;
+            text-align: right;
           }
         }
       }
 
-      .ui-table-tbody {
+      .p-datatable-tbody {
         tr {
           td {
             padding: .25em .5em;
+            text-align: right;
           }
         }
       }
@@ -136,11 +138,11 @@
         margin-top: 20px;    
       }
 
-      .ui-widget-overlay {
+      .p-widget-overlay {
         background-color: transparent;
       }
   
-      tr.ui-widget-content {
+      tr.p-widget-content {
         border-top-color: transparent;
         border-bottom-color: transparent;
         border-left: 1px solid #E5E5E5;

@@ -46,16 +46,18 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       this.categories = categories;
       this.navMenuItems = [];
       categories.forEach((category) => {
-        const subMenu = this.createSubmenuItems(category.children, category.id);
-        this.navMenuItems.push({
-          id: '' + category.id,
-          label: category.name,
-          icon: 'pi pi-pw',
-          items: subMenu,
-          command: (event) => {
-            this.navToFirstDataList(event.item, category.id);
-          }
-        });
+        if (category.children) {
+          const subMenu = this.createSubmenuItems(category.children, category.id);
+          this.navMenuItems.push({
+            id: '' + category.id,
+            label: category.name,
+            icon: 'pi pi-pw',
+            items: subMenu,
+            command: (event) => {
+              this.navToFirstDataList(event.item, category.id);
+            }
+          });
+        }
       });
     },
       (error) => {
