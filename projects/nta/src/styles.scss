@@ -87,20 +87,20 @@ body {
       }
     }
 
-    .ui-panelmenu {
-      .ui-panelmenu-header.ui-state-active {
+    .p-panelmenu {
+      .p-panelmenu-header.p-highlight {
         a {
           color: $primary;
 
           &:hover {
             color: $primary;
   
-            .ui-panelmenu-icon {
+            .p-panelmenu-icon {
               color: $primary;
             }
           }
   
-          .ui-panelmenu-icon {
+          .p-panelmenu-icon {
             color: $primary;
           }
         }
@@ -139,7 +139,7 @@ body {
       }
     }
 
-    .ui-table {
+    .p-datatable {
       .fa-spinner {
         color: $primary;
       }
