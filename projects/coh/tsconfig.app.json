@@ -4,6 +4,7 @@
     "outDir": "../../out-tsc/app",
     "types": []
   },
+  "skipLibCheck": true,
   "files": [
     "src/main.ts",
     "src/polyfills.ts"
