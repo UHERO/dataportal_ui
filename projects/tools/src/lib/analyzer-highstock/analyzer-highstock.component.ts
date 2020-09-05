@@ -77,15 +77,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
     this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
       if (this.indexChecked) {
-        this.alertMessage = 'Unavailable while series are indexed.';
-        if (this.alertMessage) {
-          // Timeout warning message alerting user if too many units are being added to the chart
-          setTimeout(() => {
-            this.alertMessage = '';
-            this.cdr.detectChanges();
-          }, 4000);
-        }
-        this.cdr.detectChanges();
+        this.displayAlertMessage('Unavailable while series are indexed.');
       }
       if (!this.indexChecked) {
         this.switchYAxes(data, this.chartObject);
@@ -111,17 +103,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         this.chartObject.redraw();
       }
       if (!toggleDisplay) {
-        this.alertMessage = 'Chart may only display up to two different units.';
-        if (this.alertMessage) {
-          // Timeout warning message alerting user if too many units are being added to the chart
-          setTimeout(() => {
-            this.alertMessage = '';
-            this.cdr.detectChanges();
-          }, 4000);
-        }
-        this.cdr.detectChanges();
+        this.displayAlertMessage('Chart may only display up to two different units.');
       }
     });
+  }
+
+  displayAlertMessage(alertMsg) {
+    this.alertMessage = alertMsg;
+      if (this.alertMessage) {
+        // Timeout warning message alerting user if too many units are being added to the chart
+        setTimeout(() => {
+          this.alertMessage = '';
+          this.cdr.detectChanges();
+        }, 4000);
+      }
+    this.cdr.detectChanges();
   }
   
 
@@ -665,28 +661,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   nameActive(e) {
     this.nameChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-    const tooltipName = this.nameChecked;
-    const tooltipUnits = this.unitsChecked;
-    const tooltipGeo = this.geoChecked;
-    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
+    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
   }
 
   unitsActive(e) {
     this.unitsChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
-    const tooltipName = this.nameChecked;
-    const tooltipUnits = this.unitsChecked;
-    const tooltipGeo = this.geoChecked;
-    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
+    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
   }
 
   geoActive(e) {
     this.geoChecked = e.target.checked;
     this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-    const tooltipName = this.nameChecked;
-    const tooltipUnits = this.unitsChecked;
-    const tooltipGeo = this.geoChecked;
-    this.updateTooltipOptions(tooltipName, tooltipUnits, tooltipGeo);
+    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
   }
 
   filterDatesForNavigator(allDates: Array<any>) {
