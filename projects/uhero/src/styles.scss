@@ -87,20 +87,20 @@ body {
       }
     }
 
-    .ui-panelmenu {
-      .ui-panelmenu-header.ui-state-active {
+    .p-panelmenu {
+      .p-panelmenu-header.p-highlight {
         a {
           color: $primary;
 
           &:hover {
             color: $primary;
   
-            .ui-panelmenu-icon {
+            .p-panelmenu-icon {
               color: $primary;
             }
           }
   
-          .ui-panelmenu-icon {
+          .p-panelmenu-icon {
             color: $primary;
           }
         }
@@ -139,7 +139,7 @@ body {
       }
     }
 
-    .ui-table {
+    .p-datatable {
       .fa-spinner {
         color: $primary;
       }
@@ -214,11 +214,11 @@ body {
 
     lib-date-slider {
       p-slider {
-        .ui-slider .ui-slider-range {
+        .p-slider .p-slider-range {
           background-color: $primary;
         }
 
-        .ui-slider:not(.ui-state-disabled) .ui-slider-handle:hover, .ui-slider .ui-slider-handle {
+        .p-slider:not(.p-state-disabled) .p-slider-handle:hover, .p-slider .p-slider-handle {
           border-color: $primary;
         }
       }
