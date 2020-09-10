@@ -27,7 +27,14 @@ import { CohHelpComponent } from './coh-help/coh-help.component';
     },
     {
       provide: 'defaultRange',
-      useValue: { start: '', end: '', range: 10 }
+      useValue: [
+        { freq: 'A', range: 10, start: '', end: '' },
+        { freq: 'Q', range: 10, start: '', end: '' },
+        { freq: 'S', range: 10, start: '', end: '' },
+        { freq: 'M', range: 10, start: '', end: '' },
+        { freq: 'W', range: 2, start: '', end: '' },
+        { freq: 'D', range: 1, start: '', end: '' }
+      ]
     },
     {
       provide: 'logo',
