@@ -44,8 +44,6 @@ export class CategoryTableViewComponent implements OnChanges {
   disableNext: boolean;
   noSeriesToDisplay;
   gridOptions;
-  private isBrowser;
-  rtlScroll: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -58,8 +56,6 @@ export class CategoryTableViewComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    // Temp. turn off RTL scroll for Chrome
-    this.rtlScroll = navigator.userAgent.search('Chrome') === -1;
     this.rows = [];
     this.gridOptions = {
       localeText: {
