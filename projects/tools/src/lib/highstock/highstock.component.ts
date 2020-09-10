@@ -189,7 +189,7 @@ export class HighstockComponent implements OnChanges {
     const name = seriesDetail.title;
     const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
-    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange) : null;
+    const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
     const endDate = this.setEndDate(this.end, chartRange, chartData);
     const series = this.formatChartSeries(chartData, portalSettings, seriesDetail, freq);
@@ -216,7 +216,7 @@ export class HighstockComponent implements OnChanges {
         },
         load() {
           if (logo.analyticsLogoSrc) {
-            this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
+            this.renderer.image(logo.analyticsLogoSrc, 0, 0, 141 / 1.75, 68 / 1.75).add();
           }
         }
       },
@@ -227,7 +227,7 @@ export class HighstockComponent implements OnChanges {
       selected: null,
       buttons: chartButtons,
       buttonPosition: {
-        x: 20,
+        x: 30,
         y: 0
       },
       labelStyle: { visibility: 'hidden' },
@@ -405,8 +405,9 @@ export class HighstockComponent implements OnChanges {
     return s;
   }
 
-  getSelectedChartRange = (userStart, userEnd, dates, defaults) => {
-    const defaultEnd = defaults.end ? defaults.end : dates[dates.length - 1].date.substr(0, 4);
+  getSelectedChartRange = (userStart, userEnd, dates, defaults, freq) => {
+    const defaultSettings = defaults.find(ranges => ranges.freq === freq)
+    const defaultEnd = defaultSettings.end ? defaultSettings.end : dates[dates.length - 1].date.substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
     while (dates[counter].date.substr(0, 4) > defaultEnd) {
       counter--;

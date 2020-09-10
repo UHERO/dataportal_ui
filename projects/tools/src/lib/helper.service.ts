@@ -268,24 +268,26 @@ export class HelperService {
   }
 
   setDefaultCategoryRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end ? defaults.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
+    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
+    const defaultEnd = defaultSettings.end ? defaultSettings.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
-    return this.getRanges(freq, counter, defaults.range);
+    return this.getRanges(freq, counter, defaultSettings.range);
   }
 
   setDefaultSliderRange(freq, dateArray, defaults) {
-    const defaultEnd = defaults.end ?
-      defaults.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
+    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
+    const defaultEnd = defaultSettings.end ?
+      defaultSettings.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     // https://github.com/IonDen/ion.rangeSlider/issues/298
     // Slider values being converted from strings to numbers for annual dates
     while (new Date(dateArray[counter].toString().substr(0, 4)).toISOString().substr(0, 4) > defaultEnd) {
       counter--;
     }
-    return this.getRanges(freq, counter, defaults.range);
+    return this.getRanges(freq, counter, defaultSettings.range);
   }
 
   getRanges(freq, counter, range) {

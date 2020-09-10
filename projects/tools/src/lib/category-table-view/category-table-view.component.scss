@@ -22,6 +22,13 @@ ul.available-geos, ul.available-freqs {
       display: block;
     }
 
+    .ag-layout-auto-height .ag-center-cols-clipper,
+    .ag-layout-auto-height .ag-center-cols-container,
+    .ag-layout-print .ag-center-cols-clipper,
+    .ag-layout-print .ag-center-cols-container {
+      min-height: auto;
+    }
+
     .ag-root-wrapper {
       margin-bottom: 20px;
 
@@ -55,20 +62,6 @@ ul.available-geos, ul.available-freqs {
       .material-icons {
         font-size: 18px;
         vertical-align: middle;
-      }
-    }
-
-    /* Temp selectors and rules for disabled RTL scroll in Chrome */
-    @media all and (-webkit-min-device-pixel-ratio:0)
-      and (min-resolution:.001dpcm) {
-        .ag-header-group-cell-label, .ag-header-cell-label {
-          justify-content: flex-end;
-        }
-      }
-
-    @supports (-moz-appearance:meterbar) {
-      .ag-header-group-cell-label, .ag-header-cell-label {
-        justify-content: flex-start;
       }
     }
   }

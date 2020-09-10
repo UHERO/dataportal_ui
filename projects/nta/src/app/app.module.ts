@@ -37,7 +37,9 @@ import { NtaHelpComponent } from './nta-help/nta-help.component';
     },
     {
       provide: 'defaultRange',
-      useValue: { start: '2000', end: '2040', range: 40 }
+      useValue: [
+        { freq: 'A', range: 40, start: '2000', end: '2040' },
+      ]
     },
     {
       provide: 'portal',
