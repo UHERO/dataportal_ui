@@ -406,17 +406,20 @@ export class HighstockComponent implements OnChanges {
   }
 
   getSelectedChartRange = (userStart, userEnd, dates, defaults, freq) => {
-    const defaultSettings = defaults.find(ranges => ranges.freq === freq)
-    const defaultEnd = defaultSettings.end ? defaultSettings.end : dates[dates.length - 1].date.substr(0, 4);
+    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
+    const defaultEnd = defaultSettings.end || dates[dates.length - 1].date.substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
     while (dates[counter].date.substr(0, 4) > defaultEnd) {
       counter--;
     }
-    const end = userEnd ? userEnd : dates[counter].date.substr(0, 10);
-    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaults.range;
-    let start = userStart ? userStart : defaultStartYear + dates[counter].date.substr(4, 6);
+    const end = userEnd || dates[counter].date.substr(0, 10);
+    const firstObsYear = +dates[0].date.substr(0, 4);
+    const defaultStartYear = +dates[counter].date.substr(0, 4) - defaultSettings.range;
+    const defaultStart = defaultStartYear < firstObsYear ? dates[0].date :
+      `${defaultStartYear}${dates[counter].date.substr(4, 6)}`;
+    let start = userStart || defaultStart;
     if (start > end) {
-      start = defaultStartYear + dates[counter].date.substr(4, 6);
+      start = defaultStart;
     }
     return { start, end };
   }
