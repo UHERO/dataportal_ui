@@ -50,7 +50,7 @@ import { CcomHelpComponent } from "./ccom-help/ccom-help.component";
     },
     {
       provide: "GoogleAnalyticsId",
-      useValue: "UA-18074519-3",
+      useValue: "UA-18074519-6",
     },
   ],
   bootstrap: [AppComponent],
