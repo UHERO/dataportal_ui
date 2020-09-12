@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiUrl: 'https://api.uhero.hawaii.edu/v1',
+  portalUrl: 'http://localhost:4200/#'
 };
 
 /*
