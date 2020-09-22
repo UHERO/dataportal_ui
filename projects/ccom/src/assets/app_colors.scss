@@ -1,33 +1,33 @@
 $black: #000;
 $white: #FFF;
-$blue: #1D667F;
+$blue: #0279c0;
 $orange: #F6A01B;
 $dark-gray: #505050;
 $hover-gray: #B3B3B3;
 $series-gray: #9E9E9E; 
 $gray: #E5E5E5;
 $light-gray: #FAFAFB;
-$green: #9BBB59;
+$green:#2d6c43;
 $purple: #8064A2;
 
-$primary: $blue;
+$primary: $green;
 $primary-text: $dark-gray;
-$secondary: $orange;
+$secondary: $blue;
 $border: $gray;
 $tooltip: $light-gray;
 
 /* Highcharts */
 $chart-background: $light-gray;
-$highcharts-series0: $blue;
+$highcharts-series0: $green;
 $highcharts-series1: none;
-$highstock-series0: $blue;
+$highstock-series0: $green;
 $highstock-series1: $series-gray;
 
 /* Analyzer Chart */
-$analyzer-series0: $blue;
+$analyzer-series0: $green;
 $analyzer-series1: $series-gray;
 $analyzer-series2: $orange;
-$analyzer-series3: $green;
+$analyzer-series3: $blue;
 $analyzer-series4: $purple;
 
 $table-gray: rgba(212, 212, 212, 0.2);

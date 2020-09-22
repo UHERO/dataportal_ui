@@ -38,15 +38,14 @@ import { CcomHelpComponent } from "./ccom-help/ccom-help.component";
       },
     },
     {
-      provide: "logo",
+      provide: 'logo',
       useValue: {
-        altText: "UHERO Data Portal Logo",
-        analyticsLogoSrc: "assets/Analytics_Logo.svg",
+        altText: 'Chamber of Commerce Hawaii Logo',
         displayImg: true,
-        headerText: "",
-        imgSrc: "assets/UHEROdata-Logo-color.svg",
+        headerText: '',
+        imgSrc: "assets/cochawaii_logo.jpg",
         mobileLogo: true,
-      },
+      }
     },
     {
       provide: "GoogleAnalyticsId",

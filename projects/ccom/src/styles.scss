@@ -87,6 +87,12 @@ body {
       }
     }
 
+    img {
+      @media (max-width: 767px) {
+        padding: 0 !important;
+      }
+    }
+
     .p-panelmenu {
       .p-panelmenu-header.p-highlight {
         a {
@@ -156,6 +162,10 @@ body {
     #header {
       p {
         color: $primary;
+      }
+
+      img {
+        padding: 0 !important;
       }
     }
   }
