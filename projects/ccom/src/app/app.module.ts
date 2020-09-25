@@ -41,6 +41,7 @@ import { CcomHelpComponent } from "./ccom-help/ccom-help.component";
       provide: 'logo',
       useValue: {
         altText: 'Chamber of Commerce Hawaii Logo',
+        analyticsLogoSrc: "assets/Analytics_Logo.svg",
         displayImg: true,
         headerText: '',
         imgSrc: "assets/cochawaii_logo.jpg",
