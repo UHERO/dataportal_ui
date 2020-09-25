@@ -19,6 +19,7 @@ import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
 import offlineExport from 'highcharts/modules/offline-exporting';
+import { max } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-analyzer-highstock',
@@ -222,6 +223,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       }
       return obj;
     }, { yAxis0: [], yAxis1: [] });
+    const indexBaseYear = this.getIndexBaseYear(series, this.start);
     const yAxes = Object.keys(axisIds).map((axis, index) => {
       const visibleSeries = axisIds[axis].find(s => s.showInChart);
       return {
@@ -232,7 +234,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         },
         id: axis,
         title: {
-          text: this.indexChecked ? 'Index' : visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
+          text: this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
@@ -250,13 +252,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
     // create copy to prevent original data from being altered if calculating indexed values
     const seriesCopy = JSON.parse(JSON.stringify(series));
+    const indexBaseYear = this.getIndexBaseYear(series, start);
+    console.log(dates.map(d => [Date.parse(d.date), null]))
     const chartSeries = seriesCopy.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       return {
         className: serie.seriesDetail.id,
         name: this.indexChecked ? serie.indexDisplayName : serie.chartDisplayName,
         tooltipName: serie.seriesDetail.title,
-        data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, start) : serie.chartData.level,
+        data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, indexBaseYear) : serie.chartData.level,
+        pointInterval: this.highstockHelper.freqInterval('S'),
+        pointIntervalUnit: this.highstockHelper.freqIntervalUnit('S'),
+        pointStart: Date.parse(dates[0].date),  
         levelData: serie.chartData.level.slice(),
         yAxis: axis ? axis.id : null,
         decimals: serie.seriesDetail.decimals,
@@ -308,9 +315,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return chartSeries;
   }
 
-  getIndexedValues(values, start) {
+  getIndexBaseYear = (series: any, start: string) => {
+    const maxObsStartDate = series.reduce((prev, current) => {
+      const prevObsStart = prev.observations.observationStart;
+      const currentObsStart = current.observations.observationStart;
+      return prevObsStart > currentObsStart ? prev : current;
+    }).observations.observationStart;
+    return maxObsStartDate > start ? maxObsStartDate : start;
+  }
+
+  getIndexedValues(values, baseYear: string) {
     return values.map((curr, ind, arr) => {
-      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === start);
+      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
       return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
     });
   }
@@ -349,11 +365,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
+    const setDateToFirstOfMonth =  (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const chartCallback = this.chartCallback;
-    const getIndexedValues = (values, start) => this.getIndexedValues(values, start);
+    const getIndexBaseYear = (series, start) => this.getIndexBaseYear(series, start);
+    const getIndexedValues = (values, baseYear) => this.getIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
 
     this.chartOptions.chart = {
@@ -502,16 +519,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
+              const indexBaseYear = getIndexBaseYear(series, this._extremes.min);
               this.series.forEach((serie) => {
                 if (serie.userOptions.className !== 'navigator') {
                   serie.update({
-                    data: getIndexedValues(serie.userOptions.levelData, this._extremes.min)
+                    data: getIndexedValues(serie.userOptions.levelData, indexBaseYear)
                   })
                 }
               });
             }
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to first of the month
+            console.log(this._extremes);
+            console.log(this)
             this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
           }
         }
@@ -535,24 +555,14 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   calculateMinRange = (freq: string) => {
-    if (freq === 'A') {
-      return 1000 * 3600 * 24 * 30 * 12;
+    const range = {
+      'A': 1000 * 3600 * 24 * 30 * 12,
+      'S': 1000 * 3600 * 24 * 30 * 6,
+      'Q': 1000 * 3600 * 24 * 30 * 3,
+      'M': 1000 * 3600 * 24 * 30,
+      'W': 1000 * 3600 * 24 * 7,
     }
-    if (freq === 'S') {
-      return 1000 * 3600 * 24 * 30 * 6;
-    }
-    if (freq === 'Q') {
-      return 1000 * 3600 * 24 * 30 * 3;
-    }
-    if (freq === 'M') {
-      return 1000 * 3600 * 24 * 30;
-    }
-    if (freq === 'W') {
-      return 1000 * 3600 * 24 * 7;
-    }
-    if (freq === 'D') {
-      return 1000 * 3600 * 24;
-    }
+    return range[freq] || 1000 * 3600 * 24;
   }
 
   formatTooltip(args, points, x, name: boolean, units: boolean, geo: boolean) {
@@ -585,15 +595,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       if (pseudoZones.length) {
         pseudoZones.forEach((zone) => {
           if (pointX < zone.value) {
-            return str += seriesColor + 'Pseudo History ' + label + geoLabel;
+            return str += `${seriesColor}Pseudo History ${label}${geoLabel}`;
           }
           if (pointX > zone.value) {
-            return str += seriesColor + label + geoLabel;
+            return str += `${seriesColor}${label}${geoLabel}`;
           }
         });
       }
       if (!pseudoZones.length) {
-        str += seriesColor + label + geoLabel + '<br>';
+        str += `${seriesColor}${label}${geoLabel}<br>`;
       }
       return str;
     };
@@ -613,9 +623,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       let label = '';
       qSeries.forEach((serie) => {
         // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
-        const obsDate = serie.data.find(obs => (Highcharts.dateFormat('%Y', obs.x) + ' ' + Highcharts.dateFormat('%b', obs.x)) === date);
+        const obsDate = serie.data.find(obs => `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date);
         if (obsDate) {
-          const qDate = pointQuarter + ' ' + Highcharts.dateFormat('%Y', obsDate.x);
+          const qDate = `${pointQuarter} ${Highcharts.dateFormat('%Y', obsDate.x)}`;
           label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');
         }
       });

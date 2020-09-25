@@ -113,6 +113,7 @@ export class HighstockComponent implements OnChanges {
 
   formatChartSeries = (chartData: HighchartChartData, portalSettings, seriesDetail, freq: Frequency) => {
     const series0 = chartData[portalSettings.highstock.series0Name];
+    console.log('series0', series0)
     const series1 = chartData[portalSettings.highstock.series1Name];
     const series2 = chartData[portalSettings.highstock.series2Name];
     const yoyLabel = seriesDetail.percent ? 'YOY Change' : 'YOY % Change';
@@ -307,6 +308,7 @@ export class HighstockComponent implements OnChanges {
         afterSetExtremes() {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
+          console.log('userMin', this.getExtremes())
           this._selectedMin = setDateToFirstOfMonth(freq.freq, userMin);
           this._selectedMax = setDateToFirstOfMonth(freq.freq, userMax);
           this._hasSetExtremes = true;
@@ -390,7 +392,7 @@ export class HighstockComponent implements OnChanges {
         if (pseudoZones.length) {
           pseudoZones.forEach((zone) => {
             if (point.x < zone.value) {
-              return s += seriesColor + pseudo + seriesNameValue + '<br>';
+              return s += `${seriesColor}${pseudo}${seriesNameValue}<br>`;
             }
             if (point.x > zone.value) {
               return s += label;
