@@ -55,6 +55,9 @@ export class DateSliderComponent implements OnInit {
   slideChange(e) {
     this.start = e.values[0];
     this.end = e.values[1];
+    // workaround for onSlideEnd not firing when not using the slide handles
+    this.sliderSelectedRange = [this.start, this.end];
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
   }
 
   slideEnd(e) {
@@ -77,7 +80,10 @@ export class DateSliderComponent implements OnInit {
 
   checkValidInputString = (value, freq: string) => {
     // Accepted input formats:
-    // Annual: YYYY; Quarterly: YYYY Q#, YYYYQ#, YYYY q#, YYYYq#; Monthly/Semiannual: YYYY-MM, YYYYMM
+    // Annual: YYYY
+    // Quarterly: YYYY Q#, YYYYQ#, YYYY q#, YYYYq#
+    // Monthly/Semiannual: YYYY-MM, YYYYMM
+    // Weekly: YYYY-MM-DD
     if (freq === 'A') {
       return /^\d{4}$/.test(value);
     }
@@ -86,6 +92,9 @@ export class DateSliderComponent implements OnInit {
     }
     if (freq === 'M' || freq === 'S') {
       return /^\d{4}(|-)\d{2}$/.test(value);
+    }
+    if (freq === 'W') {
+      return /^\d{4}(|-)\d{2}(|-)\d{2}$/.test(value);
     }
   }
 
