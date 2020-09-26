@@ -261,9 +261,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         name: this.indexChecked ? serie.indexDisplayName : serie.chartDisplayName,
         tooltipName: serie.seriesDetail.title,
         data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, indexBaseYear) : serie.chartData.level,
-        pointInterval: this.highstockHelper.freqInterval('S'),
-        pointIntervalUnit: this.highstockHelper.freqIntervalUnit('S'),
-        pointStart: Date.parse(dates[0].date),  
         levelData: serie.chartData.level.slice(),
         yAxis: axis ? axis.id : null,
         decimals: serie.seriesDetail.decimals,
@@ -529,10 +526,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
               });
             }
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
-            // use setExtremes to snap dates to first of the month
-            console.log(this._extremes);
-            console.log(this)
-            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max));
+            // use setExtremes to snap dates to min/max date range
+            setTimeout(() => {
+              this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
+            }, 1);
           }
         }
       },

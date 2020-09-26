@@ -64,17 +64,9 @@ export class HighstockHelperService {
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;
-      /* return {
-        min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
-        max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
-      }; */
     }
-    /* if (selectedRange) {
-      console.log('selectedRange', selectedRange)
-      return this.findVisibleMinMax(selectedRange.points, chartObject);
-    } */
-    console.log('SELECTED RANGE', selectedRange)
-    return selectedRange ? this.findVisibleMinMax(selectedRange, chartObject) : {
+    return selectedRange ? this.findVisibleMinMax(selectedRange, chartObject) :
+     {
       min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
       max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
     }
@@ -85,11 +77,7 @@ export class HighstockHelperService {
     let minCounter = 0;
     let xMin;
     let xMax;
-    console.log('chartObject', chartObject);
-    console.log('selectedMax', chartObject._selectedMax)
     while (!xMax || xMax > chartObject._selectedMax) {
-      console.log('maxCounter', maxCounter);
-      console.log('selectedRange[maxCounter]', selectedRange[maxCounter])
       xMax = new Date(selectedRange[maxCounter].x).toISOString().split('T')[0];
       maxCounter--;
     }
@@ -97,7 +85,6 @@ export class HighstockHelperService {
       xMin = new Date(selectedRange[minCounter].x).toISOString().split('T')[0];
       minCounter++;
     }
-    console.log('xMax', xMax)
     return { min: xMin, max: xMax };
   }
 
@@ -110,9 +97,6 @@ export class HighstockHelperService {
       'M': `${date.substr(0, 7)}-01`,
       'S': `${date.substr(0, 7)}-01`
     }
-    console.log('freq', freq);
-    console.log('DATE', date)
-    console.log('first of month', firstOfMonth[freq])
     return firstOfMonth[freq] || date;
   }
 
