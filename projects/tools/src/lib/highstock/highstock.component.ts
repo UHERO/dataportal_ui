@@ -390,7 +390,7 @@ export class HighstockComponent implements OnChanges {
         if (pseudoZones.length) {
           pseudoZones.forEach((zone) => {
             if (point.x < zone.value) {
-              return s += seriesColor + pseudo + seriesNameValue + '<br>';
+              return s += `${seriesColor}${pseudo}${seriesNameValue}<br>`;
             }
             if (point.x > zone.value) {
               return s += label;

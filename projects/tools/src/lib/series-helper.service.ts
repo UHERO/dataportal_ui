@@ -202,23 +202,14 @@ export class SeriesHelperService {
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {
     // Calculate compound annual growth rate
-    if (freq === 'A') {
-      return (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100;
+    const cagr = {
+      'A': (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100,
+      'S': (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100,
+      'Q': (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100,
+      'M': (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100,
+      'W': (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100,
+      'D': (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100
     }
-    if (freq === 'S') {
-      return (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100;
-    }
-    if (freq === 'Q') {
-      return (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100;
-    }
-    if (freq === 'M') {
-      return (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100;
-    }
-    if (freq === 'W') {
-      return (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100;
-    }
-    if (freq === 'D') {
-      return (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100;
-    }
+    return cagr[freq] || Infinity;
   }
 }
