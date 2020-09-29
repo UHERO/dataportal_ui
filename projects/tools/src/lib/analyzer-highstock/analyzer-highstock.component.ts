@@ -253,7 +253,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     // create copy to prevent original data from being altered if calculating indexed values
     const seriesCopy = JSON.parse(JSON.stringify(series));
     const indexBaseYear = this.getIndexBaseYear(series, start);
-    console.log(dates.map(d => [Date.parse(d.date), null]))
     const chartSeries = seriesCopy.map((serie) => {
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
       return {

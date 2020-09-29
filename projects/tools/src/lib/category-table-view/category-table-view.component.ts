@@ -97,6 +97,7 @@ export class CategoryTableViewComponent implements OnChanges {
     columns.push({
       field: 'series',
       headerName: 'Series',
+      colId: 'series',
       pinned: 'left',
       width: 275,
       cellRenderer: 'categoryTableRender',
@@ -123,7 +124,7 @@ export class CategoryTableViewComponent implements OnChanges {
     const tableDates = dates.slice(start, end + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
-      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125 });
+      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125, colId: i });
     }
     return columns;
   }
@@ -165,15 +166,12 @@ export class CategoryTableViewComponent implements OnChanges {
   }
 
   formatTransformationName = (transformation, percent) => {
-    if (transformation === 'pc1') {
-      return percent ? 'YOY (ch.)' : 'YOY (%)';
+    const transformationLabels = {
+      'pc1': 'YOY',
+      'ytd': 'YTD',
+      'c5ma': 'Annual'
     }
-    if (transformation === 'ytd') {
-      return percent ? 'YTD (ch.)' : 'YTD (%)';
-    }
-    if (transformation === 'c5ma') {
-      return percent ? 'Annual (ch.)' : 'Annual (%)';
-    }
+    return percent ? `${transformationLabels[transformation]} (ch.)` : `${transformationLabels[transformation]} (%)`;
   }
 
   onExport = () => {

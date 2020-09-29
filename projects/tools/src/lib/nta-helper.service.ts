@@ -226,7 +226,6 @@ export class NtaHelperService {
       let series;
       const levelData = res.seriesObservations.transformationResults[0].observations;
       const newLevelData = res.seriesObservations.transformationResults[0].dates;
-      const decimals = res.decimals ? res.decimals : 1;
       // Add series if level data is available
       if (levelData || newLevelData) {
         const seriesObsStart = res.seriesObservations.observationStart;
@@ -245,23 +244,25 @@ export class NtaHelperService {
     return filtered;
   }
 
-  setStartDate(dateWrapper, observationStart) {
-    if (dateWrapper.firstDate === '') {
+  setStartDate = (dateWrapper, observationStart) => {
+    /* if (dateWrapper.firstDate === '') {
       return observationStart;
     }
     if (observationStart < dateWrapper.firstDate) {
       return observationStart;
     }
-    return dateWrapper.firstDate;
+    return dateWrapper.firstDate; */
+    return (!dateWrapper.firstDate || observationStart < dateWrapper.firstDate) ? observationStart : dateWrapper.firstDate;
   }
 
-  setEndDate(dateWrapper, observationEnd) {
-    if (dateWrapper.endDate === '') {
+  setEndDate = (dateWrapper, observationEnd) => {
+    /* if (dateWrapper.endDate === '') {
       return observationEnd;
     }
     if (observationEnd > dateWrapper.endDate) {
       return observationEnd;
     }
-    return dateWrapper.endDate;
+    return dateWrapper.endDate; */
+    return (!dateWrapper.endDate || observationEnd > dateWrapper.endDate) ? observationEnd : dateWrapper.endDate;
   }
 }

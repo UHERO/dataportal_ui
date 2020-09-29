@@ -11,15 +11,15 @@ export class TableHelperService {
 
   showPopover(seriesInfo, subcatIndex?) {
     $('[data-toggle="tooltip"]').tooltip('hide');
-    const popoverId = subcatIndex ? '#' + subcatIndex + seriesInfo.id : '#' + seriesInfo.id;
+    const popoverId = subcatIndex ? `#${subcatIndex}${seriesInfo.id}` : `#${seriesInfo.id}`;
     const popover = $(popoverId).popover({
       trigger: 'manual',
       html: true,
       placement: 'left',
       title() {
         let title = seriesInfo.title;
-        title += ' (' + seriesInfo.geography.shortName + '; ' + seriesInfo.frequency + ')';
-        title += seriesInfo.unitsLabel ? ' (' + seriesInfo.unitsLabel + ')' : ' (' + seriesInfo.unitsLabelShort + ')';
+        title += ` (${seriesInfo.geography.shortname}; ${seriesInfo.frequency})`;
+        title += seriesInfo.unitsLabel ? ` (${seriesInfo.unitsLabel})` : ` (${seriesInfo.unitsLabelShort})`;
         title += '<i class="material-icons close-info">&#xE14C;</i>';
         return title;
       },
@@ -29,10 +29,10 @@ export class TableHelperService {
           info += 'Seasonally Adjusted<br>';
         }
         if (seriesInfo.sourceDescription) {
-          info += 'Source: ' + seriesInfo.sourceDescription + '<br>';
+          info += `Source: ${seriesInfo.sourceDescription}<br />`;
         }
         if (seriesInfo.sourceLink) {
-          info += '<a target="_blank" href="' + seriesInfo.sourceLink + '">' + seriesInfo.sourceLink + '</a><br>';
+          info += `<a target="_blank" href="${seriesInfo.sourceLink}">${seriesInfo.sourceLink}</a><br />`;
         }
         if (seriesInfo.sourceDetails) {
           info += seriesInfo.sourceDetails;
