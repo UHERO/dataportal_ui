@@ -34,7 +34,7 @@
     "jquery": "^3.4.1",
     "popper.js": "^1.16.1",
     "primeicons": "^4.0.0",
-    "primeng": "^10.0.0-rc.4",
+    "primeng": "^10.0.0",
     "rxjs": "~6.6.2",
     "tether": "^1.4.7",
     "tslib": "^2.0.0",

@@ -28,27 +28,21 @@ export class HighstockHelperService {
   constructor() { }
 
   freqInterval = (freq) => {
-    switch (freq) {
-      case 'Q':
-        return 3;
-      case 'S':
-        return 6;
-      case 'W':
-        return 7;
-      default:
-        return 1;
+    const interval = {
+      'Q': 3,
+      'S': 6,
+      'W': 7
     }
+    return interval[freq] || 1;
   }
+
   freqIntervalUnit = (freq) => {
-    switch (freq) {
-      case 'A':
-        return 'year';
-      case 'W':
-      case 'D':
-        return 'day';
-      default:
-        return 'month';
+    const unit = {
+      'A': 'year',
+      'W': 'day',
+      'D': 'day'
     }
+    return unit[freq] || 'month';
   }
 
   getChartExtremes = (chartObject) => {
@@ -69,14 +63,12 @@ export class HighstockHelperService {
   getAnalyzerChartExtremes = (chartObject) => {
     let selectedRange = null;
     if (chartObject) {
-      selectedRange = chartObject.series.find(s => s.name === 'Navigator');
-      return {
-        min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
-        max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
-      };
+      selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;
     }
-    if (selectedRange) {
-      return this.findVisibleMinMax(selectedRange.points, chartObject);
+    return selectedRange ? this.findVisibleMinMax(selectedRange, chartObject) :
+     {
+      min: new Date(chartObject._selectedMin).toISOString().split('T')[0],
+      max: new Date(chartObject._selectedMax).toISOString().split('T')[0]
     }
   }
 
@@ -99,18 +91,13 @@ export class HighstockHelperService {
   setDateToFirstOfMonth = (freq, date) => {
     const month = +date.substr(5, 2);
     const year = +date.substr(0, 4);
-    if (freq === 'A') {
-      return `${year}-01-01`;
+    const firstOfMonth = {
+      'A': `${year}-01-01`,
+      'Q': `${year}-${this.getQuarterMonths(month)}-01`,
+      'M': `${date.substr(0, 7)}-01`,
+      'S': `${date.substr(0, 7)}-01`
     }
-    if (freq === 'Q') {
-      return `${year}-${this.getQuarterMonths(month)}-01`;
-    }
-    if (freq === 'M' || freq === 'S') {
-      return `${date.substr(0, 7)}-01`;
-    }
-    if (freq === 'W' || freq === 'D') {
-      return date;
-    }
+    return firstOfMonth[freq] || date;
   }
 
   getQuarterMonths = (month) => {
@@ -157,60 +144,49 @@ export class HighstockHelperService {
   }
 
   getQuarterLabel = (month: string) => {
-    if (month === 'Jan') {
-      return ' Q1';
+    const quarters = {
+      'Jan': ' Q1',
+      'Apr': ' Q2',
+      'Jul': ' Q3',
+      'Oct': ' Q4' 
     }
-    if (month === 'Apr') {
-      return ' Q2';
-    }
-    if (month === 'Jul') {
-      return ' Q3';
-    }
-    if (month === 'Oct') {
-      return ' Q4';
-    }
-    return '';
+    return quarters[month] || '';
   }
 
   inputDateFormatter = (freq: string) => {
-    if (freq === 'A') {
-      return '%Y';
+    const dateFormat = {
+      'A': '%Y',
+      'Q': '%Y %Q',
+      'W': '%b %d %Y',
+      'D': '%b %d %Y'
     }
-    if (freq === 'Q') {
-      return '%Y %Q';
-    }
-    if (freq === 'W' || freq === 'D') {
-      return '%b %d %Y';
-    }
-    return '%b %Y';
+    return dateFormat[freq] || '%b %Y';
   }
 
   inputEditDateFormatter = (freq: string) => {
-    if (freq === 'A') {
-      return '%Y';
+    const inputDateFormat = {
+      'A': '%Y',
+      'Q': '%Y %Q',
+      'W': '%Y-%m-%d',
+      'D': '%Y-%m-%d'
     }
-    if (freq === 'Q') {
-      return '%Y %Q';
-    }
-    if (freq === 'W' || freq === 'D') {
-      return '%Y-%m-%d';
-    }
-    return '%Y-%m';
+    return inputDateFormat[freq] || '%Y-%m';
   }
 
   inputDateParserFormatter = (value: string, freq: string) => {
     const year = value.substr(0, 4);
     if (freq === 'Q') {
-      if (value.toUpperCase().includes('Q1')) {
+      const quarter = value.toUpperCase();
+      if (quarter.includes('Q1')) {
         return Date.parse(`${year}-01-01`);
       }
-      if (value.toUpperCase().includes('Q2')) {
+      if (quarter.includes('Q2')) {
         return Date.parse(`${year}-04-01`);
       }
-      if (value.toUpperCase().includes('Q3')) {
+      if (quarter.includes('Q3')) {
         return Date.parse(`${year}-07-01`);
       }
-      if (value.toUpperCase().includes('Q4')) {
+      if (quarter.includes('Q4')) {
         return Date.parse(`${year}-10-01`);
       }
     }
