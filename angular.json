@@ -66,7 +66,7 @@
               "fileReplacements": [
                 {
                   "replace": "projects/uhero/src/environments/environment.ts",
-                  "with": "projects/uhero/src/environments/environment.prod.ts"
+                  "with": "projects/uhero/src/environments/environment.staging.ts"
                 }
               ]
             },
@@ -249,7 +249,8 @@
                   "replace": "projects/coh/src/environments/environment.ts",
                   "with": "projects/coh/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "baseHref": "/coh/"
             },
             "production": {
               "fileReplacements": [
@@ -258,6 +259,7 @@
                   "with": "projects/coh/src/environments/environment.prod.ts"
                 }
               ],
+              "baseHref": "/coh/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -420,9 +422,10 @@
               "fileReplacements": [
                 {
                   "replace": "projects/nta/src/environments/environment.ts",
-                  "with": "projects/nta/src/environments/environment.prod.ts"
+                  "with": "projects/nta/src/environments/environment.staging.ts"
                 }
-              ]
+              ],
+              "baseHref": "/nta/"
             },
             "production": {
               "fileReplacements": [
@@ -431,6 +434,7 @@
                   "with": "projects/nta/src/environments/environment.prod.ts"
                 }
               ],
+              "baseHref": "/nta/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -575,6 +579,181 @@
             "exclude": [
               "**/node_modules/**"
             ]
+          }
+        }
+      }
+    },
+    "ccom": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/ccom",
+      "sourceRoot": "projects/ccom/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/ccom",
+            "index": "projects/ccom/src/index.html",
+            "main": "projects/ccom/src/main.ts",
+            "polyfills": "projects/ccom/src/polyfills.ts",
+            "tsConfig": "projects/ccom/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/ccom/src/favicon.ico",
+              "projects/ccom/src/assets",
+              "projects/ccom/src/outage.html"
+
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/primeng/resources/themes/nova/theme.css",
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/highcharts/css/highcharts.css",
+              "projects/ccom/src/styles.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets"
+              ]
+            },
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
+          },
+          "configurations": {
+            "staging": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": true,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/ccom/src/environments/environment.ts",
+                  "with": "projects/ccom/src/environments/environment.staging.ts"
+                }
+              ],
+              "baseHref": "/ccom/"
+            },
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/ccom/src/environments/environment.ts",
+                  "with": "projects/ccom/src/environments/environment.prod.ts"
+                }
+              ],
+              "baseHref": "/ccom/",
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "apiDev": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/ccom/src/environments/environment.ts",
+                  "with": "projects/ccom/src/environments/environment.apiDev.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ccom:build"
+          },
+          "configurations": {
+            "staging": {
+              "browserTarget": "ccom:build:staging"
+            },
+            "production": {
+              "browserTarget": "ccom:build:production"
+            },
+            "apiDev": {
+              "browserTarget": "ccom:build:apiDev"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ccom:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ccom/src/test.ts",
+            "polyfills": "projects/ccom/src/polyfills.ts",
+            "tsConfig": "projects/ccom/tsconfig.spec.json",
+            "karmaConfig": "projects/ccom/karma.conf.js",
+            "assets": [
+              "projects/ccom/src/favicon.ico",
+              "projects/ccom/src/assets"
+            ],
+            "styles": [
+              "projects/ccom/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ccom/tsconfig.app.json",
+              "projects/ccom/tsconfig.spec.json",
+              "projects/ccom/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/ccom/e2e/protractor.conf.js",
+            "devServerTarget": "ccom:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ccom:serve:production"
+            }
           }
         }
       }
