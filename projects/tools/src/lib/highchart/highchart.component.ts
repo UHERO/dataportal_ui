@@ -160,7 +160,8 @@ export class HighchartComponent implements OnChanges {
     let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
     series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
+    const chartStartExists = this.categoryDates.find(d => chartStart === d.date);
+    const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
     // Check how many non-null points exist in level series
     const levelLength = series0.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);

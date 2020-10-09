@@ -9,6 +9,7 @@ import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
 import { PrimengMenuNavComponent } from './primeng-menu-nav/primeng-menu-nav.component';
 import { PanelMenuModule } from 'primeng/panelmenu';
+import { CalendarModule } from 'primeng/calendar';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { CategoryChartsComponent } from './category-charts/category-charts.component';
 import { CategoryTableViewComponent } from './category-table-view/category-table-view.component';
@@ -71,6 +72,7 @@ import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
     TableModule,
     SliderModule,
     PanelMenuModule,
+    CalendarModule,
     HighchartsChartModule,
     AgGridModule.withComponents([
       CategoryTableRenderComponent,

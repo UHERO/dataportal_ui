@@ -1,3 +1,11 @@
-<input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[start]" (change)="inputChange($event, 'from')" />
-<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true" (onChange)="slideChange($event)" (onSlideEnd)="slideEnd($event)"></p-slider>
+<!-- <input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[start]" (change)="inputChange($event, 'from')" /> -->
+<div class="p-field p-col-12 p-md-4">
+  <label for="basic">Basic</label>
+  <p-calendar #calendar [class.annual-calendar]="freq === 'A'" inputId="basic" [view]="calendarView" [minDate]="minDateValue" [maxDate]="maxDateValue"
+    [(ngModel)]="value" [dateFormat]="calendarDateFormat" [yearNavigator]="true" [disabledDates]="invalidDates"
+    [yearRange]="calendarYearRange" (onSelect)="onCalendarSelect($event)" (onYearChange)="onYearChange($event, freq)">
+  </p-calendar>
+</div>
+<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
+  (onChange)="slideChange($event)" (onSlideEnd)="slideEnd($event)"></p-slider>
 <input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[end]" (change)="inputChange($event, 'to')" />
