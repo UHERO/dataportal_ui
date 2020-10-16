@@ -19,8 +19,17 @@ p-calendar.annual-calendar {
   .p-monthpicker {
     display: none;
   }
+}
 
+p-calendar {
   button.p-datepicker-prev, button.p-datepicker-next {
     display: none;
+  }
+
+  input.p-inputtext {
+    padding: 1px 2px;
+    font-size: 0.85em;
+    width: 85px !important;
+    text-align: center;
   }
 }

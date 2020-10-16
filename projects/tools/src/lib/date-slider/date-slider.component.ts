@@ -29,6 +29,7 @@ export class DateSliderComponent implements OnInit {
   calendarYearRange: string;
   calendarStartDate: Date;
   invalidDates;
+  displayMonthNavigator: boolean;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -44,50 +45,60 @@ export class DateSliderComponent implements OnInit {
       this.end = defaultRanges.end;
       this.sliderDates = defaultRanges.sliderDates;
       this.sliderSelectedRange = [this.start, this.end];
-
+      this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
       /* Date picker inputs */
       this.calendarView = this.setCalendarView(this.freq);
       this.calendarYearRange = this.setCalendarYearRange(this.sliderDates);
-      this.calendarStartDate = new Date(this.sliderDates[this.start]);
-      console.log('DATES', this.dates)
-      this.value = new Date(this.dates[this.start].date.replace(/-/g, '/'));
-      this.calendarDateFormat = this.setCalendarDateFormat(this.freq, this.value);
-      this.invalidDates = this.setInvalidDates(this.value.getFullYear());
-      console.log('sliderDates[start]', this.sliderDates[this.start].replace(/-/g, '/'))
-      console.log('default date', this.defaultDate)
-      const maxDate = new Date(this.dates[this.dates.length - 1].date.replace(/-/g, '/'));
-      const minDate = new Date(this.sliderDates[0]);
-      this.maxDateValue = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
-      console.log('this.maxDateValue', this.maxDateValue)
-      this.minDateValue = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+      this.calendarStartDate = new Date(this.dates[this.start].date.replace(/-/g, '/'));
+      this.calendarDateFormat = this.setCalendarDateFormat(this.freq, this.calendarStartDate);
+      this.invalidDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);
+      this.setMinMaxDates();
     }
   }
 
-  setInvalidDates = (year: number) => {
-    return this.getInvalidQuarterMonths(year);
+  setInvalidDates = (year: number, freq: string, month?: number) => {
+    const datesToDisable = {
+      'A': [],
+      'S': this.getInvalidMonths(year, freq),
+      'Q': this.getInvalidMonths(year, freq),
+      'M': [],
+      'W': this.getInvalidWeeklyDates(year, month)
+    };
+    return datesToDisable[freq] || [];
   }
 
-  getInvalidQuarterMonths = (year: number) => {
+  getInvalidMonths = (year: number, freq: string) => {
+    // For quarterly and semi-annual series
+    // Months not evenly divisible by 3 should be invalidated for quarterly series
+    // Month not evenly divisible by 6 should be invalidated for semi-annual series
     const invalidDates = [];
-    for (let m = 0; m < 12; m++) {
-      if ((m % 3)) {
-        invalidDates.push(new Date(year, m, 1));
+    const m = freq === 'Q' ? 3 : 6;
+    for (let month = 0; month < 12; month++) {
+      if ((month % m)) {
+        invalidDates.push(new Date(year, month, 1));
       }
     }
     return invalidDates;
   }
 
-  setCalendarYearRange = (sliderDates: Array<any>) => {
-    console.log(`${sliderDates[0].substr(0, 4)}:${sliderDates[sliderDates.length - 1].substr(0, 4)}`)
-    return `${sliderDates[0].substr(0, 4)}:${sliderDates[sliderDates.length - 1].substr(0, 4)}`;
+  getInvalidWeeklyDates = (year: number, month: number) => {
+    const invalidDates = [];
+    const daysInMonth = new Date(year, month, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const paddedDay = day.toString().length === 1 ? `0${day}` : day;
+      const paddedMonth = (month).toString().length === 1 ? `0${month}` : month;
+      if (!this.sliderDates.find(date => date === `${year}-${paddedMonth}-${paddedDay}`)) {
+        invalidDates.push(new Date(year, month - 1, day));
+      }
+    }
+    return invalidDates;
   }
 
-  setCalendarView = (freq: string) => {
-    return (freq === 'W' || freq === 'D') ? 'date' : 'month';
-  }
+  setCalendarYearRange = (sliderDates: Array<any>) => `${sliderDates[0].substr(0, 4)}:${sliderDates[sliderDates.length - 1].substr(0, 4)}`;
 
-  setCalendarDateFormat = (freq: string, value) => {
-    console.log('VALUE', value.getMonth())
+  setCalendarView = (freq: string) => (freq === 'W' || freq === 'D') ? 'date' : 'month';
+
+  setCalendarDateFormat = (freq: string, value: Date) => {
     const quarters = { 0: 'Q1', 3: 'Q2', 6: 'Q3', 9: 'Q4' };
     const format = {
       'A': 'yy',
@@ -100,47 +111,93 @@ export class DateSliderComponent implements OnInit {
     return format[freq] || 'yy-mm-dd';
   }
 
+  onCalendarInput(e: any, freq: string) {
+    const isValidInput = this.checkValidCalendarInput(e.target.value.toUpperCase(), freq);
+    if (isValidInput) {
+      this.updateCalendarDate(e.target.value.toUpperCase(), freq);
+    }
+  }
+
+  checkValidCalendarInput = (value: string, freq: string) => {
+    const valueLength = {
+      'A': 4,
+      'S': 7,
+      'Q': 7,
+      'M': 7,
+      'W': 10,
+      'D': 10
+    };
+    return valueLength[freq] === value.length && this.sliderDates.indexOf(value) > -1;
+  }
+
+  onCalendarBlur(e: any, selectedDate) {
+    // in case user deletes part of date from input and input is no longer valid
+    if (!selectedDate) {
+      this.calendarStartDate = new Date(this.dates[this.start].date.replace(/-/g, '/'));
+    }
+  }
+
+  updateCalendarDate(value: string, freq: string) {
+    const qMonths = { 'Q1': '01', 'Q2': '04', 'Q3': '07', 'Q4': '10' };
+    const quarter = value[value.search(/(q|Q)[1-4]/)];
+    const newDate = {
+      'A': new Date(`${value}/01/01`),
+      'S': new Date(`${value}/01`),
+      'Q': new Date(`${value.slice(0, 4)}/${qMonths[value.slice(5, 7)]}/01`),
+      'M': new Date(`${value}/01`),
+      'W': new Date(value.replace(/-/g, '/')),
+      'D': new Date(value.replace(/-/g, '/'))
+    };
+    this.calendarStartDate = newDate[this.freq];
+    this.calendarDateFormat = this.setCalendarDateFormat(freq, this.calendarStartDate);
+    this.start = this.sliderDates.indexOf(value);
+    this.sliderSelectedRange = [this.start, this.end];
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
+    const year = this.calendarStartDate.getUTCFullYear();
+    const month = this.calendarStartDate.getMonth() + 1;
+    this.invalidDates = freq === 'A' ? this.setInvalidDates(year, this.freq, 0) : this.setInvalidDates(year, this.freq, month);
+  }
+
+  updateAnnualCalendarDate(year) {
+    this.calendarStartDate = new Date(`${year}/01/01`);
+    this.start = this.sliderDates.indexOf(year);
+    this.sliderSelectedRange = [this.start, this.end];
+    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
+    this.invalidDates = this.setInvalidDates(year, this.freq, 0);
+  }
+
   onCalendarSelect(e: any) {
-    console.log('e', e);
-    console.log(e.toISOString().substr(0, 10));
-    console.log(this.sliderDates);
     const dateIndex = this.dates.map(d => d.date).indexOf(e.toISOString().substr(0, 10));
-    this.value = new Date(e.toISOString().substr(0, 10).replace(/-/g, '/'));
-    this.calendarDateFormat = this.setCalendarDateFormat(this.freq, this.value);
-    // TESTING
-    const formattedValue = this.formatInput(e.toISOString().substr(0, 7), this.freq);
+    this.calendarStartDate = new Date(e.toISOString().substr(0, 10).replace(/-/g, '/'));
+    this.calendarDateFormat = this.setCalendarDateFormat(this.freq, this.calendarStartDate);
     this.start = dateIndex;
     this.sliderSelectedRange = [this.start, this.end];
     this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
-
+    this.invalidDates = this.setInvalidDates(e.getFullYear(), this.freq, e.getMonth());
   }
 
-  onMonthChange(e:any) {
-    console.log('onmonthchangr', e)
-    this.minDateValue = new Date(e.year, 0, 1);
-    this.maxDateValue = new Date(e.year, 0, 1);
+  onCalendarClose(e: any, selectedDate) {
+    this.calendarStartDate = selectedDate ? new Date(selectedDate) : new Date(this.dates[this.start].date.replace(/-/g, '/'));
+    this.invalidDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);
+  }
+
+  onMonthChange(e:any, freq: string) {
+    this.invalidDates = this.setInvalidDates(e.year, freq, e.month);
+    this.setMinMaxDates();
   }
 
   onYearChange(e: any, freq: string) {
     if (freq === 'A') {
-      this.value = new Date(e.year, 0, 1);
-      this.start = this.sliderDates.indexOf(e.year.toString());
-      //this.end = e.values[1];
-      // workaround for onSlideEnd not firing when not using the slide handles
-      this.sliderSelectedRange = [this.start, this.end];
-      //this.defaultDate = new Date(this.sliderDates[this.start].replace(/-/g, '/')+'/01/01');
-      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
+      this.updateCalendarDate(e.year.toString(), freq);
       this.datePicker.overlayVisible = false;
     }
-    console.log('onyearchange', e);
-    console.log('freq', freq)
-    this.minDateValue = new Date(e.year, 0, 1);
-    let month = new Date().getMonth();
-    this.maxDateValue = new Date();
-    this.maxDateValue.setMonth(month);
-    this.invalidDates = this.setInvalidDates(e.year);
-    const maxDate = new Date(this.dates[this.dates.length - 1].date.replace(/-/g, '/'));
-    this.maxDateValue = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
+    this.invalidDates = this.setInvalidDates(e.year, this.freq, e.month);
+    this.setMinMaxDates();
+  }
+
+  setMinMaxDates() {
+    this.maxDateValue = new Date(this.dates[this.dates.length - 1].date.replace(/-/g, '/'));
+    this.minDateValue = new Date(this.dates[0].date.replace(/-/g, '/'));
   }
 
   inputChange(e, input: string) {
@@ -293,9 +350,5 @@ export class DateSliderComponent implements OnInit {
     if (freq === 'W' || freq === 'D') {
       return value;
     }
-  }
-
-  calendarSelect(value) {
-    console.log('value', value.toISOString().substr(0, 10))
   }
 }
