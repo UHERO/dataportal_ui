@@ -277,17 +277,52 @@ export class HelperService {
     return this.getRanges(freq, counter, defaultSettings.range);
   }
 
-  setDefaultSliderRange(freq, dateArray, defaults) {
-    const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = defaultSettings.end ?
-      defaultSettings.end : new Date(dateArray[dateArray.length - 1].toString().substr(0, 4)).toISOString().substr(0, 4);
-    let counter = dateArray.length - 1;
-    // https://github.com/IonDen/ion.rangeSlider/issues/298
-    // Slider values being converted from strings to numbers for annual dates
-    while (new Date(dateArray[counter].toString().substr(0, 4)).toISOString().substr(0, 4) > defaultEnd) {
-      counter--;
+  getSeriesStartAndEnd = (dates: Array<any>, start: string, end: string, freq: string, defaultRange) => {
+    const defaultRanges = this.setDefaultCategoryRange(freq, dates, defaultRange);
+    let { startIndex, endIndex } = defaultRanges;
+    if (start) {
+      const dateFromExists = this.checkDateExists(start, dates, freq);
+      if (dateFromExists > -1) {
+        startIndex = dateFromExists;
+      }
+      if (start < dates[0].date) {
+        startIndex = defaultRanges.startIndex;
+      }
     }
-    return this.getRanges(freq, counter, defaultSettings.range);
+    if (end) {
+      const dateToExists = this.checkDateExists(end, dates, freq);
+      if (dateToExists > -1) {
+        endIndex = dateToExists;
+      }
+      if (end > dates[dates.length - 1].date) {
+        endIndex = defaultRanges.endIndex;
+      }
+    }
+    return { seriesStart: startIndex, seriesEnd: endIndex };
+  }
+
+  checkDateExists = (date: string, dates: Array<any>, freq: string) => {
+    let dateToCheck = date;
+    const year = date.substring(0, 4);
+    if (freq === 'A') {
+      dateToCheck = `${year}-01-01`;
+    }
+    if (freq === 'Q') {
+      const month = +date.substring(5, 7);
+      if (month >= 1 && month <= 3) {
+        dateToCheck = `${year}-01-01`;
+      }
+      if (month >= 4 && month <= 6) {
+        dateToCheck = `${year}-04-01`;
+      }
+      if (month >= 7 && month <= 9) {
+        dateToCheck = `${year}-07-01`;
+      }
+      if (month >= 10 && month <= 12) {
+        dateToCheck = `${year}-10-01`;
+      }
+    }
+    return dates.findIndex(d => d.date === dateToCheck);
   }
 
   getRanges(freq, counter, range) {

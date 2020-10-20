@@ -32,4 +32,8 @@ p-calendar {
     width: 85px !important;
     text-align: center;
   }
+
+  .p-calendar .p-datepicker {
+    min-width: 200%;
+  }
 }
