@@ -1,4 +1,4 @@
-import { Component, Inject, OnChanges, Input, ɵConsole } from '@angular/core';
+import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
@@ -157,8 +157,6 @@ export class HighchartComponent implements OnChanges {
       subtitleText += s1 ?
       `${this.formatTransformLabel(s1.name, percent)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
-        console.log('subtitleText', subtitleText);
-        console.log('s1', s1)
       chart.setSubtitle({
         text: subtitleText,
         verticalAlign: 'middle',
