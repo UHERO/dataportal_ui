@@ -1,3 +1,25 @@
-<input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[start]" (change)="inputChange($event, 'from')" />
-<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true" (onChange)="slideChange($event)" (onSlideEnd)="slideEnd($event)"></p-slider>
-<input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[end]" (change)="inputChange($event, 'to')" />
+<!-- <input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[start]" (change)="inputChange($event, 'from')" /> -->
+<p-calendar #calendarStart [class.annual-calendar]="freq === 'A'" inputId="calendar-start" [view]="calendarView"
+  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarStartDate"
+  [dateFormat]="calendarStartDateFormat" [yearNavigator]="true" [monthNavigator]="displayMonthNavigator"
+  [disabledDates]="invalidStartDates" [yearRange]="calendarYearRange"
+  (onSelect)="onCalendarSelect($event, calendarStart.inputId, freq)"
+  (onYearChange)="onYearChange($event, calendarStart.inputId, freq)"
+  (onMonthChange)="onMonthChange($event, calendarStart.inputId, freq)"
+  (onInput)="onCalendarInput($event, calendarStart.inputId, freq)"
+  (onClose)="onCalendarClose(calendarStart.inputId, calendarStartDate)"
+  (onBlur)="onCalendarBlur(calendarStart.inputId, calendarStartDate)">
+</p-calendar>
+<p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
+  (onChange)="slideChange($event)" (onSlideEnd)="slideChange($event)"></p-slider>
+<!-- <input type="text" class="date-input" pInputText [(ngModel)]="sliderDates[end]" (change)="inputChange($event, 'to')" /> -->
+<p-calendar #calendarEnd [class.annual-calendar]="freq === 'A'" inputId="calendar-end" [view]="calendarView"
+  [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [dateFormat]="calendarEndDateFormat"
+  [yearNavigator]="true" [monthNavigator]="displayMonthNavigator" [disabledDates]="invalidEndDates"
+  [yearRange]="calendarYearRange" (onSelect)="onCalendarSelect($event, calendarEnd.inputId, freq)"
+  (onYearChange)="onYearChange($event, calendarEnd.inputId, freq)"
+  (onMonthChange)="onMonthChange($event, calendarEnd.inputId, freq)"
+  (onInput)="onCalendarInput($event, calendarEnd.inputId, freq)"
+  (onClose)="onCalendarClose(calendarEnd.inputId, calendarEndDate)"
+  (onBlur)="onCalendarBlur(calendarEnd.inputId, calendarEndDate)">
+</p-calendar>

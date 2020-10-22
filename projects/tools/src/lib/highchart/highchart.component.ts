@@ -47,21 +47,6 @@ export class HighchartComponent implements OnChanges {
       this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
       this.updateChart = true;
     }
-
-  }
-
-  getSeriesStartAndEnd = (dates, start, end) => {
-    const defaultRanges = this.helperService.setDefaultCategoryRange(this.currentFreq, dates, this.defaultRange);
-    let { startIndex, endIndex } = defaultRanges;
-    dates.forEach((item, index) => {
-      if (item.date === start) {
-        startIndex = index;
-      }
-      if (item.date === end) {
-        endIndex = index;
-      }
-    });
-    return { seriesStart: startIndex, seriesEnd: endIndex };
   }
 
   setChartTitle = (title: string) => {
@@ -154,13 +139,14 @@ export class HighchartComponent implements OnChanges {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
-    const { seriesStart, seriesEnd } = this.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd);
-    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
+    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd, currentFreq, this.defaultRange);
+    const decimals = seriesData.seriesInfo.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
     series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const startDate = chartStart ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
+    const chartStartExists = this.categoryDates.find(d => chartStart === d.date);
+    const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
     // Check how many non-null points exist in level series
     const levelLength = series0.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);
@@ -169,7 +155,7 @@ export class HighchartComponent implements OnChanges {
       let subtitleText = '';
       subtitleText += Highcharts.numberFormat(point0.y, decimals, '.', ',') + '<br> (' + unitsLabelShort + ') <br>';
       subtitleText += s1 ?
-      `${this.formatTransformLabel(series1.name, percent)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
+      `${this.formatTransformLabel(s1.name, percent)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
       chart.setSubtitle({
         text: subtitleText,
@@ -389,6 +375,7 @@ export class HighchartComponent implements OnChanges {
     if (freq === 'M' || freq === 'S') {
       return Highcharts.dateFormat('%b', date) + ' ' + year;
     }
+    return Highcharts.dateFormat('%b %e, %Y', date);
   }
 
   noDataChart = (seriesData) => {

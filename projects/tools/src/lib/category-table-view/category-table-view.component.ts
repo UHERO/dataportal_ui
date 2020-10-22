@@ -105,23 +105,8 @@ export class CategoryTableViewComponent implements OnChanges {
         return params.value;
       }
     });
-    const defaultRanges = this.helperService.setDefaultCategoryRange(freq, dates, defaultRange);
-    let { startIndex, endIndex } = defaultRanges;
-    dates.forEach((date, index) => {
-      if (date.date === tableStart) {
-        startIndex = index;
-      }
-      if (date.date === tableEnd) {
-        endIndex = index;
-      }
-    });
-    let start = startIndex;
-    let end = endIndex;
-    if (startIndex > endIndex) {
-      start = defaultRanges.startIndex;
-      end = defaultRanges.endIndex;
-    }
-    const tableDates = dates.slice(start, end + 1);
+    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, tableStart, tableEnd, freq, defaultRange);
+    const tableDates = dates.slice(seriesStart, seriesEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
     for (let i = tableDates.length - 1; i >= 0; i--) {
       columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125, colId: i });
