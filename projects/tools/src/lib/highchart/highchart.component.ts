@@ -140,7 +140,7 @@ export class HighchartComponent implements OnChanges {
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
     const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd, currentFreq, this.defaultRange);
-    const decimals = seriesData.seriesInfo.decimals ? seriesData.seriesInfo.decimals : 1;
+    const decimals = seriesData.seriesInfo.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
@@ -157,6 +157,8 @@ export class HighchartComponent implements OnChanges {
       subtitleText += s1 ?
       `${this.formatTransformLabel(s1.name, percent)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
+        console.log('subtitleText', subtitleText);
+        console.log('s1', s1)
       chart.setSubtitle({
         text: subtitleText,
         verticalAlign: 'middle',
@@ -375,6 +377,7 @@ export class HighchartComponent implements OnChanges {
     if (freq === 'M' || freq === 'S') {
       return Highcharts.dateFormat('%b', date) + ' ' + year;
     }
+    return Highcharts.dateFormat('%b %e, %Y', date);
   }
 
   noDataChart = (seriesData) => {

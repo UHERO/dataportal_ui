@@ -322,7 +322,8 @@ export class HelperService {
         dateToCheck = `${year}-10-01`;
       }
     }
-    return dates.findIndex(d => d.date === dateToCheck);
+    const dateArray = dates.map(d => d.date);
+    return this.binarySearch(dateArray, dateToCheck);
   }
 
   getRanges(freq, counter, range) {

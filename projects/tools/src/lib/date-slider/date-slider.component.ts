@@ -225,22 +225,6 @@ export class DateSliderComponent implements OnInit {
     this.minDateValue = new Date(this.dates[0].date.replace(/-/g, '/'));
   }
 
-  inputChange(e, input: string) {
-    const newValue = e.target.value.toUpperCase();
-    const formattedValue = this.formatInput(newValue, this.freq);
-    this.sliderDates = this.dates.map(d => d.tableDate); // Changing inputs seems to alter original array?
-    const validInputs = input === 'from' ?
-      this.checkValidInputs(formattedValue, this.sliderDates[this.end], input, this.freq) :
-      this.checkValidInputs(formattedValue, this.sliderDates[this.start], input, this.freq);
-    const valueIndex = this.sliderDates.indexOf(formattedValue);
-    if (valueIndex >= 0 && validInputs) {
-      this.start = input === 'from' ? this.sliderDates.indexOf(formattedValue) : this.start;
-      this.end = input === 'to' ? this.sliderDates.indexOf(formattedValue) : this.end;
-      this.sliderSelectedRange = [this.start, this.end];
-      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
-    }
-  }
-
   slideChange(e) {
     this.start = e.values[0];
     this.end = e.values[1];
@@ -257,7 +241,7 @@ export class DateSliderComponent implements OnInit {
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
   }
 
-  slideEnd(e) {
+  /* slideEnd(e) {
     this.start = e.values[0];
     this.end = e.values[1];
     this.sliderSelectedRange = [this.start, this.end];
@@ -270,7 +254,7 @@ export class DateSliderComponent implements OnInit {
     this.calendarEndDate = new Date(endDate.replace(/-/g, '/'));
     this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
-  }
+  } */
 
   updateChartsAndTables(from, to, freq: string) {
     const seriesStart = this.formatChartDate(from, freq);
@@ -281,49 +265,6 @@ export class DateSliderComponent implements OnInit {
 
   updateRanges(from, to, freq: string) {
     this.updateChartsAndTables(from, to, freq);
-  }
-
-  checkValidInputString = (value, freq: string) => {
-    // Accepted input formats:
-    // Annual: YYYY
-    // Quarterly: YYYY Q#, YYYYQ#, YYYY q#, YYYYq#
-    // Monthly/Semiannual: YYYY-MM, YYYYMM
-    // Weekly: YYYY-MM-DD
-    if (freq === 'A') {
-      return /^\d{4}$/.test(value);
-    }
-    if (freq === 'Q') {
-      return /^\d{4}( |)[Q]\d{1}$/.test(value);
-    }
-    if (freq === 'M' || freq === 'S') {
-      return /^\d{4}(|-)\d{2}$/.test(value);
-    }
-    if (freq === 'W') {
-      return /^\d{4}(|-)\d{2}(|-)\d{2}$/.test(value);
-    }
-  }
-
-  checkValidInputs = (value, siblingValue, key: string, freq: string) => {
-    const validString = this.checkValidInputString(value.toUpperCase(), freq);
-    if (!validString) {
-      return false;
-    }
-    if (key === 'from') {
-      return value <= siblingValue ? true : false;
-    }
-    if (key === 'to') {
-      return value >= siblingValue ? true : false;
-    }
-  }
-
-  formatInput = (value: string, freq: string) => {
-    if (freq === 'Q') {
-      return value.includes(' ') ? value : value.slice(0, 4) + ' ' + value.slice(4);
-    }
-    if (freq === 'M' || freq === 'S') {
-      return value.includes('-') ? value : value.slice(0, 4) + '-' + value.slice(4);
-    }
-    return value;
   }
 
   formatChartDate = (value, freq) => {
