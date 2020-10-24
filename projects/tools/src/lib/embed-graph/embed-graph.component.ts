@@ -22,7 +22,7 @@ export class EmbedGraphComponent implements OnInit {
   tooltipGeo: boolean = true;
   tooltipName: boolean = true;
   tooltipUnits: boolean = true;
-  indexSeries: boolean = true;
+  indexSeries: boolean;
   
   constructor(
     @Inject('portal') public portal,
