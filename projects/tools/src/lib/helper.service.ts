@@ -18,13 +18,14 @@ export class HelperService {
   }
 
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
+    const seasonalAdjustment = series.seriesInfo.seasonalAdjustment;
     if (!hasSeasonal) {
       return true;
     }
-    if (series.seriesInfo.seasonalAdjustment !== 'seasonally_adjusted' && !showSeasonal) {
+    if (!showSeasonal && (seasonalAdjustment !== 'seasonally_adjusted' || seasonalAdjustment === 'not_applicable')) {
       return true;
     }
-    return showSeasonal && series.seriesInfo.seasonalAdjustment === 'seasonally_adjusted';
+    return showSeasonal && (seasonalAdjustment === 'seasonally_adjusted' || seasonalAdjustment === 'not_applicable');
   }
 
   checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
