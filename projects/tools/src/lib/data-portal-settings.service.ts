@@ -48,7 +48,8 @@ export class DataPortalSettingsService {
         ytd: false,
         c5ma: true
       },
-      sliderInteraction: false
+      sliderInteraction: false,
+      otherDashboardLinks: []
     },
     uhero: {
       catTable: {
@@ -96,7 +97,13 @@ export class DataPortalSettingsService {
         ytd: true,
         c5ma: false
       },
-      sliderInteraction: true
+      sliderInteraction: true,
+      otherDashboardLinks: [
+        {
+          name: `Hawai'i High Frequency Economic Data`,
+          url: `https://data.uhero.hawaii.edu/high-frequency-dashboard/#/`
+        }
+      ]
     },
     ccom: {
       catTable: {
@@ -144,7 +151,8 @@ export class DataPortalSettingsService {
         ytd: true,
         c5ma: false
       },
-      sliderInteraction: true
+      sliderInteraction: true,
+      otherDashboardLinks: []
     },
     coh: {
       catTable: {
@@ -192,7 +200,8 @@ export class DataPortalSettingsService {
         ytd: true,
         c5ma: false
       },
-      sliderInteraction: true
+      sliderInteraction: true,
+      otherDashboardLinks: []
     }
   };
 }

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AnalyzerService } from '../analyzer.service';
 import { ApiService } from '../api.service';
 import { MenuItem } from 'primeng/api';
+import { DataPortalSettingsService } from '../data-portal-settings.service';
 
 @Component({
   selector: 'lib-primeng-menu-nav',
@@ -26,12 +27,14 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   private packageCatData;
   private expand = true;
   analyzerSeriesCount;
-
+  portalSettings;
   navMenuItems: MenuItem[];
 
   constructor(
     @Inject('logo') private logo,
     private apiService: ApiService,
+    private dataPortalSettingsServ: DataPortalSettingsService,
+    @Inject('portal') private portal,
     public analyzerService: AnalyzerService,
     private activatedRoute: ActivatedRoute,
     private router: Router
@@ -39,6 +42,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     this.analyzerSeriesCount = this.analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
       this.analyzerSeries = data;
     });
+    this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
   ngOnInit() {

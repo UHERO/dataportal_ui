@@ -16,6 +16,9 @@
     <a class="list-item" [class.selectedCategory]="selectedCategory === 'analyzer'" routerLink="/analyzer">&nbsp; Analyzer ({{analyzerSeries}})</a>
     <a class="list-item" id="about-link" [class.selectedCategory]="selectedCategory === 'help'"
       routerLink="/help">&nbsp; About</a>
+    <ng-template ngFor let-dashboard [ngForOf]="portalSettings.otherDashboardLinks">
+      <a *ngIf="dashboard.name" class="list-item" [attr.href]="dashboard.url">{{dashboard.name}}</a>  
+    </ng-template> 
     <span *ngIf="headerLogo.analyticsLogoSrc">
       <p id="built-by">Built By</p>
       <a href="https://uhero.hawaii.edu/uhero-analytics/"><img class="analytics-logo"
