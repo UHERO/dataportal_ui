@@ -26,7 +26,8 @@
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html"
+              "projects/uhero/src/outage.html",
+              "projects/uhero/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -94,7 +95,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/uhero/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -143,7 +146,8 @@
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html"
+              "projects/uhero/src/outage.html",
+              "projects/uhero/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

@@ -24,6 +24,7 @@
     "@angular/platform-browser": "^11.0.7",
     "@angular/platform-browser-dynamic": "^11.0.7",
     "@angular/router": "^11.0.7",
+    "@angular/service-worker": "^11.0.7",
     "ag-grid-angular": "^24.1.0",
     "ag-grid-community": "^24.1.0",
     "bootstrap": "^4.5.3",
