@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { CategoryTableViewComponent } from './category-table-view.component';
 
@@ -6,7 +6,7 @@ describe('CategoryTableViewComponent', () => {
   let component: CategoryTableViewComponent;
   let fixture: ComponentFixture<CategoryTableViewComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ CategoryTableViewComponent ]
     })

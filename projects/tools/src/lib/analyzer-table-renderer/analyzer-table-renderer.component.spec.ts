@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AnalyzerTableRendererComponent } from './analyzer-table-renderer.component';
 
@@ -6,7 +6,7 @@ describe('AnalyzerTableRendererComponent', () => {
   let component: AnalyzerTableRendererComponent;
   let fixture: ComponentFixture<AnalyzerTableRendererComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AnalyzerTableRendererComponent ]
     })

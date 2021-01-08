@@ -44,8 +44,9 @@ const routes: Routes = [
     useHash: true,
     anchorScrolling: 'enabled',
     scrollPositionRestoration: 'enabled',
-    scrollOffset: [0, 75]
-  })],
+    scrollOffset: [0, 75],
+    relativeLinkResolution: 'legacy'
+})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
