@@ -9,7 +9,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [AppComponent, UheroHelpComponent],
-  imports: [BrowserModule, ToolsModule, AppRoutingModule, ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production })],
+  imports: [BrowserModule, ToolsModule, AppRoutingModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
   providers: [
     {
       provide: "environment",
