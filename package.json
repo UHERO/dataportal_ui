@@ -7,7 +7,7 @@
     "start-staging": "ng build tools --prod && ng serve --project=${PROJECT:-uhero} -c=staging --port=4200",
     "start-api-dev": "ng build tools --prod && ng serve --project=${PROJECT:-uhero} -c=apiDev",
     "build-staging": "ng build tools --prod && ng build --project=${PROJECT:-uhero} -c=staging",
-    "build": "ng build tools --prod && ng build --vendorChunk=false --project=${PROJECT:-uhero} --prod",
+    "build": "ng build tools --prod && ng build --project=${PROJECT:-uhero} --prod",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
