@@ -5,10 +5,11 @@ import { ToolsModule } from "tools";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { CcomHelpComponent } from "./ccom-help/ccom-help.component";
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [AppComponent, CcomHelpComponent],
-  imports: [BrowserModule, ToolsModule, AppRoutingModule],
+  imports: [BrowserModule, ToolsModule, AppRoutingModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
   providers: [
     {
       provide: "environment",

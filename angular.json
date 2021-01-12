@@ -209,7 +209,8 @@
             "assets": [
               "projects/coh/src/hawaii-county-seal.png",
               "projects/coh/src/assets",
-              "projects/coh/src/outage.html"
+              "projects/coh/src/outage.html",
+              "projects/coh/src/manifest.webmanifest"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -279,7 +280,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/coh/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -324,7 +327,8 @@
             "assets": [
               "projects/coh/src/hawaii-county-seal.png",
               "projects/coh/src/assets",
-              "projects/coh/src/outage.html"
+              "projects/coh/src/outage.html",
+              "projects/coh/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/coh/src/styles.scss"
@@ -387,7 +391,8 @@
             "assets": [
               "projects/nta/src/nta-logo.png",
               "projects/nta/src/assets",
-              "projects/nta/src/outage.html"
+              "projects/nta/src/outage.html",
+              "projects/nta/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -452,7 +457,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/nta/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -497,7 +504,8 @@
             "assets": [
               "projects/nta/src/nta-logo.png",
               "projects/nta/src/assets",
-              "projects/nta/src/outage.html"
+              "projects/nta/src/outage.html",
+              "projects/nta/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/nta/src/styles.scss"
@@ -604,7 +612,8 @@
             "assets": [
               "projects/ccom/src/favicon.ico",
               "projects/ccom/src/assets",
-              "projects/ccom/src/outage.html"
+              "projects/ccom/src/outage.html",
+              "projects/ccom/src/manifest.webmanifest"
 
             ],
             "styles": [
@@ -675,7 +684,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/ccom/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -719,7 +730,8 @@
             "karmaConfig": "projects/ccom/karma.conf.js",
             "assets": [
               "projects/ccom/src/favicon.ico",
-              "projects/ccom/src/assets"
+              "projects/ccom/src/assets",
+              "projects/ccom/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/ccom/src/styles.scss"

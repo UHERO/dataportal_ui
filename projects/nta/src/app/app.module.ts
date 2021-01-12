@@ -5,6 +5,7 @@ import { ToolsModule } from 'tools';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NtaHelpComponent } from './nta-help/nta-help.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { NtaHelpComponent } from './nta-help/nta-help.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ToolsModule
+    ToolsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     {

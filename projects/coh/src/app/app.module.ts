@@ -5,6 +5,7 @@ import { ToolsModule } from 'tools';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CohHelpComponent } from './coh-help/coh-help.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { CohHelpComponent } from './coh-help/coh-help.component';
   imports: [
     BrowserModule,
     ToolsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     {

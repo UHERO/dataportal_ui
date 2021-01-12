@@ -21,8 +21,8 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
-          "/assets/**",
-          "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+          "../assets/**",
+          "../*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
         ]
       }
     }
@@ -38,20 +38,5 @@
         "strategy": "freshness"
       }
     }
-  ],
-  "navigationUrls": [
-    "/**", "!/**/*.*", "!/**/*__*", "!/**/*__*/**",
-    "!/coh",
-    "!/coh/**",
-    "!/nta",
-    "!/nta/**",
-    "!/ccom",
-    "!/ccom/**",
-    "!/high-frequency-dashboard",
-    "!/high-frequency-dashboard/**",
-    "!/dbedt",
-    "!/dbedt/**",
-    "!/dvw",
-    "!/dvw/**"
   ]
 }
