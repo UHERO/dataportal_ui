@@ -1,6 +1,6 @@
 {
-  "name": "nta",
-  "short_name": "nta",
+  "name": "NTA Data Portal",
+  "short_name": "NTA Data Portal",
   "theme_color": "#0068B3",
   "background_color": "#fafafa",
   "display": "standalone",

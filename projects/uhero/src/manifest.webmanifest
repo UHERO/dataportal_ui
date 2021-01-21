@@ -1,6 +1,6 @@
 {
-  "name": "uhero",
-  "short_name": "uhero",
+  "name": "UHERO Data Portal",
+  "short_name": "UHERO Data Portal",
   "theme_color": "#1d667f",
   "background_color": "#fafafa",
   "display": "standalone",
