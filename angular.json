@@ -26,7 +26,8 @@
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html"
+              "projects/uhero/src/outage.html",
+              "projects/uhero/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -57,7 +58,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -80,7 +80,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -96,7 +95,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/uhero/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -145,7 +146,8 @@
             "assets": [
               "projects/uhero/src/manoa.jpg",
               "projects/uhero/src/assets",
-              "projects/uhero/src/outage.html"
+              "projects/uhero/src/outage.html",
+              "projects/uhero/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -207,7 +209,8 @@
             "assets": [
               "projects/coh/src/hawaii-county-seal.png",
               "projects/coh/src/assets",
-              "projects/coh/src/outage.html"
+              "projects/coh/src/outage.html",
+              "projects/coh/src/manifest.webmanifest"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -238,7 +241,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -263,7 +265,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -279,7 +280,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/coh/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -324,7 +327,8 @@
             "assets": [
               "projects/coh/src/hawaii-county-seal.png",
               "projects/coh/src/assets",
-              "projects/coh/src/outage.html"
+              "projects/coh/src/outage.html",
+              "projects/coh/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/coh/src/styles.scss"
@@ -387,7 +391,8 @@
             "assets": [
               "projects/nta/src/nta-logo.png",
               "projects/nta/src/assets",
-              "projects/nta/src/outage.html"
+              "projects/nta/src/outage.html",
+              "projects/nta/src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -413,7 +418,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -438,7 +442,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -454,7 +457,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/nta/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -499,7 +504,8 @@
             "assets": [
               "projects/nta/src/nta-logo.png",
               "projects/nta/src/assets",
-              "projects/nta/src/outage.html"
+              "projects/nta/src/outage.html",
+              "projects/nta/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/nta/src/styles.scss"
@@ -546,7 +552,7 @@
       },
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/tools/tsconfig.lib.json",
             "project": "projects/tools/ng-package.json"
@@ -606,7 +612,8 @@
             "assets": [
               "projects/ccom/src/favicon.ico",
               "projects/ccom/src/assets",
-              "projects/ccom/src/outage.html"
+              "projects/ccom/src/outage.html",
+              "projects/ccom/src/manifest.webmanifest"
 
             ],
             "styles": [
@@ -638,7 +645,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -663,7 +669,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -679,7 +684,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/ccom/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
@@ -723,7 +730,8 @@
             "karmaConfig": "projects/ccom/karma.conf.js",
             "assets": [
               "projects/ccom/src/favicon.ico",
-              "projects/ccom/src/assets"
+              "projects/ccom/src/assets",
+              "projects/ccom/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/ccom/src/styles.scss"

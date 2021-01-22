@@ -202,7 +202,8 @@ export interface HighstockObject {
   };
   xAxis: {
     events: {
-      afterSetExtremes: () => void
+      afterSetExtremes: () => void,
+      setExtremes?: () => void
     },
     minRange?: number,
     min: number,

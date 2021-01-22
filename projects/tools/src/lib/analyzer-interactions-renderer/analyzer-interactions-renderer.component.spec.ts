@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AnalyzerInteractionsRendererComponent } from './analyzer-interactions-renderer.component';
 
@@ -6,7 +6,7 @@ describe('AnalyzerInteractionsRendererComponent', () => {
   let component: AnalyzerInteractionsRendererComponent;
   let fixture: ComponentFixture<AnalyzerInteractionsRendererComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AnalyzerInteractionsRendererComponent ]
     })

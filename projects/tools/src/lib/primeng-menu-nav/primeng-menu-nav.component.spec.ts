@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PrimengMenuNavComponent } from './primeng-menu-nav.component';
 
@@ -6,7 +6,7 @@ describe('PrimengMenuNavComponent', () => {
   let component: PrimengMenuNavComponent;
   let fixture: ComponentFixture<PrimengMenuNavComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ PrimengMenuNavComponent ]
     })

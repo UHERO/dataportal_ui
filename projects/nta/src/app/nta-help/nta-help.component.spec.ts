@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NtaHelpComponent } from './nta-help.component';
 
@@ -6,7 +6,7 @@ describe('NtaHelpComponent', () => {
   let component: NtaHelpComponent;
   let fixture: ComponentFixture<NtaHelpComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ NtaHelpComponent ]
     })

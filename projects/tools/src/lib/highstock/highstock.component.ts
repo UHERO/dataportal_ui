@@ -218,6 +218,7 @@ export class HighstockComponent implements OnChanges {
           if (logo.analyticsLogoSrc) {
             this.renderer.image(logo.analyticsLogoSrc, 0, 0, 141 / 1.75, 68 / 1.75).add();
           }
+          Highcharts.fireEvent(this.xAxis[0], 'afterSetExtremes');
         }
       },
       styledMode: true,

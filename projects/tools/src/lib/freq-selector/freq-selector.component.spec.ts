@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { FreqSelectorComponent } from './freq-selector.component';
 
@@ -6,7 +6,7 @@ describe('FreqSelectorComponent', () => {
   let component: FreqSelectorComponent;
   let fixture: ComponentFixture<FreqSelectorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ FreqSelectorComponent ]
     })

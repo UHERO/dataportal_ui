@@ -1,0 +1,47 @@
+{
+  "name": "Chamber of Commerce Hawaii Data Portal",
+  "short_name": "Chamber of Commerce Hawaii Data Portal",
+  "theme_color": "#2d6c43",
+  "background_color": "#fafafa",
+  "display": "standalone",
+  "scope": "/ccom/",
+  "start_url": "/ccom/",
+  "icons": [
+    {
+      "src": "assets/icons/ccom_x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ccom_x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ccom_x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ccom_x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ccom_x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ccom_x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
