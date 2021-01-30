@@ -1,4 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { HelperService } from '../helper.service';
 
 import { Geography } from '../tools.models';
 
@@ -7,18 +9,25 @@ import { Geography } from '../tools.models';
   templateUrl: './geo-selector.component.html',
   styleUrls: ['./geo-selector.component.scss']
 })
-export class GeoSelectorComponent implements OnInit {
+export class GeoSelectorComponent implements OnDestroy {
   @Input() regions: Array<Geography>;
-  @Input() selectedGeo: Geography;
+  selectedGeo: Geography;
+  geoSubscription: Subscription;
   @Output() selectedGeoChange = new EventEmitter();
 
-  constructor() { }
+  constructor(private helperService: HelperService) {
+    this.geoSubscription = helperService.currentGeo.subscribe((geo) => {
+      this.selectedGeo = geo;
+    });
+  }
 
-  ngOnInit() {
+  ngOnDestroy() {
+    this.geoSubscription.unsubscribe();
   }
 
   onChange(newGeo) {
     this.selectedGeo = this.regions.find(region => region.handle === newGeo);
     this.selectedGeoChange.emit(this.selectedGeo);
+    this.helperService.updateCurrentGeography(this.selectedGeo);
   }
 }

@@ -52,12 +52,12 @@ export class SeriesHelperService {
       decimals = data.series.decimals ? data.series.decimals : 1;
       currentGeo = data.series.geography;
       currentFreq = { freq: data.series.frequencyShort, label: data.series.frequency, observationStart: '', observationEnd: '' };
-      this.seriesData.currentGeo = currentGeo;
-      this.seriesData.regions = geos ? geos : [data.series.geography];
-      this.seriesData.frequencies = freqs ? freqs : [{ freq: data.series.frequencyShort, label: data.series.frequency }];
+      this.helperService.updateCurrentFrequency(currentFreq);
+      this.helperService.updateCurrentGeography(currentGeo);
+      this.seriesData.regions = geos || [data.series.geography];
+      this.seriesData.frequencies = freqs || [{ freq: data.series.frequencyShort, label: data.series.frequency }];
       this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
-      this.seriesData.currentFreq = currentFreq;
       this.seriesData.siblings = data.siblings;
       const geoFreqPair = this.findGeoFreqSibling(data.siblings, currentGeo.handle, currentFreq.freq);
       // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
@@ -69,7 +69,7 @@ export class SeriesHelperService {
       const obsEnd = obs.observationEnd;
       if (levelData && levelData.length) {
         // Use to format dates for table
-        this.helperService.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this.helperService.createDateArray(obsStart, obsEnd, currentFreq.freq, dateArray);
         const formattedData = this.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = formattedData.chartData;
         this.seriesData.seriesTableData = formattedData.tableData;

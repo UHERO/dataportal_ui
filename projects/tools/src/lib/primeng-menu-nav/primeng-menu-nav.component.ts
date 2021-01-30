@@ -12,7 +12,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 })
 export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   public categories;
-  private errorMessage: string;
   public reveal = false;
   public overlay = false;
   public selectedCategory: any;

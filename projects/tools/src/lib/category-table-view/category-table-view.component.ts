@@ -1,21 +1,20 @@
-import { Component, Inject, OnChanges, Input } from '@angular/core';
+import { Component, Inject, OnChanges, Input, OnDestroy } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { CategoryTableRenderComponent } from '../category-table-render/category-table-render.component';
 import { AnalyzerService } from '../analyzer.service';
+import { Frequency, Geography } from '../tools.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'lib-category-table-view',
   templateUrl: './category-table-view.component.html',
   styleUrls: ['./category-table-view.component.scss']
 })
-export class CategoryTableViewComponent implements OnChanges {
+export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() data;
   @Input() sublist;
   @Input() selectedCategory;
   @Input() selectedDataList;
-  @Input() freq;
-  @Input() freqLabel;
-  @Input() geo;
   @Input() tableId;
   @Input() dates;
   @Input() noSeries;
@@ -44,6 +43,10 @@ export class CategoryTableViewComponent implements OnChanges {
   disableNext: boolean;
   noSeriesToDisplay;
   gridOptions;
+  freqSub: Subscription;
+  geoSub: Subscription;
+  selectedGeo: Geography;
+  selectedFreq: Frequency;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -53,6 +56,12 @@ export class CategoryTableViewComponent implements OnChanges {
     this.frameworkComponents = {
       categoryTableRender: CategoryTableRenderComponent
     };
+    this.freqSub = helperService.currentFreq.subscribe((freq) => {
+      this.selectedFreq = freq;
+    });
+    this.geoSub = helperService.currentGeo.subscribe((geo) => {
+      this.selectedGeo = geo;
+    });
   }
 
   ngOnChanges() {
@@ -63,7 +72,7 @@ export class CategoryTableViewComponent implements OnChanges {
       }
     };
     if (this.data) {
-      this.columnDefs = this.setTableColumns(this.dates, this.freq, this.defaultRange, this.tableStart, this.tableEnd);
+      this.columnDefs = this.setTableColumns(this.dates, this.selectedFreq.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series.seriesInfo !== 'No data available' && this.dates) {
           series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
@@ -78,7 +87,7 @@ export class CategoryTableViewComponent implements OnChanges {
             const yoyData = this.formatTransformationData(series, yoy, 'pc1');
             if (series.display) { this.rows.push(yoyData); }
           }
-          if (this.ytdActive && this.freq !== 'A') {
+          if (this.ytdActive && this.selectedFreq.freq !== 'A') {
             const ytdData = this.formatTransformationData(series, ytd, 'ytd');
             if (series.display) { this.rows.push(ytdData); }
           }
@@ -90,6 +99,11 @@ export class CategoryTableViewComponent implements OnChanges {
       });
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
+  }
+
+  ngOnDestroy() {
+    this.freqSub.unsubscribe();
+    this.geoSub.unsubscribe();
   }
 
   setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
@@ -162,18 +176,13 @@ export class CategoryTableViewComponent implements OnChanges {
   onExport = () => {
     const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
     const exportColumns = [];
-    const parentName = this.selectedCategory ? this.selectedCategory.name + ': ' : '';
-    const sublistName = this.selectedDataList ? this.selectedDataList.name : '';
-    let geoAndFreq = '';
-    if (this.geo) {
-      geoAndFreq += `${this.geo.name}`;
-    }
-    if (this.freqLabel) {
-      geoAndFreq += `-${this.freqLabel}`;
-    }
-    const fileName = geoAndFreq ? `${sublistName}_${geoAndFreq}` : sublistName;
+    const parentName = `${(this.selectedCategory && this.selectedCategory.name)}: ` || '';
+    const sublistName = `${(this.selectedDataList && this.selectedDataList.name)}` || '';
+    const geoName = (this.selectedGeo && this.selectedGeo.name) || '';
+    const freqLabel = (this.selectedFreq && this.selectedFreq.label) || '';
+    const fileName = `${sublistName}_${geoName}-${freqLabel}`
     const catId = this.selectedCategory ? this.selectedCategory.id : '';
-    const dataListId = this.selectedDataList ? `&data_list_id=${this.selectedDataList.id}` : '';
+    const dataListId = `&data_list_id=${(this.selectedDataList && this.selectedDataList.id)}` || '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
       exportColumns.push(allColumns[i]);
     }
@@ -181,7 +190,7 @@ export class CategoryTableViewComponent implements OnChanges {
       columnKeys: exportColumns,
       suppressQuotes: false,
       fileName,
-      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoAndFreq} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
+      customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoName}-${freqLabel} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`
     };
     this.gridApi.exportDataAsCsv(params);
   }

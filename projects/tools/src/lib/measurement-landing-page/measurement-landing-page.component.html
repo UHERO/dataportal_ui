@@ -29,8 +29,7 @@
 		<i *ngIf="!search && !data.requestComplete && !data.invalid" class="fas fa-spinner fa-pulse fa-fw"></i>
 		<lib-category-table-view *ngIf="routeView === 'table' && data.requestComplete" [portalSettings]="portalSettings"
 			[dates]="data.dateArray" [tableStart]="data.seriesStart" [tableEnd]="data.seriesEnd"
-			[data]="data.displaySeries" [geo]="data.currentGeo" [tableId]="data.selectedDataList" [freq]="data.currentFreq?.freq"
-			[selectedDataList]="data.selectedDataList" [selectedCategory]="data.selectedCategory" [c5maActive]="queryParams.c5ma === 'true'"
+			[data]="data.displaySeries" [tableId]="data.selectedDataList" [selectedCategory]="data.selectedCategory" [c5maActive]="queryParams.c5ma === 'true'"
 			[noSeries]="data.noData" [params]="queryParams" [seriesInAnalyzer]="seriesInAnalyzer">
 		</lib-category-table-view>
 		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [search]="search"

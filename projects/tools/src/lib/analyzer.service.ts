@@ -1,10 +1,11 @@
-import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } from 'rxjs';
+import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject, forkJoin } from 'rxjs';
 import { Injectable, EventEmitter, Output } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './tools.models';
 import { Geography } from './tools.models';
 import * as Highcharts from 'highcharts/highstock';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,17 @@ import * as Highcharts from 'highcharts/highstock';
 export class AnalyzerService {
   // Keep track of series in the analyzer
   public analyzerSeries = [];
-  private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeries.length);
+  analyzerSeriesSourceTest: BehaviorSubject<any> = new BehaviorSubject([]);
+  analyzerSeriesTest= this.analyzerSeriesSourceTest.asObservable();
+  private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesSourceTest.value.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
   public analyzerData = {
     analyzerTableDates: [],
     analyzerSeries: [],
     highstockSeriesOptions: [],
+    displayFreqSelector: false,
+    siblingFreqs: [],
+    analyzerFrequency: {},
     y0Series: null,
     y1Series: null
   };
@@ -49,16 +55,38 @@ export class AnalyzerService {
   }
 
   checkAnalyzer(seriesInfo) {
-    const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
+    //const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
+    const analyzeSeries = this.analyzerSeriesSourceTest.value.find(series => series.id === seriesInfo.id);
+    console.log('series source test', this.analyzerSeriesSourceTest.value)
+    console.log('checkanalyzer', analyzeSeries)
     return analyzeSeries ? true : false;
   }
 
+  updateAnalyzerSeriesTest(data) {
+    this.analyzerSeriesSourceTest.next(data);
+  }
+
+  toggleAnalyzerSeries(seriesID) {
+    const currentValue = this.analyzerSeriesSourceTest.value;
+    let updatedValue;
+    const seriesExist = currentValue.find(s => s.id === seriesID);
+    if (seriesExist) {
+      updatedValue = currentValue.filter(s => s.id !== seriesID);
+    }
+    if (!seriesExist) {
+      updatedValue = [...currentValue, { id: seriesID }];
+    }
+    this.analyzerSeriesSourceTest.next(updatedValue);
+  }
+
   updateAnalyzerSeriesCount(seriesInfo) {
-    this.updateAnalyzer(seriesInfo.id);
+    //this.updateAnalyzer(seriesInfo.id);
     // Update analyze button on category charts/tables
     // Emits click event to parent (landing-page.component) to trigger change
     // detection for a series that may show up in multiple places on a page
-    this.updateAnalyzerCount.emit(seriesInfo);
+    //this.updateAnalyzerCount.emit(seriesInfo);
+    this.toggleAnalyzerSeries(seriesInfo.id);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
   }
 
   getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
@@ -66,6 +94,10 @@ export class AnalyzerService {
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
+      this.analyzerData.displayFreqSelector = this.countFrequencies(results.series);
+      this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
+      this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : null;
+      console.log(this.getSiblingFrequencies(results.series))
       series.forEach((s) => {
         const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
         this.analyzerData.analyzerSeries.push(seriesData);
@@ -100,14 +132,14 @@ export class AnalyzerService {
       geography: series.geography.shortName,
       frequency: series.frequency,
       seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
+      units: series.unitsLabelShort || series.unitsLabel
     };
     const chartNameDetails = {
       title: series.title,
       geography: series.geography.shortName,
       frequency: series.frequency,
       seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort ? series.unitsLabelShort : series.unitsLabel
+      units: series.unitsLabelShort || series.unitsLabel
     };
     const indexNameDetails = {
       title: series.title,
@@ -147,9 +179,60 @@ export class AnalyzerService {
     return seriesData;
   }
 
+  countFrequencies = (series: Array<any>) => {
+    const freqs  = series.map(s => s.freqs.map((f) => { return { freq: f.freq, label: f.label } }));
+    return freqs.filter((freq, index, self) => self.findIndex((f) => (f.freq === freq.freq)) === index).length === 1;
+  }
+
+  getSiblingFrequencies = (series: Array<any>) => {
+    const freqs  = series.map(s => s.freqs.map((f) => { return { freq: f.freq, label: f.label } }));
+    return freqs.reduce((prev, curr) => prev.filter(f => curr.some(freq => freq.freq === f.freq)));
+  }
+
+  getCurrentAnalyzerFrequency = (series: Array<any>, freqList: Array<any>) => {
+    console.log(freqList.filter(f => f.freq === series[0].frequencyShort));
+    const currentFreq = freqList.filter(f => f.freq === series[0].frequencyShort)[0];
+    this.helperService.updateCurrentFrequency(currentFreq);
+    return currentFreq;
+  }
+
   checkFrequencies = (series) => {
     const freqs = series.map((s) => s.currentFreq.freq);
     return freqs.includes('D') ? 'D' : freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
+  }
+
+  getSiblingSeriesIDs = (currentSeries: Array<any>, newFreq) => {
+    const siblingIds = [];
+    const siblingsList = [];
+    let filtered;
+    /* currentSeries.forEach((serie) => {
+      this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle).subscribe((siblings) => {
+        console.log(siblings)
+        filtered = siblings.filter(s => s.frequencyShort === newFreq);
+        console.log('filtered', filtered)
+      },
+      (error) => {
+        console.log('error fetching series siblings', error);
+      },
+      () => {
+         siblingIds.push(filtered);
+      });
+    });
+    console.log('ids', siblingIds) */
+    currentSeries.forEach((serie) => {
+      siblingsList.push(this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle))
+    });
+    forkJoin(siblingsList).subscribe((res: any) => {
+      res.forEach((siblings) => {
+        siblings.forEach((series) => {
+          siblingIds.push(series.id);
+        });
+      });
+      console.log('siblingIds', siblingIds)
+      return siblingIds
+    });
+    //console.log('ids', siblingIds);
+    //return siblingIds;
   }
 
   createAnalyzerTable = (analyzerSeries) => {

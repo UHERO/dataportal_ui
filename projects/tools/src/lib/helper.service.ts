@@ -1,13 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { Frequency, Geography } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
   private categoryData = new Subject();
+  currentFreqChange: BehaviorSubject<any> = new BehaviorSubject(null);
+  currentFreq = this.currentFreqChange.asObservable();
+  currentGeoChange: BehaviorSubject<any> = new BehaviorSubject(null);
+  currentGeo = this.currentGeoChange.asObservable();
 
   constructor() { }
+
+  updateCurrentFrequency = (newFreq: Frequency) => {
+    this.currentFreqChange.next(newFreq);
+    return newFreq;
+  }
+  updateCurrentGeography = (newGeo: Geography) => {
+    this.currentGeoChange.next(newGeo);
+    return newGeo;
+  }
 
   getCatData() {
     return this.categoryData;

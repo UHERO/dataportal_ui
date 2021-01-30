@@ -8,6 +8,8 @@ import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { Frequency } from '../tools.models';
 import { Geography } from '../tools.models';
+import { Subscription } from 'rxjs';
+
 import 'jquery';
 declare var $: any;
 
@@ -43,10 +45,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Variables for geo and freq selectors
   public currentGeo: Geography;
-  public currentFreq: Frequency;
   public categoryData;
   private loading = false;
   private userEvent;
+  freqSub: Subscription;
+  geoSub: Subscription;
+  selectedGeo: Geography;
+
+  selectedFreq: Frequency;
+
   constructor(
     @Inject('portal') public portal,
     private analyzerService: AnalyzerService,
@@ -60,15 +67,17 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
       this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
     });
+    this.freqSub = helperService.currentFreq.subscribe((freq) => {
+      this.selectedFreq = freq;
+    });
+    this.geoSub = helperService.currentGeo.subscribe((geo) => {
+      this.selectedGeo = geo;
+    });
   }
 
   ngOnInit(): void {
-    this.currentGeo = { fips: null, name: null, shortName: null, handle: null };
-    this.currentFreq = { freq: null, label: null };
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-  }
 
-  ngAfterViewInit() {
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
@@ -98,8 +107,43 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit() {
+    /*this.sub = this.activatedRoute.queryParams.subscribe((params) => {
+      this.id = this.getIdParam(params[`id`]);
+      this.dataListId = this.getIdParam(params[`data_list_id`]);
+      this.search = typeof this.id === 'string' ? true : false;
+      this.routeGeo = params[`geo`];
+      this.routeFreq = params[`freq`];
+      this.routeView = params[`view`];
+      this.routeYoy = params[`yoy`];
+      this.routeYtd = params[`ytd`];
+      this.routeSa = params[`sa`];
+      this.routeStart = params[`start`];
+      this.routeEnd = params[`end`];
+      this.noCache = params[`nocache`] === 'true';
+      if (this.id) { this.queryParams.id = this.id; }
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
+      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
+      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
+      if (this.routeView) { this.queryParams.view = this.routeView; }
+      if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
+      if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
+      if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
+      if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
+      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
+      this.helperService.updateCatData(this.categoryData);
+      // Run change detection explicitly after the change:
+      this.cdRef.detectChanges();
+    }); */
+    console.log('afterviewinit')
+  }
+
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
+    this.freqSub.unsubscribe();
+    this.geoSub.unsubscribe();
     this.toggleSeriesInAnalyzer.unsubscribe();
   }
 
