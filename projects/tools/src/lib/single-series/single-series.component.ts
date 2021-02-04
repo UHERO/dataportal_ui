@@ -152,7 +152,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   updateAnalyze(seriesInfo) {
-    this.analyzerService.updateAnalyzer(seriesInfo.id);
+    //this.analyzerService.updateAnalyzer(seriesInfo.id);
     seriesInfo.analyze = this.analyzerService.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id);
     this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
   }

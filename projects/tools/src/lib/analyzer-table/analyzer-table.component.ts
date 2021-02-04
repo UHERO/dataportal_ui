@@ -302,6 +302,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   removeFromAnalyzer(series) {
-    this.analyzerService.updateAnalyzer(series.seriesInfo.id);
+    this.analyzerService.toggleAnalyzerSeries(series.seriesInfo.id);
+    //this.analyzerService.updateAnalyzer(series.seriesInfo.id);
   }
 }

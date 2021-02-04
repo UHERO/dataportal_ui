@@ -4,8 +4,6 @@ import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { Frequency } from './tools.models';
 import { Geography } from './tools.models';
-import * as Highcharts from 'highcharts/highstock';
-import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -77,9 +75,10 @@ export class AnalyzerService {
       updatedValue = [...currentValue, { id: seriesID }];
     }
     this.analyzerSeriesSourceTest.next(updatedValue);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
   }
 
-  updateAnalyzerSeriesCount(seriesInfo) {
+  /*updateAnalyzerSeriesCount(seriesInfo) {
     //this.updateAnalyzer(seriesInfo.id);
     // Update analyze button on category charts/tables
     // Emits click event to parent (landing-page.component) to trigger change
@@ -87,20 +86,22 @@ export class AnalyzerService {
     //this.updateAnalyzerCount.emit(seriesInfo);
     this.toggleAnalyzerSeries(seriesInfo.id);
     this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
-  }
+  }*/
 
   getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
     this.analyzerData.analyzerSeries = [];
+    this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
-      this.analyzerData.displayFreqSelector = this.countFrequencies(results.series);
+      this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : null;
-      console.log(this.getSiblingFrequencies(results.series))
       series.forEach((s) => {
-        const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
-        this.analyzerData.analyzerSeries.push(seriesData);
+        if (!this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === s.id)) {
+          const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
+          this.analyzerData.analyzerSeries.push(seriesData);  
+        }
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.checkAnalyzerChartSeries();
@@ -108,6 +109,19 @@ export class AnalyzerService {
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
+  }
+
+  resetAnalyzerData = () => {
+    return {
+      analyzerTableDates: [],
+      analyzerSeries: [],
+      highstockSeriesOptions: [],
+      displayFreqSelector: false,
+      siblingFreqs: [],
+      analyzerFrequency: {},
+      y0Series: null,
+      y1Series: null
+    };
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
@@ -179,8 +193,8 @@ export class AnalyzerService {
     return seriesData;
   }
 
-  countFrequencies = (series: Array<any>) => {
-    const freqs  = series.map(s => s.freqs.map((f) => { return { freq: f.freq, label: f.label } }));
+  singleFrequencyAnalyzer = (series: Array<any>) => {
+    const freqs = series.map((s) => { return { freq: s.frequencyShort, label: s.frequency }});
     return freqs.filter((freq, index, self) => self.findIndex((f) => (f.freq === freq.freq)) === index).length === 1;
   }
 
@@ -190,8 +204,8 @@ export class AnalyzerService {
   }
 
   getCurrentAnalyzerFrequency = (series: Array<any>, freqList: Array<any>) => {
-    console.log(freqList.filter(f => f.freq === series[0].frequencyShort));
     const currentFreq = freqList.filter(f => f.freq === series[0].frequencyShort)[0];
+    console.log(currentFreq);
     this.helperService.updateCurrentFrequency(currentFreq);
     return currentFreq;
   }
@@ -299,7 +313,9 @@ export class AnalyzerService {
     let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
-      this.analyzerSeries.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
+      console.log('analyzer series', this.analyzerSeries);
+      console.log('notinchart', notInChart)
+      this.analyzerSeriesSourceTest.value.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
       notInChart.showInChart = true;
       chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }
