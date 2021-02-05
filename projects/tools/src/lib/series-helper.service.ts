@@ -49,7 +49,7 @@ export class SeriesHelperService {
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const geos = data.series.geos;
       const freqs = data.series.freqs;
-      decimals = data.series.decimals ? data.series.decimals : 1;
+      decimals = data.series.decimals || 1;
       currentGeo = data.series.geography;
       currentFreq = { freq: data.series.frequencyShort, label: data.series.frequency, observationStart: '', observationEnd: '' };
       this.helperService.updateCurrentFrequency(currentFreq);
@@ -202,14 +202,14 @@ export class SeriesHelperService {
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {
     // Calculate compound annual growth rate
-    const cagr = {
-      'A': (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100,
-      'S': (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100,
-      'Q': (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100,
-      'M': (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100,
-      'W': (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100,
-      'D': (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100
-    }
-    return cagr[freq] || Infinity;
+    const multiplier = {
+      A: 1,
+      Q: 4,
+      S: 2,
+      M: 12,
+      W: 52,
+      D: 365
+    };
+    return (Math.pow((lastValue / firstValue), multiplier[freq] / periods) - 1) * 100 || Infinity;
   }
 }

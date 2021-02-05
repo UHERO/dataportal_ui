@@ -34,6 +34,8 @@ export class CategoryHelperService {
   initContent(catId: any, noCache: boolean, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
     if (this.categoryData[cacheId]) {
+      this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
+      this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
@@ -108,6 +110,8 @@ export class CategoryHelperService {
       const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
       this.helperService.updateCurrentFrequency(currentFreq);
       this.helperService.updateCurrentGeography(currentGeo);
+      this.categoryData[cacheId].currentFreq = currentFreq;
+      this.categoryData[cacheId].currentGeo = currentGeo;
       if (expandedCategory) {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
@@ -184,6 +188,8 @@ export class CategoryHelperService {
   initSearch(search: string, noCache?: boolean, routeGeo?: string, routeFreq?: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(search, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
+      this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
+      this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
@@ -224,6 +230,8 @@ export class CategoryHelperService {
       const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
       this.helperService.updateCurrentFrequency(currentFreq);
       this.helperService.updateCurrentGeography(currentGeo);
+      this.categoryData[cacheId].currentFreq = currentFreq;
+      this.categoryData[cacheId].currentGeo = currentGeo;
       const displaySeries = this.filterSeriesResults(results.series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
       this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);

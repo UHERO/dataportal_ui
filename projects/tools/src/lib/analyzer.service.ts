@@ -62,6 +62,7 @@ export class AnalyzerService {
 
   updateAnalyzerSeriesTest(data) {
     this.analyzerSeriesSourceTest.next(data);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
   }
 
   toggleAnalyzerSeries(seriesID) {
@@ -313,8 +314,6 @@ export class AnalyzerService {
     let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
-      console.log('analyzer series', this.analyzerSeries);
-      console.log('notinchart', notInChart)
       this.analyzerSeriesSourceTest.value.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
       notInChart.showInChart = true;
       chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);

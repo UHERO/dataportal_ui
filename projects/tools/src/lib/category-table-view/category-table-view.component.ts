@@ -181,7 +181,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     const geoName = (this.selectedGeo && this.selectedGeo.name) || '';
     const freqLabel = (this.selectedFreq && this.selectedFreq.label) || '';
     const fileName = `${sublistName}_${geoName}-${freqLabel}`
-    const catId = this.selectedCategory ? this.selectedCategory.id : '';
+    const catId = (this.selectedCategory && this.selectedCategory.id) || '';
     const dataListId = `&data_list_id=${(this.selectedDataList && this.selectedDataList.id)}` || '';
     for (let i = allColumns.length - 1; i >= 0; i--) {
       exportColumns.push(allColumns[i]);

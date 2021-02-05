@@ -293,13 +293,13 @@ export class HighchartComponent implements OnChanges {
             let label = name + formattedValue;
             const pseudo = ' Pseudo History ';
             if (point.series.name === 'level') {
-              label += ' (' + unitsLabelShort + ') <br>';
+              label += ` (${unitsLabelShort}) <br />`;
             }
             if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
                 if (point.x < zone.value) {
                   const otherSeriesLabel = pseudo + name + formattedValue;
-                  const levelLabel = otherSeriesLabel + ' (' + unitsLabelShort + ') <br>';
+                  const levelLabel = `${otherSeriesLabel} (${unitsLabelShort}) <br />`;
                   labelString += point.series.name === 'level' ? levelLabel : otherSeriesLabel;
                 }
                 if (point.x >= zone.value) {
@@ -313,7 +313,7 @@ export class HighchartComponent implements OnChanges {
           });
           return labelString;
         };
-        let s = '<b>' + displayName + '</b><br>';
+        let s = `<b>${displayName}</b><br>`;
         if (levelLength.length > 1) {
           // Get Quarter or Month for Q/M frequencies
           s = s + getFreqLabel(currentFreq, this.x);
@@ -380,7 +380,7 @@ export class HighchartComponent implements OnChanges {
 
   noDataChart = (seriesData) => {
     const title = seriesData.seriesInfo.displayName;
-    this.chartOptions.title = this.setChartTitle('<b>' + title + '</b><br>No Data Available');
+    this.chartOptions.title = this.setChartTitle(`<b>${title}</b><br />No Data Available`);
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };

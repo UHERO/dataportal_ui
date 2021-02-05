@@ -147,7 +147,6 @@ export class DateSliderComponent implements OnInit {
 
   updateCalendarDate(value: string, calendar: string, freq: string) {
     const qMonths = { 'Q1': '01', 'Q2': '04', 'Q3': '07', 'Q4': '10' };
-    const quarter = value[value.search(/(q|Q)[1-4]/)];
     const newDate = {
       'A': `${value}/01/01`,
       'S': `${value}/01`,

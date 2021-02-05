@@ -119,17 +119,14 @@ export class HelperService {
     return dateArray;
   }
 
-  getTableDate(start, currentFreq, q) {
-    if (currentFreq === 'A') {
-      return start.toISOString().substr(0, 4);
+  getTableDate(start: Date, currentFreq: string, q: string) {
+    const dateStr = {
+      A: start.toISOString().substr(0, 4),
+      Q: `${start.toISOString().substr(0, 4)} ${q}`,
+      W: start.toISOString().substr(0, 10),
+      D: start.toISOString().substr(0, 10)
     }
-    if (currentFreq === 'Q') {
-      return `${start.toISOString().substr(0, 4)} ${q}`;
-    }
-    if (currentFreq === 'W' || currentFreq === 'D') {
-      return start.toISOString().substr(0, 10);
-    }
-    return start.toISOString().substr(0, 7);
+    return dateStr[currentFreq] || start.toISOString().substr(0, 7);
   }
 
   getTransformations(observations) {
@@ -341,26 +338,17 @@ export class HelperService {
     return this.binarySearch(dateArray, dateToCheck);
   }
 
-  getRanges(freq, counter, range) {
+  getRanges(freq: string, counter: number, range: number) {
     // Range = default amount of years to display
-    if (freq === 'A') {
-      return { startIndex: this.getRangeStart(counter, range, 1), endIndex: counter };
-    }
-    if (freq === 'Q') {
-      return { startIndex: this.getRangeStart(counter, range, 4), endIndex: counter };
-    }
-    if (freq === 'S') {
-      return { startIndex: this.getRangeStart(counter, range, 2), endIndex: counter };
-    }
-    if (freq === 'M') {
-      return { startIndex: this.getRangeStart(counter, range, 12), endIndex: counter };
-    }
-    if (freq === 'W') {
-      return { startIndex: this.getRangeStart(counter, range, 52), endIndex: counter };
-    }
-    if (freq === 'D') {
-      return { startIndex: this.getRangeStart(counter, range, 365), endIndex: counter };
-    }
+    const multiplier = {
+      A: 1,
+      Q: 4,
+      S: 2,
+      M: 12,
+      W: 52,
+      D: 365
+    };
+    return { startIndex: this.getRangeStart(counter, range, multiplier[freq]), endIndex: counter };
   }
 
   getRangeStart = (counter, range, multiplier) => {
@@ -369,7 +357,6 @@ export class HelperService {
   }
 
   getTableDates(dateArray: Array<any>) {
-    const tableDates = dateArray.map(date => date.tableDate);
-    return tableDates;
+    return dateArray.map(date => date.tableDate);
   }
 }

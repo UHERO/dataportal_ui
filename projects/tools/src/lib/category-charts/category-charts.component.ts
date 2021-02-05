@@ -55,8 +55,8 @@ export class CategoryChartsComponent implements OnChanges {
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {
       const defaultStartEnd = this.defaultRange.find(ranges => ranges.freq === this.freq);
-      const start = this.chartStart ? this.chartStart : Date.parse(defaultStartEnd.start);
-      const end = this.chartEnd ? this.chartEnd : Date.parse(defaultStartEnd.end);
+      const start = this.chartStart || Date.parse(defaultStartEnd.start);
+      const end = this.chartEnd || Date.parse(defaultStartEnd.end);
       if (this.findMinMax) {
         // Find minimum and maximum values out of all series within a sublist; Use values to set min/max of yAxis
         this.minValue = this.findMin(this.data, start, end);
