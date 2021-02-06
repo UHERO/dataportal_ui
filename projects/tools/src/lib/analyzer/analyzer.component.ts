@@ -205,20 +205,16 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
-    console.log('change freq', freq);
-    console.log('change freq - currentSeries', analyzerSeries);
-    const queryParams = { analyzerSeries: '', chartSeries: ''
-      /*analyzerSeries: this.analyzerService.getSiblingSeriesIDs(analyzerSeries, freq).subscribe(siblings => {
-
-      })*/
-    };
     const siblingIds = [];
     const siblingsList = analyzerSeries.map((serie) => {
-      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle);
+      console.log('serie', serie);
+      const nonSeasonal = serie.seriesDetail.seasonalAdjustment === 'not_seasonally_adjusted';
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle, nonSeasonal);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
-      this.analyzerService.updateAnalyzerSeriesTest([]);
-      this.analyzerService.analyzerData.analyzerSeries = [];
+      //this.analyzerService.updateAnalyzerSeriesTest([]);
+      //this.analyzerService.analyzerData.analyzerSeries = [];
+      console.log('res', res)
       res.forEach((siblings) => {
         siblings.forEach((series) => {
           if (series.frequencyShort === freq && !siblingIds.includes(series.id)) {
@@ -227,11 +223,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         });
       });
       this.analyzerService.updateAnalyzerSeriesTest(siblingIds.map((s) => {return{id: s}}))
-      queryParams.analyzerSeries = siblingIds.join('-');
-      console.log('analyzer series', this.analyzerService.analyzerSeries)
-      //this.router.navigate(['/analyzer/'], { queryParams, relativeTo: this.route })
-    });    //console.log('analyzer nav change', this.analyzerService.getSiblingSeriesIDs(analyzerSeries, freq));
-    //this.router.navigate(['/analyzer/'], { queryParams });
+    });
   }
 
   removeAllAnalyzerSeries() {

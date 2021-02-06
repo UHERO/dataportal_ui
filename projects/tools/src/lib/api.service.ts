@@ -1,5 +1,5 @@
 import { of as observableOf, Observable } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, filter } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Category } from './category';
@@ -147,14 +147,18 @@ export class ApiService {
     }
   }
 
-  fetchSiblingSeriesByIdAndGeo(id: number, geo: string) {
-    if (this.cachedSibSeriesByIdAndGeo[id + geo]) {
-      return observableOf(this.cachedSibSeriesByIdAndGeo[id + geo]);
+  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, nonSeasonal: boolean) {
+    const cacheId = nonSeasonal ? `${id + geo}NS` : id + geo;
+    if (this.cachedSibSeriesByIdAndGeo[cacheId]) {
+      return observableOf(this.cachedSibSeriesByIdAndGeo[cacheId]);
     } else {
       let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=${id}&geo=${geo}&u=${this.portal.universe}`, this.httpOptions).pipe(
         map(mapData),
+        map(data => nonSeasonal ? data.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : data.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted')),
         tap(val => {
-          this.cachedSibSeriesByIdAndGeo[id + geo] = val;
+          console.log('val', val)
+          //val = nonSeasonal ? val.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : val.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted');
+          this.cachedSibSeriesByIdAndGeo[cacheId] = val;
           seriesSiblings$ = null;
         }), );
       return seriesSiblings$;

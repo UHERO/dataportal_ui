@@ -226,40 +226,6 @@ export class AnalyzerService {
     return freqs.includes('D') ? 'D' : freqs.includes('W') ? 'W' : freqs.includes('M') ? 'M' : freqs.includes('Q') ? 'Q' : freqs.includes('S') ? 'S' : 'A';
   }
 
-  getSiblingSeriesIDs = (currentSeries: Array<any>, newFreq) => {
-    const siblingIds = [];
-    const siblingsList = [];
-    let filtered;
-    /* currentSeries.forEach((serie) => {
-      this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle).subscribe((siblings) => {
-        console.log(siblings)
-        filtered = siblings.filter(s => s.frequencyShort === newFreq);
-        console.log('filtered', filtered)
-      },
-      (error) => {
-        console.log('error fetching series siblings', error);
-      },
-      () => {
-         siblingIds.push(filtered);
-      });
-    });
-    console.log('ids', siblingIds) */
-    currentSeries.forEach((serie) => {
-      siblingsList.push(this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle))
-    });
-    forkJoin(siblingsList).subscribe((res: any) => {
-      res.forEach((siblings) => {
-        siblings.forEach((series) => {
-          siblingIds.push(series.id);
-        });
-      });
-      console.log('siblingIds', siblingIds)
-      return siblingIds
-    });
-    //console.log('ids', siblingIds);
-    //return siblingIds;
-  }
-
   createAnalyzerTable = (analyzerSeries) => {
     analyzerSeries.forEach((aSeries) => {
       const decimal = aSeries.seriesDetail.decimals;
