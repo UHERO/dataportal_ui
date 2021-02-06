@@ -23,7 +23,8 @@ export class AnalyzerService {
     siblingFreqs: [],
     analyzerFrequency: {},
     y0Series: null,
-    y1Series: null
+    y1Series: null,
+    requestComplete: false
   };
   public embedData = {
     analyzerTableDates: [],
@@ -93,6 +94,7 @@ export class AnalyzerService {
     this.analyzerData.analyzerSeries = [];
     this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
+    console.log('ids', ids)
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
@@ -105,11 +107,18 @@ export class AnalyzerService {
         }
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
+      console.log('GET DATA ANALYZER SERIES', this.analyzerData.analyzerSeries)
       this.checkAnalyzerChartSeries();
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
+      this.analyzerData.requestComplete = true;
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
+  }
+
+  removeAll() {
+    this.updateAnalyzerSeriesTest([]);
+    this.analyzerData = this.resetAnalyzerData();
   }
 
   resetAnalyzerData = () => {
@@ -121,7 +130,8 @@ export class AnalyzerService {
       siblingFreqs: [],
       analyzerFrequency: {},
       y0Series: null,
-      y1Series: null
+      y1Series: null,
+      requestComplete: false
     };
   }
 

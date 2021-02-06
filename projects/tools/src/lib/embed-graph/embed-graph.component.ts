@@ -74,7 +74,8 @@ export class EmbedGraphComponent implements OnInit {
       siblingFreqs: [],
       analyzerFrequency: {},
       y0Series: null,
-      y1Series: null
+      y1Series: null,
+      requestComplete: false
     };
   }
 
