@@ -29,7 +29,7 @@
     "ag-grid-community": "^24.1.0",
     "bootstrap": "^4.5.3",
     "core-js": "^3.8.2",
-    "highcharts": "^8.2.2",
+    "highcharts": "^9.0.0",
     "highcharts-angular": "^2.9.0",
     "highcharts-export-csv": "^1.4.8",
     "jquery": "^3.5.1",

@@ -134,7 +134,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   updateAnalyze(seriesInfo) {
     seriesInfo.analyze = !seriesInfo.analyze;
-    //this.analyzerService.updateAnalyzerSeriesCount(seriesInfo);
     this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
   }
 

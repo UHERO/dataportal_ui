@@ -54,10 +54,7 @@ export class AnalyzerService {
   }
 
   checkAnalyzer(seriesInfo) {
-    //const analyzeSeries = this.analyzerSeries.find(series => series.id === seriesInfo.id);
     const analyzeSeries = this.analyzerSeriesSourceTest.value.find(series => series.id === seriesInfo.id);
-    console.log('series source test', this.analyzerSeriesSourceTest.value)
-    console.log('checkanalyzer', analyzeSeries)
     return analyzeSeries ? true : false;
   }
 
@@ -94,7 +91,6 @@ export class AnalyzerService {
     this.analyzerData.analyzerSeries = [];
     this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
-    console.log('ids', ids)
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
@@ -107,7 +103,6 @@ export class AnalyzerService {
         }
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      console.log('GET DATA ANALYZER SERIES', this.analyzerData.analyzerSeries)
       this.checkAnalyzerChartSeries();
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
@@ -216,7 +211,6 @@ export class AnalyzerService {
 
   getCurrentAnalyzerFrequency = (series: Array<any>, freqList: Array<any>) => {
     const currentFreq = freqList.filter(f => f.freq === series[0].frequencyShort)[0];
-    console.log(currentFreq);
     this.helperService.updateCurrentFrequency(currentFreq);
     return currentFreq;
   }

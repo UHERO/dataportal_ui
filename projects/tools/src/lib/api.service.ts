@@ -156,8 +156,6 @@ export class ApiService {
         map(mapData),
         map(data => nonSeasonal ? data.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : data.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted')),
         tap(val => {
-          console.log('val', val)
-          //val = nonSeasonal ? val.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : val.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted');
           this.cachedSibSeriesByIdAndGeo[cacheId] = val;
           seriesSiblings$ = null;
         }), );

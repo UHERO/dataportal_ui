@@ -39,7 +39,6 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.analyzerSeriesCount = this.analyzerService.analyzerSeriesCount$.subscribe((data: any) => {
-      console.log('analyzerCount', data)
       this.analyzerSeries = data;
     });
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];

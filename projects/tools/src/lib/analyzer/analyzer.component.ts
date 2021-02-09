@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
@@ -43,7 +43,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
-    private cdRef: ChangeDetectorRef
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeriesTest.subscribe((analyzerSeries) => {
       this.analyzerSeries = analyzerSeries;
@@ -159,7 +158,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     }
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-    // this.analyzerService.toggleIndexedData.emit(this.indexSeries);
   }
 
   checkTransforms(e) {
@@ -181,7 +179,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   getAnalyzerParams(start, end, seriesUrl) {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
-    if (this.analyzerSeries/* this.analyzerService.analyzerSeries.length */) {
+    if (this.analyzerSeries) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
       this.analyzerService.analyzerData.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
@@ -207,14 +205,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
     const siblingsList = analyzerSeries.map((serie) => {
-      console.log('serie', serie);
-      const nonSeasonal = serie.seriesDetail.seasonalAdjustment === 'not_seasonally_adjusted';
+      const nonSeasonal = serie.seriesDetail.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle, nonSeasonal);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
-      //this.analyzerService.updateAnalyzerSeriesTest([]);
-      //this.analyzerService.analyzerData.analyzerSeries = [];
-      console.log('res', res)
       res.forEach((siblings) => {
         siblings.forEach((series) => {
           if (series.frequencyShort === freq && !siblingIds.includes(series.id)) {
