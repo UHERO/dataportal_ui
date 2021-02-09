@@ -240,21 +240,6 @@ export class DateSliderComponent implements OnInit {
     this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
   }
 
-  /* slideEnd(e) {
-    this.start = e.values[0];
-    this.end = e.values[1];
-    this.sliderSelectedRange = [this.start, this.end];
-    this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
-    const startDate = this.dates[this.start].date;
-    const endDate = this.dates[this.end].date;
-    this.calendarStartDate = new Date(startDate.replace(/-/g, '/'));
-    this.calendarStartDateFormat = this.setCalendarDateFormat(this.freq, this.calendarStartDate);
-    this.invalidStartDates = this.setInvalidDates(this.calendarStartDate.getFullYear(), this.freq, this.calendarStartDate.getMonth() + 1);  
-    this.calendarEndDate = new Date(endDate.replace(/-/g, '/'));
-    this.calendarEndDateFormat = this.setCalendarDateFormat(this.freq, this.calendarEndDate);
-    this.invalidEndDates = this.setInvalidDates(this.calendarEndDate.getFullYear(), this.freq, this.calendarEndDate.getMonth() + 1);
-  } */
-
   updateChartsAndTables(from, to, freq: string) {
     const seriesStart = this.formatChartDate(from, freq);
     const seriesEnd = this.formatChartDate(to, freq);

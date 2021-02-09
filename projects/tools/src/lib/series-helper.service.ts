@@ -44,8 +44,8 @@ export class SeriesHelperService {
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
       // Check if series is in the analyzer
-      const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
-      this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
+      // const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
+      this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const geos = data.series.geos;
       const freqs = data.series.freqs;

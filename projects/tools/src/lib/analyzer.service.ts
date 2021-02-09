@@ -10,10 +10,9 @@ import { Geography } from './tools.models';
 })
 export class AnalyzerService {
   // Keep track of series in the analyzer
-  public analyzerSeries = [];
-  analyzerSeriesSourceTest: BehaviorSubject<any> = new BehaviorSubject([]);
-  analyzerSeriesTest= this.analyzerSeriesSourceTest.asObservable();
-  private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesSourceTest.value.length);
+  analyzerSeriesSource: BehaviorSubject<any> = new BehaviorSubject([]);
+  analyzerSeries = this.analyzerSeriesSource.asObservable();
+  private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesSource.value.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
   public analyzerData = {
     analyzerTableDates: [],
@@ -54,17 +53,17 @@ export class AnalyzerService {
   }
 
   checkAnalyzer(seriesInfo) {
-    const analyzeSeries = this.analyzerSeriesSourceTest.value.find(series => series.id === seriesInfo.id);
+    const analyzeSeries = this.analyzerSeriesSource.value.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
 
-  updateAnalyzerSeriesTest(data) {
-    this.analyzerSeriesSourceTest.next(data);
-    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
+  updateAnalyzerSeries(data) {
+    this.analyzerSeriesSource.next(data);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
   toggleAnalyzerSeries(seriesID) {
-    const currentValue = this.analyzerSeriesSourceTest.value;
+    const currentValue = this.analyzerSeriesSource.value;
     let updatedValue;
     const seriesExist = currentValue.find(s => s.id === seriesID);
     if (seriesExist) {
@@ -73,19 +72,9 @@ export class AnalyzerService {
     if (!seriesExist) {
       updatedValue = [...currentValue, { id: seriesID }];
     }
-    this.analyzerSeriesSourceTest.next(updatedValue);
-    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
+    this.analyzerSeriesSource.next(updatedValue);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
-
-  /*updateAnalyzerSeriesCount(seriesInfo) {
-    //this.updateAnalyzer(seriesInfo.id);
-    // Update analyze button on category charts/tables
-    // Emits click event to parent (landing-page.component) to trigger change
-    // detection for a series that may show up in multiple places on a page
-    //this.updateAnalyzerCount.emit(seriesInfo);
-    this.toggleAnalyzerSeries(seriesInfo.id);
-    this.analyzerSeriesCount.next(this.analyzerSeriesSourceTest.value.length);
-  }*/
 
   getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
     this.analyzerData.analyzerSeries = [];
@@ -112,7 +101,7 @@ export class AnalyzerService {
   }
 
   removeAll() {
-    this.updateAnalyzerSeriesTest([]);
+    this.updateAnalyzerSeries([]);
     this.analyzerData = this.resetAnalyzerData();
   }
 
@@ -284,7 +273,7 @@ export class AnalyzerService {
     let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
-      this.analyzerSeriesSourceTest.value.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
+      this.analyzerSeriesSource.value.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
       notInChart.showInChart = true;
       chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }
@@ -299,20 +288,5 @@ export class AnalyzerService {
       ending = '; Not Seasonally Adjusted';
     }
     return `${title} (${units}) (${geography}; ${frequency}${ending})`;
-  }
-
-  updateAnalyzer(seriesId) {
-    const seriesExist = this.analyzerSeries.findIndex(series => series.id === seriesId);
-    if (seriesExist >= 0) {
-      this.analyzerSeries.splice(seriesExist, 1);
-      this.analyzerData.analyzerSeries.splice(this.analyzerData.analyzerSeries.findIndex(series => series.seriesDetail.id === seriesId), 1);
-      this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
-      this.analyzerSeriesCount.next(this.analyzerSeries.length);
-    }
-    if (seriesExist < 0) {
-      this.analyzerSeries.push({ id: seriesId });
-      this.analyzerSeriesCount.next(this.analyzerSeries.length);
-      this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(this.analyzerData.analyzerSeries);
-    }
   }
 }

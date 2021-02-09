@@ -8,7 +8,19 @@
   }
 }
 
-#sidebar-nav {  
+#sidebar-nav {
+  lib-search-bar {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  #about-link {
+    @media (min-width:768px) {
+      display: none;
+    }
+  }
+
   .navbar-brand {
     @media (min-width:768px) {
       display: none;

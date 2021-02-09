@@ -1,13 +1,12 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { AnalyzerService } from '../analyzer.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { Frequency } from '../tools.models';
-import { Geography } from '../tools.models';
+import { Frequency, Geography } from '../tools.models';
 import { Subscription } from 'rxjs';
 
 import 'jquery';
@@ -18,7 +17,7 @@ declare var $: any;
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LandingPageComponent implements OnInit, OnDestroy {
   private sub;
   private defaultCategory;
   private id: number;
@@ -34,8 +33,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   routeEnd;
   search = false;
   queryParams: any = {};
-  private tableStart;
-  private tableEnd;
   seriesStart = null;
   seriesEnd = null;
   portalSettings;
@@ -44,14 +41,11 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private toggleSeriesInAnalyzer;
 
   // Variables for geo and freq selectors
-  public currentGeo: Geography;
   public categoryData;
   private loading = false;
-  private userEvent;
   freqSub: Subscription;
   geoSub: Subscription;
   selectedGeo: Geography;
-
   selectedFreq: Frequency;
 
   constructor(
@@ -62,7 +56,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     private helperService: HelperService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private cdRef: ChangeDetectorRef
   ) {
     this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
       this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
@@ -77,7 +70,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
@@ -101,41 +93,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
-      this.helperService.updateCatData(this.categoryData);
-      // Run change detection explicitly after the change:
-      this.cdRef.detectChanges();
     });
-  }
-
-  ngAfterViewInit() {
-    /*this.sub = this.activatedRoute.queryParams.subscribe((params) => {
-      this.id = this.getIdParam(params[`id`]);
-      this.dataListId = this.getIdParam(params[`data_list_id`]);
-      this.search = typeof this.id === 'string' ? true : false;
-      this.routeGeo = params[`geo`];
-      this.routeFreq = params[`freq`];
-      this.routeView = params[`view`];
-      this.routeYoy = params[`yoy`];
-      this.routeYtd = params[`ytd`];
-      this.routeSa = params[`sa`];
-      this.routeStart = params[`start`];
-      this.routeEnd = params[`end`];
-      this.noCache = params[`nocache`] === 'true';
-      if (this.id) { this.queryParams.id = this.id; }
-      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
-      if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
-      if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
-      if (this.routeView) { this.queryParams.view = this.routeView; }
-      if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
-      if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
-      if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
-      if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
-      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
-      this.helperService.updateCatData(this.categoryData);
-      // Run change detection explicitly after the change:
-      this.cdRef.detectChanges();
-    }); */
-    console.log('afterviewinit')
   }
 
   ngOnDestroy() {
@@ -230,8 +188,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateRoute() {
-    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
+    this.queryParams.id = this.queryParams.id || this.id;
+    this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;

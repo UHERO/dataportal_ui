@@ -1,5 +1,5 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { NtaHelperService } from '../nta-helper.service';
 import { AnalyzerService } from '../analyzer.service';
@@ -40,7 +40,6 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
     private dataPortalSettingsServ: DataPortalSettingsService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private cdRef: ChangeDetectorRef
   ) {
     this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
       this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
@@ -67,8 +66,6 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
       this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
-      // Run change detection explicitly after the change:
-      this.cdRef.detectChanges();
     });
   }
 
@@ -125,8 +122,8 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
   }
 
   updateRoute() {
-    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
+    this.queryParams.id = this.queryParams.id || this.id;
+    this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this.router.navigate(['/category'], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;

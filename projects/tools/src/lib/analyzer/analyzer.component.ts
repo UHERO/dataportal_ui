@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
 
 @Component({
@@ -31,8 +31,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   analyzerShareLink: string;
   embedCode: string;
   indexSeries: boolean;
-  analyzerSeriesSub;
-
+  analyzerSeriesSub: Subscription;
   analyzerSeries;
 
   constructor(
@@ -44,7 +43,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private router: Router,
     private apiService: ApiService,
   ) {
-    this.analyzerSeriesSub = analyzerService.analyzerSeriesTest.subscribe((analyzerSeries) => {
+    this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((analyzerSeries) => {
       this.analyzerSeries = analyzerSeries;
       if (analyzerSeries.length) {
         this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
@@ -110,7 +109,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   storeUrlSeries(params) {
     const urlASeries = params[`analyzerSeries`].split('-').map((id) => { return { id: +id } });
-    this.analyzerService.updateAnalyzerSeriesTest(urlASeries);
+    this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
   storeUrlChartSeries(params) {
@@ -216,7 +215,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           }
         });
       });
-      this.analyzerService.updateAnalyzerSeriesTest(siblingIds.map((s) => {return{id: s}}))
+      this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => {return{id: s}}))
     });
   }
 

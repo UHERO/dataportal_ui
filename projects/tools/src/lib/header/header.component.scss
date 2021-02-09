@@ -18,6 +18,11 @@
     z-index: 1;
   }
 
+  #about-link {
+    margin-right: 0.5em;
+    line-height: 1.15;
+  }
+
   a {
     padding: 0;
     width: auto;
@@ -39,16 +44,5 @@
     padding-left: 0;
     text-transform: uppercase;
     vertical-align: middle;
-  }
-}
-
-.about-portal {
-  position: absolute;
-  right: 10px;
-  top: 13px;
-  width: initial !important;
-
-  .material-icons {
-    font-size: 28px;
   }
 }

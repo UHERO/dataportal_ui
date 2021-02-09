@@ -373,7 +373,7 @@ export class HighchartComponent implements OnChanges {
       }
     }
     if (freq === 'M' || freq === 'S') {
-      return Highcharts.dateFormat('%b', date) + ' ' + year;
+      return `${Highcharts.dateFormat('%b', date)} ${year}`;
     }
     return Highcharts.dateFormat('%b %e, %Y', date);
   }

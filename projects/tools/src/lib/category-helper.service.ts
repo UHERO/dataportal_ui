@@ -4,8 +4,6 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { CategoryData } from './tools.models';
-import { Frequency } from './tools.models';
-import { Geography } from './tools.models';
 import { DateWrapper } from './tools.models';
 
 @Injectable({
