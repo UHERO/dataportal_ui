@@ -1,10 +1,6 @@
 // Highstock chart component used for single-series view
 import { Component, Inject, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
-import { Geography } from '../tools.models';
-import { Frequency } from '../tools.models';
-import { HighchartChartData } from '../tools.models';
-import { Series } from '../tools.models';
-import { HighstockObject } from '../tools.models';
+import { HighchartChartData, Series, HighstockObject, Geography, Frequency } from '../tools.models';
 import 'jquery';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
@@ -22,8 +18,6 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 export class HighstockComponent implements OnChanges {
   @Input() portalSettings;
   @Input() chartData;
-  @Input() currentFreq;
-  @Input() currentGeo;
   @Input() seriesDetail;
   @Input() start;
   @Input() end;
@@ -64,7 +58,7 @@ export class HighstockComponent implements OnChanges {
   ngOnChanges() {
     if (Object.keys(this.seriesDetail).length) {
       this.showChart = true;
-      this.drawChart(this.chartData, this.seriesDetail, this.currentGeo, this.currentFreq, this.portalSettings);
+      this.drawChart(this.chartData, this.seriesDetail, this.portalSettings);
       this.updateChart = true;
     }
   }
@@ -180,14 +174,16 @@ export class HighstockComponent implements OnChanges {
     return chartRange ? chartRange.end : null;
   }
 
-  drawChart = (chartData: HighchartChartData, seriesDetail: Series, geo: Geography, freq: Frequency, portalSettings) => {
-    const decimals = seriesDetail.decimals ? seriesDetail.decimals : 1;
+  drawChart = (chartData: HighchartChartData, seriesDetail: Series, portalSettings) => {
+    const decimals = seriesDetail.decimals || 1;
+    const geo: Geography = seriesDetail.geography;
+    const freq: Frequency = { freq: seriesDetail.frequencyShort, label: seriesDetail.frequency };
     const buttons = portalSettings.highstock.buttons;
     const chartButtons = this.formatChartButtons(freq.freq, buttons);
     const labelItems = this.formatChartLabels(seriesDetail, portalSettings, geo, freq);
     const pseudoZones = chartData.pseudoZones;
     const name = seriesDetail.title;
-    const units = seriesDetail.unitsLabel ? seriesDetail.unitsLabel : seriesDetail.unitsLabelShort;
+    const units = seriesDetail.unitsLabel || seriesDetail.unitsLabelShort;
     const change = seriesDetail.percent ? 'Change' : '% Change';
     const chartRange = chartData.level ? this.getSelectedChartRange(this.start, this.end, chartData.dates, this.defaultRange, freq.freq) : null;
     const startDate = this.start ? this.start : chartRange ? chartRange.start : null;
@@ -408,7 +404,7 @@ export class HighstockComponent implements OnChanges {
 
   getSelectedChartRange = (userStart, userEnd, dates, defaults, freq) => {
     const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = defaultSettings.end || dates[dates.length - 1].date.substr(0, 4);
+    const defaultEnd = (defaultSettings && defaultSettings.end) || dates[dates.length - 1].date.substr(0, 4);
     let counter = dates.length ? dates.length - 1 : null;
     while (dates[counter].date.substr(0, 4) > defaultEnd) {
       counter--;
