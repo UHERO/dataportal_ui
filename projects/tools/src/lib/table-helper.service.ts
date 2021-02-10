@@ -18,8 +18,8 @@ export class TableHelperService {
       placement: 'left',
       title() {
         let title = seriesInfo.title;
-        title += ` (${seriesInfo.geography.shortname}; ${seriesInfo.frequency})`;
-        title += seriesInfo.unitsLabel ? ` (${seriesInfo.unitsLabel})` : ` (${seriesInfo.unitsLabelShort})`;
+        title += ` (${seriesInfo.geography.shortName}; ${seriesInfo.frequency})`;
+        title += ` (${seriesInfo.unitsLabel || seriesInfo.unitsLabelShort})`;
         title += '<i class="material-icons close-info">&#xE14C;</i>';
         return title;
       },

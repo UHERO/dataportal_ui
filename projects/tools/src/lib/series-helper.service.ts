@@ -44,20 +44,20 @@ export class SeriesHelperService {
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
       // Check if series is in the analyzer
-      const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
-      this.seriesData.seriesDetail.analyze = existAnalyze ? true : false;
+      // const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
+      this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const geos = data.series.geos;
       const freqs = data.series.freqs;
-      decimals = data.series.decimals ? data.series.decimals : 1;
+      decimals = data.series.decimals || 1;
       currentGeo = data.series.geography;
       currentFreq = { freq: data.series.frequencyShort, label: data.series.frequency, observationStart: '', observationEnd: '' };
-      this.seriesData.currentGeo = currentGeo;
-      this.seriesData.regions = geos ? geos : [data.series.geography];
-      this.seriesData.frequencies = freqs ? freqs : [{ freq: data.series.frequencyShort, label: data.series.frequency }];
+      this.helperService.updateCurrentFrequency(currentFreq);
+      this.helperService.updateCurrentGeography(currentGeo);
+      this.seriesData.regions = geos || [data.series.geography];
+      this.seriesData.frequencies = freqs || [{ freq: data.series.frequencyShort, label: data.series.frequency }];
       this.seriesData.yoyChange = data.series.percent ? 'Year/Year Change' : 'Year/Year % Change';
       this.seriesData.ytdChange = data.series.percent ? 'Year-to-Date Change' : 'Year-to-Date % Change';
-      this.seriesData.currentFreq = currentFreq;
       this.seriesData.siblings = data.siblings;
       const geoFreqPair = this.findGeoFreqSibling(data.siblings, currentGeo.handle, currentFreq.freq);
       // If a series has a seasonal and a non-seasonal sibling, display SA toggle in single series view
@@ -69,7 +69,7 @@ export class SeriesHelperService {
       const obsEnd = obs.observationEnd;
       if (levelData && levelData.length) {
         // Use to format dates for table
-        this.helperService.createDateArray(obsStart, obsEnd, this.seriesData.currentFreq.freq, dateArray);
+        this.helperService.createDateArray(obsStart, obsEnd, currentFreq.freq, dateArray);
         const formattedData = this.dataTransform(obs, dateArray, decimals);
         this.seriesData.chartData = formattedData.chartData;
         this.seriesData.seriesTableData = formattedData.tableData;
@@ -202,14 +202,14 @@ export class SeriesHelperService {
 
   calculateCAGR(firstValue: number, lastValue: number, freq: string, periods: number) {
     // Calculate compound annual growth rate
-    const cagr = {
-      'A': (Math.pow((lastValue / firstValue), 1 / periods) - 1) * 100,
-      'S': (Math.pow((lastValue / firstValue), 2 / periods) - 1) * 100,
-      'Q': (Math.pow((lastValue / firstValue), 4 / periods) - 1) * 100,
-      'M': (Math.pow((lastValue / firstValue), 12 / periods) - 1) * 100,
-      'W': (Math.pow((lastValue / firstValue), 52 / periods) - 1) * 100,
-      'D': (Math.pow((lastValue / firstValue), 365 / periods) - 1) * 100
-    }
-    return cagr[freq] || Infinity;
+    const multiplier = {
+      A: 1,
+      Q: 4,
+      S: 2,
+      M: 12,
+      W: 52,
+      D: 365
+    };
+    return (Math.pow((lastValue / firstValue), multiplier[freq] / periods) - 1) * 100 || Infinity;
   }
 }

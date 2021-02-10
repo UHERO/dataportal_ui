@@ -8,26 +8,26 @@
     <i *ngIf="data.seriesDetail && data.seriesDetail.analyze" title="Remove from Analyzer"
       [class.remove-button]="data.seriesDetail.analyze" class="material-icons analyzer-toggle remove-button"
       (click)="updateAnalyze(data.seriesDetail)">star</i>
-    <lib-geo-selector *ngIf="data.regions" [regions]="data.regions" [(selectedGeo)]="data.currentGeo"
-      (selectedGeoChange)="goToSeries(data.siblings, data.currentFreq.freq, $event.handle, seasonallyAdjusted)"
+    <lib-geo-selector *ngIf="data.regions" [regions]="data.regions"
+      (selectedGeoChange)="goToSeries(data.siblings, selectedFreq.freq, $event.handle, seasonallyAdjusted)"
       class="geo-selector"></lib-geo-selector>
     <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
-      [(selectedFreq)]="data.currentFreq"
-      (selectedFreqChange)="goToSeries(data.siblings, $event.freq, data.currentGeo.handle, seasonallyAdjusted)"
+      (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
       class="freq-selector"></lib-freq-selector>
-    <lib-share-link [view]="'series'" [embedCode]="seriesEmbedCode" [shareLink]="seriesShareLink" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
+    <lib-share-link [view]="'series'" [embedCode]="seriesEmbedCode" [shareLink]="seriesShareLink"
+      [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"
-          (ngModelChange)="goToSeries(data.siblings, data.currentFreq.freq, data.currentGeo.handle, $event)">Seasonally
+          (ngModelChange)="goToSeries(data.siblings, selectedFreq.freq, selectedGeo.handle, $event)">Seasonally
         Adjusted
       </label>
     </div>
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
     <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"
-      [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [currentFreq]="data.currentFreq"
-      [currentGeo]="data.currentGeo" (chartExtremes)="updateChartExtremes($event)"
+      [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [currentFreq]="selectedFreq"
+      [currentGeo]="selectedGeo" (chartExtremes)="updateChartExtremes($event)"
       (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.chartData)">
     </lib-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
@@ -52,8 +52,8 @@
       </div>
     </div>
     <div class="series-table">
-      <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders" [value]="newTableData"
-        [loading]="!data.requestComplete" [loadingIcon]="'fas fa-spinner'">
+      <p-table *ngIf="!noSelection && !data.noData" styleClass="p-datatable-striped" [columns]="tableHeaders"
+        [value]="newTableData" [loading]="!data.requestComplete" [loadingIcon]="'fas fa-spinner'">
         <ng-template pTemplate="header" let-columns>
           <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field"

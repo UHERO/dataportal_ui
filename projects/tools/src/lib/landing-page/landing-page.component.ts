@@ -1,13 +1,14 @@
 // Component for multi-chart view
-import { Inject, Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { AnalyzerService } from '../analyzer.service';
 import { CategoryHelperService } from '../category-helper.service';
 import { HelperService } from '../helper.service';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
-import { Frequency } from '../tools.models';
-import { Geography } from '../tools.models';
+import { Frequency, Geography } from '../tools.models';
+import { Subscription } from 'rxjs';
+
 import 'jquery';
 declare var $: any;
 
@@ -16,7 +17,7 @@ declare var $: any;
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss']
 })
-export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class LandingPageComponent implements OnInit, OnDestroy {
   private sub;
   private defaultCategory;
   private id: number;
@@ -32,8 +33,6 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   routeEnd;
   search = false;
   queryParams: any = {};
-  private tableStart;
-  private tableEnd;
   seriesStart = null;
   seriesEnd = null;
   portalSettings;
@@ -42,11 +41,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private toggleSeriesInAnalyzer;
 
   // Variables for geo and freq selectors
-  public currentGeo: Geography;
-  public currentFreq: Frequency;
   public categoryData;
   private loading = false;
-  private userEvent;
+  freqSub: Subscription;
+  geoSub: Subscription;
+  selectedGeo: Geography;
+  selectedFreq: Frequency;
+
   constructor(
     @Inject('portal') public portal,
     private analyzerService: AnalyzerService,
@@ -55,20 +56,20 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     private helperService: HelperService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private cdRef: ChangeDetectorRef
   ) {
     this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
       this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
     });
+    this.freqSub = helperService.currentFreq.subscribe((freq) => {
+      this.selectedFreq = freq;
+    });
+    this.geoSub = helperService.currentGeo.subscribe((geo) => {
+      this.selectedGeo = geo;
+    });
   }
 
   ngOnInit(): void {
-    this.currentGeo = { fips: null, name: null, shortName: null, handle: null };
-    this.currentFreq = { freq: null, label: null };
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-  }
-
-  ngAfterViewInit() {
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
@@ -92,14 +93,15 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
-      this.helperService.updateCatData(this.categoryData);
-      // Run change detection explicitly after the change:
-      this.cdRef.detectChanges();
     });
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
+    this.freqSub.unsubscribe();
+    this.geoSub.unsubscribe();
     this.toggleSeriesInAnalyzer.unsubscribe();
   }
 
@@ -186,8 +188,8 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateRoute() {
-    this.queryParams.id = this.queryParams.id ? this.queryParams.id : this.id;
-    this.queryParams.data_list_id = this.queryParams.data_list_id ? this.queryParams.data_list_id : this.dataListId;
+    this.queryParams.id = this.queryParams.id || this.id;
+    this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
     this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;

@@ -197,8 +197,8 @@ export class NtaHelperService {
       if (!measurementExists && series.frequencyShort === 'A') {
         measurements.push({
           dateWrapper: { firstDate: '', endDate: '' },
-          id: series.measurementId ? series.measurementId : 'null',
-          name: series.measurementName ? series.measurementName : ' ',
+          id: series.measurementId || 'null',
+          name: series.measurementName || ' ',
           series: [series]
         });
       }
@@ -245,24 +245,10 @@ export class NtaHelperService {
   }
 
   setStartDate = (dateWrapper, observationStart) => {
-    /* if (dateWrapper.firstDate === '') {
-      return observationStart;
-    }
-    if (observationStart < dateWrapper.firstDate) {
-      return observationStart;
-    }
-    return dateWrapper.firstDate; */
     return (!dateWrapper.firstDate || observationStart < dateWrapper.firstDate) ? observationStart : dateWrapper.firstDate;
   }
 
   setEndDate = (dateWrapper, observationEnd) => {
-    /* if (dateWrapper.endDate === '') {
-      return observationEnd;
-    }
-    if (observationEnd > dateWrapper.endDate) {
-      return observationEnd;
-    }
-    return dateWrapper.endDate; */
     return (!dateWrapper.endDate || observationEnd > dateWrapper.endDate) ? observationEnd : dateWrapper.endDate;
   }
 }

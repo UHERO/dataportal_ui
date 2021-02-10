@@ -5,6 +5,8 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { Frequency } from '../tools.models';
 import { Geography } from '../tools.models';
+import { Subscription } from 'rxjs';
+import { HelperService } from '../helper.service';
 
 declare var $: any;
 
@@ -29,6 +31,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   seriesId;
   seriesShareLink: string;
   seriesEmbedCode: string;
+  freqSub: Subscription;
+  geoSub: Subscription;
+  selectedGeo: Geography;
+
+  selectedFreq: Frequency;
 
   // Vars used in selectors
   public currentFreq: Frequency;
@@ -70,15 +77,21 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     @Inject('portal') public portal,
     private dataPortalSettings: DataPortalSettingsService,
     private seriesHelper: SeriesHelperService,
+    private helperService: HelperService,
     private analyzerService: AnalyzerService,
     private route: ActivatedRoute,
     private router: Router,
     private cdRef: ChangeDetectorRef
-  ) { }
+  ) {
+    this.freqSub = helperService.currentFreq.subscribe((freq) => {
+      this.selectedFreq = freq;
+    });
+    this.geoSub = helperService.currentGeo.subscribe((geo) => {
+      this.selectedGeo = geo;
+    });
+  }
 
   ngOnInit() {
-    this.currentGeo = { fips: null, handle: null, name: null , shortName: null };
-    this.currentFreq = { freq: null, label: null };
     this.portalSettings = this.dataPortalSettings.dataPortalSettings[this.portal.universe];
   }
 
@@ -109,6 +122,11 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
+  ngOnDestroy() {
+    this.freqSub.unsubscribe();
+    this.geoSub.unsubscribe();
+  }
+
   // Redraw chart when selecting a new region or frequency
   goToSeries = (siblings: Array<any>, freq: string, geo: string, sa: boolean) => {
     this.seasonallyAdjusted = sa;
@@ -132,8 +150,8 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
   }
 
   updateAnalyze(seriesInfo) {
-    this.analyzerService.updateAnalyzer(seriesInfo.id);
-    seriesInfo.analyze = this.analyzerService.analyzerSeries.find(aSeries => aSeries.id === seriesInfo.id);
+    seriesInfo.analyze = !seriesInfo.analyze;
+    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
   }
 
   updateChartExtremes(e) {
@@ -162,7 +180,6 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
-    seriesDetail.currentFreq = { freq: seriesDetail.frequencyShort };
     this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false);
   }
 

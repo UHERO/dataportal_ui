@@ -30,7 +30,8 @@ export class CategoryTableRenderComponent implements ICellRendererAngularComp {
     return this.tableHelper.showPopover(seriesInfo, subcatIndex);
   }
 
-  updateAnalyze = (seriesInfo) => {
-    this.analyzerService.updateAnalyzerSeriesCount(seriesInfo);
+  updateAnalyze(seriesInfo) {
+    seriesInfo.analyze = !seriesInfo.analyze;
+    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id);
   }
 }

@@ -12,7 +12,6 @@ import { DataPortalSettingsService } from '../data-portal-settings.service';
 })
 export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   public categories;
-  private errorMessage: string;
   public reveal = false;
   public overlay = false;
   public selectedCategory: any;
@@ -71,9 +70,9 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
         this.defaultCategory = this.categories[0].id;
         this.activatedRoute.queryParams.subscribe((params) => {
           this.id = params[`id`];
-          this.view = params[`view`] ? params[`view`] : 'chart';
-          this.yoy = params[`yoy`] ? params[`yoy`] : 'false';
-          this.ytd = params[`ytd`] ? params[`ytd`] : 'false';
+          this.view = params[`view`] || 'chart';
+          this.yoy = params[`yoy`] || 'false';
+          this.ytd = params[`ytd`] || 'false';
           this.selectedCategory = this.id ? this.findSelectedCategory(this.id) : this.checkRoute(this.id, this.router.url);
           this.navMenuItems.forEach((item) => {
             if (this.id) {

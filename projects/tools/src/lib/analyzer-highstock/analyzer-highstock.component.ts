@@ -19,7 +19,6 @@ import * as Highcharts from 'highcharts/highstock';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
 import offlineExport from 'highcharts/modules/offline-exporting';
-import { max } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-analyzer-highstock',

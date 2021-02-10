@@ -1,5 +1,5 @@
 import { of as observableOf, Observable } from 'rxjs';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, filter } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Category } from './category';
@@ -23,6 +23,7 @@ export class ApiService {
   private cachedPackageSearch = [];
   private cachedPackageAnalyzer = [];
   private cachedObservations = [];
+  private cachedSibSeriesByIdAndGeo = [];
 
   constructor(
     @Inject('environment') private environment,
@@ -146,12 +147,28 @@ export class ApiService {
     }
   }
 
+  fetchSiblingSeriesByIdAndGeo(id: number, geo: string, nonSeasonal: boolean) {
+    const cacheId = nonSeasonal ? `${id + geo}NS` : id + geo;
+    if (this.cachedSibSeriesByIdAndGeo[cacheId]) {
+      return observableOf(this.cachedSibSeriesByIdAndGeo[cacheId]);
+    } else {
+      let seriesSiblings$ = this.http.get(`${this.baseUrl}/series/siblings?id=${id}&geo=${geo}&u=${this.portal.universe}`, this.httpOptions).pipe(
+        map(mapData),
+        map(data => nonSeasonal ? data.filter(s => s.seasonalAdjustment === 'not_seasonally_adjusted') : data.filter(s => s.seasonalAdjustment !== 'not_seasonally_adjusted')),
+        tap(val => {
+          this.cachedSibSeriesByIdAndGeo[cacheId] = val;
+          seriesSiblings$ = null;
+        }), );
+      return seriesSiblings$;
+    }
+  }
+
   fetchSearch(search: string, noCache: boolean) {
     if (this.cachedSearch[search]) {
       return observableOf(this.cachedSearch[search]);
     } else {
       const caching = noCache ? '&nocache' : '';
-      let filters$ = this.http.get(`${this.baseUrl}/search?q=${search}&u=${this.portal.universe}`, this.httpOptions).pipe(
+      let filters$ = this.http.get(`${this.baseUrl}/search?q=${search}&u=${this.portal.universe}${caching}`, this.httpOptions).pipe(
         map(mapData),
         tap(val => {
           this.cachedSearch[search] = val;

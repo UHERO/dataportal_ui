@@ -1,14 +1,16 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
+import { forkJoin, Subscription } from 'rxjs';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'lib-analyzer',
   templateUrl: './analyzer.component.html',
   styleUrls: ['./analyzer.component.scss']
 })
-export class AnalyzerComponent implements OnInit {
+export class AnalyzerComponent implements OnInit, OnDestroy {
   minDate;
   maxDate;
   portalSettings;
@@ -29,6 +31,8 @@ export class AnalyzerComponent implements OnInit {
   analyzerShareLink: string;
   embedCode: string;
   indexSeries: boolean;
+  analyzerSeriesSub: Subscription;
+  analyzerSeries;
 
   constructor(
     @Inject('environment') private environment,
@@ -36,7 +40,18 @@ export class AnalyzerComponent implements OnInit {
     private analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
-  ) { }
+    private router: Router,
+    private apiService: ApiService,
+  ) {
+    this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((analyzerSeries) => {
+      this.analyzerSeries = analyzerSeries;
+      if (analyzerSeries.length) {
+        this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
+        this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+        this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+      }
+    });
+  }
 
   ngOnInit() {
     if (this.route) {
@@ -86,27 +101,21 @@ export class AnalyzerComponent implements OnInit {
       });
     }
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-    if (this.analyzerService.analyzerSeries.length) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerService.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
-      this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-      this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-    }
+  }
+
+  ngOnDestroy() {
+    this.analyzerSeriesSub.unsubscribe();
   }
 
   storeUrlSeries(params) {
-    const urlASeries = params[`analyzerSeries`].split('-').map(Number);
-    urlASeries.forEach((uSeries) => {
-      const seriesExists = this.analyzerService.analyzerSeries.find(s => s.id === uSeries);
-      if (!seriesExists) {
-        this.analyzerService.analyzerSeries.push({ id: uSeries, showInChart: false });
-      }
-    });
+    const urlASeries = params[`analyzerSeries`].split('-').map((id) => { return { id: +id } });
+    this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
   storeUrlChartSeries(params) {
     const urlCSeries = params[`chartSeries`].split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
-      const aSeries = this.analyzerService.analyzerSeries.find(analyzer => analyzer.id === cSeries);
+      const aSeries = this.analyzerSeries.find(analyzer => analyzer.id === cSeries);
       aSeries.showInChart = true;
     });
   }
@@ -148,7 +157,6 @@ export class AnalyzerComponent implements OnInit {
     }
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-    // this.analyzerService.toggleIndexedData.emit(this.indexSeries);
   }
 
   checkTransforms(e) {
@@ -170,7 +178,7 @@ export class AnalyzerComponent implements OnInit {
   getAnalyzerParams(start, end, seriesUrl) {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
-    if (this.analyzerService.analyzerSeries.length) {
+    if (this.analyzerSeries) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
       this.analyzerService.analyzerData.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
@@ -191,6 +199,28 @@ export class AnalyzerComponent implements OnInit {
     seriesUrl += this.y0 ? `&y0=${this.y0}` : '';
     seriesUrl += this.y1 ? `&y1=${this.y1}` : '';
     return seriesUrl;
+  }
+
+  changeAnalyzerFrequency(freq, analyzerSeries) {
+    const siblingIds = [];
+    const siblingsList = analyzerSeries.map((serie) => {
+      const nonSeasonal = serie.seriesDetail.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle, nonSeasonal);
+    });
+    forkJoin(siblingsList).subscribe((res: any) => {
+      res.forEach((siblings) => {
+        siblings.forEach((series) => {
+          if (series.frequencyShort === freq && !siblingIds.includes(series.id)) {
+            siblingIds.push(series.id);
+          }
+        });
+      });
+      this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => {return{id: s}}))
+    });
+  }
+
+  removeAllAnalyzerSeries() {
+    this.analyzerService.removeAll();
   }
 
   formatEmbedSnippet(start: string, end: string) {
