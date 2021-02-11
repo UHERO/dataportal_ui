@@ -26,8 +26,7 @@
     <p *ngIf="noSelection">{{noSelection}}</p>
     <p *ngIf="data.noData">{{data.noData}}</p>
     <lib-highstock *ngIf="!noSelection && !data.noData" [portalSettings]="portalSettings" [start]="startDate"
-      [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" [currentFreq]="selectedFreq"
-      [currentGeo]="selectedGeo" (chartExtremes)="updateChartExtremes($event)"
+      [end]="endDate" [chartData]="data.chartData" [seriesDetail]="data.seriesDetail" (chartExtremes)="updateChartExtremes($event)"
       (tableExtremes)="redrawTable($event, data.seriesDetail, data.seriesTableData, data.chartData)">
     </lib-highstock>
     <div class="source" *ngIf="data.seriesDetail.source_description || data.seriesDetail.source_link">
