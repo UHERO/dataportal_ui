@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 })
 export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() data;
-  @Input() sublist;
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() tableId;
@@ -26,7 +25,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
-  @Input() seriesInAnalyzer;
   @Input() showSeasonal: boolean;
   @Input() hasNonSeasonal: boolean;
   @Input() hasSeasonal;

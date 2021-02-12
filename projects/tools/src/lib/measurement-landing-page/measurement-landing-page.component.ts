@@ -25,8 +25,6 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
   private seriesStart;
   private seriesEnd;
   displaySeries;
-  seriesInAnalyzer;
-  private toggleSeriesInAnalyzer;
   public categoryData;
   private selectedMeasure;
   private loading = false;
@@ -40,11 +38,7 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
     private dataPortalSettingsServ: DataPortalSettingsService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-  ) {
-    this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
-      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
-    });
-  }
+  ) { }
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];

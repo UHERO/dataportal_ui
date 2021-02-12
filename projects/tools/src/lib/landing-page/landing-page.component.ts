@@ -37,8 +37,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   seriesEnd = null;
   portalSettings;
   private displaySeries;
-  seriesInAnalyzer;
-  private toggleSeriesInAnalyzer;
 
   // Variables for geo and freq selectors
   public categoryData;
@@ -57,9 +55,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) {
-    this.toggleSeriesInAnalyzer = this.analyzerService.updateAnalyzerCount.subscribe((data: any) => {
-      this.seriesInAnalyzer = { id: data.id, analyze: data.analyze };
-    });
     this.freqSub = helperService.currentFreq.subscribe((freq) => {
       this.selectedFreq = freq;
     });
@@ -102,7 +97,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
-    this.toggleSeriesInAnalyzer.unsubscribe();
   }
 
   getIdParam(id) {

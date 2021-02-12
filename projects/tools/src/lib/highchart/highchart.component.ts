@@ -3,6 +3,7 @@ import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
 import { HighstockHelperService } from '../highstock-helper.service';
+import { Frequency } from '../tools.models';
 
 @Component({
   selector: 'lib-highchart',
@@ -12,7 +13,6 @@ import { HighstockHelperService } from '../highstock-helper.service';
 export class HighchartComponent implements OnChanges {
   @Input() portalSettings;
   @Input() seriesData;
-  @Input() currentFreq;
   @Input() chartStart;
   @Input() chartEnd;
   @Input() minValue;
@@ -44,7 +44,7 @@ export class HighchartComponent implements OnChanges {
       this.noDataChart(this.seriesData);
       this.updateChart = true;
     } else {
-      this.drawChart(this.seriesData, this.currentFreq, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
+      this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
       this.updateChart = true;
     }
   }
@@ -135,8 +135,9 @@ export class HighchartComponent implements OnChanges {
     return chartSeries;
   }
 
-  drawChart = (seriesData, currentFreq: string, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
+  drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
+    const currentFreq = seriesData.seriesInfo.frequencyShort;
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
     const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd, currentFreq, this.defaultRange);
@@ -153,9 +154,9 @@ export class HighchartComponent implements OnChanges {
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = this.formatDateLabel(point0.x, freq);
       let subtitleText = '';
-      subtitleText += Highcharts.numberFormat(point0.y, decimals, '.', ',') + '<br> (' + unitsLabelShort + ') <br>';
+      subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${unitsLabelShort})`;
       subtitleText += s1 ?
-      `${this.formatTransformLabel(s1.name, percent)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
+      `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
       chart.setSubtitle({
         text: subtitleText,
@@ -340,14 +341,14 @@ export class HighchartComponent implements OnChanges {
     this.chartOptions.series = chartSeries;
   }
 
-  formatTransformLabel = (transformationName, percent) => {
+  formatTransformLabel = (transformationName, percent, currentFreq) => {
     if (transformationName === 'c5ma') {
       return percent ? 'Annual Chg: ' : 'Annual % Chg: ';
     }
-    if (transformationName === 'ytd' && this.currentFreq === 'A') {
+    if (transformationName === 'ytd' && currentFreq === 'A') {
       return percent ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
     }
-    if (transformationName === 'ytd' && this.currentFreq !== 'A') {
+    if (transformationName === 'ytd' && currentFreq !== 'A') {
       return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
     }
   }

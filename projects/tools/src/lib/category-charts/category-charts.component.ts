@@ -9,10 +9,8 @@ import { HelperService } from '../helper.service';
 })
 export class CategoryChartsComponent implements OnChanges {
   @Input() portalSettings;
-  @Input() sublist;
   @Input() data;
   @Input() findMinMax;
-  @Input() selectedDataList;
   @Input() freq;
   @Input() noSeries;
   @Input() showSeasonal;
@@ -27,7 +25,6 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() search;
   @Input() dates;
   @Input() dateWrapper;
-  @Input() seriesInAnalyzer;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
