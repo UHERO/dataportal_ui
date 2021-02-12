@@ -37,7 +37,7 @@
 		<lib-category-charts *ngIf="routeView !== 'table' && data.requestComplete" [search]="search"
 			[portalSettings]="portalSettings" [chartStart]="data.seriesStart" [chartEnd]="data.seriesEnd"
 			[dates]="data.dateArray" [data]="data.displaySeries" [freq]="data.currentFreq?.freq" [noSeries]="data.noData"
-			[params]="queryParams" [findMinMax]="data.findMinMax" (updateURLFragment)="updateRoute()">
+			[findMinMax]="data.findMinMax" (updateURLFragment)="updateRoute()">
 		</lib-category-charts>
 	</ng-template>
 </div>

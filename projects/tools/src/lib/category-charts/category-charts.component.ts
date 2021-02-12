@@ -17,14 +17,10 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() hasNonSeasonal;
   @Input() hasSeasonal;
   @Input() nsaActive;
-  @Input() yoyActive;
-  @Input() ytdActive;
-  @Input() params;
   @Input() chartStart;
   @Input() chartEnd;
   @Input() search;
   @Input() dates;
-  @Input() dateWrapper;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;

@@ -3,8 +3,7 @@ import { forkJoin as observableForkJoin, of as observableOf, Observable } from '
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
-import { CategoryData } from './tools.models';
-import { DateWrapper } from './tools.models';
+import { CategoryData, DateWrapper } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +37,7 @@ export class CategoryHelperService {
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
       this.apiService.fetchCategories().subscribe((categories) => {
-        if (catId === null) {
-          catId = categories[0].id;
-        }
+        catId = catId || categories[0].id;
         const cat = categories.find(category => category.id === catId);
         if (cat) {
           const categoryDataLists = cat.children;
@@ -55,7 +52,7 @@ export class CategoryHelperService {
           this.categoryData[cacheId].selectedCategoryId = cat.id;
           this.categoryData[cacheId].selectedCategory = cat;
           this.categoryData[cacheId].subcategories = categoryDataLists;
-          this.getDataListGeos(catId, noCache, selectedDataList, cacheId, routeGeo, routeFreq);
+          this.getDataListGeos(noCache, selectedDataList, cacheId, routeGeo, routeFreq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
           this.categoryData[cacheId].requestComplete = true;
@@ -65,9 +62,9 @@ export class CategoryHelperService {
     }
   }
 
-  getDataListGeos(catId: any, noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListGeos(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this.apiService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
-      this.categoryData[cacheId].regions = geos ? geos : [dataList.defaults.geo];
+      this.categoryData[cacheId].regions = geos || [dataList.defaults.geo];
     },
       (error) => {
         console.log('check category geos error', error);
@@ -79,7 +76,7 @@ export class CategoryHelperService {
 
   getDataListFreqs(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
     this.apiService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
-      this.categoryData[cacheId].frequencies = freqs ? freqs : [dataList.defaults.freq];
+      this.categoryData[cacheId].frequencies = freqs || [dataList.defaults.freq];
     },
       (error) => {
         console.log('check category freqs error', error);
