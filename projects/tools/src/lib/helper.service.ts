@@ -155,11 +155,15 @@ export class HelperService {
     let start = 0;
     let end = valueList.length - 1;
     let middle = Math.floor((start + end) / 2);
+    // check if array is in descending order
+    const descending = valueList[start] > valueList[end];
     while (valueList[middle] !== date && start < end) {
       if (date < valueList[middle]) {
-        end = middle - 1;
+        start = descending ? middle + 1 : start;
+        end = descending ? end : middle - 1;
       } else {
-        start = middle + 1;
+        start = descending ? start : middle + 1;
+        end = descending ? middle - 1 : end;
       }
       middle = Math.floor((start + end) / 2);
     }
