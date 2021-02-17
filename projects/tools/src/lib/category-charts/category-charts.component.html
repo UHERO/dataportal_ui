@@ -9,7 +9,7 @@
 				queryParamsHandling='merge' *ngIf="serie.seriesInfo.id">
 				<lib-highchart [minValue]="minValue" [maxValue]="maxValue"
 					[portalSettings]="portalSettings" [chartStart]="chartStart" [chartEnd]="chartEnd"
-					[seriesData]="serie" [categoryDates]="dates"></lib-highchart>
+					[seriesData]="serie"></lib-highchart>
 			</a>
 			<i *ngIf="!serie.seriesInfo.analyze" title="Add to Analyzer"
 				[class.add-analyze-button]="!serie.seriesInfo.analyze" class="material-icons analyzer-toggle"

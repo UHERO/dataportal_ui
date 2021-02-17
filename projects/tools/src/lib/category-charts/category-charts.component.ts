@@ -74,6 +74,10 @@ export class CategoryChartsComponent implements OnChanges {
         }
       });
     }
+    const test = dates.map((d, index) => {
+      return [new Date(d.date.replace(/-/, '/')), series0[index]];
+    });
+    console.log('test', test)
     const chartData = { series0, series1, pseudoZones, dates };
     return { start, end, chartData };
   }

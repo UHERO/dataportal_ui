@@ -97,6 +97,7 @@ export class AnalyzerService {
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
     });
+    console.log('analyzerdata', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 

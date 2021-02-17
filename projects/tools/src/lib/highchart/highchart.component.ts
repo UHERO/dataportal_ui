@@ -17,7 +17,7 @@ export class HighchartComponent implements OnChanges {
   @Input() chartEnd;
   @Input() minValue;
   @Input() maxValue;
-  @Input() categoryDates;
+  //@Input() categoryDates;
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions = {} as HighchartsObject;
   updateChart = false;
@@ -44,6 +44,7 @@ export class HighchartComponent implements OnChanges {
       this.noDataChart(this.seriesData);
       this.updateChart = true;
     } else {
+      console.log(this.seriesData)
       this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
       this.updateChart = true;
     }
@@ -140,14 +141,15 @@ export class HighchartComponent implements OnChanges {
     const currentFreq = seriesData.seriesInfo.frequencyShort;
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
-    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.categoryDates, chartStart, chartEnd, currentFreq, this.defaultRange);
+    //console.log('this.categoryDates', this.categoryDates)
+    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, chartStart, chartEnd, currentFreq, this.defaultRange);
     const decimals = seriesData.seriesInfo.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
     series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
-    const chartStartExists = this.categoryDates.find(d => chartStart === d.date);
-    const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(this.categoryDates[seriesStart].date);
+    const chartStartExists = dates.find(d => chartStart === d.date);
+    const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
     // Check how many non-null points exist in level series
     const levelLength = series0.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);
