@@ -159,6 +159,19 @@ body {
       }
     }
 
+    a#uhero-link {
+      display: inline-block;
+      width: 31% !important;
+    }
+
+    a#data-portal-link {
+      display: inline-block;
+
+      img {
+        margin-left: -61%;
+      }
+    }
+
     #about-link {
       color: $primary;
     }
