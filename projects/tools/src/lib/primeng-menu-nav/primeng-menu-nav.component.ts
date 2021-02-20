@@ -28,6 +28,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
   analyzerSeriesCount;
   portalSettings;
   navMenuItems: MenuItem[];
+  uheroLogo: boolean;
 
   constructor(
     @Inject('logo') private logo,
@@ -90,6 +91,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       }
     });
     this.headerLogo = this.logo;
+    this.uheroLogo = this.logo.altText.includes('UHERO');
   }
 
   ngOnDestroy() {

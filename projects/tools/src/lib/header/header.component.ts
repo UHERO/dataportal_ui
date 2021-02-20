@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class HeaderComponent implements OnInit {
   public headerLogo;
   public logoText;
-  uheroLogo;
+  uheroLogo: boolean;
 
   constructor(@Inject('logo') private logo, private router: Router) { }
 
