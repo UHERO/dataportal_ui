@@ -9,11 +9,13 @@ import { Router } from '@angular/router';
 export class HeaderComponent implements OnInit {
   public headerLogo;
   public logoText;
+  uheroLogo: boolean;
 
   constructor(@Inject('logo') private logo, private router: Router) { }
 
   ngOnInit() {
     this.headerLogo = this.logo;
+    this.uheroLogo = this.logo.altText.includes('UHERO');
   }
 
   onSearch(event) {

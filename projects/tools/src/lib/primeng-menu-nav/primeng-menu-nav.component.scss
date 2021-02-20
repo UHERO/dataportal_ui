@@ -167,7 +167,6 @@
     font-size: 0.9em;
     cursor: pointer;
     padding: 0.5em;
-    border-top: 1px solid #E5E5E5;
 
     &:hover {
       background-color: #DBDBDB;
@@ -193,7 +192,7 @@
 
       .p-panelmenu-header {
         border: 0;
-        border-top: 1px solid #E5E5E5;
+        border-bottom: 1px solid #E5E5E5;
         background: transparent;
   
         a.p-panelmenu-header-link {
