@@ -198,24 +198,24 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   formatLvlData = (series, level, minDate) => {
-    const seriesInChart = $('.highcharts-series.' + series.seriesDetail.id);
+    const seriesInChart = $('.highcharts-series.' + series.id);
     const { dates, values } = level;
-    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
     const indexedValues = this.getIndexedValues(values, dates, minDate);
     const seriesData = {
       series: this.indexChecked ? series.indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
-      seriesInfo: series.seriesDetail,
+      seriesInfo: series,
       interactionSettings: {
         showInChart: series.showInChart,
         color: seriesInChart.length ? seriesInChart.css('stroke') : '#000000',
-        seriesInfo: series.seriesDetail
+        seriesInfo: series
       },
       lvlData: true,
     };
     formattedDates.forEach((d, index) => {
-      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.seriesDetail.decimals) : this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
+      seriesData[d] = this.indexChecked ? this.helperService.formatNum(indexedValues[index], series.decimals) : this.helperService.formatNum(+values[index], series.decimals);
     });
     return seriesData;
   }
@@ -229,15 +229,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   formatTransformationData = (series, transformation) => {
     const { dates, values } = transformation;
-    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.seriesDetail.frequencyShort));
-    const displayName = this.formatTransformationName(transformation.transformation, series.seriesDetail.percent);
+    const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
+    const displayName = this.formatTransformationName(transformation.transformation, series.percent);
     const data = {
       series: displayName,
-      seriesInfo: series.seriesDetail,
+      seriesInfo: series,
       lvlData: false
     };
     formattedDates.forEach((d, index) => {
-      data[d] = this.helperService.formatNum(+values[index], series.seriesDetail.decimals);
+      data[d] = this.helperService.formatNum(+values[index], series.decimals);
     });
     return data;
   }
@@ -302,6 +302,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   removeFromAnalyzer(series) {
-    this.analyzerService.toggleAnalyzerSeries(series.seriesInfo.id);
+    this.analyzerService.toggleAnalyzerSeries(series.id);
   }
 }

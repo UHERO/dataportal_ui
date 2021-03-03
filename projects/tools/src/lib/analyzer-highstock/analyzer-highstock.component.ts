@@ -88,9 +88,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
     this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
       const chartSeries = this.series.filter(s => s.showInChart);
-      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
+      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.unitsLabelShort);
       if (toggleDisplay) {
-        const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
+        const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.id === data.id);
         if (seriesToUpdate) {
           seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
         }
@@ -176,11 +176,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.yAxis = yAxesNew;
     const seriesByAxes = yAxesNew.reduce((obj, y) => {
       if (y.id === 'yAxis0') {
-        obj.y0 = y.series.map(s => s.seriesDetail.id);
+        obj.y0 = y.series.map(s => s.id);
         return obj;
       }
       if (y.id === 'yAxis1') {
-        obj.y1 = y.series.map(s => s.seriesDetail.id);
+        obj.y1 = y.series.map(s => s.id);
         return obj;
       }
       return obj;
@@ -198,11 +198,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         return obj;
       }
       if (!this.indexChecked) {
-        if (y0Series && y0Series.includes(serie.seriesDetail.id)) {
+        if (y0Series && y0Series.includes(serie.id)) {
           obj.yAxis0.push(serie);
           return obj;
         }
-        if (y1Series && y1Series.includes(serie.seriesDetail.id)) {
+        if (y1Series && y1Series.includes(serie.id)) {
           obj.yAxis1.push(serie);
           return obj;
         }
@@ -210,12 +210,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           obj.yAxis0.push(serie);
           return obj;
         }
-        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
-        if (serie.seriesDetail.unitsLabelShort === y0Units) {
+        const y0Units = obj.yAxis0[0].unitsLabelShort;
+        if (serie.unitsLabelShort === y0Units) {
           obj.yAxis0.push(serie);
           return obj;
         }
-        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
+        if (serie.unitsLabelShort !== y0Units) {
           obj.yAxis1.push(serie);
           return obj;
         }
@@ -233,7 +233,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         },
         id: axis,
         title: {
-          text: this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
+          text: this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.unitsLabelShort : null
         },
         opposite: index === 0 ? false : true,
         minPadding: 0,
@@ -253,17 +253,17 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const seriesCopy = JSON.parse(JSON.stringify(series));
     const indexBaseYear = this.getIndexBaseYear(series, start);
     const chartSeries = seriesCopy.map((serie) => {
-      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
+      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
       return {
-        className: serie.seriesDetail.id,
+        className: serie.id,
         name: this.indexChecked ? serie.indexDisplayName : serie.chartDisplayName,
-        tooltipName: serie.seriesDetail.title,
+        tooltipName: serie.title,
         data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, indexBaseYear) : serie.chartData.level,
         levelData: serie.chartData.level.slice(),
         yAxis: axis ? axis.id : null,
-        decimals: serie.seriesDetail.decimals,
-        frequency: serie.seriesDetail.frequencyShort,
-        geography: serie.seriesDetail.geography.name,
+        decimals: serie.decimals,
+        frequency: serie.frequencyShort,
+        geography: serie.geography.name,
         includeInDataExport: serie.showInChart ? true : false,
         showInLegend: serie.showInChart ? true : false,
         showInNavigator: false,
@@ -272,8 +272,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             return false;
           }
         },
-        unitsLabelShort: serie.seriesDetail.unitsLabelShort,
-        seasonallyAdjusted: serie.seriesDetail.seasonalAdjustment === 'seasonally_adjusted',
+        unitsLabelShort: serie.unitsLabelShort,
+        seasonallyAdjusted: serie.seasonalAdjustment === 'seasonally_adjusted',
         dataGrouping: {
           enabled: false
         },

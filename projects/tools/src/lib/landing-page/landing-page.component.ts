@@ -114,16 +114,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   getData(id, noCache, dataListId, geo, freq) {
-    if (geo && freq) {
-      return (typeof id === 'number' || id === null) ?
-        this.catHelper.initContent(id, noCache, dataListId, geo, freq) :
-        this.catHelper.initSearch(id, noCache, geo, freq);
-    }
-    if (!geo && !freq) {
-      return (typeof id === 'number' || id === null) ?
-        this.catHelper.initContent(id, noCache, dataListId) :
-        this.catHelper.initSearch(id, noCache);
-    }
+    return (typeof id === 'number' || id === null) ?
+      this.catHelper.initContent(id, noCache, dataListId, geo, freq) :
+      this.catHelper.initSearch(id, noCache, geo, freq);
   }
 
   // Redraw series when a new region is selected

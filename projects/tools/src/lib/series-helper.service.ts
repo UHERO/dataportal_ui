@@ -135,7 +135,7 @@ export class SeriesHelperService {
     });
     const tableRows = [];
     series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s.seriesDetail, s.chartData, startDate, endDate, indexed);
+      const stats = this.calculateSeriesSummaryStats(s, s.chartData, startDate, endDate, indexed);
       stats.series = s.displayName;
       stats.interactionSettings.showInChart = s.showInChart;
       tableRows.push(stats);

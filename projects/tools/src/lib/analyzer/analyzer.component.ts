@@ -181,10 +181,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (this.analyzerSeries) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
       this.analyzerService.analyzerData.analyzerSeries.forEach((series, index) => {
-        aSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
+        aSeries += index === 0 ? series.id : `-${series.id}`;
       });
       chartSeries.forEach((series, index) => {
-        cSeries += index === 0 ? series.seriesDetail.id : `-${series.seriesDetail.id}`;
+        cSeries += index === 0 ? series.id : `-${series.id}`;
       });
     }
     seriesUrl += aSeries + cSeries;
@@ -204,8 +204,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
     const siblingsList = analyzerSeries.map((serie) => {
-      const nonSeasonal = serie.seriesDetail.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
-      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.seriesDetail.id, serie.currentGeo.handle, nonSeasonal);
+      const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
+      return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {

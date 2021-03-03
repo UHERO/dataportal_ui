@@ -35,11 +35,12 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
+      console.log('category charts data', this.data)
       this.data.forEach((chartSeries) => {
         if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
-          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesInfo.seriesObservations, this.dates, this.portalSettings);
-          chartSeries.seriesInfo.analyze = this.analyzerService.checkAnalyzer(chartSeries.seriesInfo);
+          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, this.dates, this.portalSettings);
+          chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
         }
       });
     }
@@ -74,10 +75,6 @@ export class CategoryChartsComponent implements OnChanges {
         }
       });
     }
-    const test = dates.map((d, index) => {
-      return [new Date(d.date.replace(/-/, '/')), series0[index]];
-    });
-    console.log('test', test)
     const chartData = { series0, series1, pseudoZones, dates };
     return { start, end, chartData };
   }
@@ -129,12 +126,12 @@ export class CategoryChartsComponent implements OnChanges {
     return series.seriesInfo.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
-  updateAnalyze(seriesInfo) {
-    seriesInfo.analyze = !seriesInfo.analyze;
-    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
+  updateAnalyze(series) {
+    series.analyze = !series.analyze;
+    this.analyzerService.toggleAnalyzerSeries(series.id)
   }
 
   trackBySeries(index, item) {
-    return item.seriesInfo.id;
+    return item.id;
   }
 }

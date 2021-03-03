@@ -40,11 +40,10 @@ export class HighchartComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    if (this.seriesData.seriesInfo === 'No data available') {
+    if (this.seriesData === 'No data available') {
       this.noDataChart(this.seriesData);
       this.updateChart = true;
     } else {
-      console.log(this.seriesData)
       this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
       this.updateChart = true;
     }
@@ -138,12 +137,12 @@ export class HighchartComponent implements OnChanges {
 
   drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
-    const currentFreq = seriesData.seriesInfo.frequencyShort;
+    const currentFreq = seriesData.frequencyShort;
     const { start, end } = seriesData.categoryDisplay;
-    const { percent, title, unitsLabelShort, displayName } = seriesData.seriesInfo;
+    const { percent, title, unitsLabelShort, displayName } = seriesData;
     //console.log('this.categoryDates', this.categoryDates)
     const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, chartStart, chartEnd, currentFreq, this.defaultRange);
-    const decimals = seriesData.seriesInfo.decimals || 1;
+    const decimals = seriesData.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;
     series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
@@ -382,7 +381,7 @@ export class HighchartComponent implements OnChanges {
   }
 
   noDataChart = (seriesData) => {
-    const title = seriesData.seriesInfo.displayName;
+    const title = seriesData.displayName;
     this.chartOptions.title = this.setChartTitle(`<b>${title}</b><br />No Data Available`);
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };

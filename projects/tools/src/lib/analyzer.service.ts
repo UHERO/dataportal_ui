@@ -86,7 +86,7 @@ export class AnalyzerService {
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : null;
       series.forEach((s) => {
-        if (!this.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === s.id)) {
+        if (!this.analyzerData.analyzerSeries.find(series => series.id === s.id)) {
           const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
           this.analyzerData.analyzerSeries.push(seriesData);  
         }
@@ -121,7 +121,7 @@ export class AnalyzerService {
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
-    const aSeriesMatch = aSeries.find(a => a.id === series.id);
+    /* const aSeriesMatch = aSeries.find(a => a.id === series.id);
     const seriesData = {
       seriesDetail: series,
       currentGeo: {} as Geography,
@@ -185,8 +185,74 @@ export class AnalyzerService {
       seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
     } else {
       seriesData.noData = 'Data not available';
+    } */
+    const aSeriesMatch = aSeries.find(a => a.id === series.id);
+    const seriesData = {
+      seriesDetail: series,
+      currentGeo: {} as Geography,
+      currentFreq: {} as Frequency,
+      chartData: {},
+      displayName: '',
+      chartDisplayName: '',
+      indexDisplayName: '',
+      seriesTableData: [],
+      error: null,
+      saParam: false,
+      noData: '',
+      observations: { transformationResults: [], observationStart: '', observationEnd: '' },
+      showInChart: aSeriesMatch.showInChart
+    };
+    const abbreviatedNameDetails = {
+      title: series.title,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: series.unitsLabelShort || series.unitsLabel
+    };
+    const chartNameDetails = {
+      title: series.title,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: series.unitsLabelShort || series.unitsLabel
+    };
+    const indexNameDetails = {
+      title: series.title,
+      geography: series.geography.shortName,
+      frequency: series.frequency,
+      seasonalAdjustment: series.seasonalAdjustment,
+      units: 'Index'
     }
-    return seriesData;
+    series.displayName = this.formatDisplayName(abbreviatedNameDetails);
+    series.chartDisplayName = this.formatDisplayName(chartNameDetails);
+    series.indexDisplayName = this.formatDisplayName(indexNameDetails);
+    series.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
+    series.currentGeo = series.geography;
+    series.currentFreq = { freq: series.frequencyShort, label: series.frequency };
+    series.observations = series.seriesObservations;
+    console.log('Series', series)
+    const levelDates = series.observations.transformationResults[0].dates;
+    const obsStart = series.observations.observationStart;
+    const obsEnd = series.observations.observationEnd;
+    const dateArray = [];
+    if (levelDates) {
+      const pseudoZones = [];
+      const level = series.observations.transformationResults[0].values;
+      if (level.pseudoHistory) {
+        level.pseudoHistory.forEach((obs, index) => {
+          if (obs && !level.pseudoHistory[index + 1]) {
+            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+          }
+        });
+      }
+      // Use to format dates for table
+      this.helperService.createDateArray(obsStart, obsEnd, series.currentFreq.freq, dateArray);
+      const levelChartData = this.createSeriesChartData(series.observations.transformationResults[0], dateArray);
+      series.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
+    } else {
+      series.noData = 'Data not available';
+    }
+    return series;
   }
 
   singleFrequencyAnalyzer = (series: Array<any>) => {
@@ -212,10 +278,11 @@ export class AnalyzerService {
 
   createAnalyzerTable = (analyzerSeries) => {
     analyzerSeries.forEach((aSeries) => {
-      const decimal = aSeries.seriesDetail.decimals;
+      const decimal = aSeries.decimals;
       const dateArray = [];
-      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.seriesDetail.frequencyShort, dateArray);
+      this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
+    console.log('dateArray', dateArray)
     });
     this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
   }
@@ -274,7 +341,7 @@ export class AnalyzerService {
     let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
       const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
-      this.analyzerSeriesSource.value.find(serie => serie.id === notInChart.seriesDetail.id).showInChart = true;
+      this.analyzerSeriesSource.value.find(serie => serie.id === notInChart.id).showInChart = true;
       notInChart.showInChart = true;
       chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }

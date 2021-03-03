@@ -32,7 +32,7 @@ export class HelperService {
   }
 
   toggleSeriesForSeasonalDisplay = (series: any, showSeasonal: boolean, hasSeasonal: boolean) => {
-    const seasonalAdjustment = series.seriesInfo.seasonalAdjustment;
+    const seasonalAdjustment = series.seasonalAdjustment;
     if (!hasSeasonal) {
       return true;
     }

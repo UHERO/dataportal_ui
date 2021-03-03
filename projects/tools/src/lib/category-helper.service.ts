@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { CategoryData, DateWrapper } from './tools.models';
+import { seriesType } from 'highcharts';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,7 @@ export class CategoryHelperService {
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, noCache: boolean, dataListId?: number, routeGeo?: string, routeFreq?: string): Observable<any> {
+  initContent(catId: any, noCache: boolean, dataListId: number, routeGeo: string, routeFreq: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
@@ -58,6 +59,7 @@ export class CategoryHelperService {
           this.categoryData[cacheId].requestComplete = true;
         }
       });
+      console.log('categoryData', this.categoryData[cacheId])
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }
@@ -111,7 +113,7 @@ export class CategoryHelperService {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
         this.categoryData[cacheId].sliderDates = this.helperService.getTableDates(dates.categoryDates);
-        this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
+        //this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
@@ -170,7 +172,7 @@ export class CategoryHelperService {
   }
 
   setNoData(subcategory) {
-    const series = [{ seriesInfo: 'No data available' }];
+    const series = ['No data available'];
     subcategory.dateWrapper = {} as DateWrapper;
     subcategory.dateRange = [];
     subcategory.datatables = {};
@@ -180,7 +182,7 @@ export class CategoryHelperService {
   }
 
   // Set up search results
-  initSearch(search: string, noCache?: boolean, routeGeo?: string, routeFreq?: string): Observable<any> {
+  initSearch(search: string, noCache: boolean, routeGeo: string, routeFreq: string): Observable<any> {
     const cacheId = CategoryHelperService.setCacheId(search, routeGeo, routeFreq);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
@@ -245,32 +247,28 @@ export class CategoryHelperService {
   getSearchDates(displaySeries) {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     displaySeries.forEach((series) => {
-      if (series.seriesInfo.seriesObservations.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-        categoryDateWrapper.firstDate = series.seriesInfo.seriesObservations.observationStart;
+      if (series.seriesObservations.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
+        categoryDateWrapper.firstDate = series.seriesObservations.observationStart;
       }
-      if (series.seriesInfo.seriesObservations.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-        categoryDateWrapper.endDate = series.seriesInfo.seriesObservations.observationEnd;
+      if (series.seriesObservations.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
+        categoryDateWrapper.endDate = series.seriesObservations.observationEnd;
       }
     });
     return categoryDateWrapper;
   }
 
   filterSeriesResults(results: Array<any>) {
-    const filtered = [];
-    results.forEach((res) => {
+    return results.map((res) => {
       const levelData = res.seriesObservations.transformationResults[0].dates;
       if (levelData) {
-        const series = { seriesInfo: { displayName: '' } };
         res.saParam = res.seasonalAdjustment === 'seasonally_adjusted';
-        series.seriesInfo = res;
-        series.seriesInfo.displayName = res.title;
-        filtered.push(series);
+        res.displayName = res.title;
+        return res;
       }
     });
-    return filtered;
   }
 
-  findSeasonalSeries = (categorySeries: Array<any>) => categorySeries.some(s => s.seriesInfo.seasonalAdjustment === 'seasonally_adjusted');
+  findSeasonalSeries = (categorySeries: Array<any>) => categorySeries.some(s => s.seasonalAdjustment === 'seasonally_adjusted');
 
   getDisplaySeries(allSeries) {
     // Check if (non-annual) category has seasonally adjusted data
