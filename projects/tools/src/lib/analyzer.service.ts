@@ -82,6 +82,10 @@ export class AnalyzerService {
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
+      const analyzerDateWrapper = { firstDate: '', endDate: '' };
+      analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
+      analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
+      console.log('analyzerDateWrapper', analyzerDateWrapper)
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : null;

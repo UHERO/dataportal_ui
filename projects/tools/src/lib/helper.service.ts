@@ -76,6 +76,10 @@ export class HelperService {
     }
   }
 
+  findDateWrapperStart = series => series.reduce((start: string, s) => (s.seriesObservations.observationStart < start || start === '') ? s.seriesObservations.observationStart : start, '');
+  
+  fineDateWrapperEnd = series => series.reduce((end: string, s) => (s.seriesObservations.observationEnd > end || end === '') ? s.seriesObservations.observationEnd : end, '');
+
   createDateArray(dateStart: string, dateEnd: string, currentFreq: string, dateArray: Array<any>) {
     const start = new Date(dateStart.replace(/-/g, '\/'));
     const end = new Date(dateEnd.replace(/-/g, '\/'));

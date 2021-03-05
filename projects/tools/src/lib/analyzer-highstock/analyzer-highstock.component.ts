@@ -253,6 +253,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const seriesCopy = JSON.parse(JSON.stringify(series));
     const indexBaseYear = this.getIndexBaseYear(series, start);
     const chartSeries = seriesCopy.map((serie) => {
+      console.log('analyzer highstock', serie)
       const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
       return {
         className: serie.id,

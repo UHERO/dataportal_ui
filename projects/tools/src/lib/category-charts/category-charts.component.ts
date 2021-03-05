@@ -37,10 +37,11 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       console.log('category charts data', this.data)
       this.data.forEach((chartSeries) => {
-        if (chartSeries.seriesInfo !== 'No data available' && this.dates) {
+        if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
-          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, this.dates, this.portalSettings);
+          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
+          //chartSeries.gridView = this.formatGridViewData(chartSeries)
         }
       });
     }
@@ -59,13 +60,51 @@ export class CategoryChartsComponent implements OnChanges {
     }
   }
 
-  formatCategoryChartData = (observations, dates, portalSettings) => {
+  formatGridViewData = (series) => {
+    const levelDates = series.observations.transformationResults[0].dates;
+    const obsStart = series.observations.observationStart;
+    const obsEnd = series.observations.observationEnd;
+    const dateArray = [];
+    if (levelDates) {
+      const pseudoZones = [];
+      const level = series.observations.transformationResults[0].values;
+      if (level.pseudoHistory) {
+        level.pseudoHistory.forEach((obs, index) => {
+          if (obs && !level.pseudoHistory[index + 1]) {
+            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
+          }
+        });
+      }
+      // Use to format dates for table
+      this.helperService.createDateArray(obsStart, obsEnd, series.currentFreq.freq, dateArray);
+      const levelChartData = this.createSeriesChartData(series.observations.transformationResults[0], dateArray);
+      console.log('GRID VIEW', levelChartData)
+    }
+  }
+
+  createSeriesChartData = (transformation, dates) => {
+    if (transformation) {
+      const transformationValues = [];
+      dates.forEach((sDate) => {
+        const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
+        dateExists > -1 ?
+          transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) :
+          transformationValues.push([Date.parse(sDate.date), null]);
+      });
+      return transformationValues;
+    }
+  }
+
+  formatCategoryChartData = (observations, freq, dates, portalSettings) => {
+    const dateArray = [];
     const transformations = this.helperService.getTransformations(observations);
     const { series0Name, series1Name } = portalSettings.highcharts;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const series0 = this.formatSeriesData(transformations[series0Name], dates);
-    const series1 = this.formatSeriesData(transformations[series1Name], dates);
+    this.helperService.createDateArray(start, end, freq, dateArray);
+    //console.log('dateArray', dateArray)
+    const series0 = this.formatSeriesData(transformations[series0Name], dateArray);
+    const series1 = this.formatSeriesData(transformations[series1Name], dateArray);
     const pseudoZones = [];
     const level = transformations.level;
     if (level.pseudoHistory) {
@@ -81,7 +120,8 @@ export class CategoryChartsComponent implements OnChanges {
 
   formatSeriesData = (transformation, dates: Array<any>) => {
     if (transformation) {
-      const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      /* const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
+      console.log('dates', dates)
       const transformationValues = [];
       if (!dateDiff.length) {
         return transformation.values.map(Number);
@@ -92,7 +132,11 @@ export class CategoryChartsComponent implements OnChanges {
           dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
         });
         return transformationValues;
-      }
+      } */
+      return dates.map((date) => {
+        const dateExists = this.helperService.binarySearch(transformation.dates, date.date);
+        return dateExists > -1 ? [Date.parse(date.date), +transformation.values[dateExists]] : [Date.parse(date.date), null];
+      });
     }
   }
 

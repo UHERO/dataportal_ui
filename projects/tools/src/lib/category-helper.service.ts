@@ -129,18 +129,12 @@ export class CategoryHelperService {
   }
 
   setCategoryDates = (series: Array<any>, currentFreq: string) => {
-    const categoryDateWrapper = { firstDate: '', endDate: '' };
+    const categoryDateWrapper: DateWrapper = { firstDate: '', endDate: '' };
     const categoryDateArray = [];
     // Check series for the earliest/latest start and end dates
     // Used to create array of dates for enitre category
-    series.forEach((s) => {
-      if (categoryDateWrapper.endDate === '' || s.seriesObservations.observationEnd > categoryDateWrapper.endDate) {
-        categoryDateWrapper.endDate = s.seriesObservations.observationEnd;
-      }
-      if (categoryDateWrapper.firstDate === '' || s.seriesObservations.observationStart < categoryDateWrapper.firstDate) {
-        categoryDateWrapper.firstDate = s.seriesObservations.observationStart;
-      }
-    });
+    categoryDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
+    categoryDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
     this.helperService.createDateArray(categoryDateWrapper.firstDate, categoryDateWrapper.endDate, currentFreq, categoryDateArray);
     return { categoryDateWrapper, categoryDates: categoryDateArray };
   }
@@ -245,15 +239,9 @@ export class CategoryHelperService {
   }
 
   getSearchDates(displaySeries) {
-    const categoryDateWrapper = { firstDate: '', endDate: '' };
-    displaySeries.forEach((series) => {
-      if (series.seriesObservations.observationStart < categoryDateWrapper.firstDate || categoryDateWrapper.firstDate === '') {
-        categoryDateWrapper.firstDate = series.seriesObservations.observationStart;
-      }
-      if (series.seriesObservations.observationEnd > categoryDateWrapper.endDate || categoryDateWrapper.endDate === '') {
-        categoryDateWrapper.endDate = series.seriesObservations.observationEnd;
-      }
-    });
+    const categoryDateWrapper: DateWrapper = { firstDate: '', endDate: '' };
+    categoryDateWrapper.firstDate = this.helperService.findDateWrapperStart(displaySeries);
+    categoryDateWrapper.endDate = this.helperService.fineDateWrapperEnd(displaySeries);
     return categoryDateWrapper;
   }
 

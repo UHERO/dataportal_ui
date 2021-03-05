@@ -5,7 +5,7 @@
       <lib-category-charts [portalSettings]="portalSettings"
         [data]="data.analyzerSeries" [dates]="data.analyzerTableDates"
         [freq]="data.analyzerFrequency" [noSeries]="data.noData"
-        [hasSeasonal]="data.hasSeasonal">
+        [hasSeasonal]="data.hasSeasonal" [chartStart]="data.analyzerTableDates[0].date">
       </lib-category-charts>
       <lib-share-link *ngIf="data.analyzerSeries.length" [embedCode]="embedCode" [shareLink]="analyzerShareLink"
         [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'" [name]="tooltipName" [units]="tooltipUnits"
