@@ -21,6 +21,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() chartEnd;
   @Input() search;
   @Input() dates;
+  @Input() dateWrapper;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
@@ -41,7 +42,6 @@ export class CategoryChartsComponent implements OnChanges {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
-          //chartSeries.gridView = this.formatGridViewData(chartSeries)
         }
       });
     }
@@ -102,9 +102,8 @@ export class CategoryChartsComponent implements OnChanges {
     const start = observations.observationStart;
     const end = observations.observationEnd;
     this.helperService.createDateArray(start, end, freq, dateArray);
-    //console.log('dateArray', dateArray)
-    const series0 = this.formatSeriesData(transformations[series0Name], dateArray);
-    const series1 = this.formatSeriesData(transformations[series1Name], dateArray);
+    const series0 = { values: this.formatSeriesData(transformations[series0Name], dateArray), start };
+    const series1 = { values: this.formatSeriesData(transformations[series1Name], dateArray), start };
     const pseudoZones = [];
     const level = transformations.level;
     if (level.pseudoHistory) {
@@ -120,22 +119,9 @@ export class CategoryChartsComponent implements OnChanges {
 
   formatSeriesData = (transformation, dates: Array<any>) => {
     if (transformation) {
-      /* const dateDiff = dates.filter(date => !transformation.dates.includes(date.date));
-      console.log('dates', dates)
-      const transformationValues = [];
-      if (!dateDiff.length) {
-        return transformation.values.map(Number);
-      }
-      if (dateDiff.length) {
-        dates.forEach((sDate) => {
-          const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
-          dateExists > -1 ? transformationValues.push(+transformation.values[dateExists]) : transformationValues.push(null);
-        });
-        return transformationValues;
-      } */
       return dates.map((date) => {
         const dateExists = this.helperService.binarySearch(transformation.dates, date.date);
-        return dateExists > -1 ? [Date.parse(date.date), +transformation.values[dateExists]] : [Date.parse(date.date), null];
+        return dateExists > -1 ? +transformation.values[dateExists] : null;
       });
     }
   }
@@ -167,7 +153,7 @@ export class CategoryChartsComponent implements OnChanges {
   getSeriesValues(series, start, end) {
     const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
     const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
-    return series.seriesInfo.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
+    return series.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
   updateAnalyze(series) {

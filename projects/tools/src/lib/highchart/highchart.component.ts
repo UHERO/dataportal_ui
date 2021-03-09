@@ -22,16 +22,14 @@ export class HighchartComponent implements OnChanges {
   chartOptions = {} as HighchartsObject;
   updateChart = false;
 
-  static findLastValue(valueArray) {
-    let counter = valueArray.length - 1;
-    while (valueArray[counter].y === null) {
-      counter--;
-      if (counter === -1) {
-        return -1;
-      }
+  static findLastValue(valueArray, endDate, start) {
+    if (endDate < start) {
+      return -1
     }
-    console.log('counter', counter)
-    return counter;
+    if (endDate) {
+      const pointIndex = valueArray.findIndex(points => points.x === endDate);
+      return pointIndex === -1 ? valueArray.length - 1: pointIndex;
+    }
   }
 
   constructor(
@@ -64,11 +62,12 @@ export class HighchartComponent implements OnChanges {
     };
   }
 
-  setXAxis = (startDate) => {
+  setXAxis = (startDate, endDate) => {
     return {
       type: 'datetime',
       min: startDate,
-      tickInterval: 1000 * 3600 * 24 * 365,
+      max: endDate,
+      ordinal: false,
       labels: {
         enabled: false
       },
@@ -100,16 +99,17 @@ export class HighchartComponent implements OnChanges {
     }];
   }
 
-  setChartSeries = (portalSettings, series0, currentFreq, startDate, pseudoZones, series1) => {
+  setChartSeries = (portalSettings, series0, pseudoZones, series1, currentFreq, endDate) => {
     const chartSeries = [];
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
-      data: series0,
-      //pointInterval: this.highstockHelper.freqInterval(currentFreq),
-      //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
-      //pointStart: startDate,
+      data: series0.values,
+      pointStart: Date.parse(series0.start),
+      pointInterval: this.highstockHelper.freqInterval(currentFreq),
+      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
+      endDate: endDate,
       states: {
         hover: {
           lineWidth: 2
@@ -126,10 +126,11 @@ export class HighchartComponent implements OnChanges {
       chartSeries.push({
         name: portalSettings.highcharts.series1Name,
         type: portalSettings.highcharts.series1Type,
-        data: series1,
-        //pointInterval: this.highstockHelper.freqInterval(currentFreq),
-        //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
-        //pointStart: startDate,
+        data: series1.values,
+        pointStart: Date.parse(series1.start),
+        pointInterval: this.highstockHelper.freqInterval(currentFreq),
+        pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
+        endDate: endDate,
         dataGrouping: {
           enabled: false
         },
@@ -141,23 +142,23 @@ export class HighchartComponent implements OnChanges {
   drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const currentFreq = seriesData.frequencyShort;
-    console.log('currentFreq', currentFreq)
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName } = seriesData;
-    //console.log('this.categoryDates', this.categoryDates)
     const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, chartStart, chartEnd, currentFreq, this.defaultRange);
     const decimals = seriesData.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
     let series1 = seriesData.categoryDisplay.chartData.series1;
-    // series0 = series0 ? series0.slice(seriesStart, seriesEnd + 1) : null;
-    // series1 = series1 ? series1.slice(seriesStart, seriesEnd + 1) : null;
     const chartStartExists = dates.find(d => chartStart === d.date);
+    const chartEndExists = dates.find(d => chartEnd === d.date);
     const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
+    const endDate = chartEndExists ? Date.parse(chartEnd) : Date.parse(dates[seriesEnd].date);
     // Check how many non-null points exist in level series
-    const levelLength = series0.filter(value => Number.isFinite(value[1]));
-    const chartSeries = this.setChartSeries(portalSettings, series0, currentFreq, startDate, pseudoZones, series1);
+    const levelLength = series0.values.filter(value => Number.isFinite(value));
+    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, currentFreq, endDate);
+    const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
+    const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
-      const dateLabel = this.formatDateLabel(point0.x, freq);
+      const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
       subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${unitsLabelShort})`;
       subtitleText += s1 ?
@@ -177,7 +178,6 @@ export class HighchartComponent implements OnChanges {
         chart.setSubtitle({ text: '' });
       }
     };
-    const formatDate = (date, freq) => this.helperService.formatDate(date, freq);
     const checkPointCount = (freq, s0, point0, chart, point1?, s1?) => {
       // Fiilter out null values
       const pointCount = s0.points.filter(point => Number.isFinite(point.y));
@@ -199,13 +199,11 @@ export class HighchartComponent implements OnChanges {
         render() {
           const s0 = this.series[0];
           const s1 = this.series[1];
-          console.log('s0', s0)
           // Get position of last non-null value
           const latestSeries0 = (s0 !== undefined && s0.points && s0.points.length) ?
-            HighchartComponent.findLastValue(s0.points) : -1;
+            HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.userOptions.pointStart) : -1;
           const latestSeries1 = (s1 !== undefined && s1.points && s1.points.length) ?
-            HighchartComponent.findLastValue(s1.points) : -1;
-
+            HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.userOptions.pointStart) : -1;
           // Prevent tooltip from being hidden on mouseleave
           // Reset toolip value and marker to most recent observation
           this.tooltip.hide = () => {
@@ -221,7 +219,6 @@ export class HighchartComponent implements OnChanges {
           };
           // Display tooltip when chart loads
           if (latestSeries0 > -1 && latestSeries1 > -1) {
-            console.log('LATESTSERIES0', [s0.points[latestSeries0], s1.points[latestSeries1]])
             this.tooltip.refresh([s0.points[latestSeries0], s1.points[latestSeries1]]);
             checkPointCount(currentFreq, s0, s0.points[latestSeries0], this, s1.points[latestSeries1], s1);
           }
@@ -255,50 +252,11 @@ export class HighchartComponent implements OnChanges {
       borderWidth: 0,
       shared: true,
       formatter() {
-        const getLabelName = (seriesName, freq, perc) => {
-          if (seriesName === 'level') {
-            return ': ';
-          }
-          if (seriesName === 'c5ma') {
-            return perc ? 'Annual Chg: ' : 'Annual % Chg: ';
-          }
-          if (seriesName === 'ytd' && freq === 'A') {
-            return perc ? 'Year/Year Chg: ' : 'Year/Year % Chg: ';
-          }
-          if (seriesName === 'ytd' && freq !== 'A') {
-            return perc ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
-          }
-        };
-        const getFreqLabel = (freq, date) => {
-          if (freq === 'A') {
-            return '';
-          }
-          if (freq === 'Q') {
-            const month = Highcharts.dateFormat('%b', date);
-            if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
-              return 'Q1 ';
-            }
-            if (month === 'Apr' || month === 'May' || month === 'Jun') {
-              return 'Q2 ';
-            }
-            if (month === 'Jul' || month === 'Aug' || month === 'Sep') {
-              return 'Q3 ';
-            }
-            if (month === 'Oct' || month === 'Nov' || month === 'Dec') {
-              return 'Q4 ';
-            }
-          }
-          if (freq === 'M' || freq === 'S') {
-            return Highcharts.dateFormat('%b', date) + ' ';
-          }
-          return Highcharts.dateFormat('%b %d', date) + ' ';
-        };
         const getSeriesLabel = (points, labelString) => {
-          console.log('POINTS', points)
           points.forEach((point) => {
             const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-            const name = getLabelName(point.series.name, currentFreq, percent);
+            const name = formatLabel(point.series.name, currentFreq, percent);
             let label = name + formattedValue;
             const pseudo = ' Pseudo History ';
             if (point.series.name === 'level') {
@@ -322,22 +280,21 @@ export class HighchartComponent implements OnChanges {
           });
           return labelString;
         };
-        let s = `<b>${displayName}</b><br>`;
-        if (levelLength.length > 1) {
-          console.log('this.points', this.points)
+        if (this.x >= startDate && this.x <= endDate) {
+          let s = `<b>${displayName}</b><br>`;
           // Get Quarter or Month for Q/M frequencies
-          s = s + getFreqLabel(currentFreq, this.x);
+          s = s + formatDate(this.x, currentFreq);
           // Add year
           s = s + Highcharts.dateFormat('%Y', this.x) + '';
           s = getSeriesLabel(this.points, s);
+          return s;
         }
-        return s;
       },
       useHTML: true
     };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
-    this.chartOptions.xAxis = this.setXAxis(startDate);
+    this.chartOptions.xAxis = this.setXAxis(startDate, endDate);
     this.chartOptions.yAxis = this.setYAxis(min, max);
     this.chartOptions.plotOptions = {
       line: {
@@ -360,12 +317,12 @@ export class HighchartComponent implements OnChanges {
     if (transformationName === 'ytd' && currentFreq !== 'A') {
       return percent ? 'Year-to-Date Chg: ' : 'Year-to-Date % Chg: ';
     }
+    return ': ';
   }
 
   formatDateLabel = (date, freq) => {
-    const year = Highcharts.dateFormat('%Y', date);
     if (freq === 'A') {
-      return year;
+      return '';
     }
     if (freq === 'Q') {
       const month = Highcharts.dateFormat('%b', date);
@@ -383,9 +340,9 @@ export class HighchartComponent implements OnChanges {
       }
     }
     if (freq === 'M' || freq === 'S') {
-      return `${Highcharts.dateFormat('%b', date)} ${year}`;
+      return Highcharts.dateFormat('%b', date) + ' ';
     }
-    return Highcharts.dateFormat('%b %e, %Y', date);
+    return Highcharts.dateFormat('%b %d', date) + ' ';
   }
 
   noDataChart = (seriesData) => {
@@ -395,7 +352,7 @@ export class HighchartComponent implements OnChanges {
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
     this.chartOptions.yAxis = this.setYAxis();
-    this.chartOptions.xAxis = this.setXAxis(null);
+    this.chartOptions.xAxis = this.setXAxis(null, null);
     this.chartOptions.series = [{
       data: []
     }];

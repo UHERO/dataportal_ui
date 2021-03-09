@@ -68,6 +68,7 @@ export class EmbedGraphComponent implements OnInit {
   ngOnDestroy() {
     this.analyzerService.analyzerData = {
       analyzerTableDates: [],
+      analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],
       highstockSeriesOptions: [],
       displayFreqSelector: false,

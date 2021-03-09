@@ -113,7 +113,7 @@ export class CategoryHelperService {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
         this.categoryData[cacheId].sliderDates = this.helperService.getTableDates(dates.categoryDates);
-        //this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
+        this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;

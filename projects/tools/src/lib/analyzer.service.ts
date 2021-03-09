@@ -16,6 +16,7 @@ export class AnalyzerService {
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
   public analyzerData = {
     analyzerTableDates: [],
+    analyzerDateWrapper: { firstDate: '', endDate: '' },
     analyzerSeries: [],
     highstockSeriesOptions: [],
     displayFreqSelector: false,
@@ -86,6 +87,7 @@ export class AnalyzerService {
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
       analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
       console.log('analyzerDateWrapper', analyzerDateWrapper)
+      this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : null;
@@ -113,6 +115,7 @@ export class AnalyzerService {
   resetAnalyzerData = () => {
     return {
       analyzerTableDates: [],
+      analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],
       highstockSeriesOptions: [],
       displayFreqSelector: false,

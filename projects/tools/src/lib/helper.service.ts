@@ -109,6 +109,8 @@ export class HelperService {
       dateArray.push({ date: start.toISOString().substr(0, 10), tableDate });
       if (currentFreq === 'A') {
         start.setFullYear(start.getFullYear() + 1);
+        start.setMonth(0);
+        start.setDate(1);
       }
       if (currentFreq === 'M' || currentFreq === 'S' || currentFreq === 'Q') {
         start.setMonth(start.getMonth() + monthIncrease);
@@ -364,7 +366,5 @@ export class HelperService {
     return index < 0 ? 0 : index;
   }
 
-  getTableDates(dateArray: Array<any>) {
-    return dateArray.map(date => date.tableDate);
-  }
+  getTableDates = (dateArray: Array<any>) => dateArray.map(date => date.tableDate);
 }

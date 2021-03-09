@@ -2,11 +2,6 @@
   <h3>Analyzer</h3>
   <ng-container *ngIf="analyzerSeries.length">
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
-      <lib-category-charts [portalSettings]="portalSettings"
-        [data]="data.analyzerSeries" [dates]="data.analyzerTableDates"
-        [freq]="data.analyzerFrequency" [noSeries]="data.noData"
-        [hasSeasonal]="data.hasSeasonal" [chartStart]="data.analyzerTableDates[0].date">
-      </lib-category-charts>
       <lib-share-link *ngIf="data.analyzerSeries.length" [embedCode]="embedCode" [shareLink]="analyzerShareLink"
         [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'" [name]="tooltipName" [units]="tooltipUnits"
         [geography]="tooltipGeo" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="minDate"
@@ -18,6 +13,11 @@
         (click)="removeAllAnalyzerSeries()">
         Remove All Series
       </button>
+      <lib-category-charts [portalSettings]="portalSettings"
+      [data]="data.analyzerSeries" [dates]="data.analyzerTableDates" [dateWrapper]="data.analyzerDateWrapper"
+      [freq]="data.analyzerFrequency" [noSeries]="data.noData"
+      [hasSeasonal]="data.hasSeasonal" [chartStart]="data.analyzerTableDates[0].date">
+    </lib-category-charts>
       <i *ngIf="!data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
       <lib-analyzer-highstock *ngIf="data.analyzerSeries.length" [portalSettings]="portalSettings"
         [allDates]="data.analyzerTableDates" [series]="data.analyzerSeries"

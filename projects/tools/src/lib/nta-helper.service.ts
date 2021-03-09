@@ -217,10 +217,11 @@ export class NtaHelperService {
     category.sliderDates = this.helperService.getTableDates(category.dateArray);
     category.findMinMax = true;
     category.requestComplete = true;
+    console.log('Category', category)
   }
 
   filterSeries(seriesArray: Array<any>, category, search: boolean) {
-    const filtered = [];
+    /* const filtered = [];
     seriesArray.forEach((res) => {
       let seriesDates = [];
       let series;
@@ -241,7 +242,25 @@ export class NtaHelperService {
         filtered.push(series);
       }
     });
-    return filtered;
+    return filtered; */
+    //category.firstDate = this.helperService.findDateWrapperStart(seriesArray);
+    //category.endDate = this.helperService.fineDateWrapperEnd(seriesArray);
+    return seriesArray.map((res) => {
+      const levelData = res.seriesObservations.transformationResults[0].observations;
+      const newLevelData = res.seriesObservations.transformationResults[0].dates;
+      const seriesObsStart = res.seriesObservations.observationStart;
+      const seriesObsEnd = res.seriesObservations.observationEnd;
+      let seriesDates = [];
+      category.dateWrapper.firstDate = this.setStartDate(category.dateWrapper, seriesObsStart);
+      category.dateWrapper.endDate = this.setEndDate(category.dateWrapper, seriesObsEnd);
+      seriesDates = this.helperService.createDateArray(seriesObsStart, seriesObsEnd, 'A', seriesDates);
+      if (levelData || newLevelData) {
+        res.saParam = res.seasonalAdjustment !== 'not_seasonally_adjusted';
+        res.displayName = search ?
+          `${res.title} (${res.geography.name})` : res.geography.name;
+        return res;
+      }
+    });
   }
 
   setStartDate = (dateWrapper, observationStart) => {
