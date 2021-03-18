@@ -4,22 +4,34 @@
     &nbsp;
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <p>
+    <lib-analyzer-compare-options [seriesInfo]="params.value.seriesInfo"></lib-analyzer-compare-options>
+    <!-- <p>
       <i class="material-icons analyze-button remove-button" title="Remove from Analyzer" (click)="invokeParentRemoveFromAnalyzer()">&#xE872;</i>
       Remove From Analyzer
     </p>
     <p *ngIf="params.value.showInChart">
-      <i class="material-icons" [style.color]="params.value.color" (click)="invokeParentSwitchChartYAxes()">
-        compare_arrows
-      </i> Swap Y-axes
+      Y-Axis:
+      <select [ngModel]="params.value.seriesInfo.selectedYAxis" (ngModelChange)="onChartAxisChange($event)" class="custom-select" aria-label="chart-axis-selector">
+        <option [ngValue]="axis" *ngFor="let axis of params.value.seriesInfo.yAxis">
+            {{axis}}
+        </option>
+      </select>
+    </p>
+    <p *ngIf="params.value.showInChart">
+      Chart Type:
+      <select [ngModel]="params.value.seriesInfo.selectedChartType" (ngModelChange)="onChartTypeChange($event)" class="custom-select" aria-label="chart-type-selector">
+        <option [ngValue]="type" *ngFor="let type of params.value.seriesInfo.chartType">
+            {{type}}
+        </option>
+      </select>
     </p>
     <p *ngIf="params.value.showInChart">
       <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
-        (click)="invokeParentToggleSeriesInChart()">&#xE834;</i> Remove From Chart
+        (click)="invokeParentToggleSeriesInChart()">stacked_line_chart</i> Remove From Comparison
     </p>
     <p *ngIf="!params.value.showInChart">
       <i class="material-icons analyze-chart color{{params.value.seriesInfo.id}}" [style.color]="params.value.color"
-        (click)="invokeParentToggleSeriesInChart()">&#xE835;</i> Add To Chart
-    </p>
+        (click)="invokeParentToggleSeriesInChart()">stacked_line_chart</i> Add To Comparison
+    </p> -->
   </div>
 </div>

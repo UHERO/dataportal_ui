@@ -33,6 +33,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
   analyzerSeries;
+  routeView: string;
+  queryParams: any = {};
+  displayCompare: boolean = false;
+
 
   constructor(
     @Inject('environment') private environment,
@@ -178,15 +182,18 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   getAnalyzerParams(start, end, seriesUrl) {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
+    console.log('GET ANALYZER PARAMS', this.analyzerSeries)
     if (this.analyzerSeries) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
-      this.analyzerService.analyzerData.analyzerSeries.forEach((series, index) => {
+      this.analyzerSeries.forEach((series, index) => {
+        console.log('params series', series.id)
         aSeries += index === 0 ? series.id : `-${series.id}`;
       });
       chartSeries.forEach((series, index) => {
         cSeries += index === 0 ? series.id : `-${series.id}`;
       });
     }
+    console.log(aSeries)
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;
     seriesUrl += this.indexSeries ? `&index=${this.indexSeries}` : '';
@@ -226,5 +233,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   formatEmbedSnippet(start: string, end: string) {
     const embedURL = this.getAnalyzerParams(start, end, '/graph');
     return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}${embedURL}" scrolling="no"></iframe></div>`;
+  }
+
+  toggleAnalyzerDisplay() {
+    this.displayCompare = !this.displayCompare;
   }
 }

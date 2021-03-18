@@ -81,13 +81,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    if (this.minDate && this.maxDate) {
+    console.log('minDate', this.minDate);
+    console.log('maxDate', this.maxDate)
+    //if (this.minDate && this.maxDate) {
       const newTableDates = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
       this.columnDefs = this.setTableColumns(newTableDates);
-    }
+    //}
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    if (this.minDate && this.maxDate) {
+    //if (this.minDate && this.maxDate) {
       this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
       this.summaryRows.forEach((statRow) => {
         const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
@@ -95,7 +97,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
       });
       // Check if the summary statistics for a series has NA values
       this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
-    }
+   // }
     // Display values in the range of dates selected
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.observations);
@@ -297,7 +299,17 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   toggleSeriesInChart(series) {
-    this.analyzerService.toggleSeriesInChart.emit(series);
+    console.log('toggle series in chart', series)
+    // this.analyzerService.toggleSeriesInChart.emit(series);
+    const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === series.seriesInfo.id);
+    const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === series.seriesInfo.id);
+    matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
+    const seriesInChart = $('.highcharts-series.' + series.seriesInfo.id);
+    matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
+    matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
+    matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
+
+    this.analyzerService.addToComparisonChart(series.seriesInfo);
     this.analyzerService.createAnalyzerTableDates(this.analyzerService.analyzerData.analyzerSeries);
   }
 

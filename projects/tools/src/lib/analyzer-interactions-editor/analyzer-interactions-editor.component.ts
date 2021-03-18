@@ -21,6 +21,7 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   agInit(params: any): void {
     this.params = params;
+    console.log('params', params)
   }
 
   invokeParentSwitchChartYAxes() {
@@ -45,5 +46,13 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   isPopup(): boolean {
     return true;
+  }
+
+  onChartTypeChange(e) {
+    console.log('e', e)
+  }
+
+  onChartAxisChange(e) {
+    console.log('e', e)
   }
 }

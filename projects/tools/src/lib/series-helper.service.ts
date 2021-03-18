@@ -129,13 +129,15 @@ export class SeriesHelperService {
   }
 
   calculateAnalyzerSummaryStats = (series: Array<any>, startDate: string, endDate: string, indexed) => {
+    console.log('startDate', startDate);
+    console.log('endDate', endDate)
     series.forEach((s) => {
-      s.seriesStartDate = s.observations.observationStart > startDate ? s.observations.observationStart : startDate;
-      s.seriesEndDate = s.observations.observationEnd > endDate ? s.observations.observationEnd : endDate;
+      s.seriesStartDate = (s.observations.observationStart > startDate || !startDate) ? s.observations.observationStart : startDate;
+      s.seriesEndDate = (s.observations.observationEnd > endDate || !endDate) ? s.observations.observationEnd : endDate;
     });
     const tableRows = [];
     series.forEach((s) => {
-      const stats = this.calculateSeriesSummaryStats(s, s.chartData, startDate, endDate, indexed);
+      const stats = this.calculateSeriesSummaryStats(s, s.chartData, s.seriesStartDate, s.seriesEndDate, indexed);
       stats.series = s.displayName;
       stats.interactionSettings.showInChart = s.showInChart;
       tableRows.push(stats);

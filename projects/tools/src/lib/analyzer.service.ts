@@ -14,6 +14,9 @@ export class AnalyzerService {
   analyzerSeries = this.analyzerSeriesSource.asObservable();
   private analyzerSeriesCount = new BehaviorSubject(this.analyzerSeriesSource.value.length);
   analyzerSeriesCount$ = this.analyzerSeriesCount.asObservable();
+  analyzerSeriesCompareSource: BehaviorSubject<any> = new BehaviorSubject([]);
+  analyzerSeriesCompare = this.analyzerSeriesCompareSource.asObservable();
+
   public analyzerData = {
     analyzerTableDates: [],
     analyzerDateWrapper: { firstDate: '', endDate: '' },
@@ -63,6 +66,52 @@ export class AnalyzerService {
     this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
+  addToComparisonChart(series) {
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    console.log('add to chart', this.analyzerData)
+    this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
+    currentCompare.push({
+      className: series.id,
+      name: series.chartDisplayName,
+      tooltipName: series.title,
+      data: series.chartData.level,
+      yAxis: `${series.unitsLabelShort}-${series.selectedYAxis}`,
+      yAxisSide: series.selectedYAxis,
+      decimals: series.decimals,
+      frequency: series.frequencyShort,
+      geography: series.geography.name,
+      includeInDataExport: true,
+      showInLegend: true,
+      showInNavigator: false,
+      events: {
+        legendItemClick() {
+          return false;
+        }
+      },
+      unitsLabelShort: series.unitsLabelShort,
+      seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
+      dataGrouping: {
+        enabled: false
+      },
+      pseudoZones: series.chartData.pseudoZones,
+      visible: true
+    });
+    this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  updateCompareSeriesAxis(seriesInfo, axis: string) {
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    currentCompare.find(s => s.className === seriesInfo.id).yAxisSide = axis;
+    currentCompare.find(s => s.className === seriesInfo.id).yAxis = `${seriesInfo.unitsLabelShort}-${axis}`
+    this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  removeFromComparisonChart(id: number) {
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    const newCompare = currentCompare.filter(s => s.className !== id);
+    this.analyzerSeriesCompareSource.next(newCompare);
+  }
+
   toggleAnalyzerSeries(seriesID) {
     const currentValue = this.analyzerSeriesSource.value;
     let updatedValue;
@@ -98,7 +147,7 @@ export class AnalyzerService {
         }
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      this.checkAnalyzerChartSeries();
+      //this.checkAnalyzerChartSeries();
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
@@ -256,6 +305,18 @@ export class AnalyzerService {
       this.helperService.createDateArray(obsStart, obsEnd, series.currentFreq.freq, dateArray);
       const levelChartData = this.createSeriesChartData(series.observations.transformationResults[0], dateArray);
       series.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
+      series.chartType = [
+        'line',
+        'column',
+        'area',
+        'scatter'
+      ];
+      series.selectedChartType = 'line';
+      series.yAxis = [
+        'left',
+        'right'
+      ];
+      series.selectedYAxis = 'left';
     } else {
       series.noData = 'Data not available';
     }
@@ -311,6 +372,7 @@ export class AnalyzerService {
     });
     allDates = allDates.sort(this.dateComparison);
     if (start && end) { allDates = allDates.filter(date => date.date >= start && date.date <= end); }
+    console.log('createTableDates', allDates)
     return allDates;
   }
 
@@ -343,7 +405,7 @@ export class AnalyzerService {
     }
   }
 
-  checkAnalyzerChartSeries() {
+  /* checkAnalyzerChartSeries() {
     // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
     let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
@@ -352,7 +414,7 @@ export class AnalyzerService {
       notInChart.showInChart = true;
       chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
     }
-  }
+  } */
 
   formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
     let ending = '';

@@ -45,14 +45,17 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Output() yAxesSeries = new EventEmitter();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  chartOptions = {} as HighstockObject;
+  //chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
   toggleSeries;
   switchAxes;
   alertMessage;
   indexed: boolean = false;
-
+  compareSeries;
+  chartOptions = {} as HighstockObject;
+  chartCallback;
+  analyzerData;
 
   constructor(
     @Inject('logo') private logo,
@@ -75,7 +78,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       });
       return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
     });
-    this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
+    this.chartCallback = chart => {
+      this.chartObject = chart;
+      console.log('CALLBACK', this.chartObject)
+    }
+    /* this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
       if (this.indexChecked) {
         this.displayAlertMessage('Unavailable while series are indexed.');
       }
@@ -105,7 +112,74 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       if (!toggleDisplay) {
         this.displayAlertMessage('Chart may only display up to two different units.');
       }
-    });
+    }); */
+    this.analyzerData = this.analyzerService.analyzerData;
+    this.compareSeries = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
+      console.log('COMPARE SERIES', series)
+      console.log('allDates', this.analyzerData)
+      const chartSeries = series;
+      chartSeries.push({
+        className: 'navigator',
+        data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
+        levelData: [],
+        decimals: null,
+        tooltipName: '',
+        frequency: null,
+        geography: null,
+        yAxisSide: 'right',
+        dataGrouping: {
+          enabled: false
+        },
+        showInLegend: false,
+        showInNavigator: true,
+        includeInDataExport: false,
+        name: 'Navigator',
+        events: {
+          legendItemClick() {
+            return false;
+          }
+        },
+        unitsLabelShort: null,
+        seasonallyAdjusted: null,
+        pseudoZones: null,
+        visible: true,
+      });
+      console.log('chartseries', chartSeries)
+      this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+        console.log('AXES', axes);
+        console.log('S', s)
+        if (axes.findIndex(a => a.id === `${s.unitsLabelShort}-${s.yAxisSide}`) === -1) {
+          axes.push({
+            labels: {
+              formatter() {
+                return Highcharts.numberFormat(this.value, 2, '.', ',');
+              }
+            },
+            id: `${s.unitsLabelShort}-${s.yAxisSide}`,
+            title: {
+              text: s.unitsLabelShort // this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.unitsLabelShort : null
+            },
+            opposite: s.yAxisSide === 'left' ? false : true, //index === 0 ? false : true,
+            minPadding: 0,
+            maxPadding: 0,
+            minTickInterval: 0.01,
+            showEmpty: false,
+            yAxisSide: s.yAxisSide
+            //series: axisIds[axis],
+            //visible: visibleSeries ? true : false
+            //visible: true
+          })
+        }
+        return axes
+      }, []);
+      console.log('YAXIS', this.chartOptions.yAxis)
+      this.chartOptions.series = chartSeries;
+      this.updateChart = true;
+      if (this.chartObject) {
+        this.chartObject.redraw()
+      }
+      //this.chartObject.redraw();
+    })
   }
 
   displayAlertMessage(alertMsg) {
@@ -122,11 +196,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   
 
   ngOnChanges() {
+    console.log('ON CHANGES', this.allDates)
     if (this.series.length && this.chartObject) {
       this.chartObject._indexed = this.indexChecked;
-      const yAxes = this.setYAxes(this.series, '', '');
-      this.chartOptions.yAxis = yAxes;
-      this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
+      // const yAxes = this.setYAxes(this.series, '', '');
+      // this.chartOptions.yAxis = yAxes;
+      // this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
       this.chartOptions.rangeSelector.selected = null;
       this.chartOptions.xAxis = null;
       this.updateChart = true;
@@ -144,13 +219,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.toggleSeries.unsubscribe();
-    this.switchAxes.unsubscribe();
+    //this.toggleSeries.unsubscribe();
+    //this.switchAxes.unsubscribe();
+    this.compareSeries.unsubscribe();
   }
 
-  chartCallback = (chart) => {
-    this.chartObject = chart;
-  }
 
   switchYAxes(data: any, chartObject) {
     const allUnits = chartObject.series.filter(series => !series.userOptions.className.toString().includes('navigator'))
@@ -186,7 +259,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return obj;
     }, { y0: [], y1: [] });
     this.yAxesSeries.emit({ y0: seriesByAxes.y0, y1: seriesByAxes.y1 });
-    this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxesNew, this.chartObject._extremes.min)
+    // this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxesNew, this.chartObject._extremes.min)
   }
 
   setYAxes = (series, y0Series, y1Series) => {
@@ -248,7 +321,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return yAxes;
   }
 
-  formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
+  /* formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
     // create copy to prevent original data from being altered if calculating indexed values
     const seriesCopy = JSON.parse(JSON.stringify(series));
     const indexBaseYear = this.getIndexBaseYear(series, start);
@@ -309,7 +382,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       visible: true,
     });
     return chartSeries;
-  }
+  } */
 
   getIndexBaseYear = (series: any, start: string) => {
     const maxObsStartDate = series.reduce((prev, current) => {
@@ -364,7 +437,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setDateToFirstOfMonth =  (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
-    const chartCallback = this.chartCallback;
+    //const chartCallback = this.chartCallback;
     const getIndexBaseYear = (series, start) => this.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.getIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
@@ -386,7 +459,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         },
         load() {
-          chartCallback(this);
+          //chartCallback(this);
           if (logo.analyticsLogoSrc) {
             this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
           }
@@ -501,8 +574,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.credits = {
       enabled: false
     };
-    this.chartOptions.series = this.formatSeriesData(series, this.allDates, yAxis, this.start);
-    this.chartOptions.yAxis = yAxis;
+    //this.chartOptions.series = this.formatSeriesData(series, this.allDates, yAxis, this.start);
+    // this.chartOptions.yAxis = yAxis;
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
