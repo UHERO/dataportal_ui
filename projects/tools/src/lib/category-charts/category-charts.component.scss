@@ -32,6 +32,14 @@
   a:hover {
     text-decoration: none;
   }
+
+  button.analyzer-dropdown {
+    padding: 0;
+
+    .material-icons {
+      font-size: 1em;
+    }
+  }
     
   .analyzer-toggle {
     color: #505050;

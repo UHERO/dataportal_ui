@@ -77,6 +77,7 @@ export class AnalyzerService {
       data: series.chartData.level,
       yAxis: `${series.unitsLabelShort}-${series.selectedYAxis}`,
       yAxisSide: series.selectedYAxis,
+      type: series.selectedChartType,
       decimals: series.decimals,
       frequency: series.frequencyShort,
       geography: series.geography.name,
@@ -103,6 +104,12 @@ export class AnalyzerService {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     currentCompare.find(s => s.className === seriesInfo.id).yAxisSide = axis;
     currentCompare.find(s => s.className === seriesInfo.id).yAxis = `${seriesInfo.unitsLabelShort}-${axis}`
+    this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  updateCompareChartType(seriesInfo, chartType: string) {
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    currentCompare.find(s => s.className === seriesInfo.id).type = chartType;
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -309,7 +316,6 @@ export class AnalyzerService {
         'line',
         'column',
         'area',
-        'scatter'
       ];
       series.selectedChartType = 'line';
       series.yAxis = [

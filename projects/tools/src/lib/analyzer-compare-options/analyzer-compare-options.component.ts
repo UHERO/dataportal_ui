@@ -34,8 +34,9 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
     this.analyzerService.toggleAnalyzerSeries(id);
   }
 
-  onChartTypeChange(e) {
+  onChartTypeChange(e, seriesInfo) {
     console.log('e', e);
+    this.analyzerService.updateCompareChartType(seriesInfo, e);
   }
 
   onChartAxisChange(e, seriesInfo) {

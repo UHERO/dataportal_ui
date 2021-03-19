@@ -60,7 +60,8 @@ export class HighstockHelperService {
     }
   }
 
-  getAnalyzerChartExtremes = (chartObject) => {
+  getAnalyzerChartExtremes = chartObject => {
+    console.log('get extremes chart object', chartObject)
     let selectedRange = null;
     if (chartObject) {
       selectedRange = chartObject.series.find(s => s.name === 'Navigator').points;

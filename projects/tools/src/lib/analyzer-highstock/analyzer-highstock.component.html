@@ -1,6 +1,3 @@
-<div *ngIf="alertMessage" class="alert alert-info alert-message" role="alert">
-  <i class="material-icons">&#xE001;</i> {{alertMessage}}
-</div>
 <highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
   [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true"></highcharts-chart>
 <div class="customize-tooltip">

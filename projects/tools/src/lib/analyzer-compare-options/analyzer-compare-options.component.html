@@ -12,7 +12,7 @@
 </p>
 <p *ngIf="inCompareChart">
   Chart Type:
-  <select [ngModel]="seriesInfo.selectedChartType" (ngModelChange)="onChartTypeChange($event)" class="custom-select" aria-label="chart-type-selector">
+  <select [ngModel]="seriesInfo.selectedChartType" (ngModelChange)="onChartTypeChange($event, seriesInfo)" class="custom-select" aria-label="chart-type-selector">
     <option [ngValue]="type" *ngFor="let type of seriesInfo.chartType">
         {{type}}
     </option>

@@ -59,7 +59,7 @@
 			[chartStart]="routeStart" [chartEnd]="routeEnd" [data]="data.displaySeries"
 			[dates]="data.categoryDates" [dateWrapper]="data.categoryDateWrapper"
 			[freq]="selectedFreq?.freq" [noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'"
-			[hasSeasonal]="data.hasSeasonal" (updateURLFragment)="updateRoute()">
+			[hasSeasonal]="data.hasSeasonal" [analyzerView]="false" (updateURLFragment)="updateRoute()">
 		</lib-category-charts>
 	</ng-template>
 </div>

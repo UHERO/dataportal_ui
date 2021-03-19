@@ -22,6 +22,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() search;
   @Input() dates;
   @Input() dateWrapper;
+  @Input() analyzerView: boolean;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
@@ -163,5 +164,9 @@ export class CategoryChartsComponent implements OnChanges {
 
   trackBySeries(index, item) {
     return item.id;
+  }
+
+  keepMenuOpen(e) {
+    e.stopPropagation();
   }
 }
