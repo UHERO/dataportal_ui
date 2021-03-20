@@ -7,7 +7,6 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   ViewEncapsulation
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
@@ -33,23 +32,17 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() portalSettings;
   @Input() start;
   @Input() end;
-  @Input() seriesOptions: Array<any>;
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
   @Input() indexChecked;
-  @Input() y0;
-  @Input() y1;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
-  @Output() yAxesSeries = new EventEmitter();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
   //chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
-  toggleSeries;
-  switchAxes;
   indexed: boolean = false;
   compareSeriesSub;
   compareSeries;
@@ -61,7 +54,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     @Inject('logo') private logo,
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
-    private cdr: ChangeDetectorRef
   ) {
     // workaround to include exporting module in production build
     exporting(this.Highcharts);
@@ -76,11 +68,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           seriesMetaData += label.html ? `${label.html} \n` : '';
         }
       });
-      return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
+      return seriesMetaData ?  `${seriesMetaData}\n\n${result}` : result;
     });
     this.chartCallback = chart => {
       this.chartObject = chart;
-      console.log('CALLBACK', this.chartObject)
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
@@ -111,7 +102,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         seasonallyAdjusted: null,
         pseudoZones: null,
         visible: true,
-      }]
+      }];
       this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
         console.log('AXES', axes);
         console.log('S', s)
@@ -161,8 +152,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     } */
     console.log('INDEX CHECKED', this.indexChecked);
     if (this.indexChecked) {
-      const indexBaseYear = this.getIndexBaseYear(this.compareSeries, this.start);
-      console.log('INDEX BASE YEAR', indexBaseYear)
+      const indexBaseYear = this.analyzerService.getIndexBaseYear(this.compareSeries, this.start);
+      console.log('HIGHSTOCK INDEX BASE YEAR', indexBaseYear);
+      console.log('HIGHSTOCK COMPARE SERIES', this.compareSeries);
+      /* this.chartOptions.series.forEach((s) => {
+        if (s.className !== 'navigator') {
+          s.data = this.getIndexedValues(s.levelData, indexBaseYear);
+        }
+      });
+      this.updateChart = true;
+      if (this.chartObject) {
+        this.chartObject.redraw()
+      } */
+
     }
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
@@ -172,6 +174,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
       this.initChart(this.series, this.portalSettings, buttons, navigatorOptions);
+      console.log('HIGHSTOCK SERIES', this.series)
     }
   }
 
@@ -242,15 +245,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return chartSeries;
   } */
 
-  getIndexBaseYear = (series: any, start: string) => {
-    const maxObsStartDate = series.reduce((prev, current) => {
-      const prevObsStart = prev.observations.observationStart;
-      const currentObsStart = current.observations.observationStart;
-      return prevObsStart > currentObsStart ? prev : current;
-    }).observations.observationStart;
-    return maxObsStartDate > start ? maxObsStartDate : start;
-  }
-
   getIndexedValues(values, baseYear: string) {
     return values.map((curr, ind, arr) => {
       const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
@@ -286,7 +280,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setDateToFirstOfMonth =  (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
-    const getIndexBaseYear = (series, start) => this.getIndexBaseYear(series, start);
+    const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.getIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
 
@@ -327,7 +321,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.legend = {
       enabled: true,
       labelFormatter() {
-        return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
+        return this.yAxis.userOptions.opposite ? `${this.name} (right)` : `${this.name} (left)`;
       }
     };
     this.chartOptions.rangeSelector = {
@@ -430,6 +424,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
+          console.log('XAXIS extremes', this._extremes)
+          console.log('XAXIS THIS', this.getExtremes())
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {

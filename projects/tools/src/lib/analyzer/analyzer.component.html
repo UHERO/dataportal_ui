@@ -26,9 +26,9 @@
       <i *ngIf="!data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
       <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
         [allDates]="data.analyzerTableDates" [series]="data.analyzerSeries"
-        [seriesOptions]="data.highstockSeriesOptions" [start]="startDate" [end]="endDate" [nameChecked]="tooltipName"
-        [unitsChecked]="tooltipUnits" [y0]="y0Series" [y1]="y1Series" [geoChecked]="tooltipGeo"
-        [indexChecked]="indexSeries" (yAxesSeries)="setYAxesSeries($event)" (tooltipOptions)="checkTooltip($event)"
+        [start]="startDate" [end]="endDate" [nameChecked]="tooltipName"
+        [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries"
+        (tooltipOptions)="checkTooltip($event)"
         (tableExtremes)="setTableDates($event)"></lib-analyzer-highstock>
       <lib-freq-selector *ngIf="data.displayFreqSelector" [freqs]="data.siblingFreqs"
         (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">

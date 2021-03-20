@@ -30,8 +30,9 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
     this.compareSeriesSub.unsubscribe();
   }
 
-  removeFromAnalyzer(id: number) {
-    this.analyzerService.toggleAnalyzerSeries(id);
+  removeFromAnalyzer(seriesInfo) {
+    this.removeFromCompare(seriesInfo);
+    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id);
   }
 
   onChartTypeChange(e, seriesInfo) {

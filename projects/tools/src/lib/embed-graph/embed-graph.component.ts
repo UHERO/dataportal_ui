@@ -70,7 +70,6 @@ export class EmbedGraphComponent implements OnInit {
       analyzerTableDates: [],
       analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],
-      highstockSeriesOptions: [],
       displayFreqSelector: false,
       siblingFreqs: [],
       analyzerFrequency: {},

@@ -132,12 +132,12 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
-  setYAxesSeries(e) {
+  /* setYAxesSeries(e) {
     this.y0 = e.y0.map(s => s.toString()).join('-');
     this.y1 = e.y1.map(s => s.toString()).join('-');
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-  }
+  } */
 
   checkTooltip(e) {
     if (e.label === 'name') {
@@ -159,6 +159,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       this.y0 = null;
       this.y1 = null;
     }
+    this.analyzerService.toggleIndexValues(e.target.checked, this.minDate)
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }

@@ -21,7 +21,6 @@ export class AnalyzerService {
     analyzerTableDates: [],
     analyzerDateWrapper: { firstDate: '', endDate: '' },
     analyzerSeries: [],
-    highstockSeriesOptions: [],
     displayFreqSelector: false,
     siblingFreqs: [],
     analyzerFrequency: {},
@@ -68,13 +67,13 @@ export class AnalyzerService {
 
   addToComparisonChart(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    console.log('add to chart', this.analyzerData)
     this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
     currentCompare.push({
       className: series.id,
       name: series.chartDisplayName,
       tooltipName: series.title,
       data: series.chartData.level,
+      levelData: series.chartData.level,
       yAxis: `${series.unitsLabelShort}-${series.selectedYAxis}`,
       yAxisSide: series.selectedYAxis,
       type: series.selectedChartType,
@@ -89,6 +88,7 @@ export class AnalyzerService {
           return false;
         }
       },
+      observations: series.observations,
       unitsLabelShort: series.unitsLabelShort,
       seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
       dataGrouping: {
@@ -100,10 +100,18 @@ export class AnalyzerService {
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
+  getIndexedValues(values, dates, start) {
+    return values.map((curr, ind, arr) => {
+      const dateIndex = dates.findIndex(date => date === start);
+      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
+    });
+  }
+
   updateCompareSeriesAxis(seriesInfo, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    currentCompare.find(s => s.className === seriesInfo.id).yAxisSide = axis;
-    currentCompare.find(s => s.className === seriesInfo.id).yAxis = `${seriesInfo.unitsLabelShort}-${axis}`
+    const series = currentCompare.find(s => s.className === seriesInfo.id);
+    series.yAxisSide = axis;
+    series.yAxis = `${seriesInfo.unitsLabelShort}-${axis}`
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -119,10 +127,40 @@ export class AnalyzerService {
     this.analyzerSeriesCompareSource.next(newCompare);
   }
 
+  toggleIndexValues(index, minYear) {
+    if (index) {
+      const currentCompareSeries = this.analyzerSeriesCompareSource.value;
+      const baseYear = this.getIndexBaseYear(this.analyzerData.analyzerSeries, minYear);
+      if (currentCompareSeries) {
+        currentCompareSeries.forEach((s) => {
+          s.data = this.getChartIndexedValues(s.levelData, baseYear);
+        });
+        this.analyzerSeriesCompareSource.next(currentCompareSeries);
+      }
+      console.log('ANALYZER SERVICE BASE YEAR', baseYear)
+    }
+  }
+
+  getChartIndexedValues(values, baseYear: string) {
+    return values.map((curr, ind, arr) => {
+      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
+      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
+    });
+  }
+
   toggleAnalyzerSeries(seriesID) {
     const currentValue = this.analyzerSeriesSource.value;
-    let updatedValue;
+    // const currentCompareSeries = this.analyzerSeriesCompareSource.value;
     const seriesExist = currentValue.find(s => s.id === seriesID);
+    let updatedValue;
+    /* let updatedCompareValue;
+    const seriesExist = currentValue.find(s => s.id === seriesID);
+    if (currentCompareSeries) {
+      const compareSeriesExist = currentCompareSeries.find(s => s.className === seriesID);
+      if (compareSeriesExist) {
+        updatedCompareValue = currentCompareSeries.filter(s => s.id !== seriesID);
+      }  
+    } */
     if (seriesExist) {
       updatedValue = currentValue.filter(s => s.id !== seriesID);
     }
@@ -130,6 +168,7 @@ export class AnalyzerService {
       updatedValue = [...currentValue, { id: seriesID }];
     }
     this.analyzerSeriesSource.next(updatedValue);
+    //this.analyzerSeriesCompareSource.next(updatedCompareValue);
     this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
@@ -142,7 +181,6 @@ export class AnalyzerService {
       const analyzerDateWrapper = { firstDate: '', endDate: '' };
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
       analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
-      console.log('analyzerDateWrapper', analyzerDateWrapper)
       this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(results.series);
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
@@ -154,12 +192,10 @@ export class AnalyzerService {
         }
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      //this.checkAnalyzerChartSeries();
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
     });
-    console.log('analyzerdata', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -173,7 +209,6 @@ export class AnalyzerService {
       analyzerTableDates: [],
       analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],
-      highstockSeriesOptions: [],
       displayFreqSelector: false,
       siblingFreqs: [],
       analyzerFrequency: {},
@@ -293,7 +328,6 @@ export class AnalyzerService {
     series.currentGeo = series.geography;
     series.currentFreq = { freq: series.frequencyShort, label: series.frequency };
     series.observations = series.seriesObservations;
-    console.log('Series', series)
     const levelDates = series.observations.transformationResults[0].dates;
     const obsStart = series.observations.observationStart;
     const obsEnd = series.observations.observationEnd;
@@ -356,7 +390,6 @@ export class AnalyzerService {
       const dateArray = [];
       this.helperService.createDateArray(aSeries.observations.observationStart, aSeries.observations.observationEnd, aSeries.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(aSeries.observations.transformationResults, dateArray, decimal);
-    console.log('dateArray', dateArray)
     });
     this.analyzerData.analyzerTableDates = this.createAnalyzerTableDates(analyzerSeries);
   }
@@ -378,7 +411,6 @@ export class AnalyzerService {
     });
     allDates = allDates.sort(this.dateComparison);
     if (start && end) { allDates = allDates.filter(date => date.date >= start && date.date <= end); }
-    console.log('createTableDates', allDates)
     return allDates;
   }
 
@@ -411,17 +443,6 @@ export class AnalyzerService {
     }
   }
 
-  /* checkAnalyzerChartSeries() {
-    // At least 2 series should be drawn in the chart, if more than 1 series has been added to the analyzer
-    let chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
-    while (chartSeries.length < 2 && this.analyzerData.analyzerSeries.length > 1 || !chartSeries.length) {
-      const notInChart = this.analyzerData.analyzerSeries.find(serie => serie.showInChart !== true);
-      this.analyzerSeriesSource.value.find(serie => serie.id === notInChart.id).showInChart = true;
-      notInChart.showInChart = true;
-      chartSeries = this.analyzerData.analyzerSeries.filter(s => s.showInChart);
-    }
-  } */
-
   formatDisplayName({ title, geography, frequency, seasonalAdjustment, units }) {
     let ending = '';
     if (seasonalAdjustment === 'seasonally_adjusted') {
@@ -431,5 +452,14 @@ export class AnalyzerService {
       ending = '; Not Seasonally Adjusted';
     }
     return `${title} (${units}) (${geography}; ${frequency}${ending})`;
+  }
+
+  getIndexBaseYear = (series: any, start: string) => {
+    const maxObsStartDate = series.reduce((prev, current) => {
+      const prevObsStart = prev.observations.observationStart;
+      const currentObsStart = current.observations.observationStart;
+      return prevObsStart > currentObsStart ? prev : current;
+    }).observations.observationStart;
+    return maxObsStartDate > start ? maxObsStartDate : !start ? maxObsStartDate : start;
   }
 }

@@ -203,7 +203,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     const seriesInChart = $('.highcharts-series.' + series.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
-    const indexedValues = this.getIndexedValues(values, dates, minDate);
+    const baseYear = this.analyzerService.getIndexBaseYear(this.series, minDate);
+    const indexedValues = this.getIndexedValues(values, dates, baseYear);
     const seriesData = {
       series: this.indexChecked ? series.indexDisplayName : series.displayName,
       lockPosition: true,
@@ -222,9 +223,9 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     return seriesData;
   }
 
-  getIndexedValues(values, dates, start) {
+  getIndexedValues(values, dates, baseYear) {
     return values.map((curr, ind, arr) => {
-      const dateIndex = dates.findIndex(date => date === start);
+      const dateIndex = dates.findIndex(date => date === baseYear);
       return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
     });
   }
