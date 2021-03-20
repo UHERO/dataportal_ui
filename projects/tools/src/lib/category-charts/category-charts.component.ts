@@ -104,7 +104,7 @@ export class CategoryChartsComponent implements OnChanges {
     this.helperService.createDateArray(start, end, freq, dateArray);
     let series0 = { values: this.formatSeriesData(transformations[series0Name], dateArray), start };
     const series1 = { values: this.formatSeriesData(transformations[series1Name], dateArray), start };
-    let pseudoZones = [];
+    const pseudoZones = [];
     const level = transformations.level;
     if (this.analyzerView && this.indexChecked) {
       series0 = { values: 
@@ -113,17 +113,17 @@ export class CategoryChartsComponent implements OnChanges {
       };
     }
     if (level.pseudoHistory) {
-      pseudoZones = level.pseudoHistory.map((obs, index) => {
+      level.pseudoHistory.forEach((obs, index) => {
         if (obs && !level.pseudoHistory[index + 1]) {
-          return {
+          pseudoZones.push({
             value: Date.parse(level.dates[index]),
             dashStyle: 'dash',
             color: '#7CB5EC',
             className: 'pseudoHistory'
-          };
-        };
+          });
+        }
       });
-    }
+    };
     const chartData = { series0, series1, pseudoZones, dates };
     return { start, end, chartData };
   }

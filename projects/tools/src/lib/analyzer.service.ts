@@ -74,11 +74,11 @@ export class AnalyzerService {
     const baseYear =this.analyzerData.baseYear;
     currentCompare.push({
       className: series.id,
-      name: series.chartDisplayName,
+      name: indexed ? series.indexDisplayName : series.chartDisplayName,
       tooltipName: series.title,
       data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       levelData: series.chartData.level,
-      yAxis: `${series.unitsLabelShort}-${series.selectedYAxis}`,
+      yAxis: indexed ? `Index (${baseYear})-${series.selectedYAxis}` : `${series.unitsLabelShort}-${series.selectedYAxis}`,
       yAxisSide: series.selectedYAxis,
       type: series.selectedChartType,
       decimals: series.decimals,
