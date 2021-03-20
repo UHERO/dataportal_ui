@@ -13,7 +13,7 @@
         (click)="removeAllAnalyzerSeries()">
         Remove All Series
       </button>
-      <button type="button" (click)="toggleAnalyzerDisplay()" class="switch-view"><span
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleAnalyzerDisplay()" class="switch-view"><span
           class="analyzer-more material-icons">
           {{displayCompare ? 'view_comfy' : 'settings'}}
         </span>{{displayCompare ? 'Grid' : 'Compare'}}
@@ -21,7 +21,7 @@
       <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
         [dates]="data.analyzerTableDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
         [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true"
-        [chartStart]="data.analyzerTableDates[0].date">
+        [chartStart]="data.analyzerTableDates[0].date" [indexChecked]="indexSeries">
       </lib-category-charts>
       <i *ngIf="!data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
       <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"

@@ -7,7 +7,7 @@
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
 				queryParamsHandling='merge' *ngIf="serie.id">
 				<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
-					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie"></lib-highchart>
+					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [indexChecked]="indexChecked"></lib-highchart>
 			</a>
 			<ng-template ngIf [ngIf]="!analyzerView">
 				<i *ngIf="!serie.analyze" title="Add to Analyzer" [class.add-analyze-button]="!serie.analyze"

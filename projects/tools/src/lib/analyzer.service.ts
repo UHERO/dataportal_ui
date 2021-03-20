@@ -26,7 +26,9 @@ export class AnalyzerService {
     analyzerFrequency: {},
     y0Series: null,
     y1Series: null,
-    requestComplete: false
+    requestComplete: false,
+    indexed: false,
+    baseYear: null
   };
   public embedData = {
     analyzerTableDates: [],
@@ -68,11 +70,13 @@ export class AnalyzerService {
   addToComparisonChart(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
+    const indexed = this.analyzerData.indexed;
+    const baseYear =this.analyzerData.baseYear;
     currentCompare.push({
       className: series.id,
       name: series.chartDisplayName,
       tooltipName: series.title,
-      data: series.chartData.level,
+      data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       levelData: series.chartData.level,
       yAxis: `${series.unitsLabelShort}-${series.selectedYAxis}`,
       yAxisSide: series.selectedYAxis,
@@ -100,10 +104,17 @@ export class AnalyzerService {
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
-  getIndexedValues(values, dates, start) {
+  getIndexedValues(values, dates, baseYear) {
     return values.map((curr, ind, arr) => {
-      const dateIndex = dates.findIndex(date => date === start);
+      const dateIndex = dates.findIndex(date => date === baseYear);
       return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
+    });
+  }
+
+  getChartIndexedValues(values, baseYear: string) {
+    return values.map((curr, ind, arr) => {
+      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
+      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
     });
   }
 
@@ -128,47 +139,25 @@ export class AnalyzerService {
   }
 
   toggleIndexValues(index, minYear) {
-    if (index) {
-      const currentCompareSeries = this.analyzerSeriesCompareSource.value;
-      const baseYear = this.getIndexBaseYear(this.analyzerData.analyzerSeries, minYear);
-      if (currentCompareSeries) {
-        currentCompareSeries.forEach((s) => {
-          s.data = this.getChartIndexedValues(s.levelData, baseYear);
-        });
-        this.analyzerSeriesCompareSource.next(currentCompareSeries);
-      }
-      console.log('ANALYZER SERVICE BASE YEAR', baseYear)
+    this.analyzerData.indexed = index;
+    const currentCompareSeries = this.analyzerSeriesCompareSource.value;
+    const baseYear = this.getIndexBaseYear(this.analyzerData.analyzerSeries, minYear);
+    this.analyzerData.baseYear = baseYear;
+    if (currentCompareSeries) {
+      currentCompareSeries.forEach((s) => {
+        s.data = index ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
+      });
+      this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
-  }
-
-  getChartIndexedValues(values, baseYear: string) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
-      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
-    });
   }
 
   toggleAnalyzerSeries(seriesID) {
     const currentValue = this.analyzerSeriesSource.value;
-    // const currentCompareSeries = this.analyzerSeriesCompareSource.value;
     const seriesExist = currentValue.find(s => s.id === seriesID);
     let updatedValue;
-    /* let updatedCompareValue;
-    const seriesExist = currentValue.find(s => s.id === seriesID);
-    if (currentCompareSeries) {
-      const compareSeriesExist = currentCompareSeries.find(s => s.className === seriesID);
-      if (compareSeriesExist) {
-        updatedCompareValue = currentCompareSeries.filter(s => s.id !== seriesID);
-      }  
-    } */
-    if (seriesExist) {
-      updatedValue = currentValue.filter(s => s.id !== seriesID);
-    }
-    if (!seriesExist) {
-      updatedValue = [...currentValue, { id: seriesID }];
-    }
+    updatedValue = seriesExist ?
+      currentValue.filter(s => s.id !== seriesID) : [...currentValue, { id: seriesID }];
     this.analyzerSeriesSource.next(updatedValue);
-    //this.analyzerSeriesCompareSource.next(updatedCompareValue);
     this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
@@ -214,92 +203,13 @@ export class AnalyzerService {
       analyzerFrequency: {},
       y0Series: null,
       y1Series: null,
-      requestComplete: false
+      requestComplete: false,
+      indexed: false,
+      baseYear: null
     };
   }
 
   formatSeriesForAnalyzer = (series, aSeries) => {
-    /* const aSeriesMatch = aSeries.find(a => a.id === series.id);
-    const seriesData = {
-      seriesDetail: series,
-      currentGeo: {} as Geography,
-      currentFreq: {} as Frequency,
-      chartData: {},
-      displayName: '',
-      chartDisplayName: '',
-      indexDisplayName: '',
-      seriesTableData: [],
-      error: null,
-      saParam: false,
-      noData: '',
-      observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-      showInChart: aSeriesMatch.showInChart
-    };
-    const abbreviatedNameDetails = {
-      title: series.title,
-      geography: series.geography.shortName,
-      frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort || series.unitsLabel
-    };
-    const chartNameDetails = {
-      title: series.title,
-      geography: series.geography.shortName,
-      frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment,
-      units: series.unitsLabelShort || series.unitsLabel
-    };
-    const indexNameDetails = {
-      title: series.title,
-      geography: series.geography.shortName,
-      frequency: series.frequency,
-      seasonalAdjustment: series.seasonalAdjustment,
-      units: 'Index'
-    }
-    seriesData.displayName = this.formatDisplayName(abbreviatedNameDetails);
-    seriesData.chartDisplayName = this.formatDisplayName(chartNameDetails);
-    seriesData.indexDisplayName = this.formatDisplayName(indexNameDetails);
-    seriesData.saParam = series.seasonalAdjustment !== 'not_seasonally_adjusted';
-    seriesData.currentGeo = series.geography;
-    seriesData.currentFreq = { freq: series.frequencyShort, label: series.frequency };
-    seriesData.observations = series.seriesObservations;
-    const levelDates = seriesData.observations.transformationResults[0].dates;
-    const obsStart = seriesData.observations.observationStart;
-    const obsEnd = seriesData.observations.observationEnd;
-    const dateArray = [];
-    if (levelDates) {
-      const pseudoZones = [];
-      const level = seriesData.observations.transformationResults[0].values;
-      if (level.pseudoHistory) {
-        level.pseudoHistory.forEach((obs, index) => {
-          if (obs && !level.pseudoHistory[index + 1]) {
-            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-          }
-        });
-      }
-      // Use to format dates for table
-      this.helperService.createDateArray(obsStart, obsEnd, seriesData.currentFreq.freq, dateArray);
-      const levelChartData = this.createSeriesChartData(seriesData.observations.transformationResults[0], dateArray);
-      seriesData.chartData = { level: levelChartData, dates: dateArray, pseudoZones };
-    } else {
-      seriesData.noData = 'Data not available';
-    } */
-    const aSeriesMatch = aSeries.find(a => a.id === series.id);
-    const seriesData = {
-      seriesDetail: series,
-      currentGeo: {} as Geography,
-      currentFreq: {} as Frequency,
-      chartData: {},
-      displayName: '',
-      chartDisplayName: '',
-      indexDisplayName: '',
-      seriesTableData: [],
-      error: null,
-      saParam: false,
-      noData: '',
-      observations: { transformationResults: [], observationStart: '', observationEnd: '' },
-      showInChart: aSeriesMatch.showInChart
-    };
     const abbreviatedNameDetails = {
       title: series.title,
       geography: series.geography.shortName,

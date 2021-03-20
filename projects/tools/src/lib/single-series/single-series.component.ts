@@ -180,7 +180,7 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     this.newTableData = tableData.slice(tableEnd, tableStart + 1).reverse();
     this.tableHeaders = this.createTableColumns(this.portalSettings, seriesDetail);
     seriesDetail.observations = seriesDetail.seriesObservations;
-    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false);
+    this.summaryStats = this.seriesHelper.calculateSeriesSummaryStats(seriesDetail, chartData, minDate, maxDate, false, null);
   }
 
   createTableColumns = (portalSettings, seriesDetail) => {

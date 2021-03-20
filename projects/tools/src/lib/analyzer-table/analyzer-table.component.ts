@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnChanges, Input, Output, OnDestroy, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { SeriesHelperService } from '../series-helper.service';
 import { HelperService } from '../helper.service';
@@ -15,7 +15,7 @@ import { GridOptions } from 'ag-grid-community';
   styleUrls: ['./analyzer-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
+export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
@@ -28,7 +28,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   portalSettings;
   missingSummaryStat = false;
   tableDates;
-  toggleSeries;
   private gridApi;
   columnDefs;
   rows;
@@ -61,19 +60,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
         componentParent: this
       } as GridOptions
     };
-    this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
-      const chartSeries = this.series.filter(s => s.showInChart);
-      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
-      if (toggleDisplay) {
-        const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === data.seriesInfo.id);
-        const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === data.seriesInfo.id);
-        matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
-        const seriesInChart = $('.highcharts-series.' + data.seriesInfo.id);
-        matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
-        matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
-        matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
-      }
-    });
   }
 
   ngOnInit() {
@@ -83,26 +69,21 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges() {
     console.log('minDate', this.minDate);
     console.log('maxDate', this.maxDate)
-    //if (this.minDate && this.maxDate) {
-      const newTableDates = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
-      this.columnDefs = this.setTableColumns(newTableDates);
-    //}
+    const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
+    this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    //if (this.minDate && this.maxDate) {
-      this.summaryRows = this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
-      this.summaryRows.forEach((statRow) => {
-        const seriesInChart = $('.highcharts-series.' + statRow.seriesInfo.id);
-        statRow.interactionSettings.color = seriesInChart.length ? seriesInChart.css('stroke') : '#000000';
-      });
-      // Check if the summary statistics for a series has NA values
-      this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
-   // }
+    this.summaryRows = []; //this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
+    // Check if the summary statistics for a series has NA values
+    this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
+    const indexedBaseYear = this.analyzerService.getIndexBaseYear(this.series, this.minDate);
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
+      const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, indexedBaseYear);
+      this.summaryRows.push(summaryStats)
       this.rows.push(seriesData);
       if (this.yoyChecked && yoy) {
         const yoyData = this.formatTransformationData(series, yoy);
@@ -119,8 +100,14 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.toggleSeries.unsubscribe();
+  calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
+    series.seriesStartDate = (series.observations.observationStart > startDate || !startDate) ?
+      series.observations.observationStart : startDate;
+    series.seriesEndDate = (series.observations.observationEnd > endDate || !endDate) ?
+      series.observations.observationEnd : endDate;
+    const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, series.seriesStartDate, series.seriesEndDate, indexed, indexBase);
+    stats.series = series.displayName;
+    return stats
   }
 
   setSummaryStatColumns = () => {
@@ -169,7 +156,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     }];
   }
 
-  setTableColumns = (dates) => {
+  setTableColumns = dates => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -204,7 +191,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
     const baseYear = this.analyzerService.getIndexBaseYear(this.series, minDate);
-    const indexedValues = this.getIndexedValues(values, dates, baseYear);
+    const indexedValues = this.analyzerService.getIndexedValues(values, dates, baseYear);
     const seriesData = {
       series: this.indexChecked ? series.indexDisplayName : series.displayName,
       lockPosition: true,
@@ -223,13 +210,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
     return seriesData;
   }
 
-  getIndexedValues(values, dates, baseYear) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = dates.findIndex(date => date === baseYear);
-      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
-    });
-  }
-
   formatTransformationData = (series, transformation) => {
     const { dates, values } = transformation;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
@@ -246,18 +226,15 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   formatTransformationName = (transformation, percent) => {
-    if (transformation === 'pc1') {
-      return percent ? 'YOY (ch.)' : 'YOY (%)';
-    }
-    if (transformation === 'ytd') {
-      return percent ? 'YTD (ch.)' : 'YTD (%)';
-    }
-    if (transformation === 'c5ma') {
-      return percent ? 'Annual (ch.)' : 'Annual (%)';
-    }
+    const transformationLabel = {
+      pc1: 'YOY',
+      ytd: 'YTD',
+      c5ma: 'Annual'
+    };
+    return `${transformationLabel[transformation]} (${percent ? 'ch.' : '%'})`;
   }
 
-  onGridReady = (params) => {
+  onGridReady(params) {
     this.gridApi = params.api;
   }
 
@@ -276,9 +253,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
   }
 
 
-  isSummaryStatMissing = (series) => {
-    return series.some((s) => s ? s.missing : null);
-  }
+  isSummaryStatMissing = series => series.some((s) => s ? s.missing : null);
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;
@@ -297,21 +272,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges, OnDestroy {
 
   switchChartYAxes(series) {
     this.analyzerService.switchYAxes.emit(series);
-  }
-
-  toggleSeriesInChart(series) {
-    console.log('toggle series in chart', series)
-    // this.analyzerService.toggleSeriesInChart.emit(series);
-    const matchingValueSeries = this.rows.find(r => r.interactionSettings.seriesInfo.id === series.seriesInfo.id);
-    const matchingStatSeries = this.summaryRows.find(r => r.seriesInfo.id === series.seriesInfo.id);
-    matchingValueSeries.interactionSettings.showInChart = !matchingValueSeries.interactionSettings.showInChart;
-    const seriesInChart = $('.highcharts-series.' + series.seriesInfo.id);
-    matchingValueSeries.interactionSettings.color = seriesInChart.css('stroke');
-    matchingStatSeries.interactionSettings.showInChart = !matchingStatSeries.interactionSettings.showInChart;
-    matchingStatSeries.interactionSettings.color = seriesInChart.css('stroke');
-
-    this.analyzerService.addToComparisonChart(series.seriesInfo);
-    this.analyzerService.createAnalyzerTableDates(this.analyzerService.analyzerData.analyzerSeries);
   }
 
   removeFromAnalyzer(series) {

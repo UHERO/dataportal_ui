@@ -23,6 +23,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() dates;
   @Input() dateWrapper;
   @Input() analyzerView: boolean;
+  @Input() indexChecked;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
@@ -37,7 +38,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
-      console.log('category charts data', this.data)
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
@@ -79,7 +79,6 @@ export class CategoryChartsComponent implements OnChanges {
       // Use to format dates for table
       this.helperService.createDateArray(obsStart, obsEnd, series.currentFreq.freq, dateArray);
       const levelChartData = this.createSeriesChartData(series.observations.transformationResults[0], dateArray);
-      console.log('GRID VIEW', levelChartData)
     }
   }
 
@@ -103,15 +102,26 @@ export class CategoryChartsComponent implements OnChanges {
     const start = observations.observationStart;
     const end = observations.observationEnd;
     this.helperService.createDateArray(start, end, freq, dateArray);
-    const series0 = { values: this.formatSeriesData(transformations[series0Name], dateArray), start };
+    let series0 = { values: this.formatSeriesData(transformations[series0Name], dateArray), start };
     const series1 = { values: this.formatSeriesData(transformations[series1Name], dateArray), start };
-    const pseudoZones = [];
+    let pseudoZones = [];
     const level = transformations.level;
+    if (this.analyzerView && this.indexChecked) {
+      series0 = { values: 
+        this.analyzerService.getIndexedValues(level.values, level.dates, this.analyzerService.analyzerData.baseYear),
+        start
+      };
+    }
     if (level.pseudoHistory) {
-      level.pseudoHistory.forEach((obs, index) => {
+      pseudoZones = level.pseudoHistory.map((obs, index) => {
         if (obs && !level.pseudoHistory[index + 1]) {
-          pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-        }
+          return {
+            value: Date.parse(level.dates[index]),
+            dashStyle: 'dash',
+            color: '#7CB5EC',
+            className: 'pseudoHistory'
+          };
+        };
       });
     }
     const chartData = { series0, series1, pseudoZones, dates };
@@ -159,7 +169,7 @@ export class CategoryChartsComponent implements OnChanges {
 
   updateAnalyze(series) {
     series.analyze = !series.analyze;
-    this.analyzerService.toggleAnalyzerSeries(series.id)
+    this.analyzerService.toggleAnalyzerSeries(series.id);
   }
 
   trackBySeries(index, item) {

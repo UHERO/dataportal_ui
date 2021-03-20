@@ -17,6 +17,7 @@ export class HighchartComponent implements OnChanges {
   @Input() chartEnd;
   @Input() minValue;
   @Input() maxValue;
+  @Input() indexChecked;
   //@Input() categoryDates;
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions = {} as HighchartsObject;

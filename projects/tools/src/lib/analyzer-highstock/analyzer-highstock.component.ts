@@ -151,21 +151,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.updateChart = true;
     } */
     console.log('INDEX CHECKED', this.indexChecked);
-    if (this.indexChecked) {
-      const indexBaseYear = this.analyzerService.getIndexBaseYear(this.compareSeries, this.start);
-      console.log('HIGHSTOCK INDEX BASE YEAR', indexBaseYear);
-      console.log('HIGHSTOCK COMPARE SERIES', this.compareSeries);
-      /* this.chartOptions.series.forEach((s) => {
-        if (s.className !== 'navigator') {
-          s.data = this.getIndexedValues(s.levelData, indexBaseYear);
-        }
-      });
-      this.updateChart = true;
-      if (this.chartObject) {
-        this.chartObject.redraw()
-      } */
-
-    }
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const navigatorOptions = {
@@ -180,76 +165,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
-  }
-
-  /* formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
-    // create copy to prevent original data from being altered if calculating indexed values
-    const seriesCopy = JSON.parse(JSON.stringify(series));
-    const indexBaseYear = this.getIndexBaseYear(series, start);
-    const chartSeries = seriesCopy.map((serie) => {
-      console.log('analyzer highstock', serie)
-      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.id === serie.id)) : null;
-      return {
-        className: serie.id,
-        name: this.indexChecked ? serie.indexDisplayName : serie.chartDisplayName,
-        tooltipName: serie.title,
-        data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, indexBaseYear) : serie.chartData.level,
-        levelData: serie.chartData.level.slice(),
-        yAxis: axis ? axis.id : null,
-        decimals: serie.decimals,
-        frequency: serie.frequencyShort,
-        geography: serie.geography.name,
-        includeInDataExport: serie.showInChart ? true : false,
-        showInLegend: serie.showInChart ? true : false,
-        showInNavigator: false,
-        events: {
-          legendItemClick() {
-            return false;
-          }
-        },
-        unitsLabelShort: serie.unitsLabelShort,
-        seasonallyAdjusted: serie.seasonalAdjustment === 'seasonally_adjusted',
-        dataGrouping: {
-          enabled: false
-        },
-        pseudoZones: serie.chartData.pseudoZones,
-        visible: serie.showInChart ? true : false
-      };
-    });
-    chartSeries.push({
-      className: 'navigator',
-      data: dates.map(d => [Date.parse(d.date), null]),
-      levelData: [],
-      decimals: null,
-      tooltipName: '',
-      frequency: null,
-      geography: null,
-      yAxis: 'yAxis1',
-      dataGrouping: {
-        enabled: false
-      },
-      showInLegend: false,
-      showInNavigator: true,
-      includeInDataExport: false,
-      name: 'Navigator',
-      events: {
-        legendItemClick() {
-          return false;
-        }
-      },
-      unitsLabelShort: null,
-      seasonallyAdjusted: null,
-      pseudoZones: null,
-      visible: true,
-    });
-    return chartSeries;
-  } */
-
-  getIndexedValues(values, baseYear: string) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
-      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
-    });
   }
 
   formatChartButtons(buttons: Array<any>) {
@@ -281,7 +196,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
-    const getIndexedValues = (values, baseYear) => this.getIndexedValues(values, baseYear);
+    const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
 
     this.chartOptions.chart = {
@@ -424,8 +339,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
-          console.log('XAXIS extremes', this._extremes)
-          console.log('XAXIS THIS', this.getExtremes())
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
@@ -434,15 +347,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
                 if (serie.userOptions.className !== 'navigator') {
                   serie.update({
                     data: getIndexedValues(serie.userOptions.levelData, indexBaseYear)
-                  })
+                  });
                 }
               });
             }
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to min/max date range
-            setTimeout(() => {
-              this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
-            }, 1);
+            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
           }
         }
       },

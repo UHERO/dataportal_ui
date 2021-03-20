@@ -21,19 +21,6 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   agInit(params: any): void {
     this.params = params;
-    console.log('params', params)
-  }
-
-  invokeParentSwitchChartYAxes() {
-    this.params.context.componentParent.switchChartYAxes(this.params.value);
-  }
-
-  invokeParentToggleSeriesInChart() {
-    this.params.context.componentParent.toggleSeriesInChart(this.params.value);
-  }
-
-  invokeParentRemoveFromAnalyzer() {
-    this.params.context.componentParent.removeFromAnalyzer(this.params.value);
   }
 
   toggleMenu() {
@@ -46,13 +33,5 @@ export class AnalyzerInteractionsEditorComponent implements ICellEditorAngularCo
 
   isPopup(): boolean {
     return true;
-  }
-
-  onChartTypeChange(e) {
-    console.log('e', e)
-  }
-
-  onChartAxisChange(e) {
-    console.log('e', e)
   }
 }
