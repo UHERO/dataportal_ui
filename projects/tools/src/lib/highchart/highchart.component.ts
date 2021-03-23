@@ -144,7 +144,7 @@ export class HighchartComponent implements OnChanges {
     const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const currentFreq = seriesData.frequencyShort;
     const { start, end } = seriesData.categoryDisplay;
-    const { percent, title, unitsLabelShort, displayName } = seriesData;
+    const { percent, title, unitsLabelShort, displayName, indexDisplayName } = seriesData;
     const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, chartStart, chartEnd, currentFreq, this.defaultRange);
     const decimals = seriesData.decimals || 1;
     let series0 = seriesData.categoryDisplay.chartData.series0;
@@ -158,10 +158,12 @@ export class HighchartComponent implements OnChanges {
     const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, currentFreq, endDate);
     const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
+    const indexed = this.indexChecked;
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
-      subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${unitsLabelShort})`;
+      console.log('this', this)
+      subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${this.indexChecked ? 'Index' : unitsLabelShort})`;
       subtitleText += s1 ?
       `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
         dateLabel;
@@ -261,7 +263,7 @@ export class HighchartComponent implements OnChanges {
             let label = name + formattedValue;
             const pseudo = ' Pseudo History ';
             if (point.series.name === 'level') {
-              label += ` (${unitsLabelShort}) <br />`;
+              label += ` (${indexed ? 'Index' : unitsLabelShort}) <br />`;
             }
             if (pseudoZones.length) {
               pseudoZones.forEach((zone) => {
@@ -282,7 +284,8 @@ export class HighchartComponent implements OnChanges {
           return labelString;
         };
         if (this.x >= startDate && this.x <= endDate) {
-          let s = `<b>${displayName}</b><br>`;
+          console.log('displayName', displayName)
+          let s = `<b>${indexed ? indexDisplayName : displayName}</b><br>`;
           // Get Quarter or Month for Q/M frequencies
           s = s + formatDate(this.x, currentFreq);
           // Add year

@@ -6,18 +6,18 @@
         [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'" [name]="tooltipName" [units]="tooltipUnits"
         [geography]="tooltipGeo" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="minDate"
         [endDate]="maxDate" [y0]="y0" [y1]="y1"></lib-share-link>
-      <label class="form-check-inline">
-        <input type="checkbox" (change)="indexActive($event)" [checked]="indexSeries">Index
-      </label>
       <button type="button" class="btn btn-sm btn-outline-secondary rm-analyzer-series-btn"
         (click)="removeAllAnalyzerSeries()">
         Remove All Series
       </button>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleAnalyzerDisplay()"><span
+      <button type="button" class="btn btn-sm btn-outline-secondary compare-btn" (click)="toggleAnalyzerDisplay()"><span
           class="analyzer-more material-icons">
           {{displayCompare ? 'view_comfy' : 'settings'}}
         </span>{{displayCompare ? 'Grid' : 'Compare'}}
       </button>
+      <label class="form-check-inline">
+        <input type="checkbox" (change)="indexActive($event)" [checked]="indexSeries">Index
+      </label>
       <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
         [dates]="data.analyzerTableDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
         [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true"

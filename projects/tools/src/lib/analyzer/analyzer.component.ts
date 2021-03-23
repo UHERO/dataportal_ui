@@ -183,11 +183,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   getAnalyzerParams(start, end, seriesUrl) {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
-    console.log('GET ANALYZER PARAMS', this.analyzerSeries)
     if (this.analyzerSeries) {
       const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
       this.analyzerSeries.forEach((series, index) => {
-        console.log('params series', series.id)
         aSeries += index === 0 ? series.id : `-${series.id}`;
       });
       chartSeries.forEach((series, index) => {
@@ -225,6 +223,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       });
       this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => {return{id: s}}))
     });
+    this.analyzerService.analyzerSeriesCompareSource.next([]);
   }
 
   removeAllAnalyzerSeries() {

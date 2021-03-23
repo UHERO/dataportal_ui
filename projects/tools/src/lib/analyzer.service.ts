@@ -71,7 +71,8 @@ export class AnalyzerService {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
     const indexed = this.analyzerData.indexed;
-    const baseYear =this.analyzerData.baseYear;
+    const baseYear = this.analyzerData.baseYear;
+    console.log('ADD TO COMPARE DATA', this.analyzerData)
     currentCompare.push({
       className: series.id,
       name: indexed ? series.indexDisplayName : series.chartDisplayName,
@@ -79,6 +80,7 @@ export class AnalyzerService {
       data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       levelData: series.chartData.level,
       yAxis: indexed ? `Index (${baseYear})-${series.selectedYAxis}` : `${series.unitsLabelShort}-${series.selectedYAxis}`,
+      yAxisText: indexed ? `Index (${baseYear})` : `${series.unitsLabelShort}`,
       yAxisSide: series.selectedYAxis,
       type: series.selectedChartType,
       decimals: series.decimals,
@@ -93,6 +95,7 @@ export class AnalyzerService {
         }
       },
       observations: series.observations,
+      indexBaseYear: baseYear,
       unitsLabelShort: series.unitsLabelShort,
       seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
       dataGrouping: {
@@ -146,6 +149,8 @@ export class AnalyzerService {
     if (currentCompareSeries) {
       currentCompareSeries.forEach((s) => {
         s.data = index ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
+        s.yAxisText = index ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
+        s.inndexBaseYear = baseYear;
       });
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
@@ -162,8 +167,9 @@ export class AnalyzerService {
   }
 
   getAnalyzerData(aSeries, noCache: boolean, y0Series: string, y1Series: string) {
+    console.log('GET ANALYZER DATA')
     this.analyzerData.analyzerSeries = [];
-    this.analyzerData = this.resetAnalyzerData();
+    //this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;

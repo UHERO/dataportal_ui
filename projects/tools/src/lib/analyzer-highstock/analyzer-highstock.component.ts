@@ -106,16 +106,16 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
         console.log('AXES', axes);
         console.log('S', s)
-        if (axes.findIndex(a => a.id === `${s.unitsLabelShort}-${s.yAxisSide}`) === -1) {
+        if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
           axes.push({
             labels: {
               formatter() {
                 return Highcharts.numberFormat(this.value, 2, '.', ',');
               }
             },
-            id: `${s.unitsLabelShort}-${s.yAxisSide}`,
+            id: `${s.yAxis}`,
             title: {
-              text: s.unitsLabelShort // this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.unitsLabelShort : null
+              text: s.yAxisText // this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.unitsLabelShort : null
             },
             opposite: s.yAxisSide === 'left' ? false : true, //index === 0 ? false : true,
             minPadding: 0,
