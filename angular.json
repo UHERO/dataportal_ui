@@ -68,7 +68,9 @@
                   "replace": "projects/uhero/src/environments/environment.ts",
                   "with": "projects/uhero/src/environments/environment.staging.ts"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/uhero/ngsw-config.json"
             },
             "production": {
               "fileReplacements": [
