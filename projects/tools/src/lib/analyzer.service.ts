@@ -45,18 +45,6 @@ export class AnalyzerService {
 
   constructor(private apiService: ApiService, private helperService: HelperService) { }
 
-  checkSeriesUnits(chartSeries, units) {
-    // List of units for series in analyzer chart
-    const allUnits = chartSeries.map(series => series.seriesDetail.unitsLabelShort);
-    const uniqueUnits = allUnits.filter((unit, index, u) => u.indexOf(unit) === index);
-    if (uniqueUnits.length === 2) {
-      // If two different units are already in use, check if the current series unit is in the list
-      const unitsExist = chartSeries.find(cSeries => cSeries.seriesDetail.unitsLabelShort === units);
-      return unitsExist ? true : false;
-    }
-    return uniqueUnits.length < 2 ? true : false;
-  }
-
   checkAnalyzer(seriesInfo) {
     const analyzeSeries = this.analyzerSeriesSource.value.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
@@ -150,19 +138,22 @@ export class AnalyzerService {
       currentCompareSeries.forEach((s) => {
         s.data = index ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
         s.yAxisText = index ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
-        s.inndexBaseYear = baseYear;
+        s.indexBaseYear = baseYear;
       });
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
   }
 
-  toggleAnalyzerSeries(seriesID) {
-    const currentValue = this.analyzerSeriesSource.value;
-    const seriesExist = currentValue.find(s => s.id === seriesID);
-    let updatedValue;
-    updatedValue = seriesExist ?
-      currentValue.filter(s => s.id !== seriesID) : [...currentValue, { id: seriesID }];
-    this.analyzerSeriesSource.next(updatedValue);
+  addToAnalzyer(seriesID: number) {
+    let currentValue = this.analyzerSeriesSource.value;
+    currentValue = [...currentValue, { id: seriesID }];
+    this.analyzerSeriesSource.next(currentValue);
+    this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
+  }
+
+  removeFromAnalyzer(seriesID: number) {
+    let currentValue = this.analyzerSeriesSource.value;
+    this.analyzerSeriesSource.next(currentValue.filter(s => s.id !== seriesID));
     this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
@@ -186,12 +177,40 @@ export class AnalyzerService {
           this.analyzerData.analyzerSeries.push(seriesData);  
         }
       });
+      /* TODO: Move into separate function */
+      /* const currentCompare = this.analyzerSeriesCompareSource.value;
+      if (!currentCompare.length) {
+        console.log(this.analyzerData.analyzerSeries[0])
+        this.addToComparisonChart(this.analyzerData.analyzerSeries[0]);
+        this.analyzerData.analyzerSeries[0].compare = true;
+        if (this.analyzerData.analyzerSeries.length > 1) {
+          this.addToComparisonChart(this.analyzerData.analyzerSeries[1]);
+          this.analyzerData.analyzerSeries[1].compare = true;
+        }
+      } */
+      this.setDefaultCompareSeries();
+      /* *********** */
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
+  }
+
+  setDefaultCompareSeries() {
+    let currentCompare = this.analyzerSeriesCompareSource.value;
+    let i = 0;
+    while ((currentCompare.length < 2 && this.analyzerData.analyzerSeries.length > 1) || !currentCompare.length) {
+      const aSeries = this.analyzerData.analyzerSeries[i]
+      const compareSeries = currentCompare.find(s => s.className === aSeries.id);
+      if (!compareSeries) {
+        this.addToComparisonChart(aSeries);
+        aSeries.compare = true;  
+      }
+      i++;
+      currentCompare = this.analyzerSeriesCompareSource.value; 
+    }
   }
 
   removeAll() {

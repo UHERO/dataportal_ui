@@ -20,9 +20,9 @@
 </p>
 <p *ngIf="inCompareChart">
   <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
-    (click)="removeFromCompare(seriesInfo)">stacked_line_chart</i> Remove From Comparison
+    (click)="removeFromCompare(seriesInfo)">assessment</i> Remove From Comparison
 </p>
 <p *ngIf="!inCompareChart">
   <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
-    (click)="addToCompare(seriesInfo)">stacked_line_chart</i> Add To Comparison
+    (click)="addToCompare(seriesInfo)">add_chart</i> Add To Comparison
 </p>

@@ -7,24 +7,20 @@
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
 				queryParamsHandling='merge' *ngIf="serie.id">
 				<lib-highchart [minValue]="minValue" [maxValue]="maxValue" [portalSettings]="portalSettings"
-					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [indexChecked]="indexChecked"></lib-highchart>
+					[chartStart]="chartStart" [chartEnd]="chartEnd" [seriesData]="serie" [indexChecked]="indexChecked">
+				</lib-highchart>
 			</a>
 			<ng-template ngIf [ngIf]="!analyzerView">
 				<i *ngIf="!serie.analyze" title="Add to Analyzer" [class.add-analyze-button]="!serie.analyze"
-					class="material-icons analyzer-toggle" (click)="updateAnalyze(serie)">star_border</i>
+					class="material-icons analyzer-toggle" (click)="addToAnalyzer(serie)">star_border</i>
 				<i *ngIf="serie.analyze" title="Remove from Analyzer" [class.remove-analyze-button]="serie.analyze"
-					class="material-icons analyzer-toggle remove-button" (click)="updateAnalyze(serie)">star</i>
+					class="material-icons analyzer-toggle remove-button" (click)="removeFromAnalyzer(serie)">star</i>
 			</ng-template>
 			<ng-template ngIf [ngIf]="analyzerView">
-					<button class="btn analyzer-dropdown analyzer-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-						aria-haspopup="true" aria-expanded="false">
-						<span class="analyzer-more material-icons">
-							settings
-						</span>
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-						<lib-analyzer-compare-options [seriesInfo]="serie" (click)="keepMenuOpen($event)"></lib-analyzer-compare-options>
-					</div>
+				<i *ngIf="!serie.compare" title="Add to Comparison" [class.add-compare-button]="!serie.compare"
+					class="material-icons analyzer-toggle" (click)="addCompare(serie)">add_chart</i>
+				<i *ngIf="serie.compare" title="Remove from Compaison" [class.remove-compare-button]="serie.compare"
+					class="material-icons analyzer-toggle remove-button" (click)="removeCompare(serie)">assessment</i>
 			</ng-template>
 		</div>
 	</ng-template>

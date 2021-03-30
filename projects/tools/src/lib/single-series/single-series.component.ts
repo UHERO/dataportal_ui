@@ -149,11 +149,16 @@ export class SingleSeriesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateAnalyze(seriesInfo) {
-    seriesInfo.analyze = !seriesInfo.analyze;
-    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id)
+  addToAnalyzer(series) {
+    series.analyze = true;
+    this.analyzerService.addToAnalzyer(series.id);
   }
 
+  removeFromAnalyzer(series) {
+    series.analyze = false;
+    this.analyzerService.removeFromAnalyzer(series.id);
+  }
+  
   updateChartExtremes(e) {
     this.chartStart = e.minDate;
     this.chartEnd = e.endOfSample ? null : e.maxDate;

@@ -162,7 +162,6 @@ export class HighchartComponent implements OnChanges {
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
-      console.log('this', this)
       subtitleText += `${Highcharts.numberFormat(point0.y, decimals, '.', ',')} <br> (${this.indexChecked ? 'Index' : unitsLabelShort})`;
       subtitleText += s1 ?
       `${this.formatTransformLabel(s1.name, percent, currentFreq)}<br>${Highcharts.numberFormat(point1.y, decimals, '.', ',')}<br>${dateLabel}` :
@@ -284,7 +283,6 @@ export class HighchartComponent implements OnChanges {
           return labelString;
         };
         if (this.x >= startDate && this.x <= endDate) {
-          console.log('displayName', displayName)
           let s = `<b>${indexed ? indexDisplayName : displayName}</b><br>`;
           // Get Quarter or Month for Q/M frequencies
           s = s + formatDate(this.x, currentFreq);

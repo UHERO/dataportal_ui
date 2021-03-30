@@ -167,16 +167,27 @@ export class CategoryChartsComponent implements OnChanges {
     return series.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);
   }
 
-  updateAnalyze(series) {
-    series.analyze = !series.analyze;
-    this.analyzerService.toggleAnalyzerSeries(series.id);
+  addToAnalyzer(series) {
+    series.analyze = true;
+    this.analyzerService.addToAnalzyer(series.id);
+  }
+
+  removeFromAnalyzer(series) {
+    series.analyze = false;
+    this.analyzerService.removeFromAnalyzer(series.id);
+  }
+
+  addCompare(series) {
+    series.compare = true;
+    this.analyzerService.addToComparisonChart(series);
+  }
+
+  removeCompare(series) {
+    series.compare = false;
+    this.analyzerService.removeFromComparisonChart(series.id);
   }
 
   trackBySeries(index, item) {
     return item.id;
-  }
-
-  keepMenuOpen(e) {
-    e.stopPropagation();
   }
 }

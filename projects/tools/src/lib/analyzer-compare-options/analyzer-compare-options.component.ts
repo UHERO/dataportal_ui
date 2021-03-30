@@ -22,7 +22,6 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('options', this.analyzerSeries)
     this.inCompareChart = this.compareSeries.findIndex(s => s.className === this.seriesInfo.id) > -1;
   }
 
@@ -32,7 +31,7 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
 
   removeFromAnalyzer(seriesInfo) {
     this.removeFromCompare(seriesInfo);
-    this.analyzerService.toggleAnalyzerSeries(seriesInfo.id);
+    this.analyzerService.removeFromAnalyzer(seriesInfo.id);
   }
 
   onChartTypeChange(e, seriesInfo) {
