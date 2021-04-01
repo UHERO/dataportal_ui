@@ -24,6 +24,7 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() dateWrapper;
   @Input() analyzerView: boolean;
   @Input() indexChecked;
+  @Input() indexBaseYear;
   @Output() updateURLFragment = new EventEmitter();
   minValue;
   maxValue;
@@ -40,6 +41,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
+          console.log('BASE YEAR', this.indexBaseYear)
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
@@ -58,27 +60,6 @@ export class CategoryChartsComponent implements OnChanges {
         this.minValue = this.findMin(this.data, start, end);
         this.maxValue = this.findMax(this.data, start, end);
       }
-    }
-  }
-
-  formatGridViewData = (series) => {
-    const levelDates = series.observations.transformationResults[0].dates;
-    const obsStart = series.observations.observationStart;
-    const obsEnd = series.observations.observationEnd;
-    const dateArray = [];
-    if (levelDates) {
-      const pseudoZones = [];
-      const level = series.observations.transformationResults[0].values;
-      if (level.pseudoHistory) {
-        level.pseudoHistory.forEach((obs, index) => {
-          if (obs && !level.pseudoHistory[index + 1]) {
-            pseudoZones.push({ value: Date.parse(level.dates[index]), dashStyle: 'dash', color: '#7CB5EC', className: 'pseudoHistory' });
-          }
-        });
-      }
-      // Use to format dates for table
-      this.helperService.createDateArray(obsStart, obsEnd, series.currentFreq.freq, dateArray);
-      const levelChartData = this.createSeriesChartData(series.observations.transformationResults[0], dateArray);
     }
   }
 
@@ -108,7 +89,7 @@ export class CategoryChartsComponent implements OnChanges {
     const level = transformations.level;
     if (this.analyzerView && this.indexChecked) {
       series0 = { values: 
-        this.analyzerService.getIndexedValues(level.values, level.dates, this.analyzerService.analyzerData.baseYear),
+        this.analyzerService.getIndexedValues(level.values, level.dates, this.indexBaseYear),
         start
       };
     }

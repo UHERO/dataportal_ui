@@ -77,7 +77,9 @@ export class EmbedGraphComponent implements OnInit {
       y1Series: null,
       requestComplete: false,
       indexed: false,
-      baseYear: null
+      baseYear: null,
+      minDate: null,
+      maxDate: null
     };
   }
 

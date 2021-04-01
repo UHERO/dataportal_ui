@@ -24,17 +24,17 @@
       <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
         [dates]="data.analyzerTableDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
         [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true"
-        [chartStart]="data.analyzerTableDates[0].date" [indexChecked]="indexSeries">
+        [chartStart]="data.analyzerTableDates[0].date" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
       </lib-category-charts>
       <i *ngIf="!data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
       <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-        [allDates]="data.analyzerTableDates" [series]="data.analyzerSeries" [start]="startDate" [end]="endDate"
+        [allDates]="data.analyzerTableDates" [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate"
         [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries"
         (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)"></lib-analyzer-highstock>
       <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="displayCompare ? minDate : null"
         [maxDate]="displayCompare ? maxDate : null" [yoyChecked]="tableYoy" [ytdChecked]="tableYtd"
         [c5maChecked]="tableC5ma" [indexChecked]="indexSeries" [series]="data.analyzerSeries"
-        [allTableDates]="data.analyzerTableDates" (tableTransform)="checkTransforms($event)"></lib-analyzer-table>
+        [allTableDates]="data.analyzerTableDates" [indexBaseYear]="data.baseYear" (tableTransform)="checkTransforms($event)"></lib-analyzer-table>
     </ng-template>
   </ng-container>
 </div>

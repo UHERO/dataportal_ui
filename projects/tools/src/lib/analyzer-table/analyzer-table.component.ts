@@ -24,7 +24,8 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() yoyChecked;
   @Input() ytdChecked;
   @Input() c5maChecked;
-  @Input() indexChecked;
+  @Input() indexChecked: boolean;
+  @Input() indexBaseYear: string;
   portalSettings;
   missingSummaryStat = false;
   tableDates;
@@ -67,8 +68,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log('minDate', this.minDate);
-    console.log('maxDate', this.maxDate)
     const tableDateCols = this.analyzerService.createAnalyzerTableDates(this.series, this.minDate, this.maxDate);
     this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
@@ -77,12 +76,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     // Check if the summary statistics for a series has NA values
     this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
-    const indexedBaseYear = this.analyzerService.getIndexBaseYear(this.series, this.minDate);
     this.series.forEach((series) => {
       const transformations = this.helperService.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
-      const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, indexedBaseYear);
+      // const indexedBaseYear = this.analyzerService.analyzerData.baseYear;
+      const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
       this.summaryRows.push(summaryStats)
       this.rows.push(seriesData);
       if (this.yoyChecked && yoy) {
@@ -190,7 +189,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const seriesInChart = $('.highcharts-series.' + series.id);
     const { dates, values } = level;
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
-    const baseYear = this.analyzerService.getIndexBaseYear(this.series, minDate);
+    const baseYear = this.indexBaseYear
     const indexedValues = this.analyzerService.getIndexedValues(values, dates, baseYear);
     const seriesData = {
       series: this.indexChecked ? series.indexDisplayName : series.displayName,

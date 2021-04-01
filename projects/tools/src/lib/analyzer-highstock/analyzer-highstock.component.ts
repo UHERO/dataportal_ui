@@ -76,6 +76,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
+      console.log('HIGHSTOCK COMPARE SERIES', series)
       const chartSeries = [...series, {
         className: 'navigator',
         data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
@@ -104,8 +105,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visible: true,
       }];
       this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
-        console.log('AXES', axes);
-        console.log('S', s)
         if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
           axes.push({
             labels: {
@@ -130,7 +129,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         }
         return axes
       }, []);
-      console.log('YAXIS', this.chartOptions.yAxis)
+      if (this.chartOptions.xAxis) {
+        console.log('XAXIS');
+        console.log('START', this.start)
+        this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      }
+      if (this.chartOptions.rangeSelector) {
+        this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 3 : null
+      }
+      //console.log('CHART OPTIONS SERIES', chartSeries)
       this.chartOptions.series = chartSeries;
       this.updateChart = true;
       if (this.chartObject) {
@@ -140,26 +147,14 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    console.log('ON CHANGES', this.allDates)
-    /* if (this.series.length && this.chartObject) {
-      this.chartObject._indexed = this.indexChecked;
-      // const yAxes = this.setYAxes(this.series, '', '');
-      // this.chartOptions.yAxis = yAxes;
-      // this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
-      this.chartOptions.rangeSelector.selected = null;
-      this.chartOptions.xAxis = null;
-      this.updateChart = true;
-    } */
-    console.log('INDEX CHECKED', this.indexChecked);
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const navigatorOptions = {
         frequency: this.analyzerService.checkFrequencies(this.series),
-        dateStart: this.allDates[0].date,
+        //dateStart: this.allDates[0].date,
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
       this.initChart(this.series, this.portalSettings, buttons, navigatorOptions);
-      console.log('HIGHSTOCK SERIES', this.series)
     }
   }
 
@@ -182,6 +177,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   initChart = (series, portalSettings, buttons, navigatorOptions) => {
     const startDate = this.start ? this.start : null;
+    console.log('INIT CHART start date', startDate)
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
@@ -198,6 +194,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
+    const comparisonSeries = this.compareSeries;
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -342,7 +339,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
-              const indexBaseYear = getIndexBaseYear(series, this._extremes.min);
+              const indexBaseYear = getIndexBaseYear(comparisonSeries, this._extremes.min);
               this.series.forEach((serie) => {
                 if (serie.userOptions.className !== 'navigator') {
                   serie.update({

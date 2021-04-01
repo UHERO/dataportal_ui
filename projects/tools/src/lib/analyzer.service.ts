@@ -26,6 +26,8 @@ export class AnalyzerService {
     analyzerFrequency: {},
     y0Series: null,
     y1Series: null,
+    minDate: null,
+    maxDate: null,
     requestComplete: false,
     indexed: false,
     baseYear: null
@@ -58,9 +60,19 @@ export class AnalyzerService {
   addToComparisonChart(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
+    this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
     const indexed = this.analyzerData.indexed;
     const baseYear = this.analyzerData.baseYear;
-    console.log('ADD TO COMPARE DATA', this.analyzerData)
+    if (currentCompare.length) {
+      currentCompare.forEach((compareSeries) => {
+        compareSeries.data = indexed ?
+          this.getChartIndexedValues(compareSeries.levelData, baseYear) : compareSeries.levelData;
+        compareSeries.yAxis = indexed ?
+          `Index (${baseYear})-${compareSeries.seriesInfo.selectedYAxis}` : `${compareSeries.unitsLabelShort}-${compareSeries.seriesInfo.selectedYAxis}`;
+        compareSeries.yAxisText = indexed ?
+          `Index (${baseYear})` : `${compareSeries.unitsLabelShort}`;
+      });
+    }
     currentCompare.push({
       className: series.id,
       name: indexed ? series.indexDisplayName : series.chartDisplayName,
@@ -77,13 +89,13 @@ export class AnalyzerService {
       includeInDataExport: true,
       showInLegend: true,
       showInNavigator: false,
+      seriesInfo: series,
       events: {
         legendItemClick() {
           return false;
         }
       },
       observations: series.observations,
-      indexBaseYear: baseYear,
       unitsLabelShort: series.unitsLabelShort,
       seasonallyAdjusted: series.seasonalAdjustment === 'seasonally_adjusted',
       dataGrouping: {
@@ -112,8 +124,11 @@ export class AnalyzerService {
   updateCompareSeriesAxis(seriesInfo, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const series = currentCompare.find(s => s.className === seriesInfo.id);
+    const indexed = this.analyzerData.indexed;
+    const baseYear = this.analyzerData.baseYear;
     series.yAxisSide = axis;
-    series.yAxis = `${seriesInfo.unitsLabelShort}-${axis}`
+    series.yAxis = indexed ? `Index (${baseYear})-${axis}` : `${series.unitsLabelShort}-${axis}`;
+    series.yAxisText = indexed ? `Index (${baseYear})` : `${series.seriesInfo.unitsLabelShort}`;
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -126,19 +141,24 @@ export class AnalyzerService {
   removeFromComparisonChart(id: number) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const newCompare = currentCompare.filter(s => s.className !== id);
+    console.log('REMOVE', currentCompare)
+    console.log('REMOVE NEW COMPARE', newCompare)
     this.analyzerSeriesCompareSource.next(newCompare);
   }
 
   toggleIndexValues(index, minYear) {
     this.analyzerData.indexed = index;
     const currentCompareSeries = this.analyzerSeriesCompareSource.value;
-    const baseYear = this.getIndexBaseYear(this.analyzerData.analyzerSeries, minYear);
+    const baseYear = this.getIndexBaseYear(currentCompareSeries, minYear);
     this.analyzerData.baseYear = baseYear;
+    console.log('TOGGLE INDEX BASE YEAR', baseYear);
     if (currentCompareSeries) {
+      console.log('currentCompareSeries', currentCompareSeries)
       currentCompareSeries.forEach((s) => {
         s.data = index ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
+        s.yAxis = index ? `Index (${baseYear})-${s.seriesInfo.selectedYAxis}` : `${s.unitsLabelShort}-${s.seriesInfo.selectedYAxis}`;
         s.yAxisText = index ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
-        s.indexBaseYear = baseYear;
+        console.log('compare series', s)
       });
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
@@ -177,20 +197,10 @@ export class AnalyzerService {
           this.analyzerData.analyzerSeries.push(seriesData);  
         }
       });
-      /* TODO: Move into separate function */
-      /* const currentCompare = this.analyzerSeriesCompareSource.value;
-      if (!currentCompare.length) {
-        console.log(this.analyzerData.analyzerSeries[0])
-        this.addToComparisonChart(this.analyzerData.analyzerSeries[0]);
-        this.analyzerData.analyzerSeries[0].compare = true;
-        if (this.analyzerData.analyzerSeries.length > 1) {
-          this.addToComparisonChart(this.analyzerData.analyzerSeries[1]);
-          this.analyzerData.analyzerSeries[1].compare = true;
-        }
-      } */
+      // On load analyzer should add 1 (or 2 if available) series to comparison chart
       this.setDefaultCompareSeries();
-      /* *********** */
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
+      this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, null);
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
@@ -230,7 +240,9 @@ export class AnalyzerService {
       y1Series: null,
       requestComplete: false,
       indexed: false,
-      baseYear: null
+      baseYear: null,
+      minDate: null,
+      maxDate: null,  
     };
   }
 
@@ -391,10 +403,10 @@ export class AnalyzerService {
 
   getIndexBaseYear = (series: any, start: string) => {
     const maxObsStartDate = series.reduce((prev, current) => {
-      const prevObsStart = prev.observations.observationStart;
-      const currentObsStart = current.observations.observationStart;
+      const prevObsStart = prev.seriesInfo.observations.observationStart;
+      const currentObsStart = current.seriesInfo.observations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
-    }).observations.observationStart;
-    return maxObsStartDate > start ? maxObsStartDate : !start ? maxObsStartDate : start;
+    }).seriesInfo.observations.observationStart;
+    return (maxObsStartDate > start || !start) ? maxObsStartDate : start;
   }
 }

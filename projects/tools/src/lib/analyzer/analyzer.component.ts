@@ -128,6 +128,8 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   setTableDates(e) {
     this.minDate = e.minDate;
     this.maxDate = e.maxDate;
+    this.analyzerService.analyzerData.minDate = e.minDate;
+    this.analyzerService.analyzerData.maxDate = e.maxDate;
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
@@ -159,7 +161,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       this.y0 = null;
       this.y1 = null;
     }
-    this.analyzerService.toggleIndexValues(e.target.checked, this.minDate)
+    this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate)
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
