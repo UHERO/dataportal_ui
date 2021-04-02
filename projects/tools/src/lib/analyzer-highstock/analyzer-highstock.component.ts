@@ -120,9 +120,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             maxPadding: 0,
             minTickInterval: 0.01,
             showEmpty: false,
-            yAxisSide: s.yAxisSide
+            yAxisSide: s.yAxisSide,
+            min: null,
+            max: null
           });
         }
+        console.log('axes', axes)
         return axes
       }, []);
       this.chartOptions.series = chartSeries;
@@ -154,6 +157,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
+  }
+
+  changeYAxisMin(e, axis) {
+    console.log('CHANGE MIN', e);
+    axis.min = +e.target.value.replace(',', '');
+    this.updateChart = true;
+
+  }
+
+  changeYAxisMax(e, axis) {
+    console.log('CHANGE MAX', e);
+    axis.max = +e.target.value.replace(',', '');
+    this.updateChart = true;
   }
 
   formatChartButtons(buttons: Array<any>) {
