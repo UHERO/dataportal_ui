@@ -76,7 +76,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
-      console.log('HIGHSTOCK COMPARE SERIES', series)
       const chartSeries = [...series, {
         className: 'navigator',
         data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
@@ -114,30 +113,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             },
             id: `${s.yAxis}`,
             title: {
-              text: s.yAxisText // this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.unitsLabelShort : null
+              text: s.yAxisText
             },
-            opposite: s.yAxisSide === 'left' ? false : true, //index === 0 ? false : true,
+            opposite: s.yAxisSide === 'left' ? false : true,
             minPadding: 0,
             maxPadding: 0,
             minTickInterval: 0.01,
             showEmpty: false,
             yAxisSide: s.yAxisSide
-            //series: axisIds[axis],
-            //visible: visibleSeries ? true : false
-            //visible: true
-          })
+          });
         }
         return axes
       }, []);
-      if (this.chartOptions.xAxis) {
-        console.log('XAXIS');
-        console.log('START', this.start)
-        this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
-      }
-      if (this.chartOptions.rangeSelector) {
-        this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 3 : null
-      }
-      //console.log('CHART OPTIONS SERIES', chartSeries)
       this.chartOptions.series = chartSeries;
       this.updateChart = true;
       if (this.chartObject) {
@@ -147,11 +134,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
+    // prevent date ranges from resetting when adding a series/indexing
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+    }
+    if (this.chartOptions.rangeSelector) {
+      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 3 : null
+    }
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const navigatorOptions = {
         frequency: this.analyzerService.checkFrequencies(this.series),
-        //dateStart: this.allDates[0].date,
         numberOfObservations: this.filterDatesForNavigator(this.allDates).length
       };
       this.initChart(this.series, this.portalSettings, buttons, navigatorOptions);
@@ -177,7 +171,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   initChart = (series, portalSettings, buttons, navigatorOptions) => {
     const startDate = this.start ? this.start : null;
-    console.log('INIT CHART start date', startDate)
     const endDate = this.end ? this.end : null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
@@ -340,10 +333,20 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           if (this._extremes) {
             if (this._indexed) {
               const indexBaseYear = getIndexBaseYear(comparisonSeries, this._extremes.min);
+              this.chart.yAxis.forEach((axis) => {
+                if (axis.userOptions.title.text && axis.userOptions.title.text.includes('Index')) {
+                  axis.update({
+                    title: {
+                      text: `Index (${indexBaseYear})`
+                    }
+                  });
+                }
+              });
               this.series.forEach((serie) => {
                 if (serie.userOptions.className !== 'navigator') {
                   serie.update({
-                    data: getIndexedValues(serie.userOptions.levelData, indexBaseYear)
+                    data: getIndexedValues(serie.userOptions.levelData, indexBaseYear),
+                    yAxisText: `Index (${indexBaseYear})`
                   });
                 }
               });

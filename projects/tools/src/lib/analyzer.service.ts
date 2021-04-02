@@ -63,15 +63,8 @@ export class AnalyzerService {
     this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
     const indexed = this.analyzerData.indexed;
     const baseYear = this.analyzerData.baseYear;
-    if (currentCompare.length) {
-      currentCompare.forEach((compareSeries) => {
-        compareSeries.data = indexed ?
-          this.getChartIndexedValues(compareSeries.levelData, baseYear) : compareSeries.levelData;
-        compareSeries.yAxis = indexed ?
-          `Index (${baseYear})-${compareSeries.seriesInfo.selectedYAxis}` : `${compareSeries.unitsLabelShort}-${compareSeries.seriesInfo.selectedYAxis}`;
-        compareSeries.yAxisText = indexed ?
-          `Index (${baseYear})` : `${compareSeries.unitsLabelShort}`;
-      });
+    if (currentCompare.length && indexed) {
+      this.updateCompareSeriesDataAndAxes(currentCompare);
     }
     currentCompare.push({
       className: series.id,
@@ -123,6 +116,7 @@ export class AnalyzerService {
 
   updateCompareSeriesAxis(seriesInfo, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
+    this.updateCompareSeriesDataAndAxes(currentCompare);
     const series = currentCompare.find(s => s.className === seriesInfo.id);
     const indexed = this.analyzerData.indexed;
     const baseYear = this.analyzerData.baseYear;
@@ -141,8 +135,11 @@ export class AnalyzerService {
   removeFromComparisonChart(id: number) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const newCompare = currentCompare.filter(s => s.className !== id);
-    console.log('REMOVE', currentCompare)
-    console.log('REMOVE NEW COMPARE', newCompare)
+    this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
+    const indexed = this.analyzerData.indexed;
+    if (newCompare.length && indexed) {
+      this.updateCompareSeriesDataAndAxes(newCompare);
+    }
     this.analyzerSeriesCompareSource.next(newCompare);
   }
 
@@ -151,17 +148,20 @@ export class AnalyzerService {
     const currentCompareSeries = this.analyzerSeriesCompareSource.value;
     const baseYear = this.getIndexBaseYear(currentCompareSeries, minYear);
     this.analyzerData.baseYear = baseYear;
-    console.log('TOGGLE INDEX BASE YEAR', baseYear);
     if (currentCompareSeries) {
-      console.log('currentCompareSeries', currentCompareSeries)
-      currentCompareSeries.forEach((s) => {
-        s.data = index ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
-        s.yAxis = index ? `Index (${baseYear})-${s.seriesInfo.selectedYAxis}` : `${s.unitsLabelShort}-${s.seriesInfo.selectedYAxis}`;
-        s.yAxisText = index ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
-        console.log('compare series', s)
-      });
+      this.updateCompareSeriesDataAndAxes(currentCompareSeries);
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
+  }
+
+  updateCompareSeriesDataAndAxes(series: Array<any>) {
+    const indexed = this.analyzerData.indexed;
+    const baseYear = this.analyzerData.baseYear;
+    series.forEach((s) => {
+      s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
+      s.yAxis = indexed ? `Index (${baseYear})-${s.seriesInfo.selectedYAxis}` : `${s.unitsLabelShort}-${s.seriesInfo.selectedYAxis}`;
+      s.yAxisText = indexed ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
+    });
   }
 
   addToAnalzyer(seriesID: number) {
@@ -407,6 +407,7 @@ export class AnalyzerService {
       const currentObsStart = current.seriesInfo.observations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
     }).seriesInfo.observations.observationStart;
-    return (maxObsStartDate > start || !start) ? maxObsStartDate : start;
+    this.analyzerData.baseYear = (maxObsStartDate > start || !start) ? maxObsStartDate : start;
+    return this.analyzerData.baseYear;
   }
 }
