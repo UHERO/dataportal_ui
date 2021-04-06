@@ -160,15 +160,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   changeYAxisMin(e, axis) {
-    console.log('CHANGE MIN', e);
-    axis.min = +e.target.value.replace(',', '');
+    axis.min = e.target.value ? +e.target.value : null;
     this.updateChart = true;
-
   }
 
   changeYAxisMax(e, axis) {
-    console.log('CHANGE MAX', e);
-    axis.max = +e.target.value.replace(',', '');
+    axis.max = e.target.value ? +e.target.value : null;
     this.updateChart = true;
   }
 
@@ -197,7 +194,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth =  (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
+    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
