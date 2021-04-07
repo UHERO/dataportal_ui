@@ -194,7 +194,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         cSeries += index === 0 ? series.id : `-${series.id}`;
       });
     }
-    console.log(aSeries)
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;
     seriesUrl += this.indexSeries ? `&index=${this.indexSeries}` : '';

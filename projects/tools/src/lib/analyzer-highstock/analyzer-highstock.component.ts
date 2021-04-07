@@ -200,7 +200,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
-    const comparisonSeries = this.compareSeries;
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -242,6 +241,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         return this.yAxis.userOptions.opposite ? `${this.name} (right)` : `${this.name} (left)`;
       }
     };
+    // incorrect indexing when using range selector
     this.chartOptions.rangeSelector = {
       selected: !startDate && !endDate ? 3 : null,
       buttons,
@@ -345,7 +345,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
-              const indexBaseYear = getIndexBaseYear(comparisonSeries, this._extremes.min);
+              const compareSeries = this.series.filter(s => s.name !== 'Navigator').map(s => s.userOptions);
+              const indexBaseYear = getIndexBaseYear(compareSeries, this._extremes.min);
               this.chart.yAxis.forEach((axis) => {
                 if (axis.userOptions.title.text && axis.userOptions.title.text.includes('Index')) {
                   axis.update({

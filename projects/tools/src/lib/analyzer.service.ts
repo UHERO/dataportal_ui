@@ -136,6 +136,7 @@ export class AnalyzerService {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const newCompare = currentCompare.filter(s => s.className !== id);
     this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
+    console.log('remove analyzerData', this.analyzerData)
     const indexed = this.analyzerData.indexed;
     if (newCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(newCompare);
@@ -402,11 +403,13 @@ export class AnalyzerService {
   }
 
   getIndexBaseYear = (series: any, start: string) => {
+    console.log('SERIES', series)
     const maxObsStartDate = series.reduce((prev, current) => {
       const prevObsStart = prev.seriesInfo.observations.observationStart;
       const currentObsStart = current.seriesInfo.observations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
     }).seriesInfo.observations.observationStart;
+    console.log('MAXOBSSTARTDATE', maxObsStartDate)
     this.analyzerData.baseYear = (maxObsStartDate > start || !start) ? maxObsStartDate : start;
     return this.analyzerData.baseYear;
   }
