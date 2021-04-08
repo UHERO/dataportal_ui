@@ -210,19 +210,25 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
+    console.log('CHANGE FREQ ANALYZER SERIES', analyzerSeries)
     const siblingsList = analyzerSeries.map((serie) => {
       const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
     });
+    console.log('SIBLINGS LIST', siblingsList)
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((series) => {
+          console.log('SERIES', series)
           if (series.frequencyShort === freq && !siblingIds.includes(series.id)) {
-            siblingIds.push(series.id);
+            const drawInCompare = analyzerSeries.find(s => s.title === series.title).compare === true;
+            siblingIds.push({ id: series.id, compare: drawInCompare });
           }
         });
       });
-      this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => {return{id: s}}))
+      // this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => { return { id: s } }));
+      console.log('SIBINGIDS', siblingIds)
+      this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
     this.analyzerService.analyzerSeriesCompareSource.next([]);
   }

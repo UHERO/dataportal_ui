@@ -59,7 +59,7 @@ export class AnalyzerService {
 
   addToComparisonChart(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    this.analyzerData.analyzerSeries.find(s => s.id === series.id).showInChart = true;
+    this.analyzerData.analyzerSeries.find(s => s.id === series.id).compare = true;
     this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
     const indexed = this.analyzerData.indexed;
     const baseYear = this.analyzerData.baseYear;
@@ -134,9 +134,9 @@ export class AnalyzerService {
 
   removeFromComparisonChart(id: number) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
+    this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
     const newCompare = currentCompare.filter(s => s.className !== id);
     this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
-    console.log('remove analyzerData', this.analyzerData)
     const indexed = this.analyzerData.indexed;
     if (newCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(newCompare);
@@ -195,11 +195,17 @@ export class AnalyzerService {
       series.forEach((s) => {
         if (!this.analyzerData.analyzerSeries.find(series => series.id === s.id)) {
           const seriesData = this.formatSeriesForAnalyzer(s, aSeries);
+          seriesData.compare = aSeries.find(series => series.id === s.id).compare;
           this.analyzerData.analyzerSeries.push(seriesData);  
         }
       });
       // On load analyzer should add 1 (or 2 if available) series to comparison chart
       this.setDefaultCompareSeries();
+      this.analyzerData.analyzerSeries.forEach((s) => {
+        if (s.compare) {
+          this.addToComparisonChart(s);
+        }
+      });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, null);
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
@@ -210,7 +216,7 @@ export class AnalyzerService {
   }
 
   setDefaultCompareSeries() {
-    let currentCompare = this.analyzerSeriesCompareSource.value;
+    /* let currentCompare = this.analyzerSeriesCompareSource.value;
     let i = 0;
     while ((currentCompare.length < 2 && this.analyzerData.analyzerSeries.length > 1) || !currentCompare.length) {
       const aSeries = this.analyzerData.analyzerSeries[i]
@@ -221,6 +227,17 @@ export class AnalyzerService {
       }
       i++;
       currentCompare = this.analyzerSeriesCompareSource.value; 
+    } */
+    let currentCompare = this.analyzerData.analyzerSeries.filter(s => s.compare === true);
+    let i = 0;
+    while ((currentCompare.length < 2 && this.analyzerData.analyzerSeries.length > 1) || !currentCompare.length) {
+      const aSeries = this.analyzerData.analyzerSeries[i];
+      const compareSeries  = currentCompare.find(s => s.id === aSeries.id);
+      if (!compareSeries) {
+        aSeries.compare = true;
+      }
+      i++;
+      currentCompare = this.analyzerData.analyzerSeries.filter(s => s.compare === true);
     }
   }
 
@@ -403,13 +420,11 @@ export class AnalyzerService {
   }
 
   getIndexBaseYear = (series: any, start: string) => {
-    console.log('SERIES', series)
     const maxObsStartDate = series.reduce((prev, current) => {
       const prevObsStart = prev.seriesInfo.observations.observationStart;
       const currentObsStart = current.seriesInfo.observations.observationStart;
       return prevObsStart > currentObsStart ? prev : current;
     }).seriesInfo.observations.observationStart;
-    console.log('MAXOBSSTARTDATE', maxObsStartDate)
     this.analyzerData.baseYear = (maxObsStartDate > start || !start) ? maxObsStartDate : start;
     return this.analyzerData.baseYear;
   }

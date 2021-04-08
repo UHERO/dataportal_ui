@@ -125,13 +125,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             max: null
           });
         }
-        console.log('axes', axes)
         return axes
       }, []);
       this.chartOptions.series = chartSeries;
       this.updateChart = true;
       if (this.chartObject) {
-        this.chartObject.redraw()
+        this.chartObject.redraw();
       }
     });
   }
