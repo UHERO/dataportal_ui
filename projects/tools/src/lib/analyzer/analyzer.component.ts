@@ -210,6 +210,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
+    this.analyzerService.analyzerSeriesCompareSource.next([]);
     console.log('CHANGE FREQ ANALYZER SERIES', analyzerSeries)
     const siblingsList = analyzerSeries.map((serie) => {
       const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
@@ -230,7 +231,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       console.log('SIBINGIDS', siblingIds)
       this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
-    this.analyzerService.analyzerSeriesCompareSource.next([]);
+    //this.analyzerService.analyzerSeriesCompareSource.next([]);
   }
 
   removeAllAnalyzerSeries() {

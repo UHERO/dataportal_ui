@@ -45,7 +45,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartObject;
   indexed: boolean = false;
   compareSeriesSub;
-  compareSeries;
   chartOptions = {} as HighstockObject;
   chartCallback;
   analyzerData;
@@ -75,63 +74,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      this.compareSeries = series;
-      const chartSeries = [...series, {
-        className: 'navigator',
-        data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
-        levelData: [],
-        decimals: null,
-        tooltipName: '',
-        frequency: null,
-        geography: null,
-        yAxisSide: 'right',
-        yAxis: `null-right`,
-        dataGrouping: {
-          enabled: false
-        },
-        showInLegend: false,
-        showInNavigator: true,
-        includeInDataExport: false,
-        name: 'Navigator',
-        events: {
-          legendItemClick() {
-            return false;
-          }
-        },
-        unitsLabelShort: null,
-        seasonallyAdjusted: null,
-        pseudoZones: null,
-        visible: true,
-      }];
-      this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
-        if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
-          axes.push({
-            labels: {
-              formatter() {
-                return Highcharts.numberFormat(this.value, 2, '.', ',');
-              }
-            },
-            id: `${s.yAxis}`,
-            title: {
-              text: s.yAxisText
-            },
-            opposite: s.yAxisSide === 'left' ? false : true,
-            minPadding: 0,
-            maxPadding: 0,
-            minTickInterval: 0.01,
-            showEmpty: false,
-            yAxisSide: s.yAxisSide,
-            min: null,
-            max: null
-          });
-        }
-        return axes
-      }, []);
-      this.chartOptions.series = chartSeries;
-      this.updateChart = true;
-      if (this.chartObject) {
-        this.chartObject.redraw();
-      }
+      this.updateChartData(series);
     });
   }
 
@@ -156,6 +99,65 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
+  }
+
+  updateChartData(series) {
+    const chartSeries = [...series, {
+      className: 'navigator',
+      data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
+      levelData: [],
+      decimals: null,
+      tooltipName: '',
+      frequency: null,
+      geography: null,
+      yAxisSide: 'right',
+      yAxis: `null-right`,
+      dataGrouping: {
+        enabled: false
+      },
+      showInLegend: false,
+      showInNavigator: true,
+      includeInDataExport: false,
+      name: 'Navigator',
+      events: {
+        legendItemClick() {
+          return false;
+        }
+      },
+      unitsLabelShort: null,
+      seasonallyAdjusted: null,
+      pseudoZones: null,
+      visible: true,
+    }];
+    this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+      if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
+        axes.push({
+          labels: {
+            formatter() {
+              return Highcharts.numberFormat(this.value, 2, '.', ',');
+            }
+          },
+          id: `${s.yAxis}`,
+          title: {
+            text: s.yAxisText
+          },
+          opposite: s.yAxisSide === 'left' ? false : true,
+          minPadding: 0,
+          maxPadding: 0,
+          minTickInterval: 0.01,
+          showEmpty: false,
+          yAxisSide: s.yAxisSide,
+          min: null,
+          max: null
+        });
+      }
+      return axes
+    }, []);
+    this.chartOptions.series = chartSeries;
+    if (this.chartObject) {
+      this.chartObject.redraw();
+    }
+    this.updateChart = true;
   }
 
   changeYAxisMin(e, axis) {

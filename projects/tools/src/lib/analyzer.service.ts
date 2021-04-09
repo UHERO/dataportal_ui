@@ -97,6 +97,7 @@ export class AnalyzerService {
       pseudoZones: series.chartData.pseudoZones,
       visible: true
     });
+    console.log('currentCompare', currentCompare)
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -211,6 +212,7 @@ export class AnalyzerService {
       this.analyzerData.y0Series = y0Series ? y0Series.split('-').map(s => +s) : null;
       this.analyzerData.y1Series = y1Series ? y1Series.split('-').map(s => +s) : null;
       this.analyzerData.requestComplete = true;
+      console.log(this.analyzerData)
     });
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
