@@ -142,7 +142,7 @@ export class HighchartComponent implements OnChanges {
   }
 
   drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
-    const { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
+    let { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const currentFreq = seriesData.frequencyShort;
     const { start, end } = seriesData.categoryDisplay;
     const { percent, title, unitsLabelShort, displayName, indexDisplayName } = seriesData;

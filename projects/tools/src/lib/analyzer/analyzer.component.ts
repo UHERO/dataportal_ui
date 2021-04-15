@@ -50,9 +50,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((analyzerSeries) => {
       this.analyzerSeries = analyzerSeries;
       if (analyzerSeries.length) {
-        this.analyzerData = this.analyzerService.getAnalyzerData(this.analyzerSeries, this.noCache, this.y0Series, this.y1Series);
-        this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-        this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+        this.updateAnalyzer(analyzerSeries);
       }
     });
   }
@@ -67,10 +65,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           this.storeUrlChartSeries(params);
         }
         if (params[`start`]) {
-          this.startDate = params[`start`];
+          this.analyzerService.analyzerData.minDate = params[`start`];
         }
         if (params[`end`]) {
-          this.endDate = params[`end`];
+          this.analyzerService.analyzerData.maxDate = params[`end`];
         }
         if (params[`index`]) {
           this.indexSeries = params[`index`];
@@ -104,7 +102,17 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         }
       });
     }
+    if (this.analyzerSeries.length) {
+      this.updateAnalyzer(this.analyzerSeries)
+    }
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
+  }
+
+  updateAnalyzer = (analyzerSeries) => {
+    console.log('y1', this.y1Series)
+    this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.y0Series, this.y1Series);
+    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
+    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   ngOnDestroy() {
@@ -186,7 +194,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
     if (this.analyzerSeries) {
-      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.showInChart);
+      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.compare);
       this.analyzerSeries.forEach((series, index) => {
         aSeries += index === 0 ? series.id : `-${series.id}`;
       });
@@ -211,27 +219,21 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeAnalyzerFrequency(freq, analyzerSeries) {
     const siblingIds = [];
     this.analyzerService.analyzerSeriesCompareSource.next([]);
-    console.log('CHANGE FREQ ANALYZER SERIES', analyzerSeries)
     const siblingsList = analyzerSeries.map((serie) => {
       const nonSeasonal = serie.seasonalAdjustment === 'not_seasonally_adjusted' && freq !== 'A';
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
     });
-    console.log('SIBLINGS LIST', siblingsList)
     forkJoin(siblingsList).subscribe((res: any) => {
       res.forEach((siblings) => {
         siblings.forEach((series) => {
-          console.log('SERIES', series)
           if (series.frequencyShort === freq && !siblingIds.includes(series.id)) {
             const drawInCompare = analyzerSeries.find(s => s.title === series.title).compare === true;
             siblingIds.push({ id: series.id, compare: drawInCompare });
           }
         });
       });
-      // this.analyzerService.updateAnalyzerSeries(siblingIds.map((s) => { return { id: s } }));
-      console.log('SIBINGIDS', siblingIds)
       this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
-    //this.analyzerService.analyzerSeriesCompareSource.next([]);
   }
 
   removeAllAnalyzerSeries() {
@@ -245,5 +247,13 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
+  }
+
+  changeRange(e) {
+    console.log('CHANGE RANGE', e);
+    this.minDate = e.seriesStart;
+    this.maxDate = e.seriesEnd;
+    this.analyzerService.analyzerData.minDate = e.seriesStart;
+    this.analyzerService.analyzerData.maxDate = e.seriesEnd;
   }
 }

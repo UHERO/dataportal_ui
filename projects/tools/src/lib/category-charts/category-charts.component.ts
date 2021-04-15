@@ -41,7 +41,6 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
-          console.log('BASE YEAR', this.indexBaseYear)
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
@@ -77,6 +76,7 @@ export class CategoryChartsComponent implements OnChanges {
   }
 
   formatCategoryChartData = (observations, freq, dates, portalSettings) => {
+    console.log("FREQ", freq)
     const dateArray = [];
     const transformations = this.helperService.getTransformations(observations);
     const { series0Name, series1Name } = portalSettings.highcharts;

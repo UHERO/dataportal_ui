@@ -1,5 +1,5 @@
 <div class="analyzer-view col-xs-12 col-xl-11">
-  <h3>Analyzer</h3>
+  <h2 id="analyzer-header">Analyzer</h2>
   <ng-container *ngIf="analyzerSeries.length">
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
       <lib-freq-selector *ngIf="data.displayFreqSelector" [freqs]="data.siblingFreqs"
@@ -21,20 +21,26 @@
       <label class="form-check-inline">
         <input type="checkbox" (change)="indexActive($event)" [checked]="indexSeries">Index
       </label>
-      <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
-        [dates]="data.analyzerTableDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
-        [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true"
-        [chartStart]="data.analyzerTableDates[0].date" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
-      </lib-category-charts>
+      <ng-template ngIf [ngIf]="data.requestComplete">
+        <lib-date-slider *ngIf="!displayCompare" class="sliders" [portalSettings]="portalSettings"
+          [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
+          [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
+        <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
+          [dates]="data.sliderDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
+          [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [chartStart]="data.minDate"
+          [chartEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
+        </lib-category-charts>
+        <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
+          [allDates]="data.sliderDates" [series]="data.analyzerSeries" [start]="data.minDate"
+          [end]="data.maxDate" [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo"
+          [indexChecked]="indexSeries" (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)">
+        </lib-analyzer-highstock>
+        <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"
+          [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [indexChecked]="indexSeries"
+          [series]="data.analyzerSeries" [allTableDates]="data.analyzerTableDates" [indexBaseYear]="data.baseYear"
+          (tableTransform)="checkTransforms($event)"></lib-analyzer-table>
+      </ng-template>
       <i *ngIf="!data.requestComplete" class="fas fa-spinner fa-pulse fa-fw"></i>
-      <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-        [allDates]="data.analyzerTableDates" [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate"
-        [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries"
-        (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)"></lib-analyzer-highstock>
-      <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="displayCompare ? minDate : null"
-        [maxDate]="displayCompare ? maxDate : null" [yoyChecked]="tableYoy" [ytdChecked]="tableYtd"
-        [c5maChecked]="tableC5ma" [indexChecked]="indexSeries" [series]="data.analyzerSeries"
-        [allTableDates]="data.analyzerTableDates" [indexBaseYear]="data.baseYear" (tableTransform)="checkTransforms($event)"></lib-analyzer-table>
     </ng-template>
   </ng-container>
 </div>

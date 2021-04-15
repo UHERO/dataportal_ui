@@ -59,6 +59,7 @@ export class CategoryHelperService {
           this.categoryData[cacheId].requestComplete = true;
         }
       });
+      console.log(this.categoryData[cacheId])
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }

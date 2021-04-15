@@ -8,7 +8,6 @@ import { HeaderComponent } from './header/header.component';
 import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
 import { PrimengMenuNavComponent } from './primeng-menu-nav/primeng-menu-nav.component';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { CalendarModule } from 'primeng/calendar';
 import { LandingPageComponent } from './landing-page/landing-page.component';
@@ -75,7 +74,6 @@ import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/anal
     TableModule,
     SliderModule,
     PanelMenuModule,
-    InputNumberModule,
     CalendarModule,
     HighchartsChartModule,
     AgGridModule.withComponents([
@@ -90,7 +88,6 @@ import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/anal
     ToolsComponent,
     HeaderComponent,
     PrimengMenuNavComponent,
-    InputNumberModule,
     LandingPageComponent,
     CategoryChartsComponent,
     CategoryTableViewComponent,

@@ -291,7 +291,7 @@ export class HelperService {
 
   setDefaultCategoryRange(freq, dateArray, defaults) {
     const defaultSettings = defaults.find(ranges => ranges.freq === freq);
-    const defaultEnd = defaultSettings.end ? defaultSettings.end : new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
+    const defaultEnd = defaultSettings.end || new Date(dateArray[dateArray.length - 1].date).toISOString().substr(0, 4);
     let counter = dateArray.length - 1;
     while (new Date(dateArray[counter].date).toISOString().substr(0, 4) > defaultEnd) {
       counter--;

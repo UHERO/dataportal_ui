@@ -47,6 +47,7 @@ export class DateSliderComponent implements OnInit {
       this.end = defaultRanges.seriesEnd;
       this.sliderDates = this.dates.map(d => d.tableDate);
       this.sliderSelectedRange = [this.start, this.end];
+      this.updateChartsAndTables(this.sliderDates[this.start], this.sliderDates[this.end], this.freq);
       /* Date picker inputs */
       this.displayMonthNavigator = this.freq === 'W' || this.freq === 'D';
       this.calendarView = this.setCalendarView(this.freq);
@@ -245,10 +246,6 @@ export class DateSliderComponent implements OnInit {
     const seriesEnd = this.formatChartDate(to, freq);
     const endOfSample = this.dates[this.dates.length - 1].date === seriesEnd;
     this.updateRange.emit({ seriesStart, seriesEnd, endOfSample });
-  }
-
-  updateRanges(from, to, freq: string) {
-    this.updateChartsAndTables(from, to, freq);
   }
 
   formatChartDate = (value, freq) => {

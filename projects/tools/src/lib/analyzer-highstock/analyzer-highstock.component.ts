@@ -85,13 +85,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
     }
     if (this.chartOptions.rangeSelector) {
-      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 3 : null
+      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null
     }
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const navigatorOptions = {
-        frequency: this.analyzerService.checkFrequencies(this.series),
-        numberOfObservations: this.filterDatesForNavigator(this.allDates).length
+        frequency: this.analyzerService.getHighestFrequency(this.series).freq,
+        numberOfObservations: this.allDates.length//this.filterDatesForNavigator(this.allDates).length
       };
       this.initChart(this.series, this.portalSettings, buttons, navigatorOptions);
     }
@@ -244,7 +244,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     // incorrect indexing when using range selector
     this.chartOptions.rangeSelector = {
-      selected: !startDate && !endDate ? 3 : null,
+      selected: !startDate && !endDate ? 2 : null,
       buttons,
       buttonPosition: {
         x: 20,
