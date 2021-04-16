@@ -180,8 +180,8 @@ export class AnalyzerService {
     this.analyzerSeriesCount.next(this.analyzerSeriesSource.value.length);
   }
 
-  getAnalyzerData(aSeries, noCache: boolean, leftY: string, rightY) {
-    console.log('GET DATA y1STRING', rightY)
+  getAnalyzerData(aSeries, noCache: boolean, rightY) {
+    console.log('GET DATA aSeries', aSeries)
     this.analyzerData.analyzerSeries = [];
     //this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
@@ -195,18 +195,22 @@ export class AnalyzerService {
       this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(results.series) : null;
       series.forEach((s) => {
         if (!this.analyzerData.analyzerSeries.find(series => series.id === s.id)) {
-          const seriesData = this.formatSeriesForAnalyzer(s, leftY, rightY);
-          seriesData.compare = this.analyzerSeriesCompareSource.value.find(series => series.className === s.id) ? true : false;
+          const seriesData = this.formatSeriesForAnalyzer(s);
+          seriesData.compare = this.analyzerSeriesCompareSource.value.find(series => series.className === s.id) ? true : aSeries.find(series => series.id === s.id) ? aSeries.find(series => series.id === s.id).compare : false;
           this.analyzerData.analyzerSeries.push(seriesData);  
+          if (seriesData.compare) {
+            this.addToComparisonChart(seriesData)
+          }
         }
       });
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : this.getHighestFrequency(this.analyzerData.analyzerSeries);
+      this.analyzerData.y0Series = null;
+      this.analyzerData.y1Series = rightY ? rightY.split('-').map(s => +s) : null;
       // On load analyzer should add 1 (or 2 if available) series to comparison chart
       this.setDefaultCompareSeries();
-      this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, null);
-      this.analyzerData.y0Series = leftY ? leftY.split('-').map(s => +s) : null;
-      this.analyzerData.y1Series = rightY ? rightY.split('-').map(s => +s) : null;
+      this.createAnalyzerTable(this.analyzerData.analyzerSeries);
+      this.assignYAxisSide(this.analyzerData.y1Series)
       this.analyzerData.requestComplete = true;
       console.log(this.analyzerData)
     });
@@ -252,8 +256,7 @@ export class AnalyzerService {
     };
   }
 
-  formatSeriesForAnalyzer = (series, leftY, rightY) => {
-    console.log('FORMAT SERIES RIGHT Y', rightY)
+  formatSeriesForAnalyzer = (series) => {
     const abbreviatedNameDetails = {
       title: series.title,
       geography: series.geography.shortName,
@@ -310,20 +313,27 @@ export class AnalyzerService {
         'left',
         'right'
       ];
-      series.selectedYAxis = this.assignYAxisSide(series.id, leftY, rightY)//'left';
+      series.selectedYAxis = 'left';
     } else {
       series.noData = 'Data not available';
     }
     return series;
   }
 
-  assignYAxisSide = (seriesId, leftY, rightY) => {
-    console.log('rightY', rightY)
-    console.log('seriesId', seriesId)
-    const leftYSeries = leftY ? leftY.split('-').map(s => +s) : null;
-    const rightYSeries = rightY ? rightY.split('-').map(s => +s) : null;
-    console.log('rightYSeries', rightYSeries)
-    return rightYSeries && rightYSeries.legnth && rightYSeries.includes(seriesId) ? 'right' : 'left';
+  assignYAxisSide(rightY: Array<number>) {
+    this.analyzerData.analyzerSeries.forEach((s) => {
+      if (rightY && rightY.includes(s.id)) {
+        s.selectedYAxis = 'right';
+      }
+      console.log('S', s)
+    });
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    currentCompare.forEach((compare) => {
+      const match = this.analyzerData.analyzerSeries.find(s => s.id === compare.className);
+      compare.yAxis = `${match.unitsLabelShort}-${match.selectedYAxis}`;
+      compare.yAxisSide = match.selectedYAxis;
+    });
+    this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
   singleFrequencyAnalyzer = (series: Array<any>) => {

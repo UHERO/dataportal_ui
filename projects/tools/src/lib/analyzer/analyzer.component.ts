@@ -36,6 +36,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   routeView: string;
   queryParams: any = {};
   displayCompare: boolean = false;
+  urlParams;
 
 
   constructor(
@@ -47,70 +48,64 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private router: Router,
     private apiService: ApiService,
   ) {
-    this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((analyzerSeries) => {
-      this.analyzerSeries = analyzerSeries;
-      if (analyzerSeries.length) {
-        this.updateAnalyzer(analyzerSeries);
+    const navigation = this.router.getCurrentNavigation();
+    console.log('ANALYZER COMPONENT NAV', navigation)
+    const { queryParams } = navigation.extractedUrl;
+    const {
+      analyzerSeries,
+      chartSeries,
+      start,
+      end,
+      index,
+      name,
+      units,
+      geography,
+      yoy,
+      ytd,
+      c5ma,
+      y1,
+      nocache
+    } = queryParams;
+    if (analyzerSeries) {
+      this.storeUrlSeries(analyzerSeries);
+    }
+    this.y1 = y1;
+    this.analyzerService.analyzerData.minDate = start;
+    this.analyzerService.analyzerData.maxDate = end;
+    this.indexActive = index;
+    this.tooltipName = name;
+    this.tooltipUnits = units;
+    this.tooltipGeo = geography;
+    this.tableYoy = yoy;
+    this.tableYtd = ytd;
+    this.tableC5ma = c5ma;
+    this.noCache = nocache;
+    this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((series) => {
+      this.analyzerSeries = series;
+      if (chartSeries) {
+        this.storeUrlChartSeries(chartSeries);
+      }
+      if (series.length) {
+        console.log('analyzerSeries', analyzerSeries);
+        console.log('index', index);
+        console.log('c5ma', c5ma);
+        console.log('y1', y1)
+        this.analyzerData = this.updateAnalyzer(this.analyzerSeries);
       }
     });
   }
 
   ngOnInit() {
-    if (this.route) {
-      this.route.queryParams.subscribe(params => {
-        if (params[`analyzerSeries`]) {
-          this.storeUrlSeries(params);
-        }
-        if (params[`chartSeries`]) {
-          this.storeUrlChartSeries(params);
-        }
-        if (params[`start`]) {
-          this.analyzerService.analyzerData.minDate = params[`start`];
-        }
-        if (params[`end`]) {
-          this.analyzerService.analyzerData.maxDate = params[`end`];
-        }
-        if (params[`index`]) {
-          this.indexSeries = params[`index`];
-        }
-        if (params[`name`]) {
-          this.tooltipName = (params[`name`] === 'true');
-        }
-        if (params[`units`]) {
-          this.tooltipUnits = (params[`units`] === 'true');
-        }
-        if (params[`geography`]) {
-          this.tooltipGeo = (params[`geography`] === 'true');
-        }
-        if (params[`yoy`]) {
-          this.tableYoy = (params[`yoy`] === 'true');
-        }
-        if (params[`ytd`]) {
-          this.tableYtd = (params[`ytd`] === 'true');
-        }
-        if (params[`c5ma`]) {
-          this.tableC5ma = (params[`c5ma`] === 'true');
-        }
-        if (params[`y0`]) {
-          this.y0Series = params[`y0`];
-        }
-        if (params[`y1`]) {
-          this.y1Series = params[`y1`];
-        }
-        if (params[`nocache`]) {
-          this.noCache = params[`nocache`] === 'true';
-        }
-      });
-    }
     if (this.analyzerSeries.length) {
-      this.updateAnalyzer(this.analyzerSeries)
+      console.log('update ng on init')
+      this.updateAnalyzer(this.analyzerSeries);
     }
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
   updateAnalyzer = (analyzerSeries) => {
     console.log('y1', this.y1Series)
-    this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.y0Series, this.y1Series);
+    this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.y1);
     this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
     this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
@@ -120,15 +115,16 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   }
 
   storeUrlSeries(params) {
-    const urlASeries = params[`analyzerSeries`].split('-').map((id) => { return { id: +id } });
+    const urlASeries = params.split('-').map((id) => { return { id: +id } });
+    console.log('URL SERIES', urlASeries)
     this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
   storeUrlChartSeries(params) {
-    const urlCSeries = params[`chartSeries`].split('-').map(Number);
+    const urlCSeries = params.split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
       const aSeries = this.analyzerSeries.find(analyzer => analyzer.id === cSeries);
-      aSeries.showInChart = true;
+      aSeries.compare = true;
     });
   }
 

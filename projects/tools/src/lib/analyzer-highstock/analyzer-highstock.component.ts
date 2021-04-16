@@ -102,6 +102,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   updateChartData(series) {
+    console.log('highstock', series)
     const chartSeries = [...series, {
       className: 'navigator',
       data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),

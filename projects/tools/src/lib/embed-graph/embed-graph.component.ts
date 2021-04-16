@@ -39,7 +39,7 @@ export class EmbedGraphComponent implements OnInit {
         this.seriesId = Number(params[`id`]);
       }
       if (params[`chartSeries`]) {
-        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, showInChart: true }));
+        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, compare: true }));
       }
       if (params[`start`]) {
         this.startDate = params[`start`];
@@ -61,7 +61,7 @@ export class EmbedGraphComponent implements OnInit {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
     if (this.chartSeries) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y0, this.y1);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y1);
     }
   }
 
