@@ -5,10 +5,10 @@
       <lib-freq-selector *ngIf="data.displayFreqSelector" [freqs]="data.siblingFreqs"
         (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">
       </lib-freq-selector>
-      <lib-share-link *ngIf="data.analyzerSeries.length" [embedCode]="embedCode" [shareLink]="analyzerShareLink"
-        [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'" [name]="tooltipName" [units]="tooltipUnits"
-        [geography]="tooltipGeo" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="minDate"
-        [endDate]="maxDate" [y0]="y0" [y1]="y1"></lib-share-link>
+      <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
+        [index]="indexSeries" [name]="tooltipName" [units]="tooltipUnits" [geography]="tooltipGeo" [yoy]="tableYoy"
+        [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate" [endDate]="data.maxDate"
+        [yRightSeries]="data.yRightSeries"></lib-share-link>
       <button type="button" class="btn btn-sm btn-outline-secondary rm-analyzer-series-btn"
         (click)="removeAllAnalyzerSeries()">
         Remove All Series
@@ -31,8 +31,8 @@
           [chartEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
         </lib-category-charts>
         <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-          [allDates]="data.sliderDates" [series]="data.analyzerSeries" [start]="data.minDate"
-          [end]="data.maxDate" [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo"
+          [allDates]="data.sliderDates" [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate"
+          [nameChecked]="tooltipName" [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo"
           [indexChecked]="indexSeries" (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)">
         </lib-analyzer-highstock>
         <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"

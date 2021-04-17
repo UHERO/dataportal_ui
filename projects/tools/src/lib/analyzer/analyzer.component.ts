@@ -11,8 +11,6 @@ import { ApiService } from '../api.service';
   styleUrls: ['./analyzer.component.scss']
 })
 export class AnalyzerComponent implements OnInit, OnDestroy {
-  minDate;
-  maxDate;
   portalSettings;
   tableYoy;
   tableYtd;
@@ -24,10 +22,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   tooltipUnits;
   tooltipGeo;
   analyzerData;
-  y0;
-  y1;
-  y0Series;
-  y1Series;
+  yRightSeries;
   analyzerShareLink: string;
   embedCode: string;
   indexSeries: boolean;
@@ -48,80 +43,57 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private router: Router,
     private apiService: ApiService,
   ) {
-    const navigation = this.router.getCurrentNavigation();
-    console.log('ANALYZER COMPONENT NAV', navigation)
-    const { queryParams } = navigation.extractedUrl;
-    const {
-      analyzerSeries,
-      chartSeries,
-      start,
-      end,
-      index,
-      name,
-      units,
-      geography,
-      yoy,
-      ytd,
-      c5ma,
-      y1,
-      nocache
-    } = queryParams;
-    if (analyzerSeries) {
-      this.storeUrlSeries(analyzerSeries);
-    }
-    this.y1 = y1;
-    this.analyzerService.analyzerData.minDate = start;
-    this.analyzerService.analyzerData.maxDate = end;
-    this.indexActive = index;
-    this.tooltipName = name;
-    this.tooltipUnits = units;
-    this.tooltipGeo = geography;
-    this.tableYoy = yoy;
-    this.tableYtd = ytd;
-    this.tableC5ma = c5ma;
-    this.noCache = nocache;
     this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((series) => {
       this.analyzerSeries = series;
-      if (chartSeries) {
-        this.storeUrlChartSeries(chartSeries);
-      }
-      if (series.length) {
-        console.log('analyzerSeries', analyzerSeries);
-        console.log('index', index);
-        console.log('c5ma', c5ma);
-        console.log('y1', y1)
-        this.analyzerData = this.updateAnalyzer(this.analyzerSeries);
-      }
+      this.analyzerData = this.updateAnalyzer(series);
     });
   }
 
   ngOnInit() {
-    if (this.analyzerSeries.length) {
-      console.log('update ng on init')
-      this.updateAnalyzer(this.analyzerSeries);
+    if (this.route) {
+      this.route.queryParams.subscribe(params => {
+        if (params[`analyzerSeries`]) {
+          this.storeUrlSeries(params[`analyzerSeries`]);
+        }
+        if (params[`chartSeries`]) {
+          this.storeUrlChartSeries(params[`chartSeries`]);
+        }
+        this.analyzerService.analyzerData.minDate = params['start'] || '';
+        this.analyzerService.analyzerData.maxDate = params['end'] || '';
+        this.indexSeries = params['index'] || null;
+        this.tooltipName = this.evalParamAsTrue(params['name']);
+        this.tooltipUnits = this.evalParamAsTrue(params['units']);
+        this.tooltipGeo = this.evalParamAsTrue(params['geo']);
+        this.tableYoy = this.evalParamAsTrue(params['yoy']);
+        this.tableYtd = this.evalParamAsTrue(params['ytd']);
+        this.tableC5ma = this.evalParamAsTrue(params['c5ma']);
+        this.yRightSeries = params['yright'];
+        this.noCache = this.evalParamAsTrue(params['nocache']);
+      });
     }
+    this.updateAnalyzer(this.analyzerSeries);
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
   }
 
-  updateAnalyzer = (analyzerSeries) => {
-    console.log('y1', this.y1Series)
-    this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.y1);
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
+  evalParamAsTrue = (param: string) => param === 'true';
+
+  updateAnalyzer (analyzerSeries: Array<any>) {
+    if (analyzerSeries.length) {
+      this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.yRightSeries);
+    }
   }
 
   ngOnDestroy() {
     this.analyzerSeriesSub.unsubscribe();
   }
 
-  storeUrlSeries(params) {
-    const urlASeries = params.split('-').map((id) => { return { id: +id } });
-    console.log('URL SERIES', urlASeries)
+  storeUrlSeries(urlSeries: string) {
+    const urlASeries = urlSeries.split('-').map(id => ({ id: +id }));
     this.analyzerService.updateAnalyzerSeries(urlASeries);
   }
 
-  storeUrlChartSeries(params) {
-    const urlCSeries = params.split('-').map(Number);
+  storeUrlChartSeries(urlChartSeries: string) {
+    const urlCSeries = urlChartSeries.split('-').map(Number);
     urlCSeries.forEach((cSeries) => {
       const aSeries = this.analyzerSeries.find(analyzer => analyzer.id === cSeries);
       aSeries.compare = true;
@@ -130,20 +102,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
 
   // Update table when selecting new ranges in the chart
   setTableDates(e) {
-    this.minDate = e.minDate;
-    this.maxDate = e.maxDate;
     this.analyzerService.analyzerData.minDate = e.minDate;
     this.analyzerService.analyzerData.maxDate = e.maxDate;
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
-
-  /* setYAxesSeries(e) {
-    this.y0 = e.y0.map(s => s.toString()).join('-');
-    this.y1 = e.y1.map(s => s.toString()).join('-');
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-  } */
 
   checkTooltip(e) {
     if (e.label === 'name') {
@@ -155,19 +116,14 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (e.label === 'geo') {
       this.tooltipGeo = e.value;
     }
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   indexActive(e) {
     this.indexSeries = e.target.checked;
     if (this.indexSeries) {
-      this.y0 = null;
-      this.y1 = null;
+      this.yRightSeries = null;
     }
     this.analyzerService.toggleIndexValues(e.target.checked, this.analyzerService.analyzerData.minDate)
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
   }
 
   checkTransforms(e) {
@@ -180,36 +136,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     if (e.label === 'c5ma') {
       this.tableC5ma = e.value;
     }
-    this.analyzerShareLink = this.formatShareLink(this.minDate, this.maxDate);
-    this.embedCode = this.formatEmbedSnippet(this.minDate, this.maxDate);
-  }
-
-  formatShareLink = (start: string, end: string) => this.environment[`portalUrl`] + this.getAnalyzerParams(start, end, '/analyzer');
-
-  getAnalyzerParams(start, end, seriesUrl) {
-    let aSeries = '?analyzerSeries=';
-    let cSeries = '&chartSeries=';
-    if (this.analyzerSeries) {
-      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.compare);
-      this.analyzerSeries.forEach((series, index) => {
-        aSeries += index === 0 ? series.id : `-${series.id}`;
-      });
-      chartSeries.forEach((series, index) => {
-        cSeries += index === 0 ? series.id : `-${series.id}`;
-      });
-    }
-    seriesUrl += aSeries + cSeries;
-    seriesUrl += `&start=${start}&end=${end}`;
-    seriesUrl += this.indexSeries ? `&index=${this.indexSeries}` : '';
-    seriesUrl += this.tooltipName ? `&name=${this.tooltipName}` : '';
-    seriesUrl += this.tooltipUnits ? `&units${this.tooltipUnits}` : '';
-    seriesUrl += this.tooltipGeo ? `&geography=${this.tooltipGeo}` : '';
-    seriesUrl += this.tableYoy ? `&yoy=${this.tableYoy}` : '';
-    seriesUrl += this.tableYtd ? `&ytd=${this.tableYtd}` : '';
-    seriesUrl += this.tableC5ma ? `&c5ma=${this.tableC5ma}` : '';
-    seriesUrl += this.y0 ? `&y0=${this.y0}` : '';
-    seriesUrl += this.y1 ? `&y1=${this.y1}` : '';
-    return seriesUrl;
   }
 
   changeAnalyzerFrequency(freq, analyzerSeries) {
@@ -236,19 +162,11 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     this.analyzerService.removeAll();
   }
 
-  formatEmbedSnippet(start: string, end: string) {
-    const embedURL = this.getAnalyzerParams(start, end, '/graph');
-    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}${embedURL}" scrolling="no"></iframe></div>`;
-  }
-
   toggleAnalyzerDisplay() {
     this.displayCompare = !this.displayCompare;
   }
 
   changeRange(e) {
-    console.log('CHANGE RANGE', e);
-    this.minDate = e.seriesStart;
-    this.maxDate = e.seriesEnd;
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
   }

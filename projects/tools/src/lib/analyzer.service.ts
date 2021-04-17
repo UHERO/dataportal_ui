@@ -26,7 +26,7 @@ export class AnalyzerService {
     siblingFreqs: [],
     analyzerFrequency: {},
     y0Series: null,
-    y1Series: null,
+    yRightSeries: null,
     minDate: null,
     maxDate: null,
     requestComplete: false,
@@ -48,7 +48,7 @@ export class AnalyzerService {
 
   constructor(private apiService: ApiService, private helperService: HelperService) { }
 
-  checkAnalyzer(seriesInfo) {
+  checkAnalyzer = (seriesInfo) => {
     const analyzeSeries = this.analyzerSeriesSource.value.find(series => series.id === seriesInfo.id);
     return analyzeSeries ? true : false;
   }
@@ -120,8 +120,16 @@ export class AnalyzerService {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.updateCompareSeriesDataAndAxes(currentCompare);
     const series = currentCompare.find(s => s.className === seriesInfo.id);
+    const aSeriesMatch = this.analyzerData.yRightSeries.find(id => id === seriesInfo.id);
     const indexed = this.analyzerData.indexed;
     const baseYear = this.analyzerData.baseYear;
+    if (axis === 'right' && !aSeriesMatch) {
+      this.analyzerData.yRightSeries.push(seriesInfo.id);
+    }
+    if (axis === 'left' && aSeriesMatch) {
+      const matchIndex = this.analyzerData.yRightSeries.findIndex(id => id === seriesInfo.ide);
+      this.analyzerData.yRightSeries.splice(matchIndex, 1);
+    }
     series.yAxisSide = axis;
     series.yAxis = indexed ? `Index (${baseYear})-${axis}` : `${series.unitsLabelShort}-${axis}`;
     series.yAxisText = indexed ? `Index (${baseYear})` : `${series.seriesInfo.unitsLabelShort}`;
@@ -204,13 +212,13 @@ export class AnalyzerService {
         }
       });
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(results.series, this.analyzerData.siblingFreqs) : this.getHighestFrequency(this.analyzerData.analyzerSeries);
-      this.analyzerData.y0Series = null;
-      this.analyzerData.y1Series = rightY ? rightY.split('-').map(s => +s) : null;
+      //this.analyzerData.y0Series = null;
+      this.analyzerData.yRightSeries = rightY ? rightY.split('-').map(s => +s) : [];
       // On load analyzer should add 1 (or 2 if available) series to comparison chart
       this.setDefaultCompareSeries();
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, null);
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      this.assignYAxisSide(this.analyzerData.y1Series)
+      this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
       console.log(this.analyzerData)
     });
@@ -247,12 +255,12 @@ export class AnalyzerService {
       siblingFreqs: [],
       analyzerFrequency: {},
       y0Series: null,
-      y1Series: null,
+      yRightSeries: null,
       requestComplete: false,
       indexed: false,
       baseYear: null,
       minDate: null,
-      maxDate: null,  
+      maxDate: null
     };
   }
 

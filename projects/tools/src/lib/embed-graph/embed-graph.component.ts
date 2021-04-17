@@ -50,8 +50,8 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`y0`]) {
         this.y0 = params[`y0`];
       }
-      if (params[`y1`]) {
-        this.y1 = params[`y1`];
+      if (params[`yright`]) {
+        this.y1 = params[`yright`];
       }
       if (params[`index`]) {
         this.indexSeries = params[`index`];
@@ -75,7 +75,7 @@ export class EmbedGraphComponent implements OnInit {
       siblingFreqs: [],
       analyzerFrequency: {},
       y0Series: null,
-      y1Series: null,
+      yRightSeries: null,
       requestComplete: false,
       indexed: false,
       baseYear: null,
