@@ -41,6 +41,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
+          console.log('CATEGORY CHARTS', this.chartStart)
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
@@ -113,7 +114,7 @@ export class CategoryChartsComponent implements OnChanges {
     if (transformation) {
       return dates.map((date) => {
         const dateExists = this.helperService.binarySearch(transformation.dates, date.date);
-        return dateExists > -1 ? +transformation.values[dateExists] : null;
+        return dateExists > -1 ? [Date.parse(date.date), +transformation.values[dateExists]] : [Date.parse(date.date), null];
       });
     }
   }

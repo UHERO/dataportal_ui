@@ -333,7 +333,6 @@ export class AnalyzerService {
       if (rightY && rightY.includes(s.id)) {
         s.selectedYAxis = 'right';
       }
-      console.log('S', s)
     });
     const currentCompare = this.analyzerSeriesCompareSource.value;
     currentCompare.forEach((compare) => {

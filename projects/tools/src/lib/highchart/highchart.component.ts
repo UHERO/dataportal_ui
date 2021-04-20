@@ -19,6 +19,8 @@ export class HighchartComponent implements OnChanges {
   @Input() maxValue;
   @Input() indexChecked;
   @Input() baseYear;
+  chartCallback;
+  chartObject;
   //@Input() categoryDates;
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions = {} as HighchartsObject;
@@ -38,7 +40,11 @@ export class HighchartComponent implements OnChanges {
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
     private highstockHelper: HighstockHelperService
-  ) { }
+  ) {
+    this.chartCallback = chart => {
+      this.chartObject = chart;
+    };
+  }
 
   ngOnChanges() {
     if (this.seriesData === 'No data available') {
@@ -47,6 +53,10 @@ export class HighchartComponent implements OnChanges {
     } else {
       this.drawChart(this.seriesData, this.portalSettings, this.minValue, this.maxValue, this.chartStart, this.chartEnd);
       this.updateChart = true;
+    }
+    if (this.chartObject) {
+      console.log('CHART OBJECT', this.chartObject)
+      this.chartObject.redraw();
     }
   }
 
@@ -65,6 +75,7 @@ export class HighchartComponent implements OnChanges {
   }
 
   setXAxis = (startDate, endDate) => {
+    console.log('SET XAXIS', new Date(startDate).toISOString())
     return {
       type: 'datetime',
       min: startDate,
@@ -109,8 +120,8 @@ export class HighchartComponent implements OnChanges {
       yAxis: 1,
       data: series0.values,
       pointStart: Date.parse(series0.start),
-      pointInterval: this.highstockHelper.freqInterval(currentFreq),
-      pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
+      //pointInterval: this.highstockHelper.freqInterval(currentFreq),
+      //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
       endDate: endDate,
       states: {
         hover: {
@@ -130,8 +141,8 @@ export class HighchartComponent implements OnChanges {
         type: portalSettings.highcharts.series1Type,
         data: series1.values,
         pointStart: Date.parse(series1.start),
-        pointInterval: this.highstockHelper.freqInterval(currentFreq),
-        pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
+        //pointInterval: this.highstockHelper.freqInterval(currentFreq),
+        //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
         endDate: endDate,
         dataGrouping: {
           enabled: false
@@ -308,6 +319,10 @@ export class HighchartComponent implements OnChanges {
       }
     };
     this.chartOptions.series = chartSeries;
+    if (this.chartObject) {
+      console.log('CHART OBJECT', this.chartObject)
+      this.chartObject.redraw();
+    }
   }
 
   formatTransformLabel = (transformationName, percent, currentFreq) => {

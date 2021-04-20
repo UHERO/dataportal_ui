@@ -25,7 +25,7 @@
         <lib-date-slider *ngIf="!displayCompare" class="sliders" [portalSettings]="portalSettings"
           [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
-        <lib-category-charts *ngIf="!displayCompare" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
+        <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings" [data]="data.analyzerSeries"
           [dates]="data.sliderDates" [dateWrapper]="data.analyzerDateWrapper" [freq]="data.analyzerFrequency"
           [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal" [analyzerView]="true" [chartStart]="data.minDate"
           [chartEnd]="data.maxDate" [indexChecked]="indexSeries" [indexBaseYear]="data.baseYear">
