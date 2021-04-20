@@ -10,7 +10,7 @@
   (onBlur)="onCalendarBlur(calendarStart.inputId, calendarStartDate)">
 </p-calendar>
 <p-slider [(ngModel)]="sliderSelectedRange" [min]="0" [max]="sliderDates.length - 1" [range]="true"
-  (onChange)="slideChange($event)" (onSlideEnd)="slideChange($event)"></p-slider>
+  (onSlideEnd)="slideChange($event)"></p-slider>
 <p-calendar #calendarEnd [class.annual-calendar]="freq === 'A'" inputId="calendar-end" [view]="calendarView"
   [minDate]="minDateValue" [maxDate]="maxDateValue" [(ngModel)]="calendarEndDate" [dateFormat]="calendarEndDateFormat"
   [yearNavigator]="true" [monthNavigator]="displayMonthNavigator" [disabledDates]="invalidEndDates"

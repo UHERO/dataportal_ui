@@ -243,8 +243,8 @@ export class HighchartComponent implements OnChanges {
           // If no data available for a given date range, display series title and display dates where data is available for a series
           if (latestSeries0 === -1 && latestSeries1 === -1) {
             this.setClassName(undefined);
-            const categoryDisplayStart = formatDate(start, currentFreq);
-            const categoryDisplayEnd = formatDate(end, currentFreq);
+            const categoryDisplayStart = formatDate(Date.parse(start), currentFreq);
+            const categoryDisplayEnd = formatDate(Date.parse(end), currentFreq);
             this.setTitle({ text: '<b>' + title + '</b>' });
             this.setSubtitle({
               text: `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
@@ -299,7 +299,7 @@ export class HighchartComponent implements OnChanges {
           // Get Quarter or Month for Q/M frequencies
           s = s + formatDate(this.x, currentFreq);
           // Add year
-          s = s + Highcharts.dateFormat('%Y', this.x) + '';
+          //s = s + Highcharts.dateFormat('%Y', this.x) + '';
           s = getSeriesLabel(this.points, s);
           return s;
         }
@@ -340,27 +340,27 @@ export class HighchartComponent implements OnChanges {
 
   formatDateLabel = (date, freq) => {
     if (freq === 'A') {
-      return '';
+      return Highcharts.dateFormat('%Y', date);
     }
     if (freq === 'Q') {
       const month = Highcharts.dateFormat('%b', date);
       if (month === 'Jan' || month === 'Feb' || month === 'Mar') {
-        return 'Q1 ';
+        return `${Highcharts.dateFormat('%Y', date)} Q1`;
       }
       if (month === 'Apr' || month === 'May' || month === 'Jun') {
-        return 'Q2 ';
+        return `${Highcharts.dateFormat('%Y', date)} Q2`;
       }
       if (month === 'Jul' || month === 'Aug' || month === 'Sep') {
-        return 'Q3 ';
+        return `${Highcharts.dateFormat('%Y', date)} Q3`;
       }
       if (month === 'Oct' || month === 'Nov' || month === 'Dec') {
-        return 'Q4 ';
+        return `${Highcharts.dateFormat('%Y', date)} Q4`;
       }
     }
     if (freq === 'M' || freq === 'S') {
-      return Highcharts.dateFormat('%b', date) + ' ';
+      return `${Highcharts.dateFormat('%b', date)} ${Highcharts.dateFormat('%Y', date)}`;
     }
-    return Highcharts.dateFormat('%b %d', date) + ' ';
+    return Highcharts.dateFormat('%b %d %Y', date);
   }
 
   noDataChart = (seriesData) => {
