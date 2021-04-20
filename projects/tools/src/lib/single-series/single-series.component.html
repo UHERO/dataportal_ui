@@ -14,7 +14,8 @@
     <lib-freq-selector *ngIf="portal !== 'nta' && data.frequencies" [freqs]="data.frequencies"
       (selectedFreqChange)="goToSeries(data.siblings, $event.freq, selectedGeo.handle, seasonallyAdjusted)"
       class="freq-selector"></lib-freq-selector>
-    <lib-share-link [view]="'series'" [startDate]="chartStart" [endDate]="chartEnd"></lib-share-link>
+    <lib-share-link [view]="'series'" [seasonallyAdjusted]="seasonallyAdjusted" [startDate]="chartStart"
+      [endDate]="chartEnd" [seriesId]="data.seriesDetail.id"></lib-share-link>
     <div class="form-check" *ngIf="data.saPairAvail">
       <label class="form-check-inline">
         <input type="checkbox" [ngModel]="data.seriesDetail.seasonalAdjustment === 'seasonally_adjusted'"

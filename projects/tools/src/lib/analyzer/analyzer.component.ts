@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DataPortalSettingsService } from '../data-portal-settings.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../api.service';
@@ -24,7 +24,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   analyzerData;
   yRightSeries;
   analyzerShareLink: string;
-  embedCode: string;
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
   analyzerSeries;
@@ -40,7 +39,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private analyzerService: AnalyzerService,
     private dataPortalSettingsServ: DataPortalSettingsService,
     private route: ActivatedRoute,
-    private router: Router,
     private apiService: ApiService,
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((series) => {
@@ -62,6 +60,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
         this.indexSeries = params['index'] || null;
         this.tooltipName = this.evalParamAsTrue(params['name']);
+        this.displayCompare = this.evalParamAsTrue(params['compare']);
         this.tooltipUnits = this.evalParamAsTrue(params['units']);
         this.tooltipGeo = this.evalParamAsTrue(params['geo']);
         this.tableYoy = this.evalParamAsTrue(params['yoy']);

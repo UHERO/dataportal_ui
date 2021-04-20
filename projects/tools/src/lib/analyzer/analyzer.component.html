@@ -8,7 +8,7 @@
       <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
         [index]="indexSeries" [name]="tooltipName" [units]="tooltipUnits" [geography]="tooltipGeo" [yoy]="tableYoy"
         [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate" [endDate]="data.maxDate"
-        [yRightSeries]="data.yRightSeries"></lib-share-link>
+        [yRightSeries]="data.yRightSeries" [displayCompare]="displayCompare"></lib-share-link>
       <button type="button" class="btn btn-sm btn-outline-secondary rm-analyzer-series-btn"
         (click)="removeAllAnalyzerSeries()">
         Remove All Series

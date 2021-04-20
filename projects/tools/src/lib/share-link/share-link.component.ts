@@ -1,12 +1,13 @@
-import { Component, Input, Inject, OnChanges } from '@angular/core';
+import { Component, Input, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'lib-share-link',
   templateUrl: './share-link.component.html',
   styleUrls: ['./share-link.component.scss']
 })
-export class ShareLinkComponent implements OnChanges {
+export class ShareLinkComponent implements OnChanges, OnDestroy {
   @Input() startDate;
   @Input() endDate;
   // View -- 'analyzer' or 'series'
@@ -16,17 +17,20 @@ export class ShareLinkComponent implements OnChanges {
   @Input() analyzerSeries;
 
   // Tooltip options in the analyzer view
-  @Input() name;
-  @Input() units;
-  @Input() geography;
-  @Input() yoy;
-  @Input() ytd;
-  @Input() c5ma;
-  @Input() index;
-  @Input() yRightSeries;
+  @Input() name: boolean;
+  @Input() units: boolean;
+  @Input() geography: boolean;
+  @Input() yoy: boolean;
+  @Input() ytd: boolean;
+  @Input() c5ma: boolean;
+  @Input() index: boolean;
+  @Input() yRightSeries: Array<any>;
+  @Input() displayCompare: boolean;
+  @Input() seasonallyAdjusted: boolean;
+  @Input() seriesId: number;
   shareLink: string;
   embedCode: string;
-  compareSeriesSub;
+  compareSeriesSub: Subscription;
   compareChartSeries;
   
   constructor(
@@ -34,33 +38,61 @@ export class ShareLinkComponent implements OnChanges {
     private analyzerService: AnalyzerService,
   ) {
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      //this.updateChartData(series);
       this.compareChartSeries = series;
-      console.log('CONSTRUCTOR SHARE COMPONENT', this.getAnalyzerParams(this.startDate, this.endDate, '/analyzer'))
-      this.embedCode = this.view === 'analyzer' ? this.formatEmbedSnippet(this.startDate, this.endDate) : '';
-      this.shareLink = this.view === 'analyzer' ? this.formatShareLink(this.startDate, this.endDate) : '';
+      this.updateShareAndEmbed(this.view);
     });
   }
 
   ngOnChanges() {
-    console.log('INIT SHARE COMPONENT');
-    console.log('SHARE COMPONENT', this.getAnalyzerParams(this.startDate, this.endDate, '/analyzer'));
-    this.embedCode = this.view === 'analyzer' ? this.formatEmbedSnippet(this.startDate, this.endDate) : '';
-    this.shareLink = this.view === 'analyzer' ? this.formatShareLink(this.startDate, this.endDate) : '';
+    this.updateShareAndEmbed(this.view);
   }
 
-  formatShareLink = (start: string, end: string) => this.environment[`portalUrl`] + this.getAnalyzerParams(start, end, '/analyzer');
+  ngOnDestroy() {
+    this.compareSeriesSub.unsubscribe();
+  }
+
+  updateShareAndEmbed(view: string) {
+    this.embedCode = this.formatEmbedSnippet(this.startDate, this.endDate);
+    this.shareLink = this.formatShareLink(this.startDate, this.endDate);
+  }
+
+  formatShareLink = (start: string, end: string) => {
+    const params = {
+      analyzer: `/analyzer${this.addAnalyzerParams(start, end)}`,
+      series: `/sereis${this.addQueryParams(start, end)}`
+    };
+    return `${this.environment['portalUrl']}${params[this.view]}`;
+  }
+
+  addQueryParams(start, end) {
+    let seriesUrl = '';
+    seriesUrl += this.seriesId ? `?id=${this.seriesId}` : '';
+    seriesUrl += this.seasonallyAdjusted ? `&sa=${this.seasonallyAdjusted}` : '';
+    seriesUrl += start ? `&start=${start}` : '';
+    seriesUrl += end ? `&end=${end}` : '';
+    return seriesUrl;
+  }
 
   formatEmbedSnippet = (start: string, end: string) => {
-    const embedURL = this.getAnalyzerParams(start, end, '/graph');
-    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}${embedURL}" scrolling="no"></iframe></div>`;
+    const params = {
+      analyzer: this.addAnalyzerParams(start, end),
+      series: this.addSingleSeriesParams(start, end)
+    };
+    return `<div style="position:relative;width:100%;overflow:hidden;padding-top:56.25%;height:475px;"><iframe style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;border:none;" src="${this.environment[`portalUrl`]}/graph${params[this.view]}" scrolling="no"></iframe></div>`;
   }
 
-  getAnalyzerParams(start, end, seriesUrl) {
+  addSingleSeriesParams = (start: string, end: string) => {
+    let params = `?id=${this.seriesId}`;
+    params += start ? `&start=${start}` : '';
+    params += end ? `&end=${end}` : '';
+    return params;
+  }
+
+  addAnalyzerParams(start: string, end: string) {
+    let seriesUrl = '';
     let aSeries = '?analyzerSeries=';
     let cSeries = '&chartSeries=';
     if (this.analyzerSeries) {
-      const chartSeries = this.analyzerService.analyzerData.analyzerSeries.filter(s => s.compare);
       aSeries += this.analyzerSeries.map(s => s.id).join('-');
       cSeries += this.compareChartSeries.map(s => s.className).join('-');
     }
@@ -74,6 +106,7 @@ export class ShareLinkComponent implements OnChanges {
     seriesUrl += this.ytd ? `&ytd=${this.ytd}` : '';
     seriesUrl += this.c5ma ? `&c5ma=${this.c5ma}` : '';
     seriesUrl += this.yRightSeries && this.yRightSeries.length ? `&yright=${this.yRightSeries.join('-')}` : '';
+    seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }
 
