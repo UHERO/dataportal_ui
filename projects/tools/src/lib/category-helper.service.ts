@@ -212,8 +212,11 @@ export class CategoryHelperService {
   }
 
   getSearchData(results, cacheId, search, geo, freq) {
-    if (results.observationStart && results.observationEnd && results.series) {
-      const categoryDateWrapper = { firstDate: '', endDate: '' };
+    const categoryDateWrapper = { firstDate: '', endDate: '' };
+    if (!results.observationStart && !results.observationEnd) {
+      this.categoryData[cacheId].invalid = search;
+    }
+    if (results.observationStart && results.observationEnd) {
       this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].frequencies = results.freqs;
@@ -223,6 +226,8 @@ export class CategoryHelperService {
       this.helperService.updateCurrentGeography(currentGeo);
       this.categoryData[cacheId].currentFreq = currentFreq;
       this.categoryData[cacheId].currentGeo = currentGeo;
+    }
+    if (results.series) {
       const displaySeries = this.filterSeriesResults(results.series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
       this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
@@ -233,8 +238,9 @@ export class CategoryHelperService {
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
     }
-    if (!results.observationStart || !results.observationEnd || !results.series) {
-      this.categoryData[cacheId].invalid = search;
+    if (results.observationStart && results.observationEnd && !results.series) {
+      this.categoryData[cacheId].noData = true;
+      this.categoryData[cacheId].requestComplete = true;
     }
   }
 

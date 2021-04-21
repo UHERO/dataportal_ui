@@ -43,6 +43,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   ) {
     this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((series) => {
       this.analyzerSeries = series;
+      console.log('CONSTRUCTOR SERIES', series)
       this.analyzerData = this.updateAnalyzer(series);
     });
   }
@@ -50,6 +51,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.route) {
       this.route.queryParams.subscribe(params => {
+        console.log('PARAMS', params['analyzerSeries'])
         if (params[`analyzerSeries`]) {
           this.storeUrlSeries(params[`analyzerSeries`]);
         }
@@ -77,8 +79,10 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   evalParamAsTrue = (param: string) => param === 'true';
 
   updateAnalyzer (analyzerSeries: Array<any>) {
+    console.log('ANALYERSERIES', analyzerSeries)
     if (analyzerSeries.length) {
       this.analyzerData = this.analyzerService.getAnalyzerData(analyzerSeries, this.noCache, this.yRightSeries);
+      console.log('UPDATE ANALYZER DATA', this.analyzerData)
     }
   }
 

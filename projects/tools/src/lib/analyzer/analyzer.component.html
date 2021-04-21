@@ -1,7 +1,9 @@
 <div class="analyzer-view col-xs-12 col-xl-11">
   <h2 id="analyzer-header">Analyzer</h2>
   <ng-container *ngIf="analyzerSeries.length">
+    {{analyzerSeries.length}}
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
+      {{data.displayFreqSelector}}
       <lib-freq-selector *ngIf="data.displayFreqSelector" [freqs]="data.siblingFreqs"
         (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">
       </lib-freq-selector>

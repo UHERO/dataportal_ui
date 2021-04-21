@@ -191,6 +191,8 @@ export class AnalyzerService {
   getAnalyzerData(aSeries, noCache: boolean, rightY) {
     console.log('GET DATA aSeries', aSeries)
     this.analyzerData.analyzerSeries = [];
+    //this.analyzerData.requestComplete = false;
+
     //this.analyzerData = this.resetAnalyzerData();
     const ids = aSeries.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
