@@ -21,25 +21,23 @@ export class HighchartComponent implements OnChanges {
   @Input() baseYear;
   chartCallback;
   chartObject;
-  //@Input() categoryDates;
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions = {} as HighchartsObject;
   updateChart = false;
 
   static findLastValue(valueArray, endDate, start) {
-    if (endDate < start) {
+    if (endDate < start || start > valueArray[valueArray.length - 1].x || endDate < valueArray[0].x) {
       return -1
     }
     if (endDate) {
       const pointIndex = valueArray.findIndex(points => points.x === endDate);
-      return pointIndex === -1 ? valueArray.length - 1: pointIndex;
+      return pointIndex === -1 ? valueArray.length - 1 : pointIndex;
     }
   }
 
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
-    private highstockHelper: HighstockHelperService
   ) {
     this.chartCallback = chart => {
       this.chartObject = chart;
@@ -120,8 +118,6 @@ export class HighchartComponent implements OnChanges {
       yAxis: 1,
       data: series0.values,
       pointStart: Date.parse(series0.start),
-      //pointInterval: this.highstockHelper.freqInterval(currentFreq),
-      //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
       endDate: endDate,
       states: {
         hover: {
@@ -141,8 +137,6 @@ export class HighchartComponent implements OnChanges {
         type: portalSettings.highcharts.series1Type,
         data: series1.values,
         pointStart: Date.parse(series1.start),
-        //pointInterval: this.highstockHelper.freqInterval(currentFreq),
-        //pointIntervalUnit: this.highstockHelper.freqIntervalUnit(currentFreq),
         endDate: endDate,
         dataGrouping: {
           enabled: false
@@ -215,9 +209,9 @@ export class HighchartComponent implements OnChanges {
           const s1 = this.series[1];
           // Get position of last non-null value
           const latestSeries0 = (s0 !== undefined && s0.points && s0.points.length) ?
-            HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.userOptions.pointStart) : -1;
+            HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
           const latestSeries1 = (s1 !== undefined && s1.points && s1.points.length) ?
-            HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.userOptions.pointStart) : -1;
+            HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
           // Prevent tooltip from being hidden on mouseleave
           // Reset toolip value and marker to most recent observation
           this.tooltip.hide = () => {
@@ -233,10 +227,12 @@ export class HighchartComponent implements OnChanges {
           };
           // Display tooltip when chart loads
           if (latestSeries0 > -1 && latestSeries1 > -1) {
+            this.setTitle({ text: '' });
             this.tooltip.refresh([s0.points[latestSeries0], s1.points[latestSeries1]]);
             checkPointCount(currentFreq, s0, s0.points[latestSeries0], this, s1.points[latestSeries1], s1);
           }
           if (latestSeries0 > -1 && latestSeries1 === -1) {
+            this.setTitle({ text: '' });
             this.tooltip.refresh([s0.points[latestSeries0]]);
             checkPointCount(currentFreq, s0, s0.points[latestSeries0], this);
           }
@@ -252,6 +248,7 @@ export class HighchartComponent implements OnChanges {
               y: -20
             });
           }
+
         }
       },
       styledMode: true,
@@ -299,7 +296,6 @@ export class HighchartComponent implements OnChanges {
           // Get Quarter or Month for Q/M frequencies
           s = s + formatDate(this.x, currentFreq);
           // Add year
-          //s = s + Highcharts.dateFormat('%Y', this.x) + '';
           s = getSeriesLabel(this.points, s);
           return s;
         }
@@ -320,7 +316,6 @@ export class HighchartComponent implements OnChanges {
     };
     this.chartOptions.series = chartSeries;
     if (this.chartObject) {
-      console.log('CHART OBJECT', this.chartObject)
       this.chartObject.redraw();
     }
   }
