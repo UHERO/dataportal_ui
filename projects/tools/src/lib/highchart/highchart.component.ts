@@ -2,8 +2,6 @@ import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
-import { HighstockHelperService } from '../highstock-helper.service';
-import { Frequency } from '../tools.models';
 
 @Component({
   selector: 'lib-highchart',
@@ -26,7 +24,9 @@ export class HighchartComponent implements OnChanges {
   updateChart = false;
 
   static findLastValue(valueArray, endDate, start) {
-    if (endDate < start || start > valueArray[valueArray.length - 1].x || endDate < valueArray[0].x) {
+    const firstSeriesObs = valueArray[0].x;
+    const lastSeriesObs = valueArray[valueArray.length - 1].x;
+    if (endDate < start || start > lastSeriesObs || endDate < firstSeriesObs) {
       return -1
     }
     if (endDate) {
@@ -53,7 +53,6 @@ export class HighchartComponent implements OnChanges {
       this.updateChart = true;
     }
     if (this.chartObject) {
-      console.log('CHART OBJECT', this.chartObject)
       this.chartObject.redraw();
     }
   }
@@ -208,50 +207,48 @@ export class HighchartComponent implements OnChanges {
           const s0 = this.series[0];
           const s1 = this.series[1];
           // Get position of last non-null value
-          const latestSeries0 = (s0 !== undefined && s0.points && s0.points.length) ?
+          const lastValue0 = (s0 !== undefined && s0.points && s0.points.length) ?
             HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
-          const latestSeries1 = (s1 !== undefined && s1.points && s1.points.length) ?
+          const lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
             HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
           // Prevent tooltip from being hidden on mouseleave
           // Reset toolip value and marker to most recent observation
           this.tooltip.hide = () => {
-            if (latestSeries0 > -1 && latestSeries1 > -1) {
-              const tooltipData = [s0.points[latestSeries0], s1.points[latestSeries1]];
-              refreshTooltip(this, tooltipData, latestSeries0, s0);
-            }
-            // If there are no YTD values
-            if (latestSeries0 > -1 && latestSeries1 === -1) {
-              const tooltipData = [s0.points[latestSeries0]];
-              refreshTooltip(this, tooltipData, latestSeries0, s0);
+            if (lastValue0 > -1) {
+              const tooltipData = lastValue1 > -1 ?
+                [s0.points[lastValue0], s1.points[lastValue1]] :
+                // no YTD values
+                [s0.points[lastValue0]];
+              refreshTooltip(this, tooltipData, lastValue0, s0);
             }
           };
           // Display tooltip when chart loads
-          if (latestSeries0 > -1 && latestSeries1 > -1) {
+          if (lastValue0 > -1 && lastValue1 > -1) {
             this.setTitle({ text: '' });
-            this.tooltip.refresh([s0.points[latestSeries0], s1.points[latestSeries1]]);
-            checkPointCount(currentFreq, s0, s0.points[latestSeries0], this, s1.points[latestSeries1], s1);
+            this.tooltip.refresh([s0.points[lastValue0], s1.points[lastValue1]]);
+            checkPointCount(currentFreq, s0, s0.points[lastValue0], this, s1.points[lastValue1], s1);
           }
-          if (latestSeries0 > -1 && latestSeries1 === -1) {
+          if (lastValue0 > -1 && lastValue1 === -1) {
             this.setTitle({ text: '' });
-            this.tooltip.refresh([s0.points[latestSeries0]]);
-            checkPointCount(currentFreq, s0, s0.points[latestSeries0], this);
+            this.tooltip.refresh([s0.points[lastValue0]]);
+            checkPointCount(currentFreq, s0, s0.points[lastValue0], this);
           }
           // If no data available for a given date range, display series title and display dates where data is available for a series
-          if (latestSeries0 === -1 && latestSeries1 === -1) {
+          if (lastValue0 === -1 && lastValue1 === -1) {
             this.setClassName(undefined);
             const categoryDisplayStart = formatDate(Date.parse(start), currentFreq);
             const categoryDisplayEnd = formatDate(Date.parse(end), currentFreq);
-            this.setTitle({ text: '<b>' + title + '</b>' });
+            this.setTitle({ text: `<b>${title}</b>` });
             this.setSubtitle({
               text: `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
               verticalAlign: 'middle',
               y: -20
             });
           }
-
         }
       },
       styledMode: true,
+     margin: [50, 15, 10, 10]
     };
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.title = this.setChartTitle('<br>');
@@ -318,6 +315,7 @@ export class HighchartComponent implements OnChanges {
     if (this.chartObject) {
       this.chartObject.redraw();
     }
+    //this.chartObject.reflow();
   }
 
   formatTransformLabel = (transformationName, percent, currentFreq) => {

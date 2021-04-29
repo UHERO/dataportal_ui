@@ -41,11 +41,11 @@ export class CategoryChartsComponent implements OnChanges {
     if (this.data) {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
-          console.log('CATEGORY CHARTS', this.chartStart)
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
         }
+        console.log('CAT CHART Series', chartSeries)
       });
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
@@ -90,7 +90,7 @@ export class CategoryChartsComponent implements OnChanges {
     const level = transformations.level;
     if (this.analyzerView && this.indexChecked) {
       series0 = { values: 
-        this.analyzerService.getIndexedValues(level.values, level.dates, this.indexBaseYear),
+        this.formatSeriesIndexData(transformations[series0Name], dateArray, this.indexBaseYear),
         start
       };
     }
@@ -108,6 +108,15 @@ export class CategoryChartsComponent implements OnChanges {
     };
     const chartData = { series0, series1, pseudoZones, dates };
     return { start, end, chartData };
+  }
+
+  formatSeriesIndexData = (transformation, dates: Array<any>, baseYear) => {
+    if (transformation) {
+      const indexDateExists = this.helperService.binarySearch(transformation.dates, baseYear);
+      return dates.map((curr, ind, arr) => {
+        return indexDateExists > -1 ? [Date.parse(curr.date), +transformation.values[ind] / +transformation.values[indexDateExists] * 100] : [Date.parse(curr.date), +transformation.values[ind] / +transformation.values[0] * 100];
+      });
+    } 
   }
 
   formatSeriesData = (transformation, dates: Array<any>) => {

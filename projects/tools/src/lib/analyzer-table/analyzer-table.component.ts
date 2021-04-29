@@ -72,7 +72,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.columnDefs = this.setTableColumns(tableDateCols);
     this.rows = [];
     this.summaryColumns = this.setSummaryStatColumns();
-    this.summaryRows = []; //this.seriesHelper.calculateAnalyzerSummaryStats(this.series, this.minDate, this.maxDate, this.indexChecked);
+    this.summaryRows = [];
     // Check if the summary statistics for a series has NA values
     this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
@@ -80,7 +80,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
       const transformations = this.helperService.getTransformations(series.observations);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
-      // const indexedBaseYear = this.analyzerService.analyzerData.baseYear;
       const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
       this.summaryRows.push(summaryStats)
       this.rows.push(seriesData);
@@ -105,7 +104,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     series.seriesEndDate = (series.observations.observationEnd > endDate || !endDate) ?
       series.observations.observationEnd : endDate;
     const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, series.seriesStartDate, series.seriesEndDate, indexed, indexBase);
-    stats.series = series.displayName;
+    stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
     return stats
   }
 

@@ -154,7 +154,7 @@ export class AnalyzerService {
     this.analyzerSeriesCompareSource.next(newCompare);
   }
 
-  toggleIndexValues(index, minYear) {
+  toggleIndexValues(index: boolean, minYear: string) {
     this.analyzerData.indexed = index;
     const currentCompareSeries = this.analyzerSeriesCompareSource.value;
     const baseYear = this.getIndexBaseYear(currentCompareSeries, minYear);

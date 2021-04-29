@@ -32,8 +32,10 @@ export interface HighchartsObject {
     className: string,
     events: {
       render: () => void,
+      load?: () => void
     },
     styledMode: true,
+    margin?: any
   };
   exporting: {
     enabled: boolean,
