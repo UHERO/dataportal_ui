@@ -190,10 +190,14 @@ export class CategoryHelperService {
 
   getSearchData(results, cacheId, search, geo, freq) {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
-    if (!results.observationStart && !results.observationEnd) {
+    const { observationStart, observationEnd, series } = results;
+    console.log('obsStart', observationStart);
+    console.log('onsEnd', observationEnd);
+    console.log('series', series)
+    if (!observationStart && !observationEnd) {
       this.categoryData[cacheId].invalid = search;
     }
-    if (results.observationStart && results.observationEnd) {
+    if (observationStart && observationEnd) {
       this.categoryData[cacheId].selectedCategory = { id: search, name: 'Search: ' + search };
       this.categoryData[cacheId].regions = results.geos;
       this.categoryData[cacheId].frequencies = results.freqs;
@@ -204,12 +208,12 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentFreq = currentFreq;
       this.categoryData[cacheId].currentGeo = currentGeo;
     }
-    if (results.series) {
-      results.series.forEach((serie) => {
+    if (series) {
+      series.forEach((serie) => {
         serie.observations = this.helperService.formatSeriesForCharts(serie);
         serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
-    });
-      const displaySeries = this.filterSeriesResults(results.series);
+      });
+      const displaySeries = this.filterSeriesResults(series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
       this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
       const catWrapper = this.getSearchDates(displaySeries);
@@ -219,10 +223,11 @@ export class CategoryHelperService {
       this.categoryData[cacheId].categoryDates = categoryDateArray;
       this.categoryData[cacheId].requestComplete = true;
     }
-    if (results.observationStart && results.observationEnd && !results.series) {
+    if (observationStart && observationEnd && !series) {
       this.categoryData[cacheId].noData = true;
       this.categoryData[cacheId].requestComplete = true;
     }
+    console.log('categoryData', this.categoryData[cacheId])
   }
 
   getSearchDates(displaySeries) {

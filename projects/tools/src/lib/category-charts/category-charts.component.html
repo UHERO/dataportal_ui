@@ -1,7 +1,4 @@
 <div class="multi-charts-row">
-	<ng-template ngIf [ngIf]="noSeriesToDisplay">
-		<p *ngIf="noSeriesToDisplay" class="no-data">No data available for current selection.</p>
-	</ng-template>
 	<ng-template ngFor let-serie [ngForOf]="data" [ngForTrackBy]="trackBySeries">
 		<div *ngIf="serie.display" class="multi-charts">
 			<a href="#" [routerLink]="['/series']" [queryParams]="{id: serie.id, sa: serie.saParam}"
