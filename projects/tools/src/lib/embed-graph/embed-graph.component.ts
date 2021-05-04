@@ -11,7 +11,7 @@ import { AnalyzerService } from '../analyzer.service';
 })
 export class EmbedGraphComponent implements OnInit {
   private seriesId: number;
-  private chartSeries: string;
+  private chartSeries: Array<any>;
   startDate: string;
   endDate: string;
   seriesData: any;

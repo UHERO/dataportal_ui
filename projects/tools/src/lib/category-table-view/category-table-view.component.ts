@@ -32,13 +32,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   columnDefs;
   rows;
   frameworkComponents;
-  paginationSizeOptions: number[] = [];
-  selectedPaginationSize;
-  totalPages: number;
   totalRows: number;
-  paginationSize: number;
-  disablePrevious: boolean;
-  disableNext: boolean;
   noSeriesToDisplay;
   gridOptions;
   freqSub: Subscription;
@@ -75,7 +69,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         if (series !== 'No data available' && this.dates) {
           series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
           series.analyze = this.analyzerService.checkAnalyzer(series);
-          const transformations = this.helperService.getTransformations(series.seriesObservations);
+          const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.selectedDataList ?
             this.formatLvlData(series, level, this.selectedDataList.id) :

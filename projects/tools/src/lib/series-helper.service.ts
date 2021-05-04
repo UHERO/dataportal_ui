@@ -40,11 +40,8 @@ export class SeriesHelperService {
       requestComplete: false
     };
     const dateArray = [];
-    const analyzerSeries = this.analyzerService.analyzerSeries;
     this.apiService.fetchPackageSeries(id, noCache, catId).subscribe((data) => {
       this.seriesData.seriesDetail = data.series;
-      // Check if series is in the analyzer
-      // const existAnalyze = analyzerSeries.find(aSeries => aSeries.id === data.series.id);
       this.seriesData.seriesDetail.analyze = this.analyzerService.checkAnalyzer(data.series);
       this.seriesData.seriesDetail.saParam = data.series.seasonalAdjustment !== 'not_seasonally_adjusted';
       const geos = data.series.geos;
@@ -84,7 +81,6 @@ export class SeriesHelperService {
         this.seriesData.eror = true;
         this.seriesData.requestComplete = true;
       });
-      console.log('seriesData', this.seriesData)
     return observableForkJoin([observableOf(this.seriesData)]);
   }
 
@@ -92,8 +88,8 @@ export class SeriesHelperService {
     const observations = seriesObs;
     const start = observations.observationStart;
     const end = observations.observationEnd;
-    const transformations = this.helperService.getTransformations(observations);
-    const level = transformations.level;
+    const transformations = this.helperService.getTransformations(observations.transformationResults);
+    const { level } = transformations;
     const pseudoZones = [];
     if (level.pseudoHistory) {
       level.pseudoHistory.forEach((obs, index) => {

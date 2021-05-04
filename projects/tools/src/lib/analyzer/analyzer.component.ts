@@ -41,7 +41,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private apiService: ApiService,
   ) {
-    this.analyzerSeriesSub = analyzerService.analyzerSeries.subscribe((series) => {
+    this.analyzerSeriesSub = analyzerService.analyzerSeriesTracker.subscribe((series) => {
       this.analyzerSeries = series;
       this.updateAnalyzer(series);
     });

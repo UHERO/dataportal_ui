@@ -28,7 +28,6 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 })
 export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() series;
-  @Input() allDates;
   @Input() portalSettings;
   @Input() start;
   @Input() end;
@@ -40,7 +39,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Output() tooltipOptions = new EventEmitter();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  //chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
   indexed: boolean = false;
@@ -67,7 +65,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           seriesMetaData += label.html ? `${label.html} \n` : '';
         }
       });
-      return seriesMetaData ?  `${seriesMetaData}\n\n${result}` : result;
+      return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
     this.chartCallback = chart => {
       this.chartObject = chart;
@@ -89,11 +87,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     }
     if(this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      const navigatorOptions = {
-        frequency: this.analyzerService.getHighestFrequency(this.series).freq,
-        numberOfObservations: this.allDates.length//this.filterDatesForNavigator(this.allDates).length
-      };
-      this.initChart(this.series, this.portalSettings, buttons, navigatorOptions);
+      const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
+      this.initChart(this.portalSettings, buttons, highestFrequency);
     }
   }
 
@@ -101,8 +96,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.compareSeriesSub.unsubscribe();
   }
 
-  updateChartData(series) {
-    console.log('highstock', series)
+  updateChartData(series: Array<any>) {
     const chartSeries = [...series, {
       className: 'navigator',
       data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
@@ -152,7 +146,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           max: null
         });
       }
-      return axes
+      return axes;
     }, []);
     this.chartOptions.series = chartSeries;
     if (this.chartObject) {
@@ -184,9 +178,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return chartButtons;
   }
 
-  initChart = (series, portalSettings, buttons, navigatorOptions) => {
-    const startDate = this.start ? this.start : null;
-    const endDate = this.end ? this.end : null;
+  initChart = (portalSettings, buttons, highestFreq) => {
+    const startDate = this.start || null;
+    const endDate = this.end || null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
@@ -211,8 +205,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         render() {
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = highestFreq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
+          this._selectedMax = highestFreq.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
@@ -255,10 +249,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visibility: 'hidden'
       },
       inputEnabled: true,
-      inputDateFormat: setInputDateFormat(navigatorOptions.frequency),
-      inputEditDateFormat: setInputEditDateFormat(navigatorOptions.frequency),
+      inputDateFormat: setInputDateFormat(highestFreq),
+      inputEditDateFormat: setInputEditDateFormat(highestFreq),
       inputDateParser(value) {
-        return setInputDateParser(value, navigatorOptions.frequency);
+        return setInputDateParser(value, highestFreq);
       },
       inputPosition: {
         x: -30,
@@ -340,8 +334,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         afterSetExtremes() {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = setDateToFirstOfMonth(navigatorOptions.frequency, userMin);
-          this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
+          this._selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
+          this._selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           this._indexed = updateIndexed(this);
@@ -373,13 +367,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         }
       },
-      minRange: this.calculateMinRange(navigatorOptions.frequency),
+      minRange: this.calculateMinRange(highestFreq),
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false,
       labels: {
         formatter() {
-          return xAxisFormatter(this, navigatorOptions.frequency);
+          return xAxisFormatter(this, highestFreq);
         }
       }
     };
@@ -446,7 +440,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       let label = '';
       aSeries.forEach((serie) => {
         // Check if current point's year is available in the annual series' data
-        const yearObs = serie.data.find(obs => Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x));
+        const yearObs = serie.data.find((obs) => {
+          return obs ? Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x) : false;
+        });
         if (yearObs) {
           label += formatSeriesLabel(name, units, geo, serie, yearObs.y, year, yearObs.x, '');
         }
@@ -458,7 +454,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       let label = '';
       qSeries.forEach((serie) => {
         // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
-        const obsDate = serie.data.find(obs => `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date);
+        const obsDate = serie.data.find((obs) => {
+          return obs ? `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date : false;
+        });
         if (obsDate) {
           const qDate = `${pointQuarter} ${Highcharts.dateFormat('%Y', obsDate.x)}`;
           label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');

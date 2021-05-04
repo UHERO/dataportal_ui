@@ -75,8 +75,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.routeYoy = params[`yoy`];
       this.routeYtd = params[`ytd`];
       this.routeSa = params[`sa`];
-      this.routeStart = params[`start`];
-      this.routeEnd = params[`end`];
+      this.routeStart = params[`start`] || null;
+      this.routeEnd = params[`end`] || null;
       this.noCache = params[`nocache`] === 'true';
       if (this.id) { this.queryParams.id = this.id; }
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
@@ -167,7 +167,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   changeRange(e) {
     this.routeStart = e.seriesStart;
-    this.routeEnd = e.endOfSample ? null : e.seriesEnd;
+    this.routeEnd = e.seriesEnd;
     this.displaySeries = true;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;

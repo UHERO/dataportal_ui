@@ -72,7 +72,6 @@ export class HighchartComponent implements OnChanges {
   }
 
   setXAxis = (startDate, endDate) => {
-    console.log('SET XAXIS', new Date(startDate).toISOString())
     return {
       type: 'datetime',
       min: startDate,
@@ -86,7 +85,7 @@ export class HighchartComponent implements OnChanges {
     };
   }
 
-  setYAxis = (min?: number, max?: number) => {
+  setYAxis = (min: number, max: number) => {
     return [{
       labels: {
         enabled: false
@@ -109,7 +108,7 @@ export class HighchartComponent implements OnChanges {
     }];
   }
 
-  setChartSeries = (portalSettings, series0, pseudoZones, series1, currentFreq, endDate) => {
+  setChartSeries = (portalSettings, series0, pseudoZones, series1, endDate) => {
     const chartSeries = [];
     chartSeries.push({
       name: portalSettings.highcharts.series0Name,
@@ -146,21 +145,16 @@ export class HighchartComponent implements OnChanges {
   }
 
   drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
-    let { dates, pseudoZones } = seriesData.categoryDisplay.chartData;
     const currentFreq = seriesData.frequencyShort;
-    const { start, end } = seriesData.categoryDisplay;
+    const { start, end } = seriesData.gridDisplay;
     const { percent, title, unitsLabelShort, displayName, indexDisplayName } = seriesData;
-    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, chartStart, chartEnd, currentFreq, this.defaultRange);
     const decimals = seriesData.decimals || 1;
-    let series0 = seriesData.categoryDisplay.chartData.series0;
-    let series1 = seriesData.categoryDisplay.chartData.series1;
-    const chartStartExists = dates.find(d => chartStart === d.date);
-    const chartEndExists = dates.find(d => chartEnd === d.date);
-    const startDate = chartStartExists ? Date.parse(chartStart) : Date.parse(dates[seriesStart].date);
-    const endDate = chartEndExists ? Date.parse(chartEnd) : Date.parse(dates[seriesEnd].date);
+    let { series0, series1, dates, pseudoZones } = seriesData.gridDisplay.chartData;
+    const startDate = Date.parse(chartStart);
+    const endDate = Date.parse(chartEnd);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
-    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, currentFreq, endDate);
+    const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
     const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
@@ -315,7 +309,6 @@ export class HighchartComponent implements OnChanges {
     if (this.chartObject) {
       this.chartObject.redraw();
     }
-    //this.chartObject.reflow();
   }
 
   formatTransformLabel = (transformationName, percent, currentFreq) => {
@@ -362,7 +355,7 @@ export class HighchartComponent implements OnChanges {
     this.chartOptions.exporting = { enabled: false };
     this.chartOptions.legend = { enabled: false };
     this.chartOptions.credits = { enabled: false };
-    this.chartOptions.yAxis = this.setYAxis();
+    this.chartOptions.yAxis = this.setYAxis(null, null);
     this.chartOptions.xAxis = this.setXAxis(null, null);
     this.chartOptions.series = [{
       data: []

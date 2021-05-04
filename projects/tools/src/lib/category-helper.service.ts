@@ -59,7 +59,6 @@ export class CategoryHelperService {
           this.categoryData[cacheId].requestComplete = true;
         }
       });
-      console.log(this.categoryData[cacheId])
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
     }
   }
@@ -115,6 +114,10 @@ export class CategoryHelperService {
         this.categoryData[cacheId].sliderDates = this.helperService.getTableDates(dates.categoryDates);
         this.categoryData[cacheId].categoryDateWrapper = dates.categoryDateWrapper;
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
+        series.forEach((serie) => {
+          serie.observations = this.helperService.formatSeriesForCharts(serie);
+          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
+        });
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
         this.categoryData[cacheId].series = series;
@@ -137,32 +140,6 @@ export class CategoryHelperService {
     categoryDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
     this.helperService.createDateArray(categoryDateWrapper.firstDate, categoryDateWrapper.endDate, currentFreq, categoryDateArray);
     return { categoryDateWrapper, categoryDates: categoryDateArray };
-  }
-
-  getUniqueRegionList = (series: Array<any>) => {
-    const regionList = [];
-    series.forEach((s) => {
-      s.geos.forEach((geo) => {
-        const regionExists = regionList.find(region => region.handle === geo.handle);
-        if (!regionExists) {
-          regionList.push(geo);
-        }
-      });
-    });
-    return regionList;
-  }
-
-  getUniqueFrequencyList = (series: Array<any>) => {
-    const freqList = [];
-    series.forEach((s) => {
-      s.freqs.forEach((freq) => {
-        const freqExists = freqList.find(frequency => frequency.freq === freq.freq);
-        if (!freqExists) {
-          freqList.push(freq);
-        }
-      });
-    });
-    return freqList;
   }
 
   setNoData(subcategory) {
@@ -228,6 +205,10 @@ export class CategoryHelperService {
       this.categoryData[cacheId].currentGeo = currentGeo;
     }
     if (results.series) {
+      results.series.forEach((serie) => {
+        serie.observations = this.helperService.formatSeriesForCharts(serie);
+        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
+    });
       const displaySeries = this.filterSeriesResults(results.series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
       this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);

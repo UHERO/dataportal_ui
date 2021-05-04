@@ -42,10 +42,8 @@ export class CategoryChartsComponent implements OnChanges {
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
-          chartSeries.categoryDisplay = this.formatCategoryChartData(chartSeries.seriesObservations, chartSeries.frequencyShort, this.dates, this.portalSettings);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
         }
-        console.log('CAT CHART Series', chartSeries)
       });
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
@@ -63,72 +61,7 @@ export class CategoryChartsComponent implements OnChanges {
     }
   }
 
-  createSeriesChartData = (transformation, dates) => {
-    if (transformation) {
-      const transformationValues = [];
-      dates.forEach((sDate) => {
-        const dateExists = this.helperService.binarySearch(transformation.dates, sDate.date);
-        dateExists > -1 ?
-          transformationValues.push([Date.parse(sDate.date), +transformation.values[dateExists]]) :
-          transformationValues.push([Date.parse(sDate.date), null]);
-      });
-      return transformationValues;
-    }
-  }
-
-  formatCategoryChartData = (observations, freq, dates, portalSettings) => {
-    console.log("FREQ", freq)
-    const dateArray = [];
-    const transformations = this.helperService.getTransformations(observations);
-    const { series0Name, series1Name } = portalSettings.highcharts;
-    const start = observations.observationStart;
-    const end = observations.observationEnd;
-    this.helperService.createDateArray(start, end, freq, dateArray);
-    let series0 = { values: this.formatSeriesData(transformations[series0Name], dateArray), start };
-    const series1 = { values: this.formatSeriesData(transformations[series1Name], dateArray), start };
-    const pseudoZones = [];
-    const level = transformations.level;
-    if (this.analyzerView && this.indexChecked) {
-      series0 = { values: 
-        this.formatSeriesIndexData(transformations[series0Name], dateArray, this.indexBaseYear),
-        start
-      };
-    }
-    if (level.pseudoHistory) {
-      level.pseudoHistory.forEach((obs, index) => {
-        if (obs && !level.pseudoHistory[index + 1]) {
-          pseudoZones.push({
-            value: Date.parse(level.dates[index]),
-            dashStyle: 'dash',
-            color: '#7CB5EC',
-            className: 'pseudoHistory'
-          });
-        }
-      });
-    };
-    const chartData = { series0, series1, pseudoZones, dates };
-    return { start, end, chartData };
-  }
-
-  formatSeriesIndexData = (transformation, dates: Array<any>, baseYear) => {
-    if (transformation) {
-      const indexDateExists = this.helperService.binarySearch(transformation.dates, baseYear);
-      return dates.map((curr, ind, arr) => {
-        return indexDateExists > -1 ? [Date.parse(curr.date), +transformation.values[ind] / +transformation.values[indexDateExists] * 100] : [Date.parse(curr.date), +transformation.values[ind] / +transformation.values[0] * 100];
-      });
-    } 
-  }
-
-  formatSeriesData = (transformation, dates: Array<any>) => {
-    if (transformation) {
-      return dates.map((date) => {
-        const dateExists = this.helperService.binarySearch(transformation.dates, date.date);
-        return dateExists > -1 ? [Date.parse(date.date), +transformation.values[dateExists]] : [Date.parse(date.date), null];
-      });
-    }
-  }
-
-  findMin(displaySeries, start, end) {
+  findMin = (displaySeries, start, end) => {
     let minValue = null;
     displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
@@ -140,7 +73,7 @@ export class CategoryChartsComponent implements OnChanges {
     return minValue;
   }
 
-  findMax(displaySeries, start, end) {
+  findMax = (displaySeries, start, end) => {
     let maxValue = null;
     displaySeries.forEach((serie) => {
       const values = this.getSeriesValues(serie, start, end);
@@ -152,7 +85,7 @@ export class CategoryChartsComponent implements OnChanges {
     return maxValue;
   }
 
-  getSeriesValues(series, start, end) {
+  getSeriesValues = (series, start, end) => {
     const dateStart = this.dates.findIndex(date => date.date === new Date(start).toISOString().substr(0, 10));
     const dateEnd = this.dates.findIndex(date => date.date === new Date(end).toISOString().substr(0, 10));
     return series.seriesObservations.transformationResults[0].values.slice(dateStart, dateEnd + 1);

@@ -19,7 +19,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() series;
   @Input() minDate;
   @Input() maxDate;
-  @Input() allTableDates;
   @Output() tableTransform = new EventEmitter();
   @Input() yoyChecked;
   @Input() ytdChecked;
@@ -28,7 +27,6 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   @Input() indexBaseYear: string;
   portalSettings;
   missingSummaryStat = false;
-  tableDates;
   private gridApi;
   columnDefs;
   rows;
@@ -77,7 +75,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.missingSummaryStat = this.isSummaryStatMissing(this.summaryRows);
     // Display values in the range of dates selected
     this.series.forEach((series) => {
-      const transformations = this.helperService.getTransformations(series.observations);
+      const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
       const { level, yoy, ytd, c5ma } = transformations;
       const seriesData = this.formatLvlData(series, level, this.minDate);
       const summaryStats = this.calculateAnalyzerSummaryStats(series, this.minDate, this.maxDate, this.indexChecked, this.indexBaseYear);
@@ -99,10 +97,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   calculateAnalyzerSummaryStats = (series, startDate: string, endDate: string, indexed: boolean, indexBase) => {
-    series.seriesStartDate = (series.observations.observationStart > startDate || !startDate) ?
-      series.observations.observationStart : startDate;
-    series.seriesEndDate = (series.observations.observationEnd > endDate || !endDate) ?
-      series.observations.observationEnd : endDate;
+    const { observationStart, observationEnd } = series.seriesObservations;
+    series.seriesStartDate = (observationStart > startDate || !startDate) ?
+      observationStart : startDate;
+    series.seriesEndDate = (observationEnd > endDate || !endDate) ?
+      observationEnd : endDate;
     const stats = this.seriesHelper.calculateSeriesSummaryStats(series, series.chartData, series.seriesStartDate, series.seriesEndDate, indexed, indexBase);
     stats.series = this.indexChecked ? series.indexDisplayName : series.displayName;
     return stats
@@ -250,8 +249,7 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     this.gridApi.exportDataAsCsv(params);
   }
 
-
-  isSummaryStatMissing = series => series.some((s) => s ? s.missing : null);
+  isSummaryStatMissing = series => series.some(s => s ? s.missing : null);
 
   yoyActive(e) {
     this.yoyChecked = e.target.checked;

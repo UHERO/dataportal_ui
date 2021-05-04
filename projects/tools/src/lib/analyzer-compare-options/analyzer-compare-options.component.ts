@@ -35,23 +35,19 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
   }
 
   onChartTypeChange(e, seriesInfo) {
-    console.log('e', e);
     this.analyzerService.updateCompareChartType(seriesInfo, e);
   }
 
   onChartAxisChange(e, seriesInfo) {
-    console.log('e', e);
     this.analyzerService.updateCompareSeriesAxis(seriesInfo, e);
   }
 
   removeFromCompare(seriesInfo) {
-    console.log('remove');
     this.analyzerService.removeFromComparisonChart(seriesInfo.id);
     this.inCompareChart = this.compareSeries.findIndex(s => s.className === this.seriesInfo.id) > -1;
   }
 
   addToCompare(seriesInfo) {
-    console.log('add');
     this.analyzerService.addToComparisonChart(seriesInfo);
     this.inCompareChart = this.compareSeries.findIndex(s => s.className === this.seriesInfo.id) > -1;
   }
