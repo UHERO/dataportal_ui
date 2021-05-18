@@ -201,21 +201,17 @@ export class AnalyzerService {
       this.analyzerData.yRightSeries = rightY ? rightY.split('-').map(s => +s) : [];
       // On load, analyzer should add 1 (or 2 if available) series to comparison chart
       // if user has not already added/removed series for comparison
-      console.log('set default compare')
       this.setDefaultCompareSeries();
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, this.analyzerData.minDate);
-      console.log("FETCH ANALYZER DATA", series)
       series.forEach((serie) => {
         serie.observations = this.helperService.formatSeriesForCharts(serie);
         const { indexed, baseYear } = this.analyzerData;
-        console.log('series', serie)
         serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', indexed, baseYear); 
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
-    console.log("ANALYZER DATA", this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 

@@ -151,7 +151,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
           }
         });
       });
-      console.log('siblingsIds', siblingIds)
       this.analyzerService.updateAnalyzerSeries(siblingIds);
     });
   }

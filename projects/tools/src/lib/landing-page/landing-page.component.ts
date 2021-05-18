@@ -36,6 +36,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   seriesStart = null;
   seriesEnd = null;
   portalSettings;
+  seriesRange;
   private displaySeries;
 
   // Variables for geo and freq selectors
@@ -167,8 +168,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   changeRange(e) {
     this.routeStart = e.seriesStart;
-    console.log('routeStart', e.seriesStart)
-    this.routeEnd = e.seriesEnd;
+    this.routeEnd = e.endOfSample ? null : e.seriesEnd;
+    this.seriesRange = e;
     this.displaySeries = true;
     this.queryParams.start = this.routeStart;
     this.queryParams.end = this.routeEnd;

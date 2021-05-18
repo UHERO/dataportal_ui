@@ -39,7 +39,6 @@ export class CategoryChartsComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.data) {
-      console.log('this.data', this.data)
       this.data.forEach((chartSeries) => {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
@@ -48,7 +47,6 @@ export class CategoryChartsComponent implements OnChanges {
       });
     }
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
-    console.log('CAT CHARTS INDEXCHECKED', this.indexChecked)
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
     if (this.portalSettings.highcharts.setYAxes && !this.search) {

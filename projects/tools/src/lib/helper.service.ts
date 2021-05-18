@@ -201,7 +201,6 @@ export class HelperService {
 
   formatSeriesForCharts = (series: any) => {
     let dateArray = [];
-    console.log('FORMATSERIESFORCHARTS')
     const { observationStart, observationEnd, transformationResults } = series.seriesObservations;
     this.createDateArray(observationStart, observationEnd, series.frequencyShort, dateArray);
     return transformationResults.map((t) => {
@@ -227,7 +226,6 @@ export class HelperService {
   }
 
   formatGridDisplay = (serie: any, series0: string, series1: string, indexed: boolean, baseYear: string) => {
-    console.log('format grid display')
     const { observationStart, observationEnd } = serie.seriesObservations;
     const s0 = serie.observations.find(obs => obs.name === series0);
     const s1 = serie.observations.find(obs => obs.name === series1);

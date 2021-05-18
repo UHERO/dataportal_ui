@@ -191,9 +191,6 @@ export class CategoryHelperService {
   getSearchData(results, cacheId, search, geo, freq) {
     const categoryDateWrapper = { firstDate: '', endDate: '' };
     const { observationStart, observationEnd, series } = results;
-    console.log('obsStart', observationStart);
-    console.log('onsEnd', observationEnd);
-    console.log('series', series)
     if (!observationStart && !observationEnd) {
       this.categoryData[cacheId].invalid = search;
     }
@@ -227,7 +224,6 @@ export class CategoryHelperService {
       this.categoryData[cacheId].noData = true;
       this.categoryData[cacheId].requestComplete = true;
     }
-    console.log('categoryData', this.categoryData[cacheId])
   }
 
   getSearchDates(displaySeries) {

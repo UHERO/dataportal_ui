@@ -154,15 +154,14 @@ export class HighchartComponent implements OnChanges {
     const decimals = seriesData.decimals || 1;
     let { series0, series1, pseudoZones } = seriesData.gridDisplay.chartData;
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
-    const startDate = Date.parse(chartStart);
-    const endDate = Date.parse(chartEnd);
+    const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start)
+    const endDate = Date.parse(chartEnd) || Date.parse(seriesData.gridDisplay.end);
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);
     const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
-    console.log('DRAW CHART INDEXED', indexed)
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
@@ -211,8 +210,6 @@ export class HighchartComponent implements OnChanges {
           let lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
             HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
           if (s0.userOptions._indexed && !s0.points.some(p => p.y !== null)) {
-            console.log('s0', s0)
-
             lastValue0 = -1;
             lastValue1 = -1
           }

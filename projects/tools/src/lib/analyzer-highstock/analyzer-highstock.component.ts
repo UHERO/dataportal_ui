@@ -82,7 +82,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
       this.chartOptions.yAxis.forEach((y) => {
-        console.log('Y', y)
         y.min = y.min || null;
         y.max = y.max || null;
       })
@@ -90,7 +89,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (this.chartOptions.rangeSelector) {
       this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
       this.chartOptions.yAxis.forEach((y) => {
-        console.log('Y', y)
         y.min = y.min || null;
         y.max = y.max || null;
       });
@@ -134,7 +132,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
-    console.log('update')
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
