@@ -49,6 +49,7 @@ export class CategoryChartsComponent implements OnChanges {
     this.noSeriesToDisplay = this.helperService.checkIfSeriesAvailable(this.noSeries, this.data);
     // If setYAxes, chart view should display all charts' (level) yAxis with the same range
     // Allow y-axes to vary for search results
+    console.log(this.portalSettings.highcharts)
     if (this.portalSettings.highcharts.setYAxes && !this.search) {
       const defaultStartEnd = this.defaultRange.find(ranges => ranges.freq === this.freq);
       const start = this.chartStart || Date.parse(defaultStartEnd.start);
