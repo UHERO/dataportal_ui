@@ -1,5 +1,6 @@
 import { Component, Inject, OnChanges, Input } from '@angular/core';
 import { HelperService } from '../helper.service';
+import { AnalyzerService } from '../analyzer.service';
 import * as Highcharts from 'highcharts';
 import { HighchartsObject } from '../tools.models';
 
@@ -38,6 +39,7 @@ export class HighchartComponent implements OnChanges {
   constructor(
     @Inject('defaultRange') private defaultRange,
     private helperService: HelperService,
+    private _analyzerService: AnalyzerService,
   ) {
     this.chartCallback = chart => {
       this.chartObject = chart;
@@ -115,6 +117,7 @@ export class HighchartComponent implements OnChanges {
       type: portalSettings.highcharts.series0Type,
       yAxis: 1,
       data: series0.values,
+      _indexed: this.indexChecked,
       pointStart: Date.parse(series0.start),
       endDate: endDate,
       states: {
@@ -144,12 +147,13 @@ export class HighchartComponent implements OnChanges {
     return chartSeries;
   }
 
-  drawChart = (seriesData, portalSettings, min: number, max: number, chartStart?, chartEnd?) => {
+  drawChart = (seriesData, portalSettings, min: number, max: number, chartStart, chartEnd) => {
     const currentFreq = seriesData.frequencyShort;
     const { start, end } = seriesData.gridDisplay;
     const { percent, title, unitsLabelShort, displayName, indexDisplayName } = seriesData;
     const decimals = seriesData.decimals || 1;
-    let { series0, series1, dates, pseudoZones } = seriesData.gridDisplay.chartData;
+    let { series0, series1, pseudoZones } = seriesData.gridDisplay.chartData;
+    series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
     const startDate = Date.parse(chartStart);
     const endDate = Date.parse(chartEnd);
     // Check how many non-null points exist in level series
@@ -158,6 +162,7 @@ export class HighchartComponent implements OnChanges {
     const formatLabel = (seriesName, freq, perc) => this.formatTransformLabel(seriesName, freq, perc);
     const formatDate = (date, freq) => this.formatDateLabel(date, freq);
     const indexed = this.indexChecked;
+    console.log('DRAW CHART INDEXED', indexed)
     const addSubtitle = (point0, freq, chart, point1?, s1?) => {
       const dateLabel = formatDate(point0.x, freq);
       let subtitleText = '';
@@ -201,10 +206,16 @@ export class HighchartComponent implements OnChanges {
           const s0 = this.series[0];
           const s1 = this.series[1];
           // Get position of last non-null value
-          const lastValue0 = (s0 !== undefined && s0.points && s0.points.length) ?
+          let lastValue0 = (s0 !== undefined && s0.points && s0.points.length) ?
             HighchartComponent.findLastValue(s0.points, s0.userOptions.endDate, s0.xAxis.min) : -1;
-          const lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
+          let lastValue1 = (s1 !== undefined && s1.points && s1.points.length) ?
             HighchartComponent.findLastValue(s1.points, s1.userOptions.endDate, s1.xAxis.min) : -1;
+          if (s0.userOptions._indexed && !s0.points.some(p => p.y !== null)) {
+            console.log('s0', s0)
+
+            lastValue0 = -1;
+            lastValue1 = -1
+          }
           // Prevent tooltip from being hidden on mouseleave
           // Reset toolip value and marker to most recent observation
           this.tooltip.hide = () => {
@@ -232,9 +243,9 @@ export class HighchartComponent implements OnChanges {
             this.setClassName(undefined);
             const categoryDisplayStart = formatDate(Date.parse(start), currentFreq);
             const categoryDisplayEnd = formatDate(Date.parse(end), currentFreq);
-            this.setTitle({ text: `<b>${title}</b>` });
+            this.setTitle({ text: s0.userOptions._indexed ? `<b>${indexDisplayName}</b>` : `<b>${title}</b>` });
             this.setSubtitle({
-              text: `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
+              text: s0.userOptions._indexed ? `Not available for current base year` : `Data Available From: ${categoryDisplayStart} - ${categoryDisplayEnd}`,
               verticalAlign: 'middle',
               y: -20
             });
@@ -255,6 +266,9 @@ export class HighchartComponent implements OnChanges {
       shared: true,
       formatter() {
         const getSeriesLabel = (points, labelString) => {
+          if (indexed && !points.some(p => p.series.userOptions.name === 'level')) {
+            return;
+          }
           points.forEach((point) => {
             const displayValue = Highcharts.numberFormat(point.y, decimals, '.', ',');
             const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;

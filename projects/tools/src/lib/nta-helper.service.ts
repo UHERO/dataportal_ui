@@ -32,6 +32,7 @@ export class NtaHelperService {
   initContent(catId: any, noCache: boolean, dataListId: number, selectedMeasure?: string): Observable<any> {
     const cacheId = NtaHelperService.setCacheId(catId, dataListId, selectedMeasure);
     if (this.categoryData[cacheId]) {
+      this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       return observableOf([this.categoryData[cacheId]]);
     }
     if (!this.categoryData[cacheId] && (typeof catId === 'number' || catId === null)) {
@@ -47,9 +48,10 @@ export class NtaHelperService {
   getCategory(cacheId: string, noCache: boolean, catId: any, dataListId, selectedMeasure?: string) {
     this.categoryData[cacheId] = {} as CategoryData;
     this.apiService.fetchCategories().subscribe((categories) => {
-      if (catId === null) {
+      /* if (catId === null) {
         catId = categories[0].id;
-      }
+      } */
+      catId = catId || categories[0].id;
       const cat = categories.find(category => category.id === catId);
       if (cat) {
         if (dataListId == null) {
@@ -105,11 +107,17 @@ export class NtaHelperService {
     category.dateWrapper = { firstDate: '', endDate: '' };
     this.apiService.fetchMeasurementSeries(category.currentMeasurement.id, noCache).subscribe((series) => {
       if (series) {
+        series.forEach((serie) => {
+          serie.observations = this.helperService.formatSeriesForCharts(serie);
+          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
+        });
         category.series = series;
+
         this.formatCategoryData(category, categoryDataArray, false);
       }
       if (!series) {
         category.noData = true;
+        category.requestComplete = true;
       }
     },
       (error) => {
@@ -217,6 +225,7 @@ export class NtaHelperService {
     category.sliderDates = this.helperService.getTableDates(category.dateArray);
     category.findMinMax = true;
     category.requestComplete = true;
+    console.log('CATEGORY', category)
   }
 
   filterSeries(seriesArray: Array<any>, category, search: boolean) {

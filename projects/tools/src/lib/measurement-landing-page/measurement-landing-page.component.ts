@@ -42,9 +42,6 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
 
   ngOnInit() {
     this.portalSettings = this.dataPortalSettingsServ.dataPortalSettings[this.portal.universe];
-  }
-
-  ngAfterViewInit() {
     this.sub = this.activatedRoute.queryParams.subscribe((params) => {
       this.id = this.getIdParam(params[`id`]);
       this.dataListId = this.getIdParam(params[`data_list_id`]);
@@ -61,6 +58,25 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
       this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
     });
+  }
+
+  ngAfterViewInit() {
+    /*this.sub = this.activatedRoute.queryParams.subscribe((params) => {
+      this.id = this.getIdParam(params[`id`]);
+      this.dataListId = this.getIdParam(params[`data_list_id`]);
+      this.search = typeof this.id === 'string' ? true : false;
+      this.routeView = params[`view`];
+      this.routeC5ma = params[`c5ma`];
+      this.selectedMeasure = params[`m`];
+      this.noCache = params[`nocache`] === 'true';
+      if (this.id) { this.queryParams.id = this.id; }
+      if (this.selectedMeasure) { this.queryParams.m = this.selectedMeasure; }
+      if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
+      if (this.routeView) { this.queryParams.view = this.routeView; }
+      if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
+      if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
+      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
+    });*/
   }
 
   ngOnDestroy() {

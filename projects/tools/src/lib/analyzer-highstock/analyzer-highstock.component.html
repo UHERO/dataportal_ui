@@ -4,7 +4,7 @@
 <div id="customize-yAxis" class="d-flex mt-2 justify-content-center">
   <ng-template ngFor let-axis [ngForOf]="chartOptions.yAxis">
     <ng-template ngIf [ngIf]="axis.title.text">
-      <div class="d-inline-flex flex-column justify-content-center">
+      <div class="d-inline-flex flex-column justify-content-center" [style.order]="axis.styleOrder">
         <span class="d-block text-center">Y-Axis ({{axis.title.text}})</span>
         <div class="d-flex justify-content-center align-items-center flex-row">
           <label class="mb-0" attr.for="min{{axis.id}}">Min:</label>

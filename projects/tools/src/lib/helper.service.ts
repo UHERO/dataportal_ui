@@ -201,6 +201,7 @@ export class HelperService {
 
   formatSeriesForCharts = (series: any) => {
     let dateArray = [];
+    console.log('FORMATSERIESFORCHARTS')
     const { observationStart, observationEnd, transformationResults } = series.seriesObservations;
     this.createDateArray(observationStart, observationEnd, series.frequencyShort, dateArray);
     return transformationResults.map((t) => {
@@ -226,12 +227,13 @@ export class HelperService {
   }
 
   formatGridDisplay = (serie: any, series0: string, series1: string, indexed: boolean, baseYear: string) => {
+    console.log('format grid display')
     const { observationStart, observationEnd } = serie.seriesObservations;
     const s0 = serie.observations.find(obs => obs.name === series0);
     const s1 = serie.observations.find(obs => obs.name === series1);
     return {
       chartData: {
-        series0: indexed ? this.getIndexedTransformation(s0, baseYear) : s0,
+        series0: s0, //indexed ? this.getIndexedTransformation(s0, baseYear) : s0,
         series1: s1,
         pseudoZones: s0.pseudoZones
       },
@@ -256,7 +258,7 @@ export class HelperService {
     if (transformation) {
       const indexDateExists = this.binarySearch(dates.map(d => d.date), baseYear);
       return dates.map((curr, ind, arr) => {
-        return indexDateExists > -1 ? [Date.parse(curr.date), +transformation[ind][1] / +transformation[indexDateExists][1] * 100] : [Date.parse(curr.date), +transformation[ind][1] / +transformation[0][1] * 100];
+        return indexDateExists > -1 ? [Date.parse(curr.date), +transformation[ind][1] / +transformation[indexDateExists][1] * 100] : [Date.parse(curr.date), null];
       });
     } 
   }

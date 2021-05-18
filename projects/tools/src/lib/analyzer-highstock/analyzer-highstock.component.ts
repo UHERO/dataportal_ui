@@ -81,11 +81,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.chartOptions.yAxis.forEach((y) => {
+        console.log('Y', y)
+        y.min = y.min || null;
+        y.max = y.max || null;
+      })
     }
     if (this.chartOptions.rangeSelector) {
-      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null
+      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
+      this.chartOptions.yAxis.forEach((y) => {
+        console.log('Y', y)
+        y.min = y.min || null;
+        y.max = y.max || null;
+      });
     }
-    if(this.series.length && !this.chartObject) {
+    if (this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
@@ -124,6 +134,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
+    console.log('update')
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
@@ -140,8 +151,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           minPadding: 0,
           maxPadding: 0,
           minTickInterval: 0.01,
+          endOnTick: false,
+          startOnTick: false,
           showEmpty: false,
           yAxisSide: s.yAxisSide,
+          styleOrder: s.yAxisSide === 'left' ? 1 : 2,
+          showLastLabel: true,
+          showFirstLabel: true,
           min: null,
           max: null
         });
@@ -156,23 +172,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   changeYAxisMin(e, axis) {
-    axis.min = e.target.value ? +e.target.value : null;
+    axis.min = +e.target.value || null;
     this.updateChart = true;
   }
 
   changeYAxisMax(e, axis) {
-    axis.max = e.target.value ? +e.target.value : null;
+    axis.max = +e.target.value || null;
     this.updateChart = true;
   }
 
   formatChartButtons(buttons: Array<any>) {
     const chartButtons = buttons.reduce((allButtons, button) => {
-      if (button !== 'all') {
-        allButtons.push({ type: 'year', count: button, text: button + 'Y' });
-      }
-      if (button === 'all') {
-        allButtons.push({ type: 'all', text: 'All' });
-      }
+        allButtons.push(button !== 'all' ? { type: 'year', count: button, text: `${button}Y` } : { type: 'all', text: 'All' });
       return allButtons;
     }, []);
     return chartButtons;

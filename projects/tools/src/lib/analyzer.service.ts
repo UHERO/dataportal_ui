@@ -63,7 +63,7 @@ export class AnalyzerService {
     }
     currentCompare.push({
       className: series.id,
-      name: indexed ? series.indexDisplayName : series.chartDisplayName,
+      name: indexed ? series.indexDisplayName : series.displayName,
       tooltipName: series.title,
       data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       levelData: series.chartData.level,
@@ -98,14 +98,14 @@ export class AnalyzerService {
   getIndexedValues = (values: Array<number>, dates: Array<string>, baseYear: string) => {
     return values.map((curr, ind, arr) => {
       const dateIndex = dates.findIndex(date => date === baseYear);
-      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : curr / arr[0] * 100;
+      return dateIndex > -1 ? curr / arr[dateIndex] * 100 : Infinity;
     });
   }
 
   getChartIndexedValues = (values: Array<number>, baseYear: string) => {
     return values.map((curr, ind, arr) => {
       const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
-      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
+      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], null];
     });
   }
 
@@ -155,13 +155,13 @@ export class AnalyzerService {
       this.updateCompareSeriesDataAndAxes(currentCompareSeries);
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
+    this.analyzerData.analyzerSeries.forEach((s) => {
+      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1', index, baseYear);
+    })
   }
 
   updateCompareSeriesDataAndAxes(series: Array<any>) {
     const { indexed, baseYear } = this.analyzerData;
-    this.analyzerData.analyzerSeries.forEach((s) => {
-      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1', indexed, baseYear);
-    })
     series.forEach((s) => {
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
       s.yAxis = indexed ? `Index (${baseYear})-${s.seriesInfo.selectedYAxis}` : `${s.unitsLabelShort}-${s.seriesInfo.selectedYAxis}`;
@@ -184,6 +184,7 @@ export class AnalyzerService {
 
   getAnalyzerData(aSeriesTracker: Array<any>, noCache: boolean, rightY: string) {
     this.analyzerData.analyzerSeries = [];
+    this.analyzerData.requestComplete = false;
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
@@ -200,17 +201,21 @@ export class AnalyzerService {
       this.analyzerData.yRightSeries = rightY ? rightY.split('-').map(s => +s) : [];
       // On load, analyzer should add 1 (or 2 if available) series to comparison chart
       // if user has not already added/removed series for comparison
+      console.log('set default compare')
       this.setDefaultCompareSeries();
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, this.analyzerData.minDate);
+      console.log("FETCH ANALYZER DATA", series)
       series.forEach((serie) => {
         serie.observations = this.helperService.formatSeriesForCharts(serie);
         const { indexed, baseYear } = this.analyzerData;
-        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', indexed, baseYear) //this.helperService.formatSeriesForChartGrid(serie, this.analyzerData.indexed, this.analyzerData.baseYear);  
+        console.log('series', serie)
+        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', indexed, baseYear); 
       });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
+    console.log("ANALYZER DATA", this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -283,13 +288,6 @@ export class AnalyzerService {
       seasonalAdjustment,
       units: unitsLabelShort || unitsLabel
     };
-    const chartNameDetails = {
-      title,
-      geography: geography.shortName,
-      frequency,
-      seasonalAdjustment,
-      units: unitsLabelShort || unitsLabel
-    };
     const indexNameDetails = {
       title,
       geography: geography.shortName,
@@ -297,9 +295,16 @@ export class AnalyzerService {
       seasonalAdjustment,
       units: 'Index'
     }
+    const indexNameNoValues = {
+      title,
+      geography: geography.shortName,
+      frequency,
+      seasonalAdjustment,
+      units: 'Not available for current base year'
+    }
     series.displayName = this.formatDisplayName(abbreviatedNameDetails);
-    series.chartDisplayName = this.formatDisplayName(chartNameDetails);
     series.indexDisplayName = this.formatDisplayName(indexNameDetails);
+    series.naIndex = this.formatDisplayName(indexNameNoValues);
     series.saParam = seasonalAdjustment !== 'not_seasonally_adjusted';
     series.currentGeo = series.geography;
     series.currentFreq = { freq: frequencyShort, label: frequency };

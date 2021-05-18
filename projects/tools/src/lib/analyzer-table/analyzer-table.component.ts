@@ -189,8 +189,12 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
     const formattedDates = dates.map(d => this.helperService.formatDate(d, series.frequencyShort));
     const baseYear = this.indexBaseYear
     const indexedValues = this.analyzerService.getIndexedValues(values, dates, baseYear);
+    console.log('baseYear', baseYear);
+    const indexBaseYearNotAvailable = !indexedValues.some(v => v !== Infinity);
+    const indexDisplayName = indexBaseYearNotAvailable ? series.naIndex : series.indexDisplayName;
+    console.log('indexedValues', indexBaseYearNotAvailable)
     const seriesData = {
-      series: this.indexChecked ? series.indexDisplayName : series.displayName,
+      series: this.indexChecked ? indexDisplayName : series.displayName,
       lockPosition: true,
       saParam: series.saParam,
       seriesInfo: series,
