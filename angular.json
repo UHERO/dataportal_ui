@@ -853,7 +853,9 @@
                   "maximumError": "10kb"
                 }
               ],
-              "baseHref": "/fc/"
+              "baseHref": "/fc/",
+              "serviceWorker": true,
+              "ngswConfigPath": "projects/forecast/ngsw-config.json"
             },
             "apiDev": {
               "fileReplacements": [
