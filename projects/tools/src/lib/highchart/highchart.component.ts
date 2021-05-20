@@ -74,7 +74,6 @@ export class HighchartComponent implements OnChanges {
   }
 
   setXAxis = (startDate, endDate) => {
-    console.log('start', new Date(startDate).toISOString())
     return {
       type: 'datetime',
       min: startDate,
@@ -157,10 +156,6 @@ export class HighchartComponent implements OnChanges {
     series0 = this.indexChecked ? this.helperService.getIndexedTransformation(seriesData.observations[0], this._analyzerService.analyzerData.baseYear) : series0;
     const startDate = Date.parse(chartStart) || Date.parse(seriesData.gridDisplay.start)
     const endDate = Date.parse(chartEnd) || Date.parse(seriesData.gridDisplay.end);
-    console.log('chartStart', chartStart)
-    console.log('chartEnd', chartEnd)
-    console.log('startDate', startDate)
-    console.log('endDate', endDate)
     // Check how many non-null points exist in level series
     const levelLength = series0.values.filter(value => Number.isFinite(value));
     const chartSeries = this.setChartSeries(portalSettings, series0, pseudoZones, series1, endDate);

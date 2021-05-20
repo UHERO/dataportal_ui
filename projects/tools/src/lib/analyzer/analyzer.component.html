@@ -18,10 +18,11 @@
           {{displayCompare ? 'view_comfy' : 'assessment'}}
         </span>{{displayCompare ? 'Grid' : 'Compare'}}
       </button>
-      <label class="form-check-inline">
-        <input type="checkbox" (change)="indexActive($event)" [checked]="indexSeries">Index
-      </label>
       <ng-template ngIf [ngIf]="data.requestComplete">
+        <label class="form-check-inline">
+          <input type="checkbox" (change)="indexActive($event)" [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="indexSeries" [disabled]="!data.displayFreqSelector">Index
+        </label>
+  
         <lib-date-slider *ngIf="!displayCompare" class="sliders" [portalSettings]="portalSettings"
           [dates]="data.sliderDates" [dateFrom]="data.minDate" [dateTo]="data.maxDate"
           [freq]="data.analyzerFrequency.freq" (updateRange)="changeRange($event)"></lib-date-slider>
