@@ -105,6 +105,60 @@ export class DataPortalSettingsService {
         }
       ]
     },
+    fc: {
+      catTable: {
+        portalSource: 'The University of Hawaii Economic Research Organization (UHERO) Forecast Data Portal: https://data.uhero.hawaii.edu/fc/ \n ',
+        portalLink: 'https://data.uhero.hawaii.edu/fc/#/category?id='
+      },
+      highcharts: {
+        seriesTotal: 2,
+        series0Name: 'level',
+        series0Type: 'line',
+        series0Data: true,
+        series1Name: 'ytd',
+        series1Type: 'column',
+        series1Data: true,
+        setYAxes: false
+      },
+      highstock: {
+        credits: 'data.uhero.hawaii.edu/fc',
+        labels: {
+          seriesLink: 'https://data.uhero.hawaii.edu/#/series?id=',
+          portal: 'The University of Hawaii Economic Research Organization (UHERO) Forecast',
+          portalLink: 'UHERO Forecast Data Portal: https://data.uhero.hawaii.edu/fc'
+        },
+        series0Name: 'level',
+        series0Type: 'line',
+        series1Name: 'yoy',
+        series1Type: 'column',
+        series2Name: 'ytd',
+        series2Type: 'column',
+        buttons: [1, 5, 10, 'all']
+      },
+      seriesTable: {
+        columns: 4,
+        series1: 'formattedValue',
+        series1Label: 'Level',
+        series2: 'formattedYoy',
+        series2Label: 'Year/Year % Chg',
+        series2PercLabel: 'Year/Year Chg',
+        series3: 'formattedYtd',
+        series3Label: 'Year-to-Date % Chg',
+        series3PercLabel: 'Year-to-Date Chg'
+      },
+      transformations: {
+        yoy: true,
+        ytd: true,
+        c5ma: false
+      },
+      sliderInteraction: true,
+      otherDashboardLinks: [
+        {
+          name: `Hawai'i High Frequency Economic Data`,
+          url: `https://data.uhero.hawaii.edu/high-frequency-dashboard/#/`
+        }
+      ]
+    },
     ccom: {
       catTable: {
         portalSource: 'Chamber of Commerce Hawaii Dataportal: https://data.uhero.hawaii.edu/ccom \n ',

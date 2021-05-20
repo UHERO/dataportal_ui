@@ -43,7 +43,8 @@ export class CategoryHelperService {
         }
         const cat = categories.find(category => category.id === catId);
         if (cat) {
-          const categoryDataLists = cat.children;
+          const categoryDataLists = cat.children || [cat];
+          console.log('cat', cat)
           const selectedDataList = dataListId ?
             this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
             this.helperService.getCategoryDataLists(categoryDataLists[0], '');
