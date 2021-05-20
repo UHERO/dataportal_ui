@@ -47,6 +47,8 @@
     "!/nta/**",
     "!/ccom",
     "!/ccom/**",
+    "!/fc",
+    "!/fc/**",
     "!/high-frequency-dashboard",
     "!/high-frequency-dashboard/**",
     "!/dbedt",
