@@ -1,8 +1,17 @@
 h2#analyzer-header {
-  display: block;
+  display: inline-block;
   font-size: 1.4em;
   text-transform: capitalize;
   margin: 0;
+}
+
+div#share-remove {
+  display: inline-block;
+}
+
+div#analyzer-customizations {
+  display: block;
+  padding-top: .5em;
 }
 
 .chart-warning {

@@ -193,7 +193,7 @@ export class AnalyzerService {
       analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
       this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(series);
-      this.analyzerData.siblingFreqs = this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(series) : null;
+      this.analyzerData.siblingFreqs = this.getSiblingFrequencies(series)//this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(series) : null;
       series.forEach((s) => {
         this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, aSeriesTracker);
       });
@@ -212,6 +212,7 @@ export class AnalyzerService {
       this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
+    console.log(this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -372,6 +373,8 @@ export class AnalyzerService {
     const sorted = freqs.sort((a, b) => {
       return (ordering[a.freq] - ordering[b.freq]);
     });
+    console.log('highest freq')
+    this.helperService.updateCurrentFrequency({ freq: null, label: null });
     return sorted[0];
   }
 
