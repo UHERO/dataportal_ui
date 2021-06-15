@@ -17,7 +17,6 @@ export class FreqSelectorComponent implements OnDestroy {
 
   constructor(private helperService: HelperService) {
     this.freqSubscription = helperService.currentFreq.subscribe((freq) => {
-      console.log('selectedFreq', freq)
       this.selectedFreq = freq;
     });
   }

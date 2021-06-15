@@ -56,7 +56,9 @@ export class MeasurementLandingPageComponent implements OnInit, AfterViewInit, O
       if (this.routeView) { this.queryParams.view = this.routeView; }
       if (this.routeC5ma) { this.queryParams.c5ma = this.routeC5ma; } else { delete this.queryParams.c5ma; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; }  else { delete this.queryParams.noCache; }
-      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, this.dataListId, this.selectedMeasure);
+      const dataListId = this.dataListId;
+      const selectedMeasure = this.selectedMeasure;
+      this.categoryData = this.ntaHelperService.initContent(this.id, this.noCache, { dataListId, selectedMeasure });
     });
   }
 

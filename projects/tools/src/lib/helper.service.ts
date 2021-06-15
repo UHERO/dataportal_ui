@@ -14,6 +14,14 @@ export class HelperService {
 
   constructor() { }
 
+  setCacheId(category: any, routeParams: any) {
+    let id = `category${category}`;
+    Object.keys(routeParams).forEach((param) => {
+      id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
+    });
+    return id;
+  }
+
   updateCurrentFrequency = (newFreq: Frequency) => {
     this.currentFreqChange.next(newFreq);
     return newFreq;
@@ -225,13 +233,13 @@ export class HelperService {
     return pseudoZones;
   }
 
-  formatGridDisplay = (serie: any, series0: string, series1: string, indexed: boolean, baseYear: string) => {
+  formatGridDisplay = (serie: any, series0: string, series1: string) => {
     const { observationStart, observationEnd } = serie.seriesObservations;
     const s0 = serie.observations.find(obs => obs.name === series0);
     const s1 = serie.observations.find(obs => obs.name === series1);
     return {
       chartData: {
-        series0: s0, //indexed ? this.getIndexedTransformation(s0, baseYear) : s0,
+        series0: s0,
         series1: s1,
         pseudoZones: s0.pseudoZones
       },

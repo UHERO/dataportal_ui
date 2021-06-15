@@ -2,6 +2,7 @@ import { of as observableOf, forkJoin as observableForkJoin, BehaviorSubject } f
 import { Injectable, EventEmitter, Output } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
+import { DateWrapper } from './tools.models';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +54,7 @@ export class AnalyzerService {
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
   }
 
-  addToComparisonChart(series) {
+  setCompareChartSeriesObject(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.analyzerData.analyzerSeries.find(s => s.id === series.id).compare = true;
     this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
@@ -156,7 +157,7 @@ export class AnalyzerService {
       this.analyzerSeriesCompareSource.next(currentCompareSeries);
     }
     this.analyzerData.analyzerSeries.forEach((s) => {
-      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1', index, baseYear);
+      s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1');
     })
   }
 
@@ -188,13 +189,15 @@ export class AnalyzerService {
     const ids = aSeriesTracker.map(s => s.id).join();
     this.apiService.fetchPackageAnalyzer(ids, noCache).subscribe((results) => {
       const series = results.series;
-      const analyzerDateWrapper = { firstDate: '', endDate: '' };
+      const analyzerDateWrapper = { } as DateWrapper;
       analyzerDateWrapper.firstDate = this.helperService.findDateWrapperStart(series);
       analyzerDateWrapper.endDate = this.helperService.fineDateWrapperEnd(series);
       this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(series);
-      this.analyzerData.siblingFreqs = this.getSiblingFrequencies(series)//this.analyzerData.displayFreqSelector ? this.getSiblingFrequencies(series) : null;
+      this.analyzerData.siblingFreqs = this.getSiblingFrequencies(series);
       series.forEach((s) => {
+        s.observations = this.helperService.formatSeriesForCharts(s);
+        s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1'); 
         this.addSeriesToAnalyzerData(s, this.analyzerData.analyzerSeries, aSeriesTracker);
       });
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) : this.getHighestFrequency(this.analyzerData.analyzerSeries);
@@ -203,16 +206,10 @@ export class AnalyzerService {
       // if user has not already added/removed series for comparison
       this.setDefaultCompareSeries();
       this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, this.analyzerData.minDate);
-      series.forEach((serie) => {
-        serie.observations = this.helperService.formatSeriesForCharts(serie);
-        const { indexed, baseYear } = this.analyzerData;
-        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', indexed, baseYear); 
-      });
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
-    console.log(this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -222,7 +219,7 @@ export class AnalyzerService {
       const seriesData = this.formatSeriesForAnalyzer(series);
       seriesData.compare = this.shouldSeriesCompare(this.analyzerSeriesCompareSource.value, aSeriesTracker, series);
       analyzerSeries.push(seriesData);
-      this.initCompareSeries(this.analyzerSeriesCompareSource.value, seriesData);
+      this.addToCompare(this.analyzerSeriesCompareSource.value, seriesData);
     }
   }
 
@@ -230,10 +227,10 @@ export class AnalyzerService {
     return compareSource.find(s => s.className === series.id) || aSeriesTracker.find(s => s.id === series.id && s.compare);
   }
 
-  initCompareSeries(compareSource: Array<any>, seriesData: any) {
+  addToCompare(compareSource: Array<any>, seriesData: any) {
     const seriesExistsInCompare = compareSource.find(s => s.className === seriesData.id);
     if (seriesData.compare && !seriesExistsInCompare) {
-      this.addToComparisonChart(seriesData)
+      this.setCompareChartSeriesObject(seriesData)
     }
   }
 
@@ -245,7 +242,7 @@ export class AnalyzerService {
       const compareSeries  = currentCompare.find(s => s.className === aSeries.id);
       if (!compareSeries) {
         aSeries.compare = true;
-        this.addToComparisonChart(aSeries);
+        this.setCompareChartSeriesObject(aSeries);
       }
       i++;
       currentCompare = this.analyzerSeriesCompareSource.value;
@@ -364,7 +361,7 @@ export class AnalyzerService {
   }
 
   getHighestFrequency = (series) => {
-    const freqs = series.map((s) => s.currentFreq);
+    const freqs = series.map(s => s.currentFreq).filter((val, ind, arr) => arr.findIndex(f => (f.freq === val.freq)) === ind);
     const ordering = {};
     const freqOrder = ['D', 'W', 'M', 'Q', 'S', 'A'];
     for (let i = 0; i < freqOrder.length; i++) {
@@ -373,15 +370,14 @@ export class AnalyzerService {
     const sorted = freqs.sort((a, b) => {
       return (ordering[a.freq] - ordering[b.freq]);
     });
-    console.log('highest freq')
-    this.helperService.updateCurrentFrequency({ freq: null, label: null });
+    // display label to select a single frequency for users who want to index series
+    if (sorted.length > 1) this.helperService.updateCurrentFrequency({ freq: null, label: null });
     return sorted[0];
   }
 
   createAnalyzerTable(analyzerSeries) {
     analyzerSeries.forEach((aSeries) => {
       const { observationStart, observationEnd, transformationResults } = aSeries.seriesObservations;
-      const decimal = aSeries.decimals;
       const dateArray = [];
       this.helperService.createDateArray(observationStart, observationEnd, aSeries.frequencyShort, dateArray);
       aSeries.seriesTableData = this.createSeriesTable(transformationResults, dateArray);

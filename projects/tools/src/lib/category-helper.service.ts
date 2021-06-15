@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { CategoryData, DateWrapper } from './tools.models';
-import { seriesType } from 'highcharts';
 
 @Injectable({
   providedIn: 'root'
@@ -14,23 +13,12 @@ export class CategoryHelperService {
   // Variables for geo and freq selectors
   private categoryData = {};
 
-  static setCacheId(category, routeGeo, routeFreq, dataList?) {
-    let id = `category${category}list${dataList}`;
-    if (routeGeo) {
-      id = id + routeGeo;
-    }
-    if (routeFreq) {
-      id = id + routeFreq;
-    }
-    return id;
-  }
-
   constructor(private apiService: ApiService, private helperService: HelperService) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, noCache: boolean, dataListId: number, routeGeo: string, routeFreq: string): Observable<any> {
-    const cacheId = CategoryHelperService.setCacheId(catId, routeGeo, routeFreq, dataListId);
+  initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
+    const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
@@ -41,19 +29,20 @@ export class CategoryHelperService {
         catId = catId || categories[0].id;
         const cat = categories.find(category => category.id === catId);
         if (cat) {
+          const { dataListId, geo, freq } = routeParams;
           const categoryDataLists = cat.children;
           const selectedDataList = dataListId ?
             this.helperService.findSelectedDataList(categoryDataLists, dataListId, '') :
             this.helperService.getCategoryDataLists(categoryDataLists[0], '');
           this.categoryData[cacheId].selectedDataList = selectedDataList;
           this.categoryData[cacheId].selectedDataListName = selectedDataList.dataListName;
-          if (dataListId === null) {
-            this.categoryData[cacheId].defaultDataList = selectedDataList.id;
-          }
           this.categoryData[cacheId].selectedCategoryId = cat.id;
           this.categoryData[cacheId].selectedCategory = cat;
           this.categoryData[cacheId].subcategories = categoryDataLists;
-          this.getDataListGeos(noCache, selectedDataList, cacheId, routeGeo, routeFreq);
+          if (dataListId === null) {
+            this.categoryData[cacheId].defaultDataList = selectedDataList.id;
+          }
+          this.getDataListGeos(noCache, selectedDataList, cacheId, geo, freq);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
           this.categoryData[cacheId].requestComplete = true;
@@ -116,7 +105,7 @@ export class CategoryHelperService {
         this.categoryData[cacheId].categoryDates = dates.categoryDates;
         series.forEach((serie) => {
           serie.observations = this.helperService.formatSeriesForCharts(serie);
-          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
+          serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
         });
         const displaySeries = this.filterSeriesResults(series);
         this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;
@@ -132,7 +121,7 @@ export class CategoryHelperService {
   }
 
   setCategoryDates = (series: Array<any>, currentFreq: string) => {
-    const categoryDateWrapper: DateWrapper = { firstDate: '', endDate: '' };
+    const categoryDateWrapper = {} as DateWrapper;
     const categoryDateArray = [];
     // Check series for the earliest/latest start and end dates
     // Used to create array of dates for enitre category
@@ -153,27 +142,28 @@ export class CategoryHelperService {
   }
 
   // Set up search results
-  initSearch(search: string, noCache: boolean, routeGeo: string, routeFreq: string): Observable<any> {
-    const cacheId = CategoryHelperService.setCacheId(search, routeGeo, routeFreq);
+  initSearch(search: string, noCache: boolean, routeParams): Observable<any> {
+    const cacheId = this.helperService.setCacheId(search, routeParams);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
-      if (routeGeo && routeFreq) {
-        this.apiService.fetchPackageSearch(search, routeGeo, routeFreq, noCache).subscribe((results) => {
-          const routeGeoExists = results.geos.find(geo => geo.handle === routeGeo);
-          const routeFreqExists = results.freqs.find(freq => freq.freq === routeFreq);
+      const { geo, freq } = routeParams;
+      if (geo && freq) {
+        this.apiService.fetchPackageSearch(search, geo, freq, noCache).subscribe((results) => {
+          const routeGeoExists = results.geos.find(g => g.handle === geo);
+          const routeFreqExists = results.freqs.find(f => f.freq === freq);
           if (routeFreqExists && routeGeoExists) {
-            this.getSearchData(results, cacheId, search, routeGeo, routeFreq);
+            this.getSearchData(results, cacheId, search, geo, freq);
           }
           if (!routeFreqExists || !routeGeoExists) {
             this.getSearchWithDefaults(search, noCache, cacheId);
           }
         });
       }
-      if (!routeGeo || !routeFreq) {
+      if (!geo || !freq) {
         this.getSearchWithDefaults(search, noCache, cacheId);
       }
       return observableForkJoin([observableOf(this.categoryData[cacheId])]);
@@ -208,7 +198,7 @@ export class CategoryHelperService {
     if (series) {
       series.forEach((serie) => {
         serie.observations = this.helperService.formatSeriesForCharts(serie);
-        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1', false, null);
+        serie.gridDisplay = this.helperService.formatGridDisplay(serie, 'lvl', 'pc1');
       });
       const displaySeries = this.filterSeriesResults(series);
       this.categoryData[cacheId].displaySeries = displaySeries.length ? displaySeries : null;

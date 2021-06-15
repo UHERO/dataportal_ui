@@ -143,7 +143,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
       return this.apiService.fetchSiblingSeriesByIdAndGeo(serie.id, serie.currentGeo.handle, nonSeasonal);
     });
     forkJoin(siblingsList).subscribe((res: any) => {
-      console.log('res', res)
       res.forEach((siblings) => {
         siblings.forEach((series) => {
           if (series.frequencyShort === freq && !siblingIds.some(serie => serie.id === series.id)) {

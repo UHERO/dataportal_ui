@@ -48,7 +48,7 @@ export class AnalyzerCompareOptionsComponent implements OnInit, OnDestroy {
   }
 
   addToCompare(seriesInfo) {
-    this.analyzerService.addToComparisonChart(seriesInfo);
+    this.analyzerService.setCompareChartSeriesObject(seriesInfo);
     this.inCompareChart = this.compareSeries.findIndex(s => s.className === this.seriesInfo.id) > -1;
   }
 }
