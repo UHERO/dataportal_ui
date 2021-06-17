@@ -17,8 +17,8 @@ export class CategoryChartsComponent implements OnChanges {
   @Input() hasNonSeasonal;
   @Input() hasSeasonal;
   @Input() nsaActive;
-  @Input() chartStart;
-  @Input() chartEnd;
+  @Input() routeStart;
+  @Input() routeEnd;
   @Input() search;
   @Input() dates;
   @Input() dateWrapper;
@@ -30,6 +30,8 @@ export class CategoryChartsComponent implements OnChanges {
   maxValue;
   noSeriesToDisplay;
   routeSubscription;
+  chartStart;
+  chartEnd;
 
   constructor(
     @Inject('defaultRange') private defaultRange,
@@ -43,6 +45,9 @@ export class CategoryChartsComponent implements OnChanges {
         if (chartSeries && this.dates) {
           chartSeries.display = this.helperService.toggleSeriesForSeasonalDisplay(chartSeries, this.showSeasonal, this.hasSeasonal);
           chartSeries.analyze = this.analyzerService.checkAnalyzer(chartSeries);
+          const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(this.dates, this.routeStart, this.routeEnd, this.freq, this.defaultRange);
+          this.chartStart = this.dates[seriesStart].date;
+          this.chartEnd = this.dates[seriesEnd].date;
         }
       });
     }

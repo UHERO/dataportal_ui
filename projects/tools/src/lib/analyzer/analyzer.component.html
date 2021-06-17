@@ -34,7 +34,7 @@
         <lib-category-charts *ngIf="!displayCompare && data.minDate" [portalSettings]="portalSettings"
           [data]="data.analyzerSeries" [dates]="data.sliderDates" [dateWrapper]="data.analyzerDateWrapper"
           [freq]="data.analyzerFrequency" [noSeries]="data.noData" [hasSeasonal]="data.hasSeasonal"
-          [analyzerView]="true" [chartStart]="data.minDate" [chartEnd]="data.maxDate" [indexChecked]="indexSeries"
+          [analyzerView]="true" [routeStart]="data.minDate" [routeEnd]="data.maxDate" [indexChecked]="indexSeries"
           [indexBaseYear]="data.baseYear">
         </lib-category-charts>
         <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"

@@ -20,7 +20,6 @@ export class CategoryHelperService {
   initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
     const cacheId = this.helperService.setCacheId(catId, routeParams);
     if (this.categoryData[cacheId]) {
-      console.log(this.categoryData[cacheId])
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
       return observableOf([this.categoryData[cacheId]]);

@@ -36,7 +36,7 @@
 				[c5maActive]="queryParams.c5ma === 'true'" [noSeries]="data.noData" [params]="queryParams">
 			</lib-category-table-view>
 			<lib-category-charts *ngIf="routeView !== 'table'" [search]="search" [portalSettings]="portalSettings"
-				[chartStart]="data.seriesStart" [chartEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
+				[routeStart]="data.seriesStart" [routeEnd]="data.seriesEnd" [dates]="data.dateArray" [data]="data.displaySeries"
 				[freq]="data.currentFreq?.freq" [noSeries]="data.noData" [findMinMax]="data.findMinMax"
 				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>

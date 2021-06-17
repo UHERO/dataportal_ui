@@ -168,16 +168,14 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
         data_list_id: subId,
         analyzerSeries: null,
         chartSeries: null,
+        start: null,
+        end: null,
         name: null,
         units: null,
         geography: null
       };
-      if (subId) {
         this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-      }
-      if (!subId) {
-        this.router.navigate(['/category'], { queryParams: catQParams, queryParamsHandling: 'merge' });
-      }
+
       this.loading = false;
     }, 15);
   }

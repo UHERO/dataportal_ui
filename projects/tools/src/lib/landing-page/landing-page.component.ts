@@ -89,7 +89,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
       this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
-      console.log('init route start', this.routeStart)
     });
   }
 
@@ -117,8 +116,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   getData(id, noCache, dataListId, geo, freq) {
     return (typeof id === 'number' || id === null) ?
-      //this.catHelper.initContent(id, noCache, dataListId, geo, freq) :
-      //this.catHelper.initSearch(id, noCache, geo, freq);
       this.catHelper.initContent(id, noCache, { dataListId, geo, freq }) :
       this.catHelper.initSearch(id, noCache, { geo, freq });
   }
@@ -170,7 +167,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   changeRange(e) {
-    console.log('e', e)
     this.routeStart = e.seriesStart;
     this.routeEnd = e.endOfSample ? null : e.seriesEnd;
     this.seriesRange = e;
@@ -181,7 +177,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   updateRoute() {
-    console.log('update route query params', this.queryParams)
     this.queryParams.id = this.queryParams.id || this.id;
     this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
