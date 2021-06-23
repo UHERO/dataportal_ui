@@ -79,6 +79,7 @@ export class AnalyzerService {
       showInLegend: true,
       showInNavigator: false,
       seriesInfo: series,
+      animation: false,
       events: {
         legendItemClick() {
           return false;
@@ -112,7 +113,7 @@ export class AnalyzerService {
 
   updateCompareSeriesAxis(seriesInfo: any, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    this.updateCompareSeriesDataAndAxes(currentCompare);
+    //this.updateCompareSeriesDataAndAxes(currentCompare);
     const series = currentCompare.find(s => s.className === seriesInfo.id);
     const aSeriesMatch = this.analyzerData.yRightSeries.find(id => id === seriesInfo.id);
     const { indexed, baseYear } = this.analyzerData;
@@ -120,10 +121,11 @@ export class AnalyzerService {
       this.analyzerData.yRightSeries.push(seriesInfo.id);
     }
     if (axis === 'left' && aSeriesMatch) {
-      const matchIndex = this.analyzerData.yRightSeries.findIndex(id => id === seriesInfo.ide);
+      const matchIndex = this.analyzerData.yRightSeries.findIndex(id => id === seriesInfo.id);
       this.analyzerData.yRightSeries.splice(matchIndex, 1);
     }
     series.yAxisSide = axis;
+    series.seriesInfo.selectedYAxis = axis;
     series.yAxis = indexed ? `Index (${baseYear})-${axis}` : `${series.unitsLabelShort}-${axis}`;
     series.yAxisText = indexed ? `Index (${baseYear})` : `${series.seriesInfo.unitsLabelShort}`;
     this.analyzerSeriesCompareSource.next(currentCompare);

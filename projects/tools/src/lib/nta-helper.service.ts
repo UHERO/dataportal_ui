@@ -211,7 +211,6 @@ export class NtaHelperService {
     category.sliderDates = this.helperService.getTableDates(category.dateArray);
     category.findMinMax = true;
     category.requestComplete = true;
-    console.log('CATEGORY', category)
   }
 
   filterSeries(seriesArray: Array<any>, category, search: boolean) {

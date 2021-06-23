@@ -81,27 +81,31 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (this.chartOptions.xAxis) {
       this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
       this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
-      this.chartOptions.yAxis.forEach((y) => {
-        y.min = y.min || null;
-        y.max = y.max || null;
-      })
+      this.setYMinMax();
     }
     if (this.chartOptions.rangeSelector) {
       this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
-      this.chartOptions.yAxis.forEach((y) => {
-        y.min = y.min || null;
-        y.max = y.max || null;
-      });
+      this.setYMinMax();
     }
     if (this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
     }
+    if (this.chartObject) {
+      this.chartObject.redraw()
+    }
   }
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
+  }
+
+  setYMinMax() {
+    this.chartOptions.yAxis.forEach((y) => {
+      y.min = y.min || null;
+      y.max = y.max || null;
+    });
   }
 
   updateChartData(series: Array<any>) {
@@ -115,6 +119,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       geography: null,
       yAxisSide: 'right',
       yAxis: `null-right`,
+      animation: false,
       dataGrouping: {
         enabled: false
       },
@@ -132,18 +137,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
+    const useAxisOffset = chartSeries.some(s => s.className !== 'navigator' && s.yAxisSide === 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
             formatter() {
               return Highcharts.numberFormat(this.value, 2, '.', ',');
-            }
+            },
+            align: s.yAxisSide === 'right' ? 'left' : 'right' 
           },
           id: `${s.yAxis}`,
           title: {
             text: s.yAxisText
           },
+          animation: false,
           opposite: s.yAxisSide === 'left' ? false : true,
           minPadding: 0,
           maxPadding: 0,
@@ -162,10 +170,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       return axes;
     }, []);
     this.chartOptions.series = chartSeries;
+    this.updateChart = true;
     if (this.chartObject) {
       this.chartObject.redraw();
     }
-    this.updateChart = true;
   }
 
   changeYAxisMin(e, axis) {
@@ -209,6 +217,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       alignTicks: false,
       className: 'analyzer-chart',
       description: undefined,
+      animation: false,
       events: {
         render() {
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
@@ -388,7 +397,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.plotOptions = {
       series: {
         cropThreshold: 0,
-        turboThreshold: 0
+        turboThreshold: 0,
       }
     };
   }

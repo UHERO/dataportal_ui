@@ -185,6 +185,8 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       id: event,
       analyzerSeries: null,
       chartSeries: null,
+      start: null,
+      end: null,
       name: null,
       units: null,
       geography: null

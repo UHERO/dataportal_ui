@@ -64,7 +64,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       }
     };
     if (this.data) {
-      console.log('table start', this.tableStart)
       this.columnDefs = this.setTableColumns(this.dates, this.selectedFreq.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series !== 'No data available' && this.dates) {

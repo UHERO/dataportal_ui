@@ -100,6 +100,7 @@ export interface HighchartChartData {
 export interface HighstockObject {
   chart: {
     alignTicks: boolean,
+    animation?: boolean,
     events?: {
       render: () => void,
       load?: () => void
