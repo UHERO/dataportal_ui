@@ -50,28 +50,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
       this.categories = categories;
       this.navMenuItems = [];
       categories.forEach((category) => {
-        if (category.children) {
-          const subMenu = this.createSubmenuItems(category.children, category.id);
-          this.navMenuItems.push({
-            id: '' + category.id,
-            label: category.name,
-            icon: 'pi pi-pw',
-            items: subMenu,
-            command: (event) => {
-              this.navToFirstDataList(event.item, category.id);
-            }
-          });
-        }
-        if (!category.children) {
-          this.navMenuItems.push({
-            id: '' + category.id,
-            label: category.name,
-            icon: 'pi pi-pw',
-            command: (event) => {
-              this.navToFirstDataList(event.item, category.id);
-            }
-          });
-        }
+        this.addMenuItem(this.navMenuItems, category);
       });
     },
       (error) => {
@@ -106,6 +85,19 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.analyzerSeriesCount.unsubscribe();
+  }
+
+  addMenuItem = (navMenuItems: Array<any>, category: any) => {
+    const menuItem = {
+      id: '' + category.id,
+      label: category.name,
+      icon: 'pi pi-pw',
+      ...(category.children && { items: this.createSubmenuItems(category.children, category.id) }),
+      command: (event) => {
+        this.navToFirstDataList(event.item, category.id);
+      }
+    }
+    navMenuItems.push(menuItem);
   }
 
   // navigate to Summary or first data list when clicking on a category
