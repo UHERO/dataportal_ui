@@ -11,7 +11,7 @@ import { AnalyzerService } from '../analyzer.service';
 })
 export class EmbedGraphComponent implements OnInit {
   private seriesId: number;
-  private chartSeries: string;
+  private chartSeries: Array<any>;
   startDate: string;
   endDate: string;
   seriesData: any;
@@ -39,7 +39,7 @@ export class EmbedGraphComponent implements OnInit {
         this.seriesId = Number(params[`id`]);
       }
       if (params[`chartSeries`]) {
-        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, showInChart: true }));
+        this.chartSeries = params[`chartSeries`].split('-').map(series => ({ id: +series, compare: true }));
       }
       if (params[`start`]) {
         this.startDate = params[`start`];
@@ -50,8 +50,8 @@ export class EmbedGraphComponent implements OnInit {
       if (params[`y0`]) {
         this.y0 = params[`y0`];
       }
-      if (params[`y1`]) {
-        this.y1 = params[`y1`];
+      if (params[`yright`]) {
+        this.y1 = params[`yright`];
       }
       if (params[`index`]) {
         this.indexSeries = params[`index`];
@@ -61,21 +61,26 @@ export class EmbedGraphComponent implements OnInit {
       this.seriesData = this.seriesHelper.getSeriesData(this.seriesId, true);
     }
     if (this.chartSeries) {
-      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y0, this.y1);
+      this.analyzerData = this.analyzerService.getAnalyzerData(this.chartSeries, true, this.y1);
     }
   }
 
   ngOnDestroy() {
     this.analyzerService.analyzerData = {
       analyzerTableDates: [],
+      sliderDates: [],
+      analyzerDateWrapper: { firstDate: '', endDate: '' },
       analyzerSeries: [],
-      highstockSeriesOptions: [],
       displayFreqSelector: false,
       siblingFreqs: [],
       analyzerFrequency: {},
       y0Series: null,
-      y1Series: null,
-      requestComplete: false
+      yRightSeries: null,
+      requestComplete: false,
+      indexed: false,
+      baseYear: null,
+      minDate: null,
+      maxDate: null
     };
   }
 

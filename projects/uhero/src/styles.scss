@@ -183,7 +183,7 @@ body {
     }
   }
 
-  lib-landing-page {
+  lib-landing-page, lib-analyzer {
     .multi-series-container {
       .material-icons.md-18 {
         color: $secondary;
@@ -289,7 +289,7 @@ body {
   }
 
   lib-analyzer {
-    h3 {
+    h2 {
       color: $primary;
     }
 
@@ -299,6 +299,12 @@ body {
   }
 
   .analyzer-chart, .single-series-chart {
+    .highcharts-series-1 {
+      .highcharts-graph {
+        stroke: unset;
+      }
+    }
+
     .highcharts-background {
       fill: $chart-background;
     }

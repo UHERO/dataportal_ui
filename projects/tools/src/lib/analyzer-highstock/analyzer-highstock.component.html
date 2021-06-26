@@ -1,17 +1,32 @@
-<div *ngIf="alertMessage" class="alert alert-info alert-message" role="alert">
-  <i class="material-icons">&#xE001;</i> {{alertMessage}}
+<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor"
+  [options]="chartOptions" [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true">
+</highcharts-chart>
+<div id="customize-yAxis" class="d-flex mt-2 justify-content-center">
+  <ng-template ngFor let-axis [ngForOf]="chartOptions.yAxis">
+    <ng-template ngIf [ngIf]="axis.title.text">
+      <div class="d-inline-flex flex-column justify-content-center" [style.order]="axis.styleOrder">
+        <span class="d-block text-center">Y-Axis ({{axis.title.text}})</span>
+        <div class="d-flex justify-content-center align-items-center flex-row">
+          <label class="mb-0" attr.for="min{{axis.id}}">Min:</label>
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="min{{axis.id}}" [(value)]="axis.min"
+            (change)="changeYAxisMin($event, axis)">
+          <label class="mb-0" attr.for="max{{axis.id}}">Max:</label>
+          <input type="number" class="w-25 mx-2 form-control form-control-sm" attr.id="max{{axis.id}}" [(value)]="axis.max"
+            (change)="changeYAxisMax($event, axis)">
+        </div>
+      </div>
+    </ng-template>
+  </ng-template>
 </div>
-<highcharts-chart id="stock-chart" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
-  [(update)]="updateChart" [callbackFunction]="chartCallback" [oneToOne]="true"></highcharts-chart>
 <div class="customize-tooltip">
   <p>Tooltip Display:</p>
   <label class="form-check-inline">
-      <input type="checkbox" (change)="nameActive($event)" [checked]="nameChecked">Series Name
+    <input type="checkbox" (change)="nameActive($event)" [checked]="nameChecked">Series Name
   </label>
   <label class="form-check-inline">
-      <input type="checkbox" (change)="unitsActive($event)" [checked]="unitsChecked">Units
+    <input type="checkbox" (change)="unitsActive($event)" [checked]="unitsChecked">Units
   </label>
   <label class="form-check-inline">
-      <input type="checkbox" (change)="geoActive($event)" [checked]="geoChecked">Geography
+    <input type="checkbox" (change)="geoActive($event)" [checked]="geoChecked">Geography
   </label>
 </div>

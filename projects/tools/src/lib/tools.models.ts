@@ -32,8 +32,10 @@ export interface HighchartsObject {
     className: string,
     events: {
       render: () => void,
+      load?: () => void
     },
     styledMode: true,
+    margin?: any
   };
   exporting: {
     enabled: boolean,
@@ -98,6 +100,7 @@ export interface HighchartChartData {
 export interface HighstockObject {
   chart: {
     alignTicks: boolean,
+    animation?: boolean,
     events?: {
       render: () => void,
       load?: () => void

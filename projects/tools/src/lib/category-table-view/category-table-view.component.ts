@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 })
 export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() data;
-  @Input() sublist;
   @Input() selectedCategory;
   @Input() selectedDataList;
   @Input() tableId;
@@ -26,7 +25,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   @Input() tableStart;
   @Input() tableEnd;
   @Input() portalSettings;
-  @Input() seriesInAnalyzer;
   @Input() showSeasonal: boolean;
   @Input() hasNonSeasonal: boolean;
   @Input() hasSeasonal;
@@ -34,13 +32,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   columnDefs;
   rows;
   frameworkComponents;
-  paginationSizeOptions: number[] = [];
-  selectedPaginationSize;
-  totalPages: number;
   totalRows: number;
-  paginationSize: number;
-  disablePrevious: boolean;
-  disableNext: boolean;
   noSeriesToDisplay;
   gridOptions;
   freqSub: Subscription;
@@ -74,10 +66,10 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     if (this.data) {
       this.columnDefs = this.setTableColumns(this.dates, this.selectedFreq.freq, this.defaultRange, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
-        if (series.seriesInfo !== 'No data available' && this.dates) {
+        if (series !== 'No data available' && this.dates) {
           series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
-          series.seriesInfo.analyze = this.analyzerService.checkAnalyzer(series.seriesInfo);
-          const transformations = this.helperService.getTransformations(series.seriesInfo.seriesObservations);
+          series.analyze = this.analyzerService.checkAnalyzer(series);
+          const transformations = this.helperService.getTransformations(series.seriesObservations.transformationResults);
           const { level, yoy, ytd, c5ma } = transformations;
           const seriesData = this.selectedDataList ?
             this.formatLvlData(series, level, this.selectedDataList.id) :
@@ -130,16 +122,16 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
 
   formatLvlData = (series, level, parentId) => {
     const { dates, values } = level;
-    const units = series.seriesInfo.unitsLabelShort ? series.seriesInfo.unitsLabelShort : series.seriesInfo.unitsLabel;
+    const units = series.unitsLabelShort || series.unitsLabel;
     const seriesData = {
-      series: `${series.seriesInfo.tablePrefix || ''} ${series.seriesInfo.displayName} ${series.seriesInfo.tablePostfix || ''} (${units})`,
-      saParam: series.seriesInfo.saParam,
-      seriesInfo: series.seriesInfo,
+      series: `${series.tablePrefix || ''} ${series.displayName} ${series.tablePostfix || ''} (${units})`,
+      saParam: series.saParam,
+      seriesInfo: series,
       lvlData: true,
       categoryId: parentId
     };
     dates.forEach((d, index) => {
-      seriesData[d] = this.helperService.formatNum(+values[index], series.seriesInfo.decimals);
+      seriesData[d] = this.helperService.formatNum(+values[index], series.decimals);
     });
     return seriesData;
   }
@@ -147,19 +139,19 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   formatTransformationData = (series, transformation, transformationName) => {
     const data = {
       series: '',
-      seriesInfo: series.seriesInfo,
+      seriesInfo: series,
       lvlData: false
     };
     if (transformation) {
       const { dates, values } = transformation;
-      const disName = this.formatTransformationName(transformation.transformation, series.seriesInfo.percent);
+      const disName = this.formatTransformationName(transformation.transformation, series.percent);
       data.series = disName;
       dates.forEach((d, index) => {
         data[d] = values[index];
       });
       return data;
     }
-    const displayName = this.formatTransformationName(transformationName, series.seriesInfo.percent);
+    const displayName = this.formatTransformationName(transformationName, series.percent);
     data.series = displayName;
     return data;
   }

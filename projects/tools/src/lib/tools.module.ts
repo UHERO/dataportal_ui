@@ -34,6 +34,7 @@ import { AnalyzerTableRendererComponent } from './analyzer-table-renderer/analyz
 import { MeasurementLandingPageComponent } from './measurement-landing-page/measurement-landing-page.component';
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
+import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
     EmbedGraphComponent,
+    AnalyzerCompareOptionsComponent,
   ],
   imports: [
     CommonModule,
@@ -104,7 +106,8 @@ import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
     AnalyzerStatsRendererComponent,
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
-    MeasurementSelectorComponent
+    MeasurementSelectorComponent,
+    AnalyzerCompareOptionsComponent
   ]
 })
 export class ToolsModule { }

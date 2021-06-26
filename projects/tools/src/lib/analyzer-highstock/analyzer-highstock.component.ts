@@ -7,7 +7,6 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   ViewEncapsulation
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
@@ -29,36 +28,29 @@ import offlineExport from 'highcharts/modules/offline-exporting';
 })
 export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() series;
-  @Input() allDates;
   @Input() portalSettings;
   @Input() start;
   @Input() end;
-  @Input() seriesOptions: Array<any>;
   @Input() nameChecked;
   @Input() unitsChecked;
   @Input() geoChecked;
   @Input() indexChecked;
-  @Input() y0;
-  @Input() y1;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
-  @Output() yAxesSeries = new EventEmitter();
   Highcharts = Highcharts;
   chartConstructor = 'stockChart';
-  chartOptions = {} as HighstockObject;
   updateChart = false;
   chartObject;
-  toggleSeries;
-  switchAxes;
-  alertMessage;
   indexed: boolean = false;
-
+  compareSeriesSub;
+  chartOptions = {} as HighstockObject;
+  chartCallback;
+  analyzerData;
 
   constructor(
     @Inject('logo') private logo,
     private highstockHelper: HighstockHelperService,
     private analyzerService: AnalyzerService,
-    private cdr: ChangeDetectorRef
   ) {
     // workaround to include exporting module in production build
     exporting(this.Highcharts);
@@ -73,223 +65,61 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           seriesMetaData += label.html ? `${label.html} \n` : '';
         }
       });
-      return seriesMetaData ?  seriesMetaData + '\n\n' + result : result;
+      return seriesMetaData ? `${seriesMetaData}\n\n${result}` : result;
     });
-    this.switchAxes = this.analyzerService.switchYAxes.subscribe((data: any) => {
-      if (this.indexChecked) {
-        this.displayAlertMessage('Unavailable while series are indexed.');
-      }
-      if (!this.indexChecked) {
-        this.switchYAxes(data, this.chartObject);
-        this.chartOptions.xAxis = null;
-        this.updateChart = true;
-        this.chartObject.redraw();
-      }
-    });
-    this.toggleSeries = this.analyzerService.toggleSeriesInChart.subscribe((data: any) => {
-      const chartSeries = this.series.filter(s => s.showInChart);
-      const toggleDisplay = this.analyzerService.checkSeriesUnits(chartSeries, data.seriesInfo.unitsLabelShort);
-      if (toggleDisplay) {
-        const seriesToUpdate = this.analyzerService.analyzerData.analyzerSeries.find(s => s.seriesDetail.id === data.seriesInfo.id);
-        if (seriesToUpdate) {
-          seriesToUpdate.showInChart = !seriesToUpdate.showInChart;
-        }
-        const yAxes = this.setYAxes(this.series, '', '');
-        this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
-        this.chartOptions.yAxis = yAxes;
-        this.chartOptions.rangeSelector.selected = null
-        this.updateChart = true;
-        this.chartOptions.xAxis = null;
-        this.chartObject.redraw();
-      }
-      if (!toggleDisplay) {
-        this.displayAlertMessage('Chart may only display up to two different units.');
-      }
+    this.chartCallback = chart => {
+      this.chartObject = chart;
+    };
+    this.analyzerData = this.analyzerService.analyzerData;
+    this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
+      this.updateChartData(series);
     });
   }
-
-  displayAlertMessage(alertMsg) {
-    this.alertMessage = alertMsg;
-      if (this.alertMessage) {
-        // Timeout warning message alerting user if too many units are being added to the chart
-        setTimeout(() => {
-          this.alertMessage = '';
-          this.cdr.detectChanges();
-        }, 4000);
-      }
-    this.cdr.detectChanges();
-  }
-  
 
   ngOnChanges() {
-    if (this.series.length && this.chartObject) {
-      this.chartObject._indexed = this.indexChecked;
-      const yAxes = this.setYAxes(this.series, '', '');
-      this.chartOptions.yAxis = yAxes;
-      this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxes, this.chartObject._extremes.min);
-      this.chartOptions.rangeSelector.selected = null;
-      this.chartOptions.xAxis = null;
-      this.updateChart = true;
+    // prevent date ranges from resetting when adding a series/indexing
+    if (this.chartOptions.xAxis) {
+      this.chartOptions.xAxis.min = this.start ? Date.parse(this.start) : undefined;
+      this.chartOptions.xAxis.max = this.end ? Date.parse(this.end) : undefined;
+      this.setYMinMax();
     }
-    if(this.series.length && !this.chartObject) {
+    if (this.chartOptions.rangeSelector) {
+      this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
+      this.setYMinMax();
+    }
+    if (this.series.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      const navigatorOptions = {
-        frequency: this.analyzerService.checkFrequencies(this.series),
-        dateStart: this.allDates[0].date,
-        numberOfObservations: this.filterDatesForNavigator(this.allDates).length
-      };
-      const yAxes = this.setYAxes(this.series, this.y0, this.y1);
-      this.initChart(this.series, yAxes, this.portalSettings, buttons, navigatorOptions);
+      const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
+      this.initChart(this.portalSettings, buttons, highestFrequency);
+    }
+    if (this.chartObject) {
+      this.chartObject.redraw()
     }
   }
 
   ngOnDestroy() {
-    this.toggleSeries.unsubscribe();
-    this.switchAxes.unsubscribe();
+    this.compareSeriesSub.unsubscribe();
   }
 
-  chartCallback = (chart) => {
-    this.chartObject = chart;
-  }
-
-  switchYAxes(data: any, chartObject) {
-    const allUnits = chartObject.series.filter(series => !series.userOptions.className.toString().includes('navigator'))
-      .map(series => series.userOptions.unitsLabelShort);
-    const uniqueUnits = allUnits.filter((unit, index, u) => u.indexOf(unit) === index);
-    const y0 = [];
-    const y1 = [];
-    if (uniqueUnits.length === 1) {
-      const seriesToSwitch = chartObject.series.find(s => s.userOptions.className === data.seriesInfo.id);
-      seriesToSwitch.userOptions.yAxis === 'yAxis0' ? y1.push(seriesToSwitch.userOptions.className) : y0.push(seriesToSwitch.userOptions.className);
-    }
-    if (uniqueUnits.length === 2) {
-      chartObject.series.forEach((serie) => {
-        if (serie.userOptions.className === data.seriesInfo.id) {
-          serie.userOptions.yAxis === 'yAxis0' ? y1.push(serie.userOptions.className) : y0.push(serie.userOptions.className);
-        }
-        if (serie.userOptions.className !== data.seriesInfo.id && !serie.userOptions.className.toString().includes('navigator')) {
-          serie.userOptions.yAxis === 'yAxis0' ? y1.push(serie.userOptions.className) : y0.push(serie.userOptions.className);
-        }
-      });
-    }
-    const yAxesNew = this.setYAxes(this.series, y0.join('-'), y1.join('-'));
-    this.chartOptions.yAxis = yAxesNew;
-    const seriesByAxes = yAxesNew.reduce((obj, y) => {
-      if (y.id === 'yAxis0') {
-        obj.y0 = y.series.map(s => s.seriesDetail.id);
-        return obj;
-      }
-      if (y.id === 'yAxis1') {
-        obj.y1 = y.series.map(s => s.seriesDetail.id);
-        return obj;
-      }
-      return obj;
-    }, { y0: [], y1: [] });
-    this.yAxesSeries.emit({ y0: seriesByAxes.y0, y1: seriesByAxes.y1 });
-    this.chartOptions.series = this.formatSeriesData(this.series, this.allDates, yAxesNew, this.chartObject._extremes.min)
-  }
-
-  setYAxes = (series, y0Series, y1Series) => {
-    // Group series by their units
-    // i.e., If series with 2 different units have been selected, draw a y-axis for each unit
-    const axisIds = series.reduce((obj, serie) => {
-      if (this.indexChecked) {
-        obj.yAxis0.push(serie);
-        return obj;
-      }
-      if (!this.indexChecked) {
-        if (y0Series && y0Series.includes(serie.seriesDetail.id)) {
-          obj.yAxis0.push(serie);
-          return obj;
-        }
-        if (y1Series && y1Series.includes(serie.seriesDetail.id)) {
-          obj.yAxis1.push(serie);
-          return obj;
-        }
-        if (!obj.yAxis0.length) {
-          obj.yAxis0.push(serie);
-          return obj;
-        }
-        const y0Units = obj.yAxis0[0].seriesDetail.unitsLabelShort;
-        if (serie.seriesDetail.unitsLabelShort === y0Units) {
-          obj.yAxis0.push(serie);
-          return obj;
-        }
-        if (serie.seriesDetail.unitsLabelShort !== y0Units) {
-          obj.yAxis1.push(serie);
-          return obj;
-        }
-      }
-      return obj;
-    }, { yAxis0: [], yAxis1: [] });
-    const indexBaseYear = this.getIndexBaseYear(series, this.start);
-    const yAxes = Object.keys(axisIds).map((axis, index) => {
-      const visibleSeries = axisIds[axis].find(s => s.showInChart);
-      return {
-        labels: {
-          formatter() {
-            return Highcharts.numberFormat(this.value, 2, '.', ',');
-          }
-        },
-        id: axis,
-        title: {
-          text: this.indexChecked ? `Index (${indexBaseYear})` : visibleSeries ? visibleSeries.seriesDetail.unitsLabelShort : null
-        },
-        opposite: index === 0 ? false : true,
-        minPadding: 0,
-        maxPadding: 0,
-        minTickInterval: 0.01,
-        showEmpty: false,
-        series: axisIds[axis],
-        visible: visibleSeries ? true : false
-        //visible: true
-      };
+  setYMinMax() {
+    this.chartOptions.yAxis.forEach((y) => {
+      y.min = y.min || null;
+      y.max = y.max || null;
     });
-    return yAxes;
   }
 
-  formatSeriesData = (series: Array<any>, dates: Array<any>, yAxes: Array<any>, start) => {
-    // create copy to prevent original data from being altered if calculating indexed values
-    const seriesCopy = JSON.parse(JSON.stringify(series));
-    const indexBaseYear = this.getIndexBaseYear(series, start);
-    const chartSeries = seriesCopy.map((serie) => {
-      const axis = yAxes ? yAxes.find(y => y.series.some(s => s.seriesDetail.id === serie.seriesDetail.id)) : null;
-      return {
-        className: serie.seriesDetail.id,
-        name: this.indexChecked ? serie.indexDisplayName : serie.chartDisplayName,
-        tooltipName: serie.seriesDetail.title,
-        data: this.indexChecked ? this.getIndexedValues(serie.chartData.level, indexBaseYear) : serie.chartData.level,
-        levelData: serie.chartData.level.slice(),
-        yAxis: axis ? axis.id : null,
-        decimals: serie.seriesDetail.decimals,
-        frequency: serie.seriesDetail.frequencyShort,
-        geography: serie.seriesDetail.geography.name,
-        includeInDataExport: serie.showInChart ? true : false,
-        showInLegend: serie.showInChart ? true : false,
-        showInNavigator: false,
-        events: {
-          legendItemClick() {
-            return false;
-          }
-        },
-        unitsLabelShort: serie.seriesDetail.unitsLabelShort,
-        seasonallyAdjusted: serie.seriesDetail.seasonalAdjustment === 'seasonally_adjusted',
-        dataGrouping: {
-          enabled: false
-        },
-        pseudoZones: serie.chartData.pseudoZones,
-        visible: serie.showInChart ? true : false
-      };
-    });
-    chartSeries.push({
+  updateChartData(series: Array<any>) {
+    const chartSeries = [...series, {
       className: 'navigator',
-      data: dates.map(d => [Date.parse(d.date), null]),
+      data: this.analyzerData.analyzerTableDates.map(d => [Date.parse(d.date), null]),
       levelData: [],
       decimals: null,
       tooltipName: '',
       frequency: null,
       geography: null,
-      yAxis: 'yAxis1',
+      yAxisSide: 'right',
+      yAxis: `null-right`,
+      animation: false,
       dataGrouping: {
         enabled: false
       },
@@ -306,51 +136,67 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       seasonallyAdjusted: null,
       pseudoZones: null,
       visible: true,
-    });
-    return chartSeries;
-  }
-
-  getIndexBaseYear = (series: any, start: string) => {
-    const maxObsStartDate = series.reduce((prev, current) => {
-      const prevObsStart = prev.observations.observationStart;
-      const currentObsStart = current.observations.observationStart;
-      return prevObsStart > currentObsStart ? prev : current;
-    }).observations.observationStart;
-    return maxObsStartDate > start ? maxObsStartDate : start;
-  }
-
-  getIndexedValues(values, baseYear: string) {
-    return values.map((curr, ind, arr) => {
-      const dateIndex = arr.findIndex(dateValuePair => new Date(dateValuePair[0]).toISOString().substr(0, 10) === baseYear);
-      return dateIndex > -1 ? [curr[0], curr[1] / arr[dateIndex][1] * 100] : [curr[0], curr[1] / arr[0][1] * 100];
-    });
-  }
-
-  removeSeriesFromChart(chartObjectSeries: Array<any>, analyzerSeries: Array<any>) {
-    chartObjectSeries.forEach((s) => {
-      const keepInChart = analyzerSeries.find(serie => serie.name === s.name && s.data.length === serie.data.length);
-      if (!keepInChart) {
-        s.remove();
+    }];
+    const useAxisOffset = chartSeries.some(s => s.className !== 'navigator' && s.yAxisSide === 'right');
+    this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+      if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
+        axes.push({
+          labels: {
+            formatter() {
+              return Highcharts.numberFormat(this.value, 2, '.', ',');
+            },
+            align: s.yAxisSide === 'right' ? 'left' : 'right' 
+          },
+          id: `${s.yAxis}`,
+          title: {
+            text: s.yAxisText
+          },
+          animation: false,
+          opposite: s.yAxisSide === 'left' ? false : true,
+          minPadding: 0,
+          maxPadding: 0,
+          minTickInterval: 0.01,
+          endOnTick: false,
+          startOnTick: false,
+          showEmpty: false,
+          yAxisSide: s.yAxisSide,
+          styleOrder: s.yAxisSide === 'left' ? 1 : 2,
+          showLastLabel: true,
+          showFirstLabel: true,
+          min: null,
+          max: null
+        });
       }
-    });
+      return axes;
+    }, []);
+    this.chartOptions.series = chartSeries;
+    this.updateChart = true;
+    if (this.chartObject) {
+      this.chartObject.redraw();
+    }
+  }
+
+  changeYAxisMin(e, axis) {
+    axis.min = +e.target.value || null;
+    this.updateChart = true;
+  }
+
+  changeYAxisMax(e, axis) {
+    axis.max = +e.target.value || null;
+    this.updateChart = true;
   }
 
   formatChartButtons(buttons: Array<any>) {
     const chartButtons = buttons.reduce((allButtons, button) => {
-      if (button !== 'all') {
-        allButtons.push({ type: 'year', count: button, text: button + 'Y' });
-      }
-      if (button === 'all') {
-        allButtons.push({ type: 'all', text: 'All' });
-      }
+        allButtons.push(button !== 'all' ? { type: 'year', count: button, text: `${button}Y` } : { type: 'all', text: 'All' });
       return allButtons;
     }, []);
     return chartButtons;
   }
 
-  initChart = (series, yAxis, portalSettings, buttons, navigatorOptions) => {
-    const startDate = this.start ? this.start : null;
-    const endDate = this.end ? this.end : null;
+  initChart = (portalSettings, buttons, highestFreq) => {
+    const startDate = this.start || null;
+    const endDate = this.end || null;
     const tooltipName = this.nameChecked;
     const tooltipUnits = this.unitsChecked;
     const tooltipGeo = this.geoChecked;
@@ -360,24 +206,24 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
     const setInputEditDateFormat = freq => this.highstockHelper.inputEditDateFormatter(freq);
     const setInputDateParser = (value, freq) => this.highstockHelper.inputDateParserFormatter(value, freq);
-    const setDateToFirstOfMonth =  (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
+    const setDateToFirstOfMonth = (freq, date) => this.highstockHelper.setDateToFirstOfMonth(freq, date);
     const tableExtremes = this.tableExtremes;
     const logo = this.logo;
-    const chartCallback = this.chartCallback;
-    const getIndexBaseYear = (series, start) => this.getIndexBaseYear(series, start);
-    const getIndexedValues = (values, baseYear) => this.getIndexedValues(values, baseYear);
+    const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
+    const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
 
     this.chartOptions.chart = {
       alignTicks: false,
       className: 'analyzer-chart',
       description: undefined,
+      animation: false,
       events: {
         render() {
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = navigatorOptions.frequency === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = navigatorOptions.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = highestFreq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
+          this._selectedMax = highestFreq.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
@@ -385,7 +231,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
         },
         load() {
-          chartCallback(this);
           if (logo.analyticsLogoSrc) {
             this.renderer.image(logo.analyticsLogoSrc, 10, 0, 141 / 1.75, 68 / 1.75).add();
           }
@@ -406,11 +251,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.legend = {
       enabled: true,
       labelFormatter() {
-        return this.yAxis.userOptions.opposite ? this.name + ' (right)' : this.name + ' (left)';
+        return this.yAxis.userOptions.opposite ? `${this.name} (right)` : `${this.name} (left)`;
       }
     };
+    // incorrect indexing when using range selector
     this.chartOptions.rangeSelector = {
-      selected: !startDate && !endDate ? 3 : null,
+      selected: !startDate && !endDate ? 2 : null,
       buttons,
       buttonPosition: {
         x: 20,
@@ -420,10 +266,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         visibility: 'hidden'
       },
       inputEnabled: true,
-      inputDateFormat: setInputDateFormat(navigatorOptions.frequency),
-      inputEditDateFormat: setInputEditDateFormat(navigatorOptions.frequency),
+      inputDateFormat: setInputDateFormat(highestFreq),
+      inputEditDateFormat: setInputEditDateFormat(highestFreq),
       inputDateParser(value) {
-        return setInputDateParser(value, navigatorOptions.frequency);
+        return setInputDateParser(value, highestFreq);
       },
       inputPosition: {
         x: -30,
@@ -500,51 +346,58 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.chartOptions.credits = {
       enabled: false
     };
-    this.chartOptions.series = this.formatSeriesData(series, this.allDates, yAxis, this.start);
-    this.chartOptions.yAxis = yAxis;
     this.chartOptions.xAxis = {
       events: {
         afterSetExtremes() {
           const userMin = new Date(this.getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = setDateToFirstOfMonth(navigatorOptions.frequency, userMin);
-          this._selectedMax = setDateToFirstOfMonth(navigatorOptions.frequency, userMax);
+          this._selectedMin = setDateToFirstOfMonth(highestFreq, userMin);
+          this._selectedMax = setDateToFirstOfMonth(highestFreq, userMax);
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           this._indexed = updateIndexed(this);
           if (this._extremes) {
             if (this._indexed) {
-              const indexBaseYear = getIndexBaseYear(series, this._extremes.min);
+              const compareSeries = this.series.filter(s => s.name !== 'Navigator').map(s => s.userOptions);
+              const indexBaseYear = getIndexBaseYear(compareSeries, this._extremes.min);
+              this.chart.yAxis.forEach((axis) => {
+                if (axis.userOptions.title.text && axis.userOptions.title.text.includes('Index')) {
+                  axis.update({
+                    title: {
+                      text: `Index (${indexBaseYear})`
+                    }
+                  });
+                }
+              });
               this.series.forEach((serie) => {
                 if (serie.userOptions.className !== 'navigator') {
                   serie.update({
-                    data: getIndexedValues(serie.userOptions.levelData, indexBaseYear)
-                  })
+                    data: getIndexedValues(serie.userOptions.levelData, indexBaseYear),
+                    yAxisText: `Index (${indexBaseYear})`
+                  });
                 }
               });
             }
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
             // use setExtremes to snap dates to min/max date range
-            setTimeout(() => {
-              this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
-            }, 1);
+            this.setExtremes(Date.parse(this._extremes.min), Date.parse(this._extremes.max))
           }
         }
       },
-      minRange: this.calculateMinRange(navigatorOptions.frequency),
+      minRange: this.calculateMinRange(highestFreq),
       min: startDate ? Date.parse(startDate) : undefined,
       max: endDate ? Date.parse(endDate) : undefined,
       ordinal: false,
       labels: {
         formatter() {
-          return xAxisFormatter(this, navigatorOptions.frequency);
+          return xAxisFormatter(this, highestFreq);
         }
       }
     };
     this.chartOptions.plotOptions = {
       series: {
         cropThreshold: 0,
-        turboThreshold: 0
+        turboThreshold: 0,
       }
     };
   }
@@ -563,9 +416,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   formatTooltip(args, points, x, name: boolean, units: boolean, geo: boolean) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
-    const filterFrequency = (cSeries: Array<any>, freq: string) => {
-      return cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
-    };
+    const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
       // Get color of the line for a series
       // Use color for tooltip label
@@ -606,7 +457,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       let label = '';
       aSeries.forEach((serie) => {
         // Check if current point's year is available in the annual series' data
-        const yearObs = serie.data.find(obs => Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x));
+        const yearObs = serie.data.find((obs) => {
+          return obs ? Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x) : false;
+        });
         if (yearObs) {
           label += formatSeriesLabel(name, units, geo, serie, yearObs.y, year, yearObs.x, '');
         }
@@ -618,7 +471,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       let label = '';
       qSeries.forEach((serie) => {
         // Check if current point's year and quarter month (i.e., Jan for Q1) is available in the quarterly series' data
-        const obsDate = serie.data.find(obs => `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date);
+        const obsDate = serie.data.find((obs) => {
+          return obs ? `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date : false;
+        });
         if (obsDate) {
           const qDate = `${pointQuarter} ${Highcharts.dateFormat('%Y', obsDate.x)}`;
           label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');
