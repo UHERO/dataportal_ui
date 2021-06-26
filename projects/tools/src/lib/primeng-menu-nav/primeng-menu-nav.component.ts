@@ -62,6 +62,16 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
             }
           });
         }
+        if (!category.children) {
+          this.navMenuItems.push({
+            id: '' + category.id,
+            label: category.name,
+            icon: 'pi pi-pw',
+            command: (event) => {
+              this.navToFirstDataList(event.item, category.id);
+            }
+          });
+        }
       });
     },
       (error) => {
