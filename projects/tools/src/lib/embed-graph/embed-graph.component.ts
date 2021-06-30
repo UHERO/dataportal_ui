@@ -19,9 +19,6 @@ export class EmbedGraphComponent implements OnInit {
   portalSettings: any;
   y0: string;
   y1: string;
-  tooltipGeo: boolean = true;
-  tooltipName: boolean = true;
-  tooltipUnits: boolean = true;
   indexSeries: boolean;
   
   constructor(
@@ -82,17 +79,5 @@ export class EmbedGraphComponent implements OnInit {
       minDate: null,
       maxDate: null
     };
-  }
-
-  checkTooltip(e) {
-    if (e.label === 'name') {
-      this.tooltipName = e.value;
-    }
-    if (e.label === 'units') {
-      this.tooltipUnits = e.value;
-    }
-    if (e.label === 'geo') {
-      this.tooltipGeo = e.value;
-    }
   }
 }

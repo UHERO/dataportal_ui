@@ -18,9 +18,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   startDate;
   endDate;
   private noCache: boolean;
-  tooltipName;
-  tooltipUnits;
-  tooltipGeo;
   analyzerData;
   yRightSeries;
   analyzerShareLink: string;
@@ -59,10 +56,7 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
         this.indexSeries = params['index'] || null;
-        this.tooltipName = this.evalParamAsTrue(params['name']);
         this.displayCompare = this.evalParamAsTrue(params['compare']);
-        this.tooltipUnits = this.evalParamAsTrue(params['units']);
-        this.tooltipGeo = this.evalParamAsTrue(params['geo']);
         this.tableYoy = this.evalParamAsTrue(params['yoy']);
         this.tableYtd = this.evalParamAsTrue(params['ytd']);
         this.tableC5ma = this.evalParamAsTrue(params['c5ma']);
@@ -104,18 +98,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   setTableDates(e) {
     this.analyzerService.analyzerData.minDate = e.minDate;
     this.analyzerService.analyzerData.maxDate = e.maxDate;
-  }
-
-  checkTooltip(e) {
-    if (e.label === 'name') {
-      this.tooltipName = e.value;
-    }
-    if (e.label === 'units') {
-      this.tooltipUnits = e.value;
-    }
-    if (e.label === 'geo') {
-      this.tooltipGeo = e.value;
-    }
   }
 
   indexActive(e) {

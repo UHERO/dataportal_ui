@@ -16,10 +16,6 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   // Series in the analyzer and series drawn in the analyzer chart
   @Input() analyzerSeries;
 
-  // Tooltip options in the analyzer view
-  @Input() name: boolean;
-  @Input() units: boolean;
-  @Input() geography: boolean;
   @Input() yoy: boolean;
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
@@ -99,9 +95,6 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;
     seriesUrl += this.index ? `&index=${this.index}` : '';
-    seriesUrl += this.name ? `&name=${this.name}` : '';
-    seriesUrl += this.units ? `&units${this.units}` : '';
-    seriesUrl += this.geography ? `&geography=${this.geography}` : '';
     seriesUrl += this.yoy ? `&yoy=${this.yoy}` : '';
     seriesUrl += this.ytd ? `&ytd=${this.ytd}` : '';
     seriesUrl += this.c5ma ? `&c5ma=${this.c5ma}` : '';

@@ -31,9 +31,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() portalSettings;
   @Input() start;
   @Input() end;
-  @Input() nameChecked;
-  @Input() unitsChecked;
-  @Input() geoChecked;
   @Input() indexChecked;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
@@ -137,7 +134,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
-    const useAxisOffset = chartSeries.some(s => s.className !== 'navigator' && s.yAxisSide === 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
@@ -197,10 +193,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   initChart = (portalSettings, buttons, highestFreq) => {
     const startDate = this.start || null;
     const endDate = this.end || null;
-    const tooltipName = this.nameChecked;
-    const tooltipUnits = this.unitsChecked;
-    const tooltipGeo = this.geoChecked;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
+    const formatTooltip = (args, points) => this.formatTooltip(args, points);
     const getChartExtremes = (chartObject) => this.highstockHelper.getAnalyzerChartExtremes(chartObject);
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
     const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
@@ -340,7 +333,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       shared: true,
       followPointer: true,
       formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+        return formatTooltip(args, this.points);
       }
     };
     this.chartOptions.credits = {
@@ -413,7 +406,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return range[freq] || 1000 * 3600 * 24;
   }
 
-  formatTooltip(args, points, x, name: boolean, units: boolean, geo: boolean) {
+  formatTooltip(args, points) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
@@ -430,26 +423,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
       return formattedValue;
     };
-    const formatSeriesLabel = (sName, sUnits, sGeo, point, seriesValue: number, date: string, pointX, str: string) => {
+    const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = sName ? point.userOptions.tooltipName : '';
+      const displayName = `${point.userOptions.tooltipName} (${point.userOptions.geography})`;
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
-      const unitsLabel = sUnits ? this.indexChecked ? `(Index)` : ` (${point.userOptions.unitsLabelShort}) `: '';
-      const geoLabel = sGeo ? `${point.userOptions.geography}` : '';
-      const label = `${displayName} ${date}: ${value} ${unitsLabel}`;
+      const label = `${displayName} ${date}: ${value}`;
       const pseudoZones = point.userOptions.pseudoZones;
       if (pseudoZones.length) {
         pseudoZones.forEach((zone) => {
-          if (pointX < zone.value) {
-            return str += `${seriesColor}Pseudo History ${label}${geoLabel}`;
-          }
-          if (pointX > zone.value) {
-            return str += `${seriesColor}${label}${geoLabel}`;
-          }
+          return str += pointX < zone.value ? `${seriesColor}Pseudo History ${label}` : `${seriesColor}${label}`;
         });
       }
       if (!pseudoZones.length) {
-        str += `${seriesColor}${label}${geoLabel}<br>`;
+        str += `${seriesColor}${label}<br>`;
       }
       return str;
     };
@@ -461,7 +447,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           return obs ? Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x) : false;
         });
         if (yearObs) {
-          label += formatSeriesLabel(name, units, geo, serie, yearObs.y, year, yearObs.x, '');
+          label += formatSeriesLabel(serie, yearObs.y, year, yearObs.x, '');
         }
       });
       // Return string of annual series with their values formatted for the tooltip
@@ -475,8 +461,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           return obs ? `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date : false;
         });
         if (obsDate) {
-          const qDate = `${pointQuarter} ${Highcharts.dateFormat('%Y', obsDate.x)}`;
-          label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');
+          const qDate = `${Highcharts.dateFormat('%Y', obsDate.x)} ${pointQuarter} `;
+          label += formatSeriesLabel(serie, obsDate.y, qDate, obsDate.x, '');
         }
       });
       // Return string of quarterly series with their values formatted for the tooltip
@@ -500,40 +486,28 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       }
       if (quarterSeries && monthSeries) {
         const pointMonth = Highcharts.dateFormat('%b', point.x);
-        if (pointMonth !== 'Jan' && pointMonth !== 'Apr' && pointMonth !== 'Jul' && pointMonth !== 'Oct') {
+        const qMonths = ['Jan', 'Apr', 'Jul', 'Oct'];
+        if (!qMonths.some(m => m === pointMonth)) {
           const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
-          const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
+          const months = {
+            Q1: ['Feb', 'Mar'],
+            Q2: ['May', 'Jun'],
+            Q3: ['Aug', 'Sep'],
+            Q4: ['Nov', 'Dec']
+          };
           // Quarter that hovered point falls into
-          const pointQuarter = months[pointMonth];
+          const pointQuarter = Object.keys(months).find(key => months[key].some(m => m === pointMonth));
           // Month for which there is quarterly data
           const quarterMonth = quarters[pointQuarter];
-          const date = Highcharts.dateFormat('%Y', point.x) + ' ' + quarterMonth;
+          const date = `${Highcharts.dateFormat('%Y', point.x)} ${quarterMonth}`;
           // Add quarterly observations when monthly series are selected
           tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
         }
       }
       const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x);
-      tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
+      tooltip += formatSeriesLabel(point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
-  }
-
-  nameActive(e) {
-    this.nameChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
-  }
-
-  unitsActive(e) {
-    this.unitsChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
-  }
-
-  geoActive(e) {
-    this.geoChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
   }
 
   filterDatesForNavigator(allDates: Array<any>) {
@@ -542,20 +516,5 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       // also check if date range only contains a partial year
       return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
     });
-  }
-
-  updateTooltipOptions(tooltipName: boolean, tooltipUnits: boolean, tooltipGeo: boolean) {
-    this.chartOptions.rangeSelector.selected = null;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    this.chartOptions.tooltip = {
-      borderWidth: 0,
-      shadow: false,
-      shared: true,
-      followPointer: true,
-      formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-      }
-    };
-    this.updateChart = true;
   }
 }
