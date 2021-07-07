@@ -16,7 +16,7 @@
         <button type="button" class="btn btn-sm btn-outline-secondary compare-btn"
           (click)="toggleAnalyzerDisplay()"><span class="analyzer-more material-icons">
             {{displayCompare ? 'view_comfy' : 'assessment'}}
-          </span>{{displayCompare ? ' Thumbnail' : ' Compare'}}
+          </span>{{displayCompare ? ' Gallery View' : ' Compare'}}
         </button>
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
           (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">

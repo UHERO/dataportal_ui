@@ -7,11 +7,13 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ViewChild
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
 import 'jquery';
+import Bootstrap from 'bootstrap/dist/js/bootstrap';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
@@ -43,6 +45,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartOptions = {} as HighstockObject;
   chartCallback;
   analyzerData;
+  modalDirect: Bootstrap.Modal;
+  @ViewChild('exampleModal', { static: true }) customModal;
 
   constructor(
     @Inject('logo') private logo,
@@ -69,7 +73,28 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
+      console.log('series sub')
       this.updateChartData(series);
+    });
+    Highcharts.addEvent(Highcharts.Chart, 'load', e => {
+      [...e.target.renderTo.querySelectorAll('div.dropup')].forEach((a) => {
+        if (a) {
+          a.querySelector('button').setAttribute('data-bs-toggle', 'dropdown');
+          const analyzerSeries = this.analyzerService;
+          let update = this.updateChart;
+          console.log('a', a)
+          const seriesId = +a.id.split('-')[1];
+          const removeButton = a.querySelector('.remove-button');
+          removeButton.setAttribute('title', 'Remove From Analyzer');
+          removeButton.addEventListener('click', function() {
+            console.log('this', this)
+            analyzerService.removeFromComparisonChart(seriesId);
+            analyzerService.removeFromAnalyzer(seriesId);
+            update = true;
+            console.log('REMOVE')
+          });
+        }
+      });
     });
   }
 
@@ -92,6 +117,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (this.chartObject) {
       this.chartObject.redraw()
     }
+    console.log('CUSTOM MODAL', this.customModal)
   }
 
   ngOnDestroy() {
@@ -116,7 +142,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       geography: null,
       yAxisSide: 'right',
       yAxis: `null-right`,
-      animation: false,
       dataGrouping: {
         enabled: false
       },
@@ -147,7 +172,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           title: {
             text: s.yAxisText
           },
-          animation: false,
           opposite: s.yAxisSide === 'left' ? false : true,
           minPadding: 0,
           maxPadding: 0,
@@ -205,23 +229,33 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
+    let modal = this.modalDirect;
+    let cModal = this.customModal;
 
     this.chartOptions.chart = {
       alignTicks: false,
       className: 'analyzer-chart',
       description: undefined,
-      animation: false,
       events: {
         render() {
+          console.log('RENDER')
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = highestFreq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = highestFreq.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
+          this._selectedMax = highestFreq.frequency === 'A' ? `${userMax.substr(0, 4)}-01-01` : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
           }
+          if (this.customButton) {
+            this.customButton.destroy();
+          }
+          this.customButton = this.renderer.button('Customize', 100, 10, function() {
+            console.log('Custom button clicked', cModal)
+            modal = new Bootstrap.Modal(cModal.nativeElement, {}).toggle();
+          }).add();
+          console.log('chart', this)
         },
         load() {
           if (logo.analyticsLogoSrc) {
@@ -243,8 +277,45 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.chartOptions.legend = {
       enabled: true,
+      useHTML: true,
       labelFormatter() {
-        return this.yAxis.userOptions.opposite ? `${this.name} (right)` : `${this.name} (left)`;
+        return this.yAxis.userOptions.opposite ?
+          `${this.name} (right)` :
+          `${this.name} (left) <div class="btn-group dropup" id="series-${this.userOptions.className}">
+          <button type="button" class="btn btn-secondary dropdown-toggle" aria-expanded="false">
+            Dropup
+          </button>
+          <ul class="dropdown-menu">
+          <p>
+            <i class="material-icons analyze-button remove-button">&#xE872;</i>
+            Remove From Analyzer
+          </p>
+          <p *ngIf="inCompareChart">
+            Y-Axis:
+            <select [ngModel]="seriesInfo.selectedYAxis" (ngModelChange)="onChartAxisChange($event, seriesInfo)" class="custom-select" aria-label="chart-axis-selector">
+              <option [ngValue]="axis" *ngFor="let axis of seriesInfo.yAxis">
+                {{axis}}
+              </option>
+            </select>
+          </p>
+          <p *ngIf="inCompareChart">
+            Chart Type:
+            <select [ngModel]="seriesInfo.selectedChartType" (ngModelChange)="onChartTypeChange($event, seriesInfo)" class="custom-select" aria-label="chart-type-selector">
+              <option [ngValue]="type" *ngFor="let type of seriesInfo.chartType">
+                {{type}}
+              </option>
+            </select>
+          </p>
+          <p *ngIf="inCompareChart">
+            <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
+              (click)="removeFromCompare(seriesInfo)">assessment</i> Remove From Comparison
+          </p>
+          <p *ngIf="!inCompareChart">
+            <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
+            (click)="addToCompare(seriesInfo)">add_chart</i> Add To Comparison
+          </p>
+          </ul>
+        </div>`;
       }
     };
     // incorrect indexing when using range selector
@@ -292,6 +363,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         events: null,
         chart: {
           events: {
+            render() {
+              if (this.customButton) {
+                this.customButton.destroy();
+              }
+            },
             load() {
               if (logo.analyticsLogoSrc) {
                 this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();
@@ -516,5 +592,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       // also check if date range only contains a partial year
       return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
     });
+  }
+
+  toggleMenu() {
+    $('.dropdown').dropdown('toggle');
   }
 }

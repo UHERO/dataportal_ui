@@ -79,7 +79,6 @@ export class AnalyzerService {
       showInLegend: true,
       showInNavigator: false,
       seriesInfo: series,
-      animation: false,
       events: {
         legendItemClick() {
           return false;
@@ -141,7 +140,9 @@ export class AnalyzerService {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
     const newCompare = currentCompare.filter(s => s.className !== id);
-    this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
+    if (newCompare.length) {
+      this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
+    }
     const indexed = this.analyzerData.indexed;
     if (newCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(newCompare);
