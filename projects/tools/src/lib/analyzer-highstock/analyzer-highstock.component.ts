@@ -13,7 +13,6 @@ import {
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
 import 'jquery';
-import Bootstrap from 'bootstrap/dist/js/bootstrap';
 import { HighstockHelperService } from '../highstock-helper.service';
 declare var $: any;
 import * as Highcharts from 'highcharts/highstock';
@@ -45,8 +44,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartOptions = {} as HighstockObject;
   chartCallback;
   analyzerData;
-  modalDirect: Bootstrap.Modal;
-  @ViewChild('exampleModal', { static: true }) customModal;
 
   constructor(
     @Inject('logo') private logo,
@@ -79,10 +76,10 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     Highcharts.addEvent(Highcharts.Chart, 'redraw', e => {
       [...e.target.renderTo.querySelectorAll('div.dropup')].forEach((a) => {
         if (a) {
-          new Bootstrap.Dropdown(a)
-          a.querySelector('span.material-icons').setAttribute('data-bs-toggle', 'dropdown');
-          console.log('this', this)
           const seriesId = +a.id.split('-')[1];
+          const settingIcon = a.querySelector('span.material-icons');
+          console.log('setting icon', settingIcon)
+          settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           const series = this.series.find(s => s.id === seriesId);
           const dropdownMenu = a.querySelector('.dropdown-menu');
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
@@ -94,6 +91,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           changeChartTypeItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
           removeFromComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
           addToComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'none' : 'block';
+          const chartTypeSelect = document.createElement('select');
+          chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);
+          if (!a.querySelector(`#chart-type-${seriesId}`)) {
+            changeChartTypeItem.appendChild(chartTypeSelect);
+          }
           //changeChartTypeItem.appendChild(document.createElement('select'));
           addToComparisonChartItem.addEventListener('click', function() {
             analyzerService.makeCompareSeriesVisible(series);
@@ -129,7 +131,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (this.chartObject) {
       this.chartObject.redraw()
     }
-    console.log('CUSTOM MODAL', this.customModal)
   }
 
   ngOnDestroy() {
@@ -241,8 +242,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     const getIndexBaseYear = (series, start) => this.analyzerService.getIndexBaseYear(series, start);
     const getIndexedValues = (values, baseYear) => this.analyzerService.getChartIndexedValues(values, baseYear);
     const updateIndexed = (chartObject) => chartObject._indexed = this.indexChecked;
-    let modal = this.modalDirect;
-    let cModal = this.customModal;
 
     this.chartOptions.chart = {
       alignTicks: false,
@@ -260,14 +259,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           if (this._extremes) {
             tableExtremes.emit({ minDate: this._extremes.min, maxDate: this._extremes.max });
           }
-          if (this.customButton) {
-            this.customButton.destroy();
-          }
-          this.customButton = this.renderer.button('Customize', 100, 10, function() {
-            console.log('Custom button clicked', cModal)
-            modal = new Bootstrap.Modal(cModal.nativeElement, {}).toggle();
-          }).add();
-          console.log('chart', this)
         },
         load() {
           if (logo.analyticsLogoSrc) {
@@ -294,7 +285,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         return this.yAxis.userOptions.opposite ?
           `${this.name} (right)` :
           `${this.name} (left) <div class="btn-group dropup" id="series-${this.userOptions.className}">
-          <span class="material-icons">
+          <span class="material-icons settings-icon">
           settings
           </span>
           <ul class="dropdown-menu">
@@ -302,7 +293,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             Y-Axis:
           </p>
           <p class="change-chart-type">
-            Chart Type: 
+            Chart Type:
           </p>
           <p class="remove-from-comparison">
             <i class="material-icons analyze-chart color{{seriesInfo.id}}">assessment</i> Remove From Comparison
