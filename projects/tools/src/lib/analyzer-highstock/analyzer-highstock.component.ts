@@ -76,22 +76,34 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       console.log('series sub')
       this.updateChartData(series);
     });
-    Highcharts.addEvent(Highcharts.Chart, 'load', e => {
+    Highcharts.addEvent(Highcharts.Chart, 'redraw', e => {
       [...e.target.renderTo.querySelectorAll('div.dropup')].forEach((a) => {
         if (a) {
-          a.querySelector('button').setAttribute('data-bs-toggle', 'dropdown');
-          const analyzerSeries = this.analyzerService;
-          let update = this.updateChart;
-          console.log('a', a)
+          new Bootstrap.Dropdown(a)
+          a.querySelector('span.material-icons').setAttribute('data-bs-toggle', 'dropdown');
+          console.log('this', this)
           const seriesId = +a.id.split('-')[1];
-          const removeButton = a.querySelector('.remove-button');
-          removeButton.setAttribute('title', 'Remove From Analyzer');
-          removeButton.addEventListener('click', function() {
-            console.log('this', this)
+          const series = this.series.find(s => s.id === seriesId);
+          const dropdownMenu = a.querySelector('.dropdown-menu');
+          const addToComparisonChartItem = a.querySelector('.add-to-comparison');
+          const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
+          const changeChartTypeItem = a.querySelector('.change-chart-type');
+          const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
+          const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
+          changeYAxisSideItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
+          changeChartTypeItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
+          removeFromComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
+          addToComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'none' : 'block';
+          //changeChartTypeItem.appendChild(document.createElement('select'));
+          addToComparisonChartItem.addEventListener('click', function() {
+            analyzerService.makeCompareSeriesVisible(series);
+          });
+          removeFromComparisonChartItem.addEventListener('click', function() {
             analyzerService.removeFromComparisonChart(seriesId);
+          });
+          removeFromAnalyzerItem.addEventListener('click', function() {
+            //analyzerService.removeFromComparisonChart(seriesId);
             analyzerService.removeFromAnalyzer(seriesId);
-            update = true;
-            console.log('REMOVE')
           });
         }
       });
@@ -282,37 +294,25 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         return this.yAxis.userOptions.opposite ?
           `${this.name} (right)` :
           `${this.name} (left) <div class="btn-group dropup" id="series-${this.userOptions.className}">
-          <button type="button" class="btn btn-secondary dropdown-toggle" aria-expanded="false">
-            Dropup
-          </button>
+          <span class="material-icons">
+          settings
+          </span>
           <ul class="dropdown-menu">
-          <p>
-            <i class="material-icons analyze-button remove-button">&#xE872;</i>
-            Remove From Analyzer
-          </p>
-          <p *ngIf="inCompareChart">
+          <p class="change-y-axis-side">
             Y-Axis:
-            <select [ngModel]="seriesInfo.selectedYAxis" (ngModelChange)="onChartAxisChange($event, seriesInfo)" class="custom-select" aria-label="chart-axis-selector">
-              <option [ngValue]="axis" *ngFor="let axis of seriesInfo.yAxis">
-                {{axis}}
-              </option>
-            </select>
           </p>
-          <p *ngIf="inCompareChart">
-            Chart Type:
-            <select [ngModel]="seriesInfo.selectedChartType" (ngModelChange)="onChartTypeChange($event, seriesInfo)" class="custom-select" aria-label="chart-type-selector">
-              <option [ngValue]="type" *ngFor="let type of seriesInfo.chartType">
-                {{type}}
-              </option>
-            </select>
+          <p class="change-chart-type">
+            Chart Type: 
           </p>
-          <p *ngIf="inCompareChart">
-            <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
-              (click)="removeFromCompare(seriesInfo)">assessment</i> Remove From Comparison
+          <p class="remove-from-comparison">
+            <i class="material-icons analyze-chart color{{seriesInfo.id}}">assessment</i> Remove From Comparison
           </p>
-          <p *ngIf="!inCompareChart">
-            <i class="material-icons analyze-chart color{{seriesInfo.id}}" [style.color]="seriesInfo.color"
-            (click)="addToCompare(seriesInfo)">add_chart</i> Add To Comparison
+          <p class="add-to-comparison">
+            <i class="material-icons analyze-chart color{{seriesInfo.id}}">add_chart</i> Add To Comparison
+          </p>
+          <p class="remove-from-analyzer text-danger">
+            <i class="material-icons analyze-button">&#xE872;</i>
+            Remove From Analyzer
           </p>
           </ul>
         </div>`;
@@ -363,11 +363,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
         events: null,
         chart: {
           events: {
-            render() {
-              if (this.customButton) {
-                this.customButton.destroy();
-              }
-            },
             load() {
               if (logo.analyticsLogoSrc) {
                 this.renderer.image(logo.analyticsLogoSrc, 490, 350, 141 / 1.75, 68 / 1.75).add();

@@ -56,8 +56,8 @@ export class AnalyzerService {
 
   setCompareChartSeriesObject(series) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    this.analyzerData.analyzerSeries.find(s => s.id === series.id).compare = true;
-    this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
+    //this.analyzerData.analyzerSeries.find(s => s.id === series.id).compare = true;
+    //this.analyzerData.baseYear = this.getIndexBaseYear([...currentCompare, { seriesInfo: series }], this.analyzerData.minDate);
     const { indexed, baseYear } = this.analyzerData;
     if (currentCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(currentCompare);
@@ -91,8 +91,23 @@ export class AnalyzerService {
         enabled: false
       },
       pseudoZones: series.chartData.pseudoZones,
-      visible: true
+      visible: series.compare//this.isVisible(currentCompare, this.analyzerSeriesTrackerSource.value, series) || false//true
     });
+    console.log('currentCompare', currentCompare)
+    this.analyzerSeriesCompareSource.next(currentCompare);
+  }
+
+  makeCompareSeriesVisible(series) {
+    const currentCompare = this.analyzerSeriesCompareSource.value;
+    const compareSeries = currentCompare.find(c => c.className === series.id);
+    compareSeries.visible = true;
+    const seriesToCalcBaseYear = currentCompare.filter(s => s.visible).length ? currentCompare.filter(s => s.visible) : currentCompare;
+    this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
+    const indexed = this.analyzerData.indexed;
+    if (currentCompare.filter(s => s.visible).length && indexed) {
+      this.updateCompareSeriesDataAndAxes(currentCompare);
+    }
+
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -138,8 +153,17 @@ export class AnalyzerService {
 
   removeFromComparisonChart(id: number) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
+    console.log('remove analyzerSeries', this.analyzerData.analyzerSeries)
     this.analyzerData.analyzerSeries.find(s => s.id === id).compare = false;
-    const newCompare = currentCompare.filter(s => s.className !== id);
+    const compareSeries = currentCompare.find(c => c.className === id);
+    compareSeries.visible = false;
+    const seriesToCalcBaseYear = currentCompare.filter(s => s.visible).length ? currentCompare.filter(s => s.visible) : currentCompare;
+    this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
+    const indexed = this.analyzerData.indexed;
+    if (currentCompare.filter(s => s.visible).length && indexed) {
+      this.updateCompareSeriesDataAndAxes(currentCompare);
+    }
+    /*const newCompare = currentCompare.filter(s => s.className !== id);
     if (newCompare.length) {
       this.analyzerData.baseYear = this.getIndexBaseYear(newCompare, this.analyzerData.minDate);
     }
@@ -147,13 +171,16 @@ export class AnalyzerService {
     if (newCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(newCompare);
     }
-    this.analyzerSeriesCompareSource.next(newCompare);
+    this.analyzerSeriesCompareSource.next(newCompare);*/
+    this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
   toggleIndexValues(index: boolean, minYear: string) {
     this.analyzerData.indexed = index;
     const currentCompareSeries = this.analyzerSeriesCompareSource.value;
-    const baseYear = this.getIndexBaseYear(currentCompareSeries, minYear);
+    const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
+
+    const baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, minYear);
     this.analyzerData.baseYear = baseYear;
     if (currentCompareSeries) {
       this.updateCompareSeriesDataAndAxes(currentCompareSeries);
@@ -182,6 +209,11 @@ export class AnalyzerService {
 
   removeFromAnalyzer(seriesID: number) {
     let currentValue = this.analyzerSeriesTrackerSource.value;
+    const compareSeries = this.analyzerSeriesCompareSource.value.find(s => s.className === seriesID);
+    if (compareSeries) {
+      this.analyzerSeriesCompareSource.next(this.analyzerSeriesCompareSource.value.filter(s => s.className !== seriesID));
+    }
+    this.analyzerData.analyzerSeries.filter(s => s.id !== seriesID)
     this.analyzerSeriesTrackerSource.next(currentValue.filter(s => s.id !== seriesID));
     this.analyzerSeriesCount.next(this.analyzerSeriesTrackerSource.value.length);
   }
@@ -205,14 +237,15 @@ export class AnalyzerService {
       });
       this.analyzerData.analyzerFrequency = this.analyzerData.displayFreqSelector ? this.getCurrentAnalyzerFrequency(series, this.analyzerData.siblingFreqs) : this.getHighestFrequency(this.analyzerData.analyzerSeries);
       this.analyzerData.yRightSeries = rightY ? rightY.split('-').map(s => +s) : [];
-      // On load, analyzer should add 1 (or 2 if available) series to comparison chart
-      // if user has not already added/removed series for comparison
-      this.setDefaultCompareSeries();
-      this.analyzerData.baseYear = this.getIndexBaseYear(this.analyzerSeriesCompareSource.value, this.analyzerData.minDate);
+      const currentCompareSeries = this.analyzerSeriesCompareSource.value;
+      const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
+  
+      this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
       this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
+    console.log('ANALYZER DATA', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -220,35 +253,25 @@ export class AnalyzerService {
     const seriesExists = analyzerSeries.find(s => series.id === s.id);
     if (!seriesExists) {
       const seriesData = this.formatSeriesForAnalyzer(series);
-      seriesData.compare = this.shouldSeriesCompare(this.analyzerSeriesCompareSource.value, aSeriesTracker, series);
+      seriesData.compare = this.isVisible(aSeriesTracker, series, analyzerSeries);
       analyzerSeries.push(seriesData);
-      this.addToCompare(this.analyzerSeriesCompareSource.value, seriesData);
+      this.addToCompareChart(this.analyzerSeriesCompareSource.value, seriesData);
     }
   }
 
-  shouldSeriesCompare = (compareSource: Array<any>, aSeriesTracker: Array<any>, series: any) => {
-    return compareSource.find(s => s.className === series.id) || aSeriesTracker.find(s => s.id === series.id && s.compare);
+  isVisible = (aSeriesTracker: Array<any>, series: any, analyzerSeries: Array<any>) => {
+    // On load, analyzer should add 1 (or 2 if available) series to comparison chart
+    // if user has not already added/removed series for comparison
+    if (aSeriesTracker.find(s => s.id === series.id && s.compare) || analyzerSeries.filter(series => series.compare).length < 2) {
+      return true;
+    }
+    return false;
   }
 
-  addToCompare(compareSource: Array<any>, seriesData: any) {
+  addToCompareChart(compareSource: Array<any>, seriesData: any) {
     const seriesExistsInCompare = compareSource.find(s => s.className === seriesData.id);
-    if (seriesData.compare && !seriesExistsInCompare) {
+    if (!seriesExistsInCompare) {
       this.setCompareChartSeriesObject(seriesData)
-    }
-  }
-
-  setDefaultCompareSeries() {
-    let currentCompare = this.analyzerSeriesCompareSource.value;
-    let i = 0;
-    while ((currentCompare.length < 2 && this.analyzerData.analyzerSeries.length > 1) || !currentCompare.length) {
-      const aSeries = this.analyzerData.analyzerSeries[i];
-      const compareSeries  = currentCompare.find(s => s.className === aSeries.id);
-      if (!compareSeries) {
-        aSeries.compare = true;
-        this.setCompareChartSeriesObject(aSeries);
-      }
-      i++;
-      currentCompare = this.analyzerSeriesCompareSource.value;
     }
   }
 

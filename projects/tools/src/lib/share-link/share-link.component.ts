@@ -34,7 +34,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     private analyzerService: AnalyzerService,
   ) {
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      this.compareChartSeries = series;
+      this.compareChartSeries = series.filter(s => s.visible);
       this.updateShareAndEmbed(this.view);
     });
   }

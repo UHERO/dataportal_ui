@@ -148,7 +148,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeRange(e) {
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
-    this.analyzerService.getIndexBaseYear(this.analyzerService.analyzerSeriesCompareSource.value, e.seriesStart)
+    const currentCompareSeries = this.analyzerService.analyzerSeriesCompareSource.value;
+    const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
+    this.analyzerService.getIndexBaseYear(seriesToCalcBaseYear, e.seriesStart)
     this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value)
   }
 }
