@@ -73,15 +73,21 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       console.log('series sub')
       this.updateChartData(series);
     });
-    Highcharts.addEvent(Highcharts.Chart, 'redraw', e => {
-      [...e.target.renderTo.querySelectorAll('div.dropup')].forEach((a) => {
+    Highcharts.addEvent(Highcharts.Chart, 'render', e => {
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
         if (a) {
+          const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('span.material-icons');
-          console.log('setting icon', settingIcon)
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
+          settingIcon.setAttribute('data-bs-boundary', 'viewport');
+          const legendColor = legendItem.style.fill;
+          console.log('legendColor', legendItem.classList)
+          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
+          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
+
           const series = this.series.find(s => s.id === seriesId);
-          const dropdownMenu = a.querySelector('.dropdown-menu');
+          console.log('SERIES', series)
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -91,18 +97,14 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           changeChartTypeItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
           removeFromComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
           addToComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'none' : 'block';
-          const chartTypeSelect = document.createElement('select');
-          chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
-            changeChartTypeItem.appendChild(chartTypeSelect);
+            this.createChartTypeSelector(seriesId, series, changeChartTypeItem)
           }
-          //changeChartTypeItem.appendChild(document.createElement('select'));
-          addToComparisonChartItem.addEventListener('click', function() {
-            analyzerService.makeCompareSeriesVisible(series);
-          });
-          removeFromComparisonChartItem.addEventListener('click', function() {
-            analyzerService.removeFromComparisonChart(seriesId);
-          });
+          if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
+            this.createYAxisSideSelector(seriesId, series, changeYAxisSideItem);
+          }
+          addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(series));
+          removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
           removeFromAnalyzerItem.addEventListener('click', function() {
             //analyzerService.removeFromComparisonChart(seriesId);
             analyzerService.removeFromAnalyzer(seriesId);
@@ -135,6 +137,30 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
+  }
+
+  createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
+    const chartTypeSelect = document.createElement('select');
+    chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
+    series.chartType.forEach((type: string) => {
+      const selectedType = type === series.selectedChartType;
+      chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
+    });
+    chartTypeMenuItem.appendChild(chartTypeSelect);
+    chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
+    chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));
+  }
+
+  createYAxisSideSelector(seriesId: number, series: any, yAxisSideMenuItem: HTMLElement) {
+    const yAxisSelect = document.createElement('select');
+    yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
+    series.yAxis.forEach((side: string) => {
+      const selectedSide = side === series.selectedYAxis;
+      yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
+    });
+    yAxisSideMenuItem.appendChild(yAxisSelect);
+    yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
+
   }
 
   setYMinMax() {
@@ -284,11 +310,11 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       labelFormatter() {
         return this.yAxis.userOptions.opposite ?
           `${this.name} (right)` :
-          `${this.name} (left) <div class="btn-group dropup" id="series-${this.userOptions.className}">
+          `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
           <span class="material-icons settings-icon">
           settings
           </span>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu px-2">
           <p class="change-y-axis-side">
             Y-Axis:
           </p>
@@ -306,7 +332,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             Remove From Analyzer
           </p>
           </ul>
-        </div>`;
+        </div> ${this.name} (left)`;
       }
     };
     // incorrect indexing when using range selector

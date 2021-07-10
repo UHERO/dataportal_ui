@@ -145,10 +145,12 @@ export class AnalyzerService {
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
-  updateCompareChartType(seriesInfo: any, chartType: string) {
+  updateCompareChartType(seriesId: number, chartType: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
-    currentCompare.find(s => s.className === seriesInfo.id).type = chartType;
+    currentCompare.find(s => s.className === seriesId).type = chartType;
     this.analyzerSeriesCompareSource.next(currentCompare);
+    this.analyzerData.analyzerSeries.find(s => s.id === seriesId).selectedChartType = chartType;
+    console.log('analyzerData', this.analyzerData)
   }
 
   removeFromComparisonChart(id: number) {
