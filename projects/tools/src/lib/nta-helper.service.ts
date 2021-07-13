@@ -21,7 +21,7 @@ export class NtaHelperService {
   // Gets data sublists available for a selected category
   initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
     const { dataListId, selectedMeasure } = routeParams;
-    const cacheId = this.helperService.setCacheId(catId, routeParams);
+    const cacheId = this.helperService.setCacheId(catId, routeParams, null);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       return observableOf([this.categoryData[cacheId]]);

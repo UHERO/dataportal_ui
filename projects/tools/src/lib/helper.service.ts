@@ -11,21 +11,30 @@ export class HelperService {
   currentFreq = this.currentFreqChange.asObservable();
   currentGeoChange: BehaviorSubject<any> = new BehaviorSubject(null);
   currentGeo = this.currentGeoChange.asObservable();
+  currentFcChange: BehaviorSubject<any> = new BehaviorSubject(null);
+  currentFc = this.currentFcChange.asObservable();
+
 
   constructor() { }
 
-  setCacheId(category: any, routeParams: any) {
+  setCacheId(category: any, routeParams: any, forecast) {
     let id = `category${category}`;
     Object.keys(routeParams).forEach((param) => {
       id += routeParams[param] ? `${param}${routeParams[param]}` : ``;
     });
-    return id;
+    return forecast ? id + forecast : id;
   }
 
   updateCurrentFrequency = (newFreq: Frequency) => {
     this.currentFreqChange.next(newFreq);
     return newFreq;
   }
+
+  updateCurrentForecast = (newFc: string) => {
+    this.currentFcChange.next(newFc);
+    return newFc;
+  }
+
   updateCurrentGeography = (newGeo: Geography) => {
     this.currentGeoChange.next(newGeo);
     return newGeo;
@@ -51,7 +60,7 @@ export class HelperService {
   }
 
   checkIfSeriesAvailable = (noData: boolean, data: Array<any>) => {
-    return noData || !data.some(s => s.display);
+    return noData || (data && !data.some(s => s.display));
   }
 
   findSelectedDataList = (dataList, dataListId, dataListName) => {

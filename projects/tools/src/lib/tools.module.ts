@@ -35,6 +35,7 @@ import { MeasurementLandingPageComponent } from './measurement-landing-page/meas
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
+import { ForecastSelectorComponent } from './forecast-selector/forecast-selector.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/anal
     MeasurementSelectorComponent,
     EmbedGraphComponent,
     AnalyzerCompareOptionsComponent,
+    ForecastSelectorComponent,
   ],
   imports: [
     CommonModule,

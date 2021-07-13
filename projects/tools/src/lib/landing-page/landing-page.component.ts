@@ -24,6 +24,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   private dataListId: number;
   private routeGeo: string;
   private routeFreq: string;
+  private routeFc: string;
   routeView: string;
   private routeYoy;
   private routeYtd;
@@ -43,9 +44,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   public categoryData;
   private loading = false;
   freqSub: Subscription;
+  fcSub: Subscription;
   geoSub: Subscription;
   selectedGeo: Geography;
   selectedFreq: Frequency;
+  selectedFc: string;
 
   constructor(
     @Inject('portal') public portal,
@@ -62,6 +65,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.geoSub = helperService.currentGeo.subscribe((geo) => {
       this.selectedGeo = geo;
     });
+    this.fcSub = helperService.currentFc.subscribe((fc) => {
+      this.selectedFc = fc;
+    })
   }
 
   ngOnInit(): void {
@@ -72,6 +78,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.search = typeof this.id === 'string' ? true : false;
       this.routeGeo = params[`geo`];
       this.routeFreq = params[`freq`];
+      this.routeFc = params[`fc`];
       this.routeView = params[`view`];
       this.routeYoy = params[`yoy`];
       this.routeYtd = params[`ytd`];
@@ -83,18 +90,22 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       if (this.dataListId) { this.queryParams.data_list_id = this.dataListId; }
       if (this.routeGeo) { this.queryParams.geo = this.routeGeo; }
       if (this.routeFreq) { this.queryParams.freq = this.routeFreq; }
+      if (this.routeFc) { this.queryParams.fc = this.routeFc; }
       if (this.routeView) { this.queryParams.view = this.routeView; }
       if (this.routeSa) { this.queryParams.sa = this.routeSa; } else { this.queryParams.sa = 'true'; }
       if (this.routeYoy) { this.queryParams.yoy = this.routeYoy; } else { delete this.queryParams.yoy; }
       if (this.routeYtd) { this.queryParams.ytd = this.routeYtd; } else { delete this.queryParams.ytd; }
       if (this.noCache) { this.queryParams.noCache = this.noCache; } else { delete this.queryParams.noCache; }
-      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq);
+      this.categoryData = this.getData(this.id, this.noCache, this.dataListId, this.routeGeo, this.routeFreq, this.routeFc);
     });
   }
 
   ngOnDestroy() {
     if (this.sub) {
       this.sub.unsubscribe();
+    }
+    if (this.fcSub) {
+      this.fcSub.unsubscribe();
     }
     this.freqSub.unsubscribe();
     this.geoSub.unsubscribe();
@@ -114,29 +125,43 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  getData(id, noCache, dataListId, geo, freq) {
+  getData(id, noCache, dataListId, geo, freq, forecast) {
     return (typeof id === 'number' || id === null) ?
-      this.catHelper.initContent(id, noCache, { dataListId, geo, freq }) :
+      this.catHelper.initContent(id, noCache, { dataListId, geo, freq }, forecast) :
       this.catHelper.initSearch(id, noCache, { geo, freq });
   }
 
   // Redraw series when a new region is selected
-  redrawSeriesGeo(event, currentFreq) {
+  redrawSeriesGeo(event, currentFreq: Frequency, currentFc: string) {
     this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = event.handle;
       this.queryParams.freq = currentFreq.freq;
+      this.queryParams.fc = currentFc;
       this.updateRoute();
     }, 20);
   }
 
-  redrawSeriesFreq(event, currentGeo) {
+  redrawSeriesFreq(event, currentGeo: Geography, currentFc: string) {
     this.displaySeries = false;
     this.loading = true;
     setTimeout(() => {
       this.queryParams.geo = currentGeo.handle;
       this.queryParams.freq = event.freq;
+      this.queryParams.fc = currentFc;
+      this.updateRoute();
+    }, 10);
+  }
+
+  redrawSeriesFc(event, currentGeo: Geography, currentFreq: Frequency) {
+    this.displaySeries = false;
+    this.loading = true;
+    console.log('redraw fc event', event)
+    setTimeout(() => {
+      this.queryParams.geo = currentGeo.handle;
+      this.queryParams.freq = currentFreq.freq;
+      this.queryParams.fc = event
       this.updateRoute();
     }, 10);
   }
@@ -180,6 +205,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.queryParams.id = this.queryParams.id || this.id;
     this.queryParams.data_list_id = this.queryParams.data_list_id || this.dataListId;
     const urlPath = typeof this.queryParams.id === 'string' ? '/search' : '/category';
+    console.log(this.queryParams)
     this.router.navigate([urlPath], { queryParams: this.queryParams, queryParamsHandling: 'merge' });
     this.loading = false;
     this.displaySeries = true;

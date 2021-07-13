@@ -1,9 +1,11 @@
+import { Inject } from '@angular/core';
 import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
 // Set up data used in category chart and table displays
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { HelperService } from './helper.service';
 import { CategoryData, DateWrapper } from './tools.models';
+import { DataPortalSettingsService } from './data-portal-settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +15,19 @@ export class CategoryHelperService {
   // Variables for geo and freq selectors
   private categoryData = {};
 
-  constructor(private apiService: ApiService, private helperService: HelperService) { }
+  constructor(@Inject('portal') public portal, private apiService: ApiService, private helperService: HelperService, private dataPortalSettings: DataPortalSettingsService) { }
 
   // Called on page load
   // Gets data sublists available for a selected category
-  initContent(catId: any, noCache: boolean, routeParams): Observable<any> {
-    const cacheId = this.helperService.setCacheId(catId, routeParams);
+  initContent(catId: any, noCache: boolean, routeParams, forecast?: string): Observable<any> {
+    const cacheId = this.helperService.setCacheId(catId, routeParams, forecast);
+    console.log('cacheId', cacheId)
+    console.log('this.categoryData', this.categoryData)
+
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);
+      this.helperService.updateCurrentForecast(this.categoryData[cacheId].currentForecast);
       return observableOf([this.categoryData[cacheId]]);
     } else {
       this.categoryData[cacheId] = {} as CategoryData;
@@ -42,7 +48,7 @@ export class CategoryHelperService {
           if (dataListId === null) {
             this.categoryData[cacheId].defaultDataList = selectedDataList.id;
           }
-          this.getDataListGeos(noCache, selectedDataList, cacheId, geo, freq);
+          this.getDataListGeos(noCache, selectedDataList, cacheId, geo, freq, forecast);
         } else {
           this.categoryData[cacheId].invalid = 'Category does not exist.';
           this.categoryData[cacheId].requestComplete = true;
@@ -52,7 +58,7 @@ export class CategoryHelperService {
     }
   }
 
-  getDataListGeos(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListGeos(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string, routeFc: string) {
     this.apiService.fetchCategoryGeos(dataList.id).subscribe((geos) => {
       this.categoryData[cacheId].regions = geos || [dataList.defaults.geo];
     },
@@ -60,11 +66,29 @@ export class CategoryHelperService {
         console.log('check category geos error', error);
       },
       () => {
-        this.getDataListFreqs(noCache, dataList, cacheId, routeGeo, routeFreq);
+        if (this.dataPortalSettings.dataPortalSettings[this.portal.universe].selectors.includes('forecast')) {
+          this.getDataListForecasts(noCache, dataList, cacheId, routeGeo, routeFreq, routeFc);
+        }
+        if (!this.dataPortalSettings.dataPortalSettings[this.portal.universe].selectors.includes('forecast')) {
+          this.getDataListFreqs(noCache, dataList, cacheId, routeGeo, routeFreq, routeFc);
+        }
       });
   }
 
-  getDataListFreqs(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string) {
+  getDataListForecasts(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string, routeFc: string) {
+    this.apiService.fetchCategoryForecasts(dataList.id).subscribe((fcs) => {
+      this.categoryData[cacheId].forecasts = fcs;
+    },
+    (error) => {
+      console.log('check category forecasts error', error);
+    },
+    () => {
+      console.log('forecasts', this.categoryData[cacheId])
+      this.getDataListFreqs(noCache, dataList, cacheId, routeGeo, routeFreq, routeFc);
+    })
+  }
+
+  getDataListFreqs(noCache: boolean, dataList: any, cacheId: string, routeGeo: string, routeFreq: string, routeFc: string) {
     this.apiService.fetchCategoryFreqs(dataList.id).subscribe((freqs) => {
       this.categoryData[cacheId].frequencies = freqs || [dataList.defaults.freq];
     },
@@ -74,29 +98,46 @@ export class CategoryHelperService {
       () => {
         let routeGeoExists;
         let routeFreqExists;
+        let routeFcExists;
+        console.log('routeGeo', routeGeo)
+        const defaultFC = (dataList.defaults && dataList.defaults.fc) || this.categoryData[cacheId].forecasts[0];
         if (routeGeo && routeFreq) {
           routeGeoExists = this.categoryData[cacheId].regions.find(region => region.handle === routeGeo);
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
+        } 
+        // !!!!!!!! don't forget to change//
+        if (routeFc) {
+          routeFcExists = this.categoryData[cacheId].forecasts.find(fc => fc === routeFc);
         }
         if (routeGeoExists && routeFreqExists) {
-          this.getData(noCache, dataList.id, routeGeo, routeFreq, cacheId);
+          if (routeFcExists) {
+            this.getData(noCache, dataList.id, routeGeo, routeFreq, cacheId, routeFc);
+          }
+          if (!routeFcExists) {
+            this.getData(noCache, dataList.id, routeGeo, routeFreq, cacheId, defaultFC);
+          }
         }
         if (!routeGeoExists || !routeFreqExists) {
           const defaultFreq = (dataList.defaults && dataList.defaults.freq) || this.categoryData[cacheId].frequencies[0];
           const defaultGeo = (dataList.defaults && dataList.defaults.geo) || this.categoryData[cacheId].regions[0];
-          this.getData(noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId);
+          this.getData(noCache, dataList.id, defaultGeo.handle, defaultFreq.freq, cacheId, defaultFC);
         }
       });
   }
 
-  getData(noCache: boolean, subId: number, geo: string, freq: string, cacheId: string) {
-    this.apiService.fetchExpanded(subId, geo, freq, noCache).subscribe((expandedCategory) => {
+  getData(noCache: boolean, subId: number, geo: string, freq: string, cacheId: string, forecast: string) {
+    this.apiService.fetchExpanded(subId, geo, freq, noCache, forecast).subscribe((expandedCategory) => {
       const currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
       const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
+      const currentFc = this.categoryData[cacheId].forecasts.find(fc => fc === forecast);
       this.helperService.updateCurrentFrequency(currentFreq);
       this.helperService.updateCurrentGeography(currentGeo);
+      console.log('CURRENTFC', currentFc)
+      this.helperService.updateCurrentForecast(currentFc);
       this.categoryData[cacheId].currentFreq = currentFreq;
       this.categoryData[cacheId].currentGeo = currentGeo;
+      this.categoryData[cacheId].currentForecast = currentFc;
+      console.log('expandedCategory', expandedCategory)
       if (expandedCategory) {
         const series = expandedCategory;
         const dates = this.setCategoryDates(series, freq);
@@ -113,7 +154,7 @@ export class CategoryHelperService {
         this.categoryData[cacheId].hasSeasonal = this.findSeasonalSeries(displaySeries);
         this.categoryData[cacheId].requestComplete = true;
       }
-      if (!expandedCategory) {
+      if (!expandedCategory || !expandedCategory.length) {
         this.categoryData[cacheId].requestComplete = true;
         this.categoryData[cacheId].noData = true;
       }
@@ -143,7 +184,7 @@ export class CategoryHelperService {
 
   // Set up search results
   initSearch(search: string, noCache: boolean, routeParams): Observable<any> {
-    const cacheId = this.helperService.setCacheId(search, routeParams);
+    const cacheId = this.helperService.setCacheId(search, routeParams, null);
     if (this.categoryData[cacheId]) {
       this.helperService.updateCurrentFrequency(this.categoryData[cacheId].currentFreq);
       this.helperService.updateCurrentGeography(this.categoryData[cacheId].currentGeo);

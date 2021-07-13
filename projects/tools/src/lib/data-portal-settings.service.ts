@@ -157,6 +157,11 @@ export class DataPortalSettingsService {
           name: `Hawai'i High Frequency Economic Data`,
           url: `https://data.uhero.hawaii.edu/high-frequency-dashboard/#/`
         }
+      ],
+      selectors: [
+        'geography',
+        'frequency',
+        'forecast'
       ]
     },
     ccom: {

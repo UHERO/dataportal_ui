@@ -22,12 +22,15 @@
 					{{data.selectedDataList.dataListName}}</h3>
 			</ng-template>
 			<div class="filters">
-				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq)"
+				<lib-geo-selector [regions]="data.regions" (selectedGeoChange)="redrawSeriesGeo($event, selectedFreq, selectedFc)"
 					class="selector">
 				</lib-geo-selector>
-				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo)"
+				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo, selectedFc)"
 					class="selector">
 				</lib-freq-selector>
+				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts" (selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)"
+					class="selector">
+				</lib-forecast-selector>
 				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
 					<i class="material-icons md-18">show_chart</i>
 				</a>
@@ -58,11 +61,11 @@
 				[noSeries]="data.noData" [params]="queryParams" [showSeasonal]="queryParams.sa === 'true'"
 				[hasSeasonal]="data.hasSeasonal">
 			</lib-category-table-view>
-			<lib-category-charts *ngIf="routeView !== 'table'"
-				[portalSettings]="portalSettings" [routeStart]="routeStart" [routeEnd]="routeEnd" [data]="data.displaySeries"
-				[dates]="data.categoryDates" [dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq"
-				[noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal"
-				[analyzerView]="false" (updateURLFragment)="updateRoute()">
+			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
+				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates"
+				[dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq" [noSeries]="data.noData"
+				[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [analyzerView]="false"
+				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData">
