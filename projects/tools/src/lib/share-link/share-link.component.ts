@@ -21,6 +21,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   @Input() c5ma: boolean;
   @Input() index: boolean;
   @Input() yRightSeries: Array<any>;
+  @Input() yLeftSeries: Array<any>;
   @Input() displayCompare: boolean;
   @Input() seasonallyAdjusted: boolean;
   @Input() seriesId: number;
@@ -99,6 +100,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     seriesUrl += this.ytd ? `&ytd=${this.ytd}` : '';
     seriesUrl += this.c5ma ? `&c5ma=${this.c5ma}` : '';
     seriesUrl += this.yRightSeries && this.yRightSeries.length ? `&yright=${this.yRightSeries.join('-')}` : '';
+    seriesUrl += this.yLeftSeries && this.yLeftSeries.length ? `&yleft=${this.yLeftSeries.join('-')}` : '';
     seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }

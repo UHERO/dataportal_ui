@@ -44,6 +44,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartOptions = {} as HighstockObject;
   chartCallback;
   analyzerData;
+  compareSeries;
 
   constructor(
     @Inject('logo') private logo,
@@ -70,43 +71,43 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      console.log('series sub')
+      this.compareSeries = series;
+      console.log('series sub', series)
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
+        console.log('A', a)
         if (a) {
           const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('span.material-icons');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          const legendColor = legendItem.style.fill;
           console.log('legendColor', legendItem.classList)
           settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
           settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
-
-          const series = this.series.find(s => s.id === seriesId);
-          console.log('SERIES', series)
+          const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
+          console.log('chartOptionSeries', chartOptionSeries)
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
           const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
           const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
-          changeYAxisSideItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
-          changeChartTypeItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
-          removeFromComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'block' : 'none';
-          addToComparisonChartItem.style.display = this.chartOptions.series.find(s => s.className === seriesId).visible ? 'none' : 'block';
+          changeYAxisSideItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          changeChartTypeItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
-            this.createChartTypeSelector(seriesId, series, changeChartTypeItem)
+            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem)
           }
           if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
-            this.createYAxisSideSelector(seriesId, series, changeYAxisSideItem);
+            this.createYAxisSideSelector(seriesId, chartOptionSeries, changeYAxisSideItem);
           }
-          addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(series));
+          addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(seriesId));
           removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
-          removeFromAnalyzerItem.addEventListener('click', function() {
-            //analyzerService.removeFromComparisonChart(seriesId);
+          removeFromAnalyzerItem.addEventListener('click', function(e) {
+            e.stopPropagation()
             analyzerService.removeFromAnalyzer(seriesId);
           });
         }
@@ -125,13 +126,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
       this.setYMinMax();
     }
-    if (this.series.length && !this.chartObject) {
+    if (this.compareSeries.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
+      const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeries).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
     }
     if (this.chartObject) {
-      this.chartObject.redraw()
+      //this.chartObject.redraw()
     }
   }
 
@@ -140,27 +141,31 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
-    const chartTypeSelect = document.createElement('select');
-    chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
-    series.chartType.forEach((type: string) => {
-      const selectedType = type === series.selectedChartType;
-      chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
-    });
-    chartTypeMenuItem.appendChild(chartTypeSelect);
-    chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
-    chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));
+    if (series) {
+      const chartTypeSelect = document.createElement('select');
+      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
+      series.chartType.forEach((type: string) => {
+        const selectedType = type === series.selectedChartType;
+        chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
+      });
+      chartTypeMenuItem.appendChild(chartTypeSelect);
+      chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
+      chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));  
+    }
   }
 
   createYAxisSideSelector(seriesId: number, series: any, yAxisSideMenuItem: HTMLElement) {
-    const yAxisSelect = document.createElement('select');
-    yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
-    series.yAxis.forEach((side: string) => {
-      const selectedSide = side === series.selectedYAxis;
-      yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
-    });
-    yAxisSideMenuItem.appendChild(yAxisSelect);
-    yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
-
+    if (series) {
+      const yAxisSelect = document.createElement('select');
+      yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
+      series.yAxisSides.forEach((side: string) => {
+        const selectedSide = side === series.selectedYAxis;
+        yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
+      });
+      yAxisSideMenuItem.appendChild(yAxisSelect);
+      yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
+      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value))  
+    }
   }
 
   setYMinMax() {
@@ -199,6 +204,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       visible: true,
     }];
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+      console.log('CHART SERIES', chartSeries)
+      console.log('S.YAXIS', s.yAxis)
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
@@ -308,31 +315,29 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       enabled: true,
       useHTML: true,
       labelFormatter() {
-        return this.yAxis.userOptions.opposite ?
-          `${this.name} (right)` :
-          `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-          <span class="material-icons settings-icon">
-          settings
-          </span>
-          <ul class="dropdown-menu px-2">
-          <p class="change-y-axis-side">
-            Y-Axis:
-          </p>
-          <p class="change-chart-type">
-            Chart Type:
-          </p>
-          <p class="remove-from-comparison">
-            <i class="material-icons analyze-chart color{{seriesInfo.id}}">assessment</i> Remove From Comparison
-          </p>
-          <p class="add-to-comparison">
-            <i class="material-icons analyze-chart color{{seriesInfo.id}}">add_chart</i> Add To Comparison
-          </p>
-          <p class="remove-from-analyzer text-danger">
-            <i class="material-icons analyze-button">&#xE872;</i>
-            Remove From Analyzer
-          </p>
-          </ul>
-        </div> ${this.name} (left)`;
+        return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
+        <span class="material-icons settings-icon">
+        settings
+        </span>
+        <ul class="dropdown-menu px-2">
+        <p class="change-y-axis-side">
+          Y-Axis:
+        </p>
+        <p class="change-chart-type">
+          Chart Type:
+        </p>
+        <p class="remove-from-comparison">
+          <i class="material-icons analyze-chart">assessment</i> Remove From Comparison
+        </p>
+        <p class="add-to-comparison">
+          <i class="material-icons analyze-chart">add_chart</i> Add To Comparison
+        </p>
+        <p class="remove-from-analyzer text-danger">
+          <i class="material-icons analyze-button">&#xE872;</i>
+          Remove From Analyzer
+        </p>
+        </ul>
+      </div> ${this.name} ${this.userOptions.opposite ? '(right)' : '(left)'}`
       }
     };
     // incorrect indexing when using range selector
