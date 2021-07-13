@@ -16,15 +16,12 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
   // Series in the analyzer and series drawn in the analyzer chart
   @Input() analyzerSeries;
 
-  // Tooltip options in the analyzer view
-  @Input() name: boolean;
-  @Input() units: boolean;
-  @Input() geography: boolean;
   @Input() yoy: boolean;
   @Input() ytd: boolean;
   @Input() c5ma: boolean;
   @Input() index: boolean;
   @Input() yRightSeries: Array<any>;
+  @Input() yLeftSeries: Array<any>;
   @Input() displayCompare: boolean;
   @Input() seasonallyAdjusted: boolean;
   @Input() seriesId: number;
@@ -38,7 +35,7 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     private analyzerService: AnalyzerService,
   ) {
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
-      this.compareChartSeries = series;
+      this.compareChartSeries = series.filter(s => s.visible);
       this.updateShareAndEmbed(this.view);
     });
   }
@@ -99,13 +96,11 @@ export class ShareLinkComponent implements OnChanges, OnDestroy {
     seriesUrl += aSeries + cSeries;
     seriesUrl += `&start=${start}&end=${end}`;
     seriesUrl += this.index ? `&index=${this.index}` : '';
-    seriesUrl += this.name ? `&name=${this.name}` : '';
-    seriesUrl += this.units ? `&units${this.units}` : '';
-    seriesUrl += this.geography ? `&geography=${this.geography}` : '';
     seriesUrl += this.yoy ? `&yoy=${this.yoy}` : '';
     seriesUrl += this.ytd ? `&ytd=${this.ytd}` : '';
     seriesUrl += this.c5ma ? `&c5ma=${this.c5ma}` : '';
     seriesUrl += this.yRightSeries && this.yRightSeries.length ? `&yright=${this.yRightSeries.join('-')}` : '';
+    seriesUrl += this.yLeftSeries && this.yLeftSeries.length ? `&yleft=${this.yLeftSeries.join('-')}` : '';
     seriesUrl += this.displayCompare && this.view === 'analyzer' ? `&compare=${this.displayCompare}` : '';
     return seriesUrl;
   }

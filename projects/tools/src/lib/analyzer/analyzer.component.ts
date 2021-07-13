@@ -18,11 +18,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   startDate;
   endDate;
   private noCache: boolean;
-  tooltipName;
-  tooltipUnits;
-  tooltipGeo;
   analyzerData;
   yRightSeries;
+  yLeftSeries;
   analyzerShareLink: string;
   indexSeries: boolean;
   analyzerSeriesSub: Subscription;
@@ -59,14 +57,15 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.analyzerService.analyzerData.minDate = params['start'] || '';
         this.analyzerService.analyzerData.maxDate = params['end'] || '';
         this.indexSeries = params['index'] || null;
-        this.tooltipName = this.evalParamAsTrue(params['name']);
         this.displayCompare = this.evalParamAsTrue(params['compare']);
-        this.tooltipUnits = this.evalParamAsTrue(params['units']);
-        this.tooltipGeo = this.evalParamAsTrue(params['geo']);
         this.tableYoy = this.evalParamAsTrue(params['yoy']);
         this.tableYtd = this.evalParamAsTrue(params['ytd']);
         this.tableC5ma = this.evalParamAsTrue(params['c5ma']);
         this.yRightSeries = params['yright'];
+        this.yLeftSeries = params['yleft'];
+        this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
+        this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
+        console.log('params y right', params['yright'])
         this.noCache = this.evalParamAsTrue(params['nocache']);
       });
     }
@@ -104,18 +103,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   setTableDates(e) {
     this.analyzerService.analyzerData.minDate = e.minDate;
     this.analyzerService.analyzerData.maxDate = e.maxDate;
-  }
-
-  checkTooltip(e) {
-    if (e.label === 'name') {
-      this.tooltipName = e.value;
-    }
-    if (e.label === 'units') {
-      this.tooltipUnits = e.value;
-    }
-    if (e.label === 'geo') {
-      this.tooltipGeo = e.value;
-    }
   }
 
   indexActive(e) {
@@ -166,7 +153,9 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
   changeRange(e) {
     this.analyzerService.analyzerData.minDate = e.seriesStart;
     this.analyzerService.analyzerData.maxDate = e.seriesEnd;
-    this.analyzerService.getIndexBaseYear(this.analyzerService.analyzerSeriesCompareSource.value, e.seriesStart)
+    const currentCompareSeries = this.analyzerService.analyzerSeriesCompareSource.value;
+    const seriesToCalcBaseYear = currentCompareSeries.filter(s => s.visible).length ? currentCompareSeries.filter(s => s.visible) : currentCompareSeries;
+    this.analyzerService.getIndexBaseYear(seriesToCalcBaseYear, e.seriesStart)
     this.analyzerService.updateCompareSeriesDataAndAxes(this.analyzerService.analyzerSeriesCompareSource.value)
   }
 }

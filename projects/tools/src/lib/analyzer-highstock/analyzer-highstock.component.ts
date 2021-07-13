@@ -7,7 +7,8 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ViewChild
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
@@ -31,9 +32,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   @Input() portalSettings;
   @Input() start;
   @Input() end;
-  @Input() nameChecked;
-  @Input() unitsChecked;
-  @Input() geoChecked;
   @Input() indexChecked;
   @Output() tableExtremes = new EventEmitter(true);
   @Output() tooltipOptions = new EventEmitter();
@@ -46,6 +44,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   chartOptions = {} as HighstockObject;
   chartCallback;
   analyzerData;
+  compareSeries;
 
   constructor(
     @Inject('logo') private logo,
@@ -72,7 +71,47 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
+      this.compareSeries = series;
+      console.log('series sub', series)
       this.updateChartData(series);
+    });
+    Highcharts.addEvent(Highcharts.Chart, 'render', e => {
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
+        console.log('A', a)
+        if (a) {
+          const legendItem = a.parentNode.parentNode as HTMLElement;
+          const seriesId = +a.id.split('-')[1];
+          const settingIcon = a.querySelector('span.material-icons');
+          settingIcon.setAttribute('data-bs-toggle', 'dropdown');
+          settingIcon.setAttribute('data-bs-boundary', 'viewport');
+          console.log('legendColor', legendItem.classList)
+          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
+          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
+          const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
+          console.log('chartOptionSeries', chartOptionSeries)
+          const addToComparisonChartItem = a.querySelector('.add-to-comparison');
+          const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
+          const changeChartTypeItem = a.querySelector('.change-chart-type');
+          const changeYAxisSideItem = a.querySelector('.change-y-axis-side');
+          const removeFromAnalyzerItem = a.querySelector('.remove-from-analyzer');
+          changeYAxisSideItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          changeChartTypeItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
+          addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
+          if (!a.querySelector(`#chart-type-${seriesId}`)) {
+            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem)
+          }
+          if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
+            this.createYAxisSideSelector(seriesId, chartOptionSeries, changeYAxisSideItem);
+          }
+          addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(seriesId));
+          removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
+          removeFromAnalyzerItem.addEventListener('click', function(e) {
+            e.stopPropagation()
+            analyzerService.removeFromAnalyzer(seriesId);
+          });
+        }
+      });
     });
   }
 
@@ -87,18 +126,46 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartOptions.rangeSelector.selected = !this.start && !this.end ? 2 : null;
       this.setYMinMax();
     }
-    if (this.series.length && !this.chartObject) {
+    if (this.compareSeries.length && !this.chartObject) {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
-      const highestFrequency = this.analyzerService.getHighestFrequency(this.series).freq;
+      const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeries).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
     }
     if (this.chartObject) {
-      this.chartObject.redraw()
+      //this.chartObject.redraw()
     }
   }
 
   ngOnDestroy() {
     this.compareSeriesSub.unsubscribe();
+  }
+
+  createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
+    if (series) {
+      const chartTypeSelect = document.createElement('select');
+      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
+      series.chartType.forEach((type: string) => {
+        const selectedType = type === series.selectedChartType;
+        chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
+      });
+      chartTypeMenuItem.appendChild(chartTypeSelect);
+      chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
+      chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));  
+    }
+  }
+
+  createYAxisSideSelector(seriesId: number, series: any, yAxisSideMenuItem: HTMLElement) {
+    if (series) {
+      const yAxisSelect = document.createElement('select');
+      yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
+      series.yAxisSides.forEach((side: string) => {
+        const selectedSide = side === series.selectedYAxis;
+        yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
+      });
+      yAxisSideMenuItem.appendChild(yAxisSelect);
+      yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
+      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value))  
+    }
   }
 
   setYMinMax() {
@@ -119,7 +186,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       geography: null,
       yAxisSide: 'right',
       yAxis: `null-right`,
-      animation: false,
       dataGrouping: {
         enabled: false
       },
@@ -137,8 +203,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
-    const useAxisOffset = chartSeries.some(s => s.className !== 'navigator' && s.yAxisSide === 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
+      console.log('CHART SERIES', chartSeries)
+      console.log('S.YAXIS', s.yAxis)
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
@@ -151,7 +218,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           title: {
             text: s.yAxisText
           },
-          animation: false,
           opposite: s.yAxisSide === 'left' ? false : true,
           minPadding: 0,
           maxPadding: 0,
@@ -197,10 +263,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   initChart = (portalSettings, buttons, highestFreq) => {
     const startDate = this.start || null;
     const endDate = this.end || null;
-    const tooltipName = this.nameChecked;
-    const tooltipUnits = this.unitsChecked;
-    const tooltipGeo = this.geoChecked;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
+    const formatTooltip = (args, points) => this.formatTooltip(args, points);
     const getChartExtremes = (chartObject) => this.highstockHelper.getAnalyzerChartExtremes(chartObject);
     const xAxisFormatter = (chart, freq) => this.highstockHelper.xAxisLabelFormatter(chart, freq);
     const setInputDateFormat = freq => this.highstockHelper.inputDateFormatter(freq);
@@ -217,13 +280,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       alignTicks: false,
       className: 'analyzer-chart',
       description: undefined,
-      animation: false,
       events: {
         render() {
+          console.log('RENDER')
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
-          this._selectedMin = highestFreq === 'A' ? userMin.substr(0, 4) + '-01-01' : userMin;
-          this._selectedMax = highestFreq.frequency === 'A' ? userMax.substr(0, 4) + '-01-01' : userMax;
+          this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
+          this._selectedMax = highestFreq.frequency === 'A' ? `${userMax.substr(0, 4)}-01-01` : userMax;
           this._hasSetExtremes = true;
           this._extremes = getChartExtremes(this);
           if (this._extremes) {
@@ -250,8 +313,31 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     };
     this.chartOptions.legend = {
       enabled: true,
+      useHTML: true,
       labelFormatter() {
-        return this.yAxis.userOptions.opposite ? `${this.name} (right)` : `${this.name} (left)`;
+        return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
+        <span class="material-icons settings-icon">
+        settings
+        </span>
+        <ul class="dropdown-menu px-2">
+        <p class="change-y-axis-side">
+          Y-Axis:
+        </p>
+        <p class="change-chart-type">
+          Chart Type:
+        </p>
+        <p class="remove-from-comparison">
+          <i class="material-icons analyze-chart">assessment</i> Remove From Comparison
+        </p>
+        <p class="add-to-comparison">
+          <i class="material-icons analyze-chart">add_chart</i> Add To Comparison
+        </p>
+        <p class="remove-from-analyzer text-danger">
+          <i class="material-icons analyze-button">&#xE872;</i>
+          Remove From Analyzer
+        </p>
+        </ul>
+      </div> ${this.name} ${this.userOptions.opposite ? '(right)' : '(left)'}`
       }
     };
     // incorrect indexing when using range selector
@@ -340,7 +426,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       shared: true,
       followPointer: true,
       formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
+        return formatTooltip(args, this.points);
       }
     };
     this.chartOptions.credits = {
@@ -413,7 +499,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     return range[freq] || 1000 * 3600 * 24;
   }
 
-  formatTooltip(args, points, x, name: boolean, units: boolean, geo: boolean) {
+  formatTooltip(args, points) {
     // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
@@ -430,26 +516,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
       return formattedValue;
     };
-    const formatSeriesLabel = (sName, sUnits, sGeo, point, seriesValue: number, date: string, pointX, str: string) => {
+    const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
       const seriesColor = getSeriesColor(point.colorIndex);
-      const displayName = sName ? point.userOptions.tooltipName : '';
+      const displayName = `${point.userOptions.tooltipName} (${point.userOptions.geography})`;
       const value = formatObsValue(seriesValue, point.userOptions.decimals);
-      const unitsLabel = sUnits ? this.indexChecked ? `(Index)` : ` (${point.userOptions.unitsLabelShort}) `: '';
-      const geoLabel = sGeo ? `${point.userOptions.geography}` : '';
-      const label = `${displayName} ${date}: ${value} ${unitsLabel}`;
+      const label = `${displayName} ${date}: ${value}`;
       const pseudoZones = point.userOptions.pseudoZones;
       if (pseudoZones.length) {
         pseudoZones.forEach((zone) => {
-          if (pointX < zone.value) {
-            return str += `${seriesColor}Pseudo History ${label}${geoLabel}`;
-          }
-          if (pointX > zone.value) {
-            return str += `${seriesColor}${label}${geoLabel}`;
-          }
+          return str += pointX < zone.value ? `${seriesColor}Pseudo History ${label}` : `${seriesColor}${label}`;
         });
       }
       if (!pseudoZones.length) {
-        str += `${seriesColor}${label}${geoLabel}<br>`;
+        str += `${seriesColor}${label}<br>`;
       }
       return str;
     };
@@ -461,7 +540,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           return obs ? Highcharts.dateFormat('%Y', obs.x) === Highcharts.dateFormat('%Y', point.x) : false;
         });
         if (yearObs) {
-          label += formatSeriesLabel(name, units, geo, serie, yearObs.y, year, yearObs.x, '');
+          label += formatSeriesLabel(serie, yearObs.y, year, yearObs.x, '');
         }
       });
       // Return string of annual series with their values formatted for the tooltip
@@ -475,8 +554,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           return obs ? `${Highcharts.dateFormat('%Y', obs.x)} ${Highcharts.dateFormat('%b', obs.x)}` === date : false;
         });
         if (obsDate) {
-          const qDate = `${pointQuarter} ${Highcharts.dateFormat('%Y', obsDate.x)}`;
-          label += formatSeriesLabel(name, units, geo, serie, obsDate.y, qDate, obsDate.x, '');
+          const qDate = `${Highcharts.dateFormat('%Y', obsDate.x)} ${pointQuarter} `;
+          label += formatSeriesLabel(serie, obsDate.y, qDate, obsDate.x, '');
         }
       });
       // Return string of quarterly series with their values formatted for the tooltip
@@ -500,40 +579,28 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       }
       if (quarterSeries && monthSeries) {
         const pointMonth = Highcharts.dateFormat('%b', point.x);
-        if (pointMonth !== 'Jan' && pointMonth !== 'Apr' && pointMonth !== 'Jul' && pointMonth !== 'Oct') {
+        const qMonths = ['Jan', 'Apr', 'Jul', 'Oct'];
+        if (!qMonths.some(m => m === pointMonth)) {
           const quarters = { Q1: 'Jan', Q2: 'Apr', Q3: 'Jul', Q4: 'Oct' };
-          const months = { Feb: 'Q1', Mar: 'Q1', May: 'Q2', Jun: 'Q2', Aug: 'Q3', Sep: 'Q3', Nov: 'Q4', Dec: 'Q4' };
+          const months = {
+            Q1: ['Feb', 'Mar'],
+            Q2: ['May', 'Jun'],
+            Q3: ['Aug', 'Sep'],
+            Q4: ['Nov', 'Dec']
+          };
           // Quarter that hovered point falls into
-          const pointQuarter = months[pointMonth];
+          const pointQuarter = Object.keys(months).find(key => months[key].some(m => m === pointMonth));
           // Month for which there is quarterly data
           const quarterMonth = quarters[pointQuarter];
-          const date = Highcharts.dateFormat('%Y', point.x) + ' ' + quarterMonth;
+          const date = `${Highcharts.dateFormat('%Y', point.x)} ${quarterMonth}`;
           // Add quarterly observations when monthly series are selected
           tooltip += getQuarterObs(quarterSeries, date, pointQuarter);
         }
       }
       const dateLabel = getFreqLabel(point.series.userOptions.frequency, point.x);
-      tooltip += formatSeriesLabel(name, units, geo, point.series, point.y, dateLabel, point.x, s);
+      tooltip += formatSeriesLabel(point.series, point.y, dateLabel, point.x, s);
     });
     return tooltip;
-  }
-
-  nameActive(e) {
-    this.nameChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'name' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
-  }
-
-  unitsActive(e) {
-    this.unitsChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'units' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
-  }
-
-  geoActive(e) {
-    this.geoChecked = e.target.checked;
-    this.tooltipOptions.emit({ value: e.target.checked, label: 'geo' });
-    this.updateTooltipOptions(this.nameChecked, this.unitsChecked, this.geoChecked);
   }
 
   filterDatesForNavigator(allDates: Array<any>) {
@@ -544,18 +611,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     });
   }
 
-  updateTooltipOptions(tooltipName: boolean, tooltipUnits: boolean, tooltipGeo: boolean) {
-    this.chartOptions.rangeSelector.selected = null;
-    const formatTooltip = (args, points, x, name, units, geo) => this.formatTooltip(args, points, x, name, units, geo);
-    this.chartOptions.tooltip = {
-      borderWidth: 0,
-      shadow: false,
-      shared: true,
-      followPointer: true,
-      formatter(args) {
-        return formatTooltip(args, this.points, this.x, tooltipName, tooltipUnits, tooltipGeo);
-      }
-    };
-    this.updateChart = true;
+  toggleMenu() {
+    $('.dropdown').dropdown('toggle');
   }
 }

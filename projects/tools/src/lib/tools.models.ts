@@ -140,6 +140,7 @@ export interface HighstockObject {
   };
   legend?: {
     enabled: boolean,
+    useHTML?: boolean,
     labelFormatter: () => string
   };
   navigator: {

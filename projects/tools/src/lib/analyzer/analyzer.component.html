@@ -4,23 +4,23 @@
     <ng-template ngFor let-data [ngForOf]="analyzerData | async">
       <div id="share-remove">
         <lib-share-link *ngIf="data.analyzerSeries.length" [analyzerSeries]="data.analyzerSeries" [view]="'analyzer'"
-          [index]="indexSeries" [name]="tooltipName" [units]="tooltipUnits" [geography]="tooltipGeo" [yoy]="tableYoy"
-          [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate" [endDate]="data.maxDate"
-          [yRightSeries]="data.yRightSeries" [displayCompare]="displayCompare"></lib-share-link>
-        <button type="button" class="btn btn-sm btn-outline-secondary rm-analyzer-series-btn"
+          [index]="indexSeries" [yoy]="tableYoy" [ytd]="tableYtd" [c5ma]="tableC5ma" [startDate]="data.minDate"
+          [endDate]="data.maxDate" [yRightSeries]="data.yRightSeries" [yLeftSeries]="data.yLeftSeries" [displayCompare]="displayCompare">
+        </lib-share-link>
+        <button type="button" class="btn btn-sm btn-outline-danger rm-analyzer-series-btn"
           (click)="removeAllAnalyzerSeries()">
           Remove All Series
         </button>
       </div>
       <div id="analyzer-customizations">
+        <button type="button" class="btn btn-sm btn-outline-primary compare-btn"
+          (click)="toggleAnalyzerDisplay()"><span class="analyzer-more material-icons">
+            {{displayCompare ? 'view_comfy' : 'assessment'}}
+          </span>{{displayCompare ? ' Gallery View' : ' Compare'}}
+        </button>
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
           (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">
         </lib-freq-selector>
-        <button type="button" class="btn btn-sm btn-outline-secondary compare-btn"
-          (click)="toggleAnalyzerDisplay()"><span class="analyzer-more material-icons">
-            {{displayCompare ? 'view_comfy' : 'assessment'}}
-          </span>{{displayCompare ? 'Grid' : 'Compare'}}
-        </button>
         <label *ngIf="data.requestComplete && data.displayFreqSelector" class="form-check-inline">
           <input type="checkbox" (change)="indexActive($event)"
             [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="indexSeries"
@@ -38,9 +38,8 @@
           [indexBaseYear]="data.baseYear">
         </lib-category-charts>
         <lib-analyzer-highstock *ngIf="displayCompare && data.analyzerSeries.length" [portalSettings]="portalSettings"
-          [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [nameChecked]="tooltipName"
-          [unitsChecked]="tooltipUnits" [geoChecked]="tooltipGeo" [indexChecked]="indexSeries"
-          (tooltipOptions)="checkTooltip($event)" (tableExtremes)="setTableDates($event)">
+          [series]="data.analyzerSeries" [start]="data.minDate" [end]="data.maxDate" [indexChecked]="indexSeries"
+          (tableExtremes)="setTableDates($event)">
         </lib-analyzer-highstock>
         <lib-analyzer-table *ngIf="data.analyzerSeries.length" [minDate]="data.minDate" [maxDate]="data.maxDate"
           [yoyChecked]="tableYoy" [ytdChecked]="tableYtd" [c5maChecked]="tableC5ma" [indexChecked]="indexSeries"
