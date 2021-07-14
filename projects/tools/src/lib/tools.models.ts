@@ -199,7 +199,9 @@ export interface HighstockObject {
     shadow: false,
     followPointer: boolean,
     shared?: boolean,
-    formatter: (args: any) => any
+    split?: boolean,
+    formatter?: (args: any) => any,
+    pointFormatter?: () => any,
   };
   credits: {
     enabled: boolean

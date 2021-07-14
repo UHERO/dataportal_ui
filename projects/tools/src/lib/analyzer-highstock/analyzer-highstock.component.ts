@@ -8,7 +8,6 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
-  ViewChild
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
@@ -72,23 +71,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
-      console.log('series sub', series)
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
-        console.log('A', a)
         if (a) {
           const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('span.material-icons');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          console.log('legendColor', legendItem.classList)
           settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
           settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
-          console.log('chartOptionSeries', chartOptionSeries)
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -106,8 +101,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           }
           addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(seriesId));
           removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
-          removeFromAnalyzerItem.addEventListener('click', function(e) {
-            e.stopPropagation()
+          removeFromAnalyzerItem.addEventListener('click', (e) => {
+            e.stopPropagation();
             analyzerService.removeFromAnalyzer(seriesId);
           });
         }
@@ -130,9 +125,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const buttons = this.formatChartButtons(this.portalSettings.highstock.buttons);
       const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeries).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
-    }
-    if (this.chartObject) {
-      //this.chartObject.redraw()
     }
   }
 
@@ -204,8 +196,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       visible: true,
     }];
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
-      console.log('CHART SERIES', chartSeries)
-      console.log('S.YAXIS', s.yAxis)
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
@@ -243,12 +233,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   }
 
   changeYAxisMin(e, axis) {
-    axis.min = +e.target.value || null;
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
     this.updateChart = true;
   }
 
   changeYAxisMax(e, axis) {
-    axis.max = +e.target.value || null;
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value || null
     this.updateChart = true;
   }
 
@@ -282,7 +272,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render() {
-          console.log('RENDER')
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
@@ -424,6 +413,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       borderWidth: 0,
       shadow: false,
       shared: true,
+      split: false,
       followPointer: true,
       formatter(args) {
         return formatTooltip(args, this.points);
@@ -490,31 +480,27 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   calculateMinRange = (freq: string) => {
     const range = {
-      'A': 1000 * 3600 * 24 * 30 * 12,
-      'S': 1000 * 3600 * 24 * 30 * 6,
-      'Q': 1000 * 3600 * 24 * 30 * 3,
-      'M': 1000 * 3600 * 24 * 30,
-      'W': 1000 * 3600 * 24 * 7,
+      A: 1000 * 3600 * 24 * 30 * 12,
+      S: 1000 * 3600 * 24 * 30 * 6,
+      Q: 1000 * 3600 * 24 * 30 * 3,
+      M: 1000 * 3600 * 24 * 30,
+      W: 1000 * 3600 * 24 * 7,
     }
     return range[freq] || 1000 * 3600 * 24;
   }
 
   formatTooltip(args, points) {
-    // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
-      // Get color of the line for a series
-      // Use color for tooltip label
-      const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
-      const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
-      return seriesColor;
+      // Get color of the line for a series & use for tooltip label
+      const lineColor = $(`.highcharts-markers.highcharts-color-${seriesIndex} path`).css('fill');
+      return '<span style="fill:' + lineColor + '">\u25CF</span> ';
     };
     const formatObsValue = (value: number, decimals: number) => {
       // Round observation to specified decimal place
       const displayValue = Highcharts.numberFormat(value, decimals, '.', ',');
-      const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-      return formattedValue;
+      return displayValue === '-0.00' ? '0.00' : displayValue;
     };
     const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
       const seriesColor = getSeriesColor(point.colorIndex);
@@ -609,9 +595,5 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       // also check if date range only contains a partial year
       return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
     });
-  }
-
-  toggleMenu() {
-    $('.dropdown').dropdown('toggle');
   }
 }
