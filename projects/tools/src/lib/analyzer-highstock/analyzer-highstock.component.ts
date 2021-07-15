@@ -8,6 +8,7 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
+  AfterViewInit
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
@@ -74,16 +75,20 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
-      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
         if (a) {
           const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
           const settingIcon = a.querySelector('span.material-icons');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
-          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
+          //settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
+          //settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
+          console.log(this.chartObject)
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
+          console.log('chart Options', this.chartOptions)
+          console.log('a', legendItem)
+          chartOptionSeries.visible ? settingIcon.classList.add(`highcharts-color-${index}`) : settingIcon.classList.add('highcharts-legend-item-hidden');
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -94,7 +99,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
           addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
-            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem)
+            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem);
           }
           if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
             this.createYAxisSideSelector(seriesId, chartOptionSeries, changeYAxisSideItem);
@@ -151,12 +156,12 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const yAxisSelect = document.createElement('select');
       yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
       series.yAxisSides.forEach((side: string) => {
-        const selectedSide = side === series.selectedYAxis;
+        const selectedSide = side === series.yAxis;
         yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
       });
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
-      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value))  
+      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value));
     }
   }
 
@@ -176,8 +181,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       tooltipName: '',
       frequency: null,
       geography: null,
-      yAxisSide: 'right',
-      yAxis: `null-right`,
+      yAxis: `right`,
       dataGrouping: {
         enabled: false
       },
@@ -195,6 +199,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
+    const leftAxisLabel = this.createYAxisLabel(chartSeries, 'left');
+    const rightAxisLabel = this.createYAxisLabel(chartSeries, 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
@@ -202,21 +208,20 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
             formatter() {
               return Highcharts.numberFormat(this.value, 2, '.', ',');
             },
-            align: s.yAxisSide === 'right' ? 'left' : 'right' 
+            align: s.yAxis === 'right' ? 'left' : 'right' 
           },
           id: `${s.yAxis}`,
           title: {
-            text: s.yAxisText
+            text: s.yAxis === 'right' ? rightAxisLabel : leftAxisLabel
           },
-          opposite: s.yAxisSide === 'left' ? false : true,
+          opposite: s.yAxis === 'left' ? false : true,
           minPadding: 0,
           maxPadding: 0,
           minTickInterval: 0.01,
           endOnTick: false,
           startOnTick: false,
           showEmpty: false,
-          yAxisSide: s.yAxisSide,
-          styleOrder: s.yAxisSide === 'left' ? 1 : 2,
+          styleOrder: s.yAxis === 'left' ? 1 : 2,
           showLastLabel: true,
           showFirstLabel: true,
           min: null,
@@ -231,6 +236,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       this.chartObject.redraw();
     }
   }
+
+  createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
 
   changeYAxisMin(e, axis) {
     this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
@@ -305,9 +312,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-        <span class="material-icons settings-icon">
-        settings
-        </span>
+        <mat-icon class="material-icons settings-icon" svgIcon="settings">
+        </mat-icon>
         <ul class="dropdown-menu px-2">
         <p class="change-y-axis-side">
           Y-Axis:
@@ -326,7 +332,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           Remove From Analyzer
         </p>
         </ul>
-      </div> ${this.name} ${this.userOptions.opposite ? '(right)' : '(left)'}`
+      </div> ${this.name} (${this.userOptions.yAxis})`
       }
     };
     // incorrect indexing when using range selector

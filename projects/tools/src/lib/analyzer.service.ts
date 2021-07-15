@@ -61,18 +61,15 @@ export class AnalyzerService {
     if (currentCompare.length && indexed) {
       this.updateCompareSeriesDataAndAxes(currentCompare);
     }
-    console.log('ASSIGN Y AXIS SIDE', this.assignYAxisSide(series))
-    const yAxisSide = this.assignYAxisSide(series)//!units.length || units.some(unit => unit === series.unitsLabelShort) ? 'left' : 'right';
-    console.log(yAxisSide)
+    const yAxisSide = this.assignYAxisSide(series);
     currentCompare.push({
       className: series.id,
       name: indexed ? series.indexDisplayName : series.displayName,
       tooltipName: series.title,
       data: indexed ? this.getChartIndexedValues(series.chartData.level, baseYear) : series.chartData.level,
       levelData: series.chartData.level,
-      yAxis: indexed ? `Index (${baseYear})-${yAxisSide}` : `${series.unitsLabelShort}-${yAxisSide}`,
+      yAxis: yAxisSide,
       yAxisText: indexed ? `Index (${baseYear})` : `${series.unitsLabelShort}`,
-      yAxisSide: yAxisSide,
       type: series.selectedChartType,
       decimals: series.decimals,
       frequency: series.frequencyShort,
@@ -105,9 +102,7 @@ export class AnalyzerService {
         'left',
         'right'
       ],
-      selectedYAxis: yAxisSide
     });
-    console.log('currentCompare', currentCompare)
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
 
@@ -160,9 +155,7 @@ export class AnalyzerService {
     if (axis === 'left' && !leftSeriesMatch) {
       this.analyzerData.yLeftSeries.push(seriesId);
     }
-    currentCompareSeries.yAxisSide = axis;
-    currentCompareSeries.selectedYAxis = axis;
-    currentCompareSeries.yAxis = indexed ? `Index (${baseYear})-${axis}` : `${currentCompareSeries.unitsLabelShort}-${axis}`;
+    currentCompareSeries.yAxis = axis;
     currentCompareSeries.yAxisText = indexed ? `Index (${baseYear})` : `${currentCompareSeries.seriesInfo.unitsLabelShort}`;
     this.analyzerSeriesCompareSource.next(currentCompare);
   }
@@ -208,7 +201,7 @@ export class AnalyzerService {
     const { indexed, baseYear } = this.analyzerData;
     series.forEach((s) => {
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
-      s.yAxis = indexed ? `Index (${baseYear})-${s.selectedYAxis}` : `${s.unitsLabelShort}-${s.selectedYAxis}`;
+      //s.yAxis = s.yAxis//indexed ? `Index (${baseYear})-${s.selectedYAxis}` : `${s.unitsLabelShort}-${s.selectedYAxis}`;
       s.yAxisText = indexed ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
     });
   }
@@ -378,11 +371,12 @@ export class AnalyzerService {
       compare.yAxisSide = match.selectedYAxis;
     }); */
     //this.analyzerSeriesCompareSource.next(currentCompare);
+    const { yLeftSeries, yRightSeries } = this.analyzerData;
     console.log('this.analyzerData.yRightSeries', this.analyzerData.yRightSeries)
-    if (this.analyzerData.yLeftSeries.length && this.analyzerData.yLeftSeries.some(id => id === series.id)) {
+    if (yLeftSeries.length && yLeftSeries.some(id => id === series.id)) {
       return 'left';
     }
-    if (this.analyzerData.yRightSeries.length && this.analyzerData.yRightSeries.some(id => id === series.id)) {
+    if (yRightSeries.length && yRightSeries.some(id => id === series.id)) {
       return 'right';
     }
     const currentCompare = this.analyzerSeriesCompareSource.value;
