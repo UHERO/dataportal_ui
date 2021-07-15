@@ -8,7 +8,6 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
-  AfterViewInit
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
@@ -77,18 +76,13 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
       [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
         if (a) {
-          const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
-          const settingIcon = a.querySelector('span.material-icons');
+          const settingIcon = a.querySelector('svg.bi-gear-fill');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          //settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
-          //settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
-          console.log(this.chartObject)
+          settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+          settingIcon.setAttribute('viewBox', '0 0 16 16')
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
-          console.log('chart Options', this.chartOptions)
-          console.log('a', legendItem)
-          chartOptionSeries.visible ? settingIcon.classList.add(`highcharts-color-${index}`) : settingIcon.classList.add('highcharts-legend-item-hidden');
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -140,11 +134,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
     if (series) {
       const chartTypeSelect = document.createElement('select');
-      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
-      series.chartType.forEach((type: string) => {
-        const selectedType = type === series.selectedChartType;
-        chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
-      });
+      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);
+      chartTypeSelect.classList.add('form-select'); 
+      this.addSelectorOptions(chartTypeSelect, series.chartType, series.selectedChartType)
       chartTypeMenuItem.appendChild(chartTypeSelect);
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));  
@@ -155,14 +147,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (series) {
       const yAxisSelect = document.createElement('select');
       yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
-      series.yAxisSides.forEach((side: string) => {
-        const selectedSide = side === series.yAxis;
-        yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
-      });
+      yAxisSelect.classList.add('form-select');
+      this.addSelectorOptions(yAxisSelect, series.yAxisSides, series.yAxis);
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
       yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value));
     }
+  }
+
+  addSelectorOptions(selector: any, options: Array<any>, selected: string) {
+    options.forEach((opt: string) => {
+      const selectedOpt = opt === selected;
+      selector.add(new Option(opt, opt, selectedOpt, selectedOpt), undefined);
+    });
   }
 
   setYMinMax() {
@@ -225,7 +222,8 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           showLastLabel: true,
           showFirstLabel: true,
           min: null,
-          max: null
+          max: null,
+          visible: chartSeries.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
         });
       }
       return axes;
@@ -312,25 +310,26 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-        <mat-icon class="material-icons settings-icon" svgIcon="settings">
-        </mat-icon>
+        <svg width="16" height="16" class="bi bi-gear-fill">
+          <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.` +
+          `987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.` +
+          `105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.` +
+          `81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .8` +
+          `72-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.` +
+          `987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+        </svg>
         <ul class="dropdown-menu px-2">
-        <p class="change-y-axis-side">
-          Y-Axis:
-        </p>
-        <p class="change-chart-type">
-          Chart Type:
-        </p>
-        <p class="remove-from-comparison">
-          <i class="material-icons analyze-chart">assessment</i> Remove From Comparison
-        </p>
-        <p class="add-to-comparison">
-          <i class="material-icons analyze-chart">add_chart</i> Add To Comparison
-        </p>
-        <p class="remove-from-analyzer text-danger">
-          <i class="material-icons analyze-button">&#xE872;</i>
-          Remove From Analyzer
-        </p>
+          <p class="change-y-axis-side">Y-Axis: </p>
+          <p class="change-chart-type">Chart Type: </p>
+          <p class="remove-from-comparison">
+          <i class="bi bi-bar-chart-fill"></i> Remove From Comparison
+          </p>
+          <p class="add-to-comparison">
+            <i class="bi bi-bar-chart"></i> Add To Comparison
+          </p>
+          <p class="remove-from-analyzer text-danger">
+            <i class="bi bi-trash-fill"></i> Remove From Analyzer
+          </p>
         </ul>
       </div> ${this.name} (${this.userOptions.yAxis})`
       }

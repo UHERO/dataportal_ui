@@ -35,6 +35,7 @@ import { MeasurementLandingPageComponent } from './measurement-landing-page/meas
 import { MeasurementSelectorComponent } from './measurement-selector/measurement-selector.component';
 import { EmbedGraphComponent } from './embed-graph/embed-graph.component';
 import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/analyzer-compare-options.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/anal
     PanelMenuModule,
     CalendarModule,
     HighchartsChartModule,
+    MatIconModule,
     AgGridModule.withComponents([
       CategoryTableRenderComponent,
       AnalyzerTableRendererComponent,
@@ -107,7 +109,8 @@ import { AnalyzerCompareOptionsComponent } from './analyzer-compare-options/anal
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
-    AnalyzerCompareOptionsComponent
+    AnalyzerCompareOptionsComponent,
+    MatIconModule
   ]
 })
 export class ToolsModule { }
