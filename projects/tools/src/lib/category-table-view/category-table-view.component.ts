@@ -64,7 +64,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
       }
     };
     if (this.data) {
-      this.columnDefs = this.setTableColumns(this.dates, this.selectedFreq.freq, this.defaultRange, this.tableStart, this.tableEnd);
+      this.columnDefs = this.setTableColumns(this.dates, this.tableStart, this.tableEnd);
       this.data.forEach((series) => {
         if (series !== 'No data available' && this.dates) {
           series.display = this.helperService.toggleSeriesForSeasonalDisplay(series, this.showSeasonal, this.hasSeasonal);
@@ -98,7 +98,7 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     this.geoSub.unsubscribe();
   }
 
-  setTableColumns = (dates, freq, defaultRange, tableStart, tableEnd) => {
+  setTableColumns = (dates, tableStart, tableEnd) => {
     const columns: Array<any> = [];
     columns.push({
       field: 'series',
@@ -111,11 +111,11 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
         return params.value;
       }
     });
-    const { seriesStart, seriesEnd } = this.helperService.getSeriesStartAndEnd(dates, tableStart, tableEnd, freq, defaultRange);
-    const tableDates = dates.slice(seriesStart, seriesEnd + 1);
+    const tableDates = dates//.slice(seriesStart, seriesEnd + 1);
     // Reverse dates for right-to-left scrolling on tables
-    for (let i = tableDates.length - 1; i >= 0; i--) {
-      columns.push({ field: tableDates[i].date, headerName: tableDates[i].tableDate, width: 125, colId: i });
+    for (let i = dates.length - 1; i >= 0; i--) {
+      const hideColumn = dates[i].date < tableStart || dates[i].date > tableEnd
+      columns.push({ field: dates[i].date, headerName: dates[i].tableDate, width: 125, colId: i, hide: hideColumn });
     }
     return columns;
   }
@@ -166,8 +166,6 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
   }
 
   onExport = () => {
-    const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
-    const exportColumns = [];
     const parentName = `${(this.selectedCategory && this.selectedCategory.name)}: ` || '';
     const sublistName = `${(this.selectedDataList && this.selectedDataList.name)}` || '';
     const geoName = (this.selectedGeo && this.selectedGeo.name) || '';
@@ -175,11 +173,9 @@ export class CategoryTableViewComponent implements OnChanges, OnDestroy {
     const fileName = `${sublistName}_${geoName}-${freqLabel}`
     const catId = (this.selectedCategory && this.selectedCategory.id) || '';
     const dataListId = `&data_list_id=${(this.selectedDataList && this.selectedDataList.id)}` || '';
-    for (let i = allColumns.length - 1; i >= 0; i--) {
-      exportColumns.push(allColumns[i]);
-    }
+    const displayedColumns = this.gridApi.csvCreator.columnController.getAllDisplayedColumns()
     const params = {
-      columnKeys: exportColumns,
+      columnKeys: ['series'].concat(displayedColumns.flatMap(col => col.userProvidedColDef.field === 'series' ? [] : col).reverse()),
       suppressQuotes: false,
       fileName,
       customFooter: `\n\n ${parentName}${sublistName} Table \n ${geoName}-${freqLabel} \n ${this.portalSettings.catTable.portalLink + catId + dataListId}&view=table`

@@ -28,17 +28,17 @@
 				<lib-freq-selector [freqs]="data.frequencies" (selectedFreqChange)="redrawSeriesFreq($event, selectedGeo)"
 					class="selector">
 				</lib-freq-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
-					<i class="material-icons md-18">show_chart</i>
+				<a *ngIf="routeView === 'table'" (click)="switchView()" class="btn btn-sm switch-view">Chart View
+					<i class="bi bi-graph-up"></i>
 				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="btn btn-sm switch-view">Table
 					View
-					<i class="material-icons md-18">view_list</i>
+					<i class="bi bi-table"></i>
 				</a>
-				<label *ngIf="routeView === 'table'" class="form-check-inline">
+				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
 				</label>
-				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="form-check-inline">
+				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year-to-Date
 				</label>
 				<label *ngIf="data.hasSeasonal" class="form-check-inline">
@@ -58,11 +58,11 @@
 				[noSeries]="data.noData" [params]="queryParams" [showSeasonal]="queryParams.sa === 'true'"
 				[hasSeasonal]="data.hasSeasonal">
 			</lib-category-table-view>
-			<lib-category-charts *ngIf="routeView !== 'table'"
-				[portalSettings]="portalSettings" [routeStart]="routeStart" [routeEnd]="routeEnd" [data]="data.displaySeries"
-				[dates]="data.categoryDates" [dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq"
-				[noSeries]="data.noData" [showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal"
-				[analyzerView]="false" (updateURLFragment)="updateRoute()">
+			<lib-category-charts *ngIf="routeView !== 'table'" [portalSettings]="portalSettings" [routeStart]="routeStart"
+				[routeEnd]="routeEnd" [data]="data.displaySeries" [dates]="data.categoryDates"
+				[dateWrapper]="data.categoryDateWrapper" [freq]="selectedFreq?.freq" [noSeries]="data.noData"
+				[showSeasonal]="queryParams.sa === 'true'" [hasSeasonal]="data.hasSeasonal" [analyzerView]="false"
+				(updateURLFragment)="updateRoute()">
 			</lib-category-charts>
 		</ng-template>
 		<ng-template ngIf [ngIf]="data.requestComplete && data.noData">

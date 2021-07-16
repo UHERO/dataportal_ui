@@ -14,9 +14,8 @@
       </div>
       <div id="analyzer-customizations">
         <button type="button" class="btn btn-sm btn-outline-primary compare-btn"
-          (click)="toggleAnalyzerDisplay()"><span class="analyzer-more material-icons">
-            {{displayCompare ? 'view_comfy' : 'assessment'}}
-          </span>{{displayCompare ? ' Gallery View' : ' Compare'}}
+          (click)="toggleAnalyzerDisplay()">
+          <span><i class="bi" [class.bi-grid-3x3-gap-fill]="displayCompare" [class.bi-bar-chart-fill]="!displayCompare"></i>{{displayCompare ? ' Gallery View' : ' Compare'}}</span>
         </button>
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
           (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">

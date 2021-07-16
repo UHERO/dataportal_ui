@@ -42,19 +42,19 @@
     top: -25px;
     vertical-align: middle;
     left: 10px;
-    font-size: 1em;
+    font-size: 0.8em;
   }
 
   .add-analyze-button, .add-compare-button {
     text-shadow: 1px 2px 6px #E5E5E5, 0 0 0 #000, 1px 2px 6px #E5E5E5;
 
     &:hover::after {
-      color: #9E9E9E;
+      color: #505050;
       content: ' Add to Analyzer';
-      vertical-align: text-bottom;
-      font-weight: bold;
-      font-size: 0.8em;
       font-family: 'Lucida Sans', sans-serif;
+      font-size: 1em;
+      font-style: normal;
+      font-weight: bold;
       text-shadow: none;
     }
   }
@@ -69,11 +69,11 @@
     color: #505050;
 
     &:hover::after {
-      color: #9E9E9E;
+      color: #505050;
       content: ' Remove from Analyzer';
-      vertical-align: text-bottom;
       font-weight: bold;
-      font-size: 0.8em;
+      font-size: 1em;
+      font-style: normal;
       font-family: 'Lucida Sans', sans-serif;
       text-shadow: none;
     }

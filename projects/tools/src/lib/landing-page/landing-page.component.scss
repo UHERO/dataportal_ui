@@ -17,13 +17,13 @@
   .filters {
     display: inline-block;
     margin-bottom: 5px;
-    margin-right: 10px;
+    //margin-right: 10px;
+    //vertical-align: middle;
 
     .sliders {
       display: inline-block;
-      vertical-align: bottom;
-      margin-left: 10px;
-      margin-right: 10px;
+      //margin-left: 10px;
+      //margin-right: 10px;
 
       @media (max-width: 767px) {
         display: block;
