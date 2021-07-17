@@ -109,7 +109,7 @@ import { ForecastSelectorComponent } from './forecast-selector/forecast-selector
     AnalyzerTableRendererComponent,
     MeasurementLandingPageComponent,
     MeasurementSelectorComponent,
-    AnalyzerCompareOptionsComponent
+    AnalyzerCompareOptionsComponent,
   ]
 })
 export class ToolsModule { }

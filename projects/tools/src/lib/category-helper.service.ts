@@ -100,12 +100,13 @@ export class CategoryHelperService {
         let routeFreqExists;
         let routeFcExists;
         console.log('routeGeo', routeGeo)
-        const defaultFC = (dataList.defaults && dataList.defaults.fc) || this.categoryData[cacheId].forecasts[0];
+        const defaultFC = (dataList.defaults && dataList.defaults.fc) || (this.categoryData[cacheId].forecasts && this.categoryData[cacheId].forecasts[0]);
         if (routeGeo && routeFreq) {
           routeGeoExists = this.categoryData[cacheId].regions.find(region => region.handle === routeGeo);
           routeFreqExists = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === routeFreq);
         } 
         // !!!!!!!! don't forget to change//
+        console.log('routeFc', routeFc)
         if (routeFc) {
           routeFcExists = this.categoryData[cacheId].forecasts.find(fc => fc === routeFc);
         }
@@ -129,7 +130,7 @@ export class CategoryHelperService {
     this.apiService.fetchExpanded(subId, geo, freq, noCache, forecast).subscribe((expandedCategory) => {
       const currentFreq = this.categoryData[cacheId].frequencies.find(frequency => frequency.freq === freq);
       const currentGeo = this.categoryData[cacheId].regions.find(region => region.handle === geo);
-      const currentFc = this.categoryData[cacheId].forecasts.find(fc => fc === forecast);
+      const currentFc = this.categoryData[cacheId].forecasts?.find(fc => fc === forecast);
       this.helperService.updateCurrentFrequency(currentFreq);
       this.helperService.updateCurrentGeography(currentGeo);
       console.log('CURRENTFC', currentFc)

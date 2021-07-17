@@ -8,7 +8,6 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
-  ViewChild
 } from '@angular/core';
 import { AnalyzerService } from '../analyzer.service';
 import { HighstockObject } from '../tools.models';
@@ -72,23 +71,18 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     this.analyzerData = this.analyzerService.analyzerData;
     this.compareSeriesSub = this.analyzerService.analyzerSeriesCompare.subscribe((series) => {
       this.compareSeries = series;
-      console.log('series sub', series)
       this.updateChartData(series);
     });
     Highcharts.addEvent(Highcharts.Chart, 'render', e => {
-      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a) => {
-        console.log('A', a)
+      [...e.target.renderTo.querySelectorAll('div.dropdown')].forEach((a, index) => {
         if (a) {
-          const legendItem = a.parentNode.parentNode as HTMLElement;
           const seriesId = +a.id.split('-')[1];
-          const settingIcon = a.querySelector('span.material-icons');
+          const settingIcon = a.querySelector('svg.bi-gear-fill');
           settingIcon.setAttribute('data-bs-toggle', 'dropdown');
           settingIcon.setAttribute('data-bs-boundary', 'viewport');
-          console.log('legendColor', legendItem.classList)
-          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-color-'))[0]);
-          settingIcon.classList.add(Array.from(legendItem.classList).filter(c => c.includes('highcharts-legend-item-hidden'))[0]);
+          settingIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+          settingIcon.setAttribute('viewBox', '0 0 16 16')
           const chartOptionSeries = this.chartOptions.series.find(s => s.className === seriesId);
-          console.log('chartOptionSeries', chartOptionSeries)
           const addToComparisonChartItem = a.querySelector('.add-to-comparison');
           const removeFromComparisonChartItem = a.querySelector('.remove-from-comparison');
           const changeChartTypeItem = a.querySelector('.change-chart-type');
@@ -99,15 +93,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
           removeFromComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'block' : 'none';
           addToComparisonChartItem.style.display = chartOptionSeries && chartOptionSeries.visible ? 'none' : 'block';
           if (!a.querySelector(`#chart-type-${seriesId}`)) {
-            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem)
+            this.createChartTypeSelector(seriesId, chartOptionSeries, changeChartTypeItem);
           }
           if (!a.querySelector(`#y-axis-side-${seriesId}`)) {
             this.createYAxisSideSelector(seriesId, chartOptionSeries, changeYAxisSideItem);
           }
           addToComparisonChartItem.addEventListener('click', () => analyzerService.makeCompareSeriesVisible(seriesId));
           removeFromComparisonChartItem.addEventListener('click', () => analyzerService.removeFromComparisonChart(seriesId));
-          removeFromAnalyzerItem.addEventListener('click', function(e) {
-            e.stopPropagation()
+          removeFromAnalyzerItem.addEventListener('click', (e) => {
+            e.stopPropagation();
             analyzerService.removeFromAnalyzer(seriesId);
           });
         }
@@ -131,9 +125,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       const highestFrequency = this.analyzerService.getHighestFrequency(this.compareSeries).freq;
       this.initChart(this.portalSettings, buttons, highestFrequency);
     }
-    if (this.chartObject) {
-      //this.chartObject.redraw()
-    }
   }
 
   ngOnDestroy() {
@@ -143,11 +134,9 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
   createChartTypeSelector(seriesId: number, series: any, chartTypeMenuItem: HTMLElement) {
     if (series) {
       const chartTypeSelect = document.createElement('select');
-      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);  
-      series.chartType.forEach((type: string) => {
-        const selectedType = type === series.selectedChartType;
-        chartTypeSelect.add(new Option(type, type, selectedType, selectedType), undefined);
-      });
+      chartTypeSelect.setAttribute('id', `chart-type-${seriesId}`);
+      chartTypeSelect.classList.add('form-select'); 
+      this.addSelectorOptions(chartTypeSelect, series.chartType, series.selectedChartType)
       chartTypeMenuItem.appendChild(chartTypeSelect);
       chartTypeSelect.addEventListener('mousedown', e => e.stopPropagation());
       chartTypeSelect.addEventListener('change', e => this.analyzerService.updateCompareChartType(seriesId, (e.target as HTMLSelectElement).value));  
@@ -158,14 +147,19 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     if (series) {
       const yAxisSelect = document.createElement('select');
       yAxisSelect.setAttribute('id', `y-axis-side-${seriesId}`);
-      series.yAxisSides.forEach((side: string) => {
-        const selectedSide = side === series.selectedYAxis;
-        yAxisSelect.add(new Option(side, side, selectedSide, selectedSide), undefined);
-      });
+      yAxisSelect.classList.add('form-select');
+      this.addSelectorOptions(yAxisSelect, series.yAxisSides, series.yAxis);
       yAxisSideMenuItem.appendChild(yAxisSelect);
       yAxisSelect.addEventListener('mousedown', e => e.stopPropagation());
-      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value))  
+      yAxisSelect.addEventListener('change', e => this.analyzerService.updateCompareSeriesAxis(seriesId, (e.target as HTMLSelectElement).value));
     }
+  }
+
+  addSelectorOptions(selector: any, options: Array<any>, selected: string) {
+    options.forEach((opt: string) => {
+      const selectedOpt = opt === selected;
+      selector.add(new Option(opt, opt, selectedOpt, selectedOpt), undefined);
+    });
   }
 
   setYMinMax() {
@@ -184,8 +178,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       tooltipName: '',
       frequency: null,
       geography: null,
-      yAxisSide: 'right',
-      yAxis: `null-right`,
+      yAxis: `right`,
       dataGrouping: {
         enabled: false
       },
@@ -203,34 +196,34 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       pseudoZones: null,
       visible: true,
     }];
+    const leftAxisLabel = this.createYAxisLabel(chartSeries, 'left');
+    const rightAxisLabel = this.createYAxisLabel(chartSeries, 'right');
     this.chartOptions.yAxis = chartSeries.reduce((axes, s) => {
-      console.log('CHART SERIES', chartSeries)
-      console.log('S.YAXIS', s.yAxis)
       if (axes.findIndex(a => a.id === `${s.yAxis}`) === -1) {
         axes.push({
           labels: {
             formatter() {
               return Highcharts.numberFormat(this.value, 2, '.', ',');
             },
-            align: s.yAxisSide === 'right' ? 'left' : 'right' 
+            align: s.yAxis === 'right' ? 'left' : 'right' 
           },
           id: `${s.yAxis}`,
           title: {
-            text: s.yAxisText
+            text: s.yAxis === 'right' ? rightAxisLabel : leftAxisLabel
           },
-          opposite: s.yAxisSide === 'left' ? false : true,
+          opposite: s.yAxis === 'left' ? false : true,
           minPadding: 0,
           maxPadding: 0,
           minTickInterval: 0.01,
           endOnTick: false,
           startOnTick: false,
           showEmpty: false,
-          yAxisSide: s.yAxisSide,
-          styleOrder: s.yAxisSide === 'left' ? 1 : 2,
+          styleOrder: s.yAxis === 'left' ? 1 : 2,
           showLastLabel: true,
           showFirstLabel: true,
           min: null,
-          max: null
+          max: null,
+          visible: chartSeries.filter(series => series.yAxis === s.yAxis && series.className !== 'navigator').some(series => series.visible)
         });
       }
       return axes;
@@ -242,13 +235,15 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
     }
   }
 
+  createYAxisLabel = (chartSeries: Array<any>, axis: string) => [...new Set(chartSeries.filter(s => s.yAxis === axis && s.className !== 'navigator').map(s => s.yAxisText))].join(', ');
+
   changeYAxisMin(e, axis) {
-    axis.min = +e.target.value || null;
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).min = +e.target.value || null
     this.updateChart = true;
   }
 
   changeYAxisMax(e, axis) {
-    axis.max = +e.target.value || null;
+    this.chartOptions.yAxis.find(a => a.id === axis.userOptions.id).max = +e.target.value || null
     this.updateChart = true;
   }
 
@@ -282,7 +277,6 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       description: undefined,
       events: {
         render() {
-          console.log('RENDER')
           const userMin = new Date(this.xAxis[0].getExtremes().min).toISOString().split('T')[0];
           const userMax = new Date(this.xAxis[0].getExtremes().max).toISOString().split('T')[0];
           this._selectedMin = highestFreq === 'A' ? `${userMin.substr(0, 4)}-01-01` : userMin;
@@ -316,28 +310,28 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       useHTML: true,
       labelFormatter() {
         return `<div class="btn-group dropdown" id="series-${this.userOptions.className}">
-        <span class="material-icons settings-icon">
-        settings
-        </span>
+        <svg width="16" height="16" class="bi bi-gear-fill">
+          <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.` +
+          `987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.` +
+          `105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.` +
+          `81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .8` +
+          `72-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.` +
+          `987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+        </svg>
         <ul class="dropdown-menu px-2">
-        <p class="change-y-axis-side">
-          Y-Axis:
-        </p>
-        <p class="change-chart-type">
-          Chart Type:
-        </p>
-        <p class="remove-from-comparison">
-          <i class="material-icons analyze-chart">assessment</i> Remove From Comparison
-        </p>
-        <p class="add-to-comparison">
-          <i class="material-icons analyze-chart">add_chart</i> Add To Comparison
-        </p>
-        <p class="remove-from-analyzer text-danger">
-          <i class="material-icons analyze-button">&#xE872;</i>
-          Remove From Analyzer
-        </p>
+          <p class="change-y-axis-side">Y-Axis: </p>
+          <p class="change-chart-type">Chart Type: </p>
+          <p class="remove-from-comparison">
+          <i class="bi bi-bar-chart-fill"></i> Remove From Comparison
+          </p>
+          <p class="add-to-comparison">
+            <i class="bi bi-bar-chart"></i> Add To Comparison
+          </p>
+          <p class="remove-from-analyzer text-danger">
+            <i class="bi bi-trash-fill"></i> Remove From Analyzer
+          </p>
         </ul>
-      </div> ${this.name} ${this.userOptions.opposite ? '(right)' : '(left)'}`
+      </div> ${this.name} (${this.userOptions.yAxis})`
       }
     };
     // incorrect indexing when using range selector
@@ -424,6 +418,7 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       borderWidth: 0,
       shadow: false,
       shared: true,
+      split: false,
       followPointer: true,
       formatter(args) {
         return formatTooltip(args, this.points);
@@ -490,31 +485,27 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
 
   calculateMinRange = (freq: string) => {
     const range = {
-      'A': 1000 * 3600 * 24 * 30 * 12,
-      'S': 1000 * 3600 * 24 * 30 * 6,
-      'Q': 1000 * 3600 * 24 * 30 * 3,
-      'M': 1000 * 3600 * 24 * 30,
-      'W': 1000 * 3600 * 24 * 7,
+      A: 1000 * 3600 * 24 * 30 * 12,
+      S: 1000 * 3600 * 24 * 30 * 6,
+      Q: 1000 * 3600 * 24 * 30 * 3,
+      M: 1000 * 3600 * 24 * 30,
+      W: 1000 * 3600 * 24 * 7,
     }
     return range[freq] || 1000 * 3600 * 24;
   }
 
   formatTooltip(args, points) {
-    // Name, units, and geo evaluate as true when their respective tooltip options are checked in the analyzer
     const getFreqLabel = (frequency, date) => this.highstockHelper.getTooltipFreqLabel(frequency, date);
     const filterFrequency = (cSeries: Array<any>, freq: string) => cSeries.filter(series => series.userOptions.frequency === freq && series.name !== 'Navigator 1');
     const getSeriesColor = (seriesIndex: number) => {
-      // Get color of the line for a series
-      // Use color for tooltip label
-      const lineColor = $('.highcharts-markers.highcharts-color-' + seriesIndex + ' path').css('fill');
-      const seriesColor = '<span style="fill:' + lineColor + '">\u25CF</span> ';
-      return seriesColor;
+      // Get color of the line for a series & use for tooltip label
+      const lineColor = $(`.highcharts-markers.highcharts-color-${seriesIndex} path`).css('fill');
+      return '<span style="fill:' + lineColor + '">\u25CF</span> ';
     };
     const formatObsValue = (value: number, decimals: number) => {
       // Round observation to specified decimal place
       const displayValue = Highcharts.numberFormat(value, decimals, '.', ',');
-      const formattedValue = displayValue === '-0.00' ? '0.00' : displayValue;
-      return formattedValue;
+      return displayValue === '-0.00' ? '0.00' : displayValue;
     };
     const formatSeriesLabel = (point, seriesValue: number, date: string, pointX, str: string) => {
       const seriesColor = getSeriesColor(point.colorIndex);
@@ -609,9 +600,5 @@ export class AnalyzerHighstockComponent implements OnChanges, OnDestroy {
       // also check if date range only contains a partial year
       return i > 0 ? a.indexOf(d) === i && d > a[i - 1] : a.indexOf(d) === i;
     });
-  }
-
-  toggleMenu() {
-    $('.dropdown').dropdown('toggle');
   }
 }

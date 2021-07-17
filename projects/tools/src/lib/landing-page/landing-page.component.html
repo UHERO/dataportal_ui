@@ -31,17 +31,17 @@
 				<lib-forecast-selector *ngIf="portalSettings.selectors.includes('forecast')" [forecasts]="data.forecasts" (selectedFcChange)="redrawSeriesFc($event, selectedGeo, selectedFreq)"
 					class="selector">
 				</lib-forecast-selector>
-				<a *ngIf="routeView === 'table'" (click)="switchView()" class="switch-view">Chart View
-					<i class="material-icons md-18">show_chart</i>
+				<a *ngIf="routeView === 'table'" (click)="switchView()" class="btn btn-sm switch-view">Chart View
+					<i class="bi bi-graph-up"></i>
 				</a>
-				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="switch-view">Table
+				<a *ngIf="routeView === 'chart' || !routeView" (click)="switchView()" class="btn btn-sm switch-view">Table
 					View
-					<i class="material-icons md-18">view_list</i>
+					<i class="bi bi-table"></i>
 				</a>
-				<label *ngIf="routeView === 'table'" class="form-check-inline">
+				<label *ngIf="routeView === 'table'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.yoy === 'true'" (change)="yoyActive($event)">Year/Year
 				</label>
-				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="form-check-inline">
+				<label *ngIf="routeView === 'table' && selectedFreq?.freq !== 'A'" class="me-2 form-check-inline">
 					<input type="checkbox" [checked]="queryParams.ytd === 'true'" (change)="ytdActive($event)">Year-to-Date
 				</label>
 				<label *ngIf="data.hasSeasonal" class="form-check-inline">

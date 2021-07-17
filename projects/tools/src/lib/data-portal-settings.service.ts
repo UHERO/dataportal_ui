@@ -49,7 +49,8 @@ export class DataPortalSettingsService {
         c5ma: true
       },
       sliderInteraction: false,
-      otherDashboardLinks: []
+      otherDashboardLinks: [],
+      selectors: []
     },
     uhero: {
       catTable: {
@@ -103,7 +104,8 @@ export class DataPortalSettingsService {
           name: `UHERO Dashboard Project`,
           url: `https://uhero.hawaii.edu/analytics-dashboards/`
         }
-      ]
+      ],
+      selectors: []
     },
     fc: {
       catTable: {
@@ -211,7 +213,8 @@ export class DataPortalSettingsService {
         c5ma: false
       },
       sliderInteraction: true,
-      otherDashboardLinks: []
+      otherDashboardLinks: [],
+      selectors: []
     },
     coh: {
       catTable: {
@@ -260,7 +263,8 @@ export class DataPortalSettingsService {
         c5ma: false
       },
       sliderInteraction: true,
-      otherDashboardLinks: []
+      otherDashboardLinks: [],
+      selectors: []
     }
   };
 }

@@ -210,15 +210,11 @@ export class AnalyzerTableComponent implements OnInit, OnChanges {
   }
 
   onExport = () => {
-    const allColumns = this.gridApi.csvCreator.columnController.allDisplayedColumns;
-    const exportColumns = [];
-    for (let i = allColumns.length - 2; i >= 0; i--) {
-      exportColumns.push(allColumns[i]);
-    }
+    const { columnDefs } = this.gridApi.csvCreator.columnController;
     const params = {
-      columnKeys: exportColumns,
+      columnKeys: ['series'].concat(columnDefs.flatMap(col => col.field === 'series' ? [] : col.field).reverse()),
       fileName: 'analyzer',
-      customHeader: this.portalSettings.catTable.portalSource + '\n\n'
+      customHeader: `${this.portalSettings.catTable.portalSource} \n\n`
     };
     this.gridApi.exportDataAsCsv(params);
   }

@@ -89,7 +89,7 @@ export class PrimengMenuNavComponent implements OnInit, OnDestroy {
 
   addMenuItem = (navMenuItems: Array<any>, category: any) => {
     const menuItem = {
-      id: '' + category.id,
+      id: `${category.id}`,
       label: category.name,
       icon: 'pi pi-pw',
       ...(category.children && { items: this.createSubmenuItems(category.children, category.id) }),

@@ -97,6 +97,14 @@ input.highcharts-range-selector {
   font-size: 0.5em;
 }
 
+.highcharts-legend-item .dropdown svg {
+  cursor: pointer;
+}
+
+.highcharts-legend-item .dropdown-menu {
+  background-color: #FAFAFB;
+}
+
 #single-stock-chart {
   .highcharts-color-2 {
     fill: transparent;
