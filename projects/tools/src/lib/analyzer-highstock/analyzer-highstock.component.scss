@@ -101,6 +101,10 @@ input.highcharts-range-selector {
   cursor: pointer;
 }
 
+.highcharts-legend-item .dropdown-menu {
+  background-color: #FAFAFB;
+}
+
 #single-stock-chart {
   .highcharts-color-2 {
     fill: transparent;

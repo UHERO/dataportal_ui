@@ -65,7 +65,6 @@ export class AnalyzerComponent implements OnInit, OnDestroy {
         this.yLeftSeries = params['yleft'];
         this.analyzerService.analyzerData.yLeftSeries = params['yleft']?.split('-').map(id => +id) || []
         this.analyzerService.analyzerData.yRightSeries = params['yright']?.split('-').map(id => +id) || []
-        console.log('params y right', params['yright'])
         this.noCache = this.evalParamAsTrue(params['nocache']);
       });
     }

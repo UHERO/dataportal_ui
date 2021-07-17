@@ -20,7 +20,7 @@
         <lib-freq-selector [freqs]="data.siblingFreqs" [analyzerView]="true"
           (selectedFreqChange)="changeAnalyzerFrequency($event.freq, data.analyzerSeries)" class="selector">
         </lib-freq-selector>
-        <label *ngIf="data.requestComplete && data.displayFreqSelector" class="form-check-inline">
+        <label *ngIf="data.requestComplete && data.displayFreqSelector" class="mx-2 form-check-inline">
           <input type="checkbox" (change)="indexActive($event)"
             [attr.title]="!data.displayFreqSelector ? 'Unavailable for mixed frequencies' : ''" [checked]="indexSeries"
             [disabled]="!data.displayFreqSelector">Index

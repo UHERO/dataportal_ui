@@ -138,22 +138,23 @@ export class AnalyzerService {
   updateCompareSeriesAxis(seriesId: any, axis: string) {
     const currentCompare = this.analyzerSeriesCompareSource.value;
     const currentCompareSeries = currentCompare.find(s => s.className === seriesId);
-    const rightSeriesMatch = this.analyzerData.yRightSeries.find(id => id === seriesId);
-    const leftSeriesMatch = this.analyzerData.yLeftSeries.find(id => id === seriesId);
+    const { yRightSeries, yLeftSeries } = this.analyzerData;
+    const rightSeriesMatch = yRightSeries.find(id => id === seriesId);
+    const leftSeriesMatch = yLeftSeries.find(id => id === seriesId);
     const { indexed, baseYear } = this.analyzerData;
     if (axis === 'right' && !rightSeriesMatch) {
-      this.analyzerData.yRightSeries.push(seriesId);
+      yRightSeries.push(seriesId);
     }
     if (axis === 'left' && rightSeriesMatch) {
-      const matchIndex = this.analyzerData.yRightSeries.findIndex(id => id === seriesId);
-      this.analyzerData.yRightSeries.splice(matchIndex, 1);
+      const matchIndex = yRightSeries.findIndex(id => id === seriesId);
+      yRightSeries.splice(matchIndex, 1);
     }
     if (axis === 'right' && leftSeriesMatch) {
-      const matchIndex = this.analyzerData.yLeftSeries.findIndex(id => id === seriesId);
-      this.analyzerData.yLeftSeries.splice(matchIndex, 1);
+      const matchIndex = yLeftSeries.findIndex(id => id === seriesId);
+      yLeftSeries.splice(matchIndex, 1);
     }
     if (axis === 'left' && !leftSeriesMatch) {
-      this.analyzerData.yLeftSeries.push(seriesId);
+      yLeftSeries.push(seriesId);
     }
     currentCompareSeries.yAxis = axis;
     currentCompareSeries.yAxisText = indexed ? `Index (${baseYear})` : `${currentCompareSeries.seriesInfo.unitsLabelShort}`;
@@ -201,7 +202,6 @@ export class AnalyzerService {
     const { indexed, baseYear } = this.analyzerData;
     series.forEach((s) => {
       s.data = indexed ? this.getChartIndexedValues(s.levelData, baseYear) : s.levelData;
-      //s.yAxis = s.yAxis//indexed ? `Index (${baseYear})-${s.selectedYAxis}` : `${s.unitsLabelShort}-${s.selectedYAxis}`;
       s.yAxisText = indexed ? `Index (${baseYear})` : `${s.unitsLabelShort}`;
     });
   }
@@ -216,7 +216,6 @@ export class AnalyzerService {
   removeFromAnalyzer(seriesID: number) {
     let currentValue = this.analyzerSeriesTrackerSource.value;
     const compareSeries = this.analyzerSeriesCompareSource.value.find(s => s.className === seriesID);
-    console.log('remove compareSeries', this.analyzerSeriesCompareSource.value.filter(s => s.className !== seriesID))
     if (compareSeries) {
       this.analyzerSeriesCompareSource.next(this.analyzerSeriesCompareSource.value.filter(s => s.className !== seriesID));
     }
@@ -237,8 +236,6 @@ export class AnalyzerService {
       this.analyzerData.analyzerDateWrapper = analyzerDateWrapper
       this.analyzerData.displayFreqSelector = this.singleFrequencyAnalyzer(series);
       this.analyzerData.siblingFreqs = this.getSiblingFrequencies(series);
-      console.log('RIGHT Y', rightY)
-      //this.analyzerData.yRightSeries = rightY ? rightY.split('-').map(s => +s) : [];
       series.forEach((s) => {
         s.observations = this.helperService.formatSeriesForCharts(s);
         s.gridDisplay = this.helperService.formatGridDisplay(s, 'lvl', 'pc1'); 
@@ -250,10 +247,8 @@ export class AnalyzerService {
   
       this.analyzerData.baseYear = this.getIndexBaseYear(seriesToCalcBaseYear, this.analyzerData.minDate);
       this.createAnalyzerTable(this.analyzerData.analyzerSeries);
-      //this.assignYAxisSide(this.analyzerData.yRightSeries)
       this.analyzerData.requestComplete = true;
     });
-    console.log('ANALYZER DATA', this.analyzerData)
     return observableForkJoin([observableOf(this.analyzerData)]);
   }
 
@@ -351,28 +346,8 @@ export class AnalyzerService {
     return series;
   }
 
-  assignYAxisSide(series/* rightY: Array<number> */) {
-    /* this.analyzerData.analyzerSeries.forEach((s) => {
-      if (rightY && rightY.includes(s.id)) {
-        s.selectedYAxis = 'right';
-      }
-    }); */
-    /* const currentCompare = this.analyzerSeriesCompareSource.value;
-    currentCompare.forEach((series) => {
-      if (rightY && rightY.includes(series.className)) {
-        series.selectedYAxis = 'right';
-        series.yAxis = `${series.unitsLabelShort}-${series.selectedYAxis}`;
-        series.yAxisSide = series.selectedYAxis;
-      }
-    }) */
-    /* currentCompare.forEach((compare) => {
-      const match = this.analyzerData.analyzerSeries.find(s => s.id === compare.className);
-      compare.yAxis = `${match.unitsLabelShort}-${match.selectedYAxis}`;
-      compare.yAxisSide = match.selectedYAxis;
-    }); */
-    //this.analyzerSeriesCompareSource.next(currentCompare);
+  assignYAxisSide(series: any) {
     const { yLeftSeries, yRightSeries } = this.analyzerData;
-    console.log('this.analyzerData.yRightSeries', this.analyzerData.yRightSeries)
     if (yLeftSeries.length && yLeftSeries.some(id => id === series.id)) {
       return 'left';
     }
